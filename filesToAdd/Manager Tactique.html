@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FootApp - Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .pitch {
+            background-color: #2f855a;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.2) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.2) 2px, transparent 2px),
+                linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+            background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+            position: relative;
+        }
+
+        .player-token {
+            transition: all 0.2s;
+            cursor: grab;
+        }
+
+        .player-token:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-gray-100 font-sans text-gray-800 min-h-screen max-w-md mx-auto relative shadow-2xl overflow-hidden flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white p-4 shadow-sm z-10 flex justify-between items-center">
+        <h1 class="font-bold text-lg">Composition U13</h1>
+        <button class="bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold shadow">Publier</button>
+    </header>
+
+    <!-- Pitch Area -->
+    <div class="flex-1 pitch relative overflow-hidden flex flex-col justify-center items-center">
+
+        <!-- Pitch Markings (Simplified) -->
+        <div class="absolute inset-4 border-2 border-white/50 rounded-lg"></div>
+        <div class="absolute top-1/2 left-4 right-4 h-px bg-white/50"></div>
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-2 border-white/50 rounded-full">
+        </div>
+
+        <!-- Draggable Players (Absolute positioning simulation for 4-3-3) -->
+
+        <!-- GK -->
+        <div class="player-token absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
+            <div
+                class="w-10 h-10 bg-yellow-400 rounded-full border-2 border-white shadow-lg flex items-center justify-center font-bold text-xs">
+                1</div>
+            <span class="bg-black/50 text-white text-[10px] px-1 rounded mt-1">Hugo</span>
+        </div>
+
+        <!-- DEF -->
+        <div class="player-token absolute bottom-24 left-16 flex flex-col items-center">
+            <div
+                class="w-10 h-10 bg-white text-gray-900 rounded-full border-2 border-gray-300 shadow-lg flex items-center justify-center font-bold text-xs">
+                3</div>
+            <span class="bg-black/50 text-white text-[10px] px-1 rounded mt-1">Lucas</span>
+        </div>
+        <div class="player-token absolute bottom-24 right-16 flex flex-col items-center">
+            <div
+                class="w-10 h-10 bg-white text-gray-900 rounded-full border-2 border-gray-300 shadow-lg flex items-center justify-center font-bold text-xs">
+                2</div>
+            <span class="bg-black/50 text-white text-[10px] px-1 rounded mt-1">Theo</span>
+        </div>
+
+        <!-- MID -->
+        <div
+            class="player-token absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+            <div
+                class="w-10 h-10 bg-white text-gray-900 rounded-full border-2 border-gray-300 shadow-lg flex items-center justify-center font-bold text-xs">
+                8</div>
+            <span class="bg-black/50 text-white text-[10px] px-1 rounded mt-1">Paul</span>
+        </div>
+
+        <!-- ATT -->
+        <div class="player-token absolute top-24 left-1/2 -translate-x-1/2 flex flex-col items-center">
+            <div
+                class="w-10 h-10 bg-white text-gray-900 rounded-full border-2 border-gray-300 shadow-lg flex items-center justify-center font-bold text-xs">
+                9</div>
+            <span class="bg-black/50 text-white text-[10px] px-1 rounded mt-1">Kylian</span>
+        </div>
+
+    </div>
+
+    <!-- Bench / Player List -->
+    <div class="bg-white h-48 border-t border-gray-200 z-10 flex flex-col">
+        <div class="p-2 border-b border-gray-100 flex gap-2 overflow-x-auto">
+            <button
+                class="px-3 py-1 bg-gray-100 rounded-full text-xs font-bold text-gray-600 whitespace-nowrap">Remplaçants</button>
+            <button
+                class="px-3 py-1 bg-white text-gray-400 rounded-full text-xs font-bold whitespace-nowrap">Absents</button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-2">
+            <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold">12
+                    </div>
+                    <span class="text-sm font-medium">Enzo Lebrun</span>
+                </div>
+                <i class="fa-solid fa-grip-vertical text-gray-300"></i>
+            </div>
+            <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold">14
+                    </div>
+                    <span class="text-sm font-medium">Maxime R.</span>
+                </div>
+                <i class="fa-solid fa-grip-vertical text-gray-300"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 flex justify-around py-3 pb-5 z-50">
+        <a href="feed.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-newspaper text-xl mb-1"></i>
+            <span class="text-[10px] font-medium">Actu</span>
+        </a>
+        <a href="app.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-calendar-days text-xl mb-1"></i>
+            <span class="text-[10px] font-medium">Planning</span>
+        </a>
+        <a href="tactics.html" class="flex flex-col items-center text-blue-600">
+            <i class="fa-solid fa-users-gear text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Gestion</span>
+        </a>
+        <a href="profile.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-user text-xl mb-1"></i>
+            <span class="text-[10px] font-medium">Profil</span>
+        </a>
+    </nav>
+
+</body>
+
+</html>

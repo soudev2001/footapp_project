@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Creer un post - FootApp{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto px-4 py-6">
+    <div class="flex items-center gap-4 mb-6">
+        <a href="/feed"
+            class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h1 class="text-xl font-bold">Nouvelle publication</h1>
+    </div>
+
+    <form method="POST" class="space-y-6">
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Titre</label>
+            <input type="text" name="title" required
+                class="w-full bg-gray-800/50 border border-gray-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-blue-500 transition"
+                placeholder="Titre de la publication">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Categorie</label>
+            <select name="category"
+                class="w-full bg-gray-800/50 border border-gray-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-blue-500 transition">
+                <option value="news">Actualite</option>
+                <option value="announcement">Annonce</option>
+                <option value="match_report">Compte-rendu match</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Contenu</label>
+            <textarea name="content" rows="6" required
+                class="w-full bg-gray-800/50 border border-gray-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-blue-500 transition resize-none"
+                placeholder="Ecrivez votre message..."></textarea>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Image (URL)</label>
+            <input type="url" name="image"
+                class="w-full bg-gray-800/50 border border-gray-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-blue-500 transition"
+                placeholder="https://...">
+        </div>
+
+        <button type="submit"
+            class="w-full gradient-primary py-3 rounded-xl font-bold text-lg hover:opacity-90 transition">
+            <i class="fa-solid fa-paper-plane mr-2"></i>Publier
+        </button>
+    </form>
+</div>
+{% endblock %}

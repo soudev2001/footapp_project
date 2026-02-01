@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block title %}Actualités - FootApp{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Stories Bar -->
+    <div class="glass-light py-4 overflow-x-auto border-b border-white/10 scrollbar-hide mb-4">
+        <div class="inline-flex gap-4 px-4">
+            <!-- Add Story -->
+            <div class="flex flex-col items-center gap-2 cursor-pointer group">
+                <div
+                    class="w-16 h-16 rounded-full border-2 border-dashed border-gray-600 flex items-center justify-center text-gray-500 group-hover:border-primary-400 group-hover:text-primary-400 transition">
+                    <i class="fa-solid fa-plus text-xl"></i>
+                </div>
+                <span class="text-[10px] text-gray-500 font-medium">Ajouter</span>
+            </div>
+
+            <!-- Story 1 -->
+            <a href="#" class="flex flex-col items-center gap-2 cursor-pointer group">
+                <div class="p-0.5 rounded-full bg-gradient-to-br from-amber-500 via-pink-500 to-purple-500">
+                    <div class="w-16 h-16 rounded-full border-2 border-surface-900 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1522778119026-d647f0565c6a?auto=format&fit=crop&w=100&q=80"
+                            class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <span class="text-[10px] text-gray-400 font-medium">Résumés</span>
+            </a>
+
+            <!-- Story 2 -->
+            <a href="#" class="flex flex-col items-center gap-2 cursor-pointer group">
+                <div class="p-0.5 rounded-full bg-gradient-to-br from-amber-500 via-pink-500 to-purple-500">
+                    <div class="w-16 h-16 rounded-full border-2 border-surface-900 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=100&q=80"
+                            class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <span class="text-[10px] text-gray-400 font-medium">Tournoi</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Posts -->
+    <div class="space-y-4 px-4 pb-6">
+        <!-- Post 1: Match Result -->
+        <article class="card overflow-hidden">
+            <div class="flex items-center justify-between p-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 gradient-primary rounded-full flex items-center justify-center font-bold shadow-lg">
+                        FC</div>
+                    <div>
+                        <p class="font-bold text-sm">FC Elite Officiel</p>
+                        <p class="text-xs text-gray-500">Il y a 2h • Score final</p>
+                    </div>
+                </div>
+                <button class="text-gray-500 hover:text-white transition">
+                    <i class="fa-solid fa-ellipsis"></i>
+                </button>
+            </div>
+
+            <div class="relative aspect-video bg-gray-900 flex flex-col items-center justify-center overflow-hidden">
+                <div
+                    class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1574629810360-7efbbe195018')] bg-cover bg-center opacity-30">
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+
+                <div class="relative z-10 text-center">
+                    <h3 class="text-sm font-bold tracking-widest uppercase mb-6 text-primary-400">Victoire Écrasante !
+                    </h3>
+                    <div class="flex items-center gap-8">
+                        <div class="text-center">
+                            <span class="text-5xl font-black block">4</span>
+                            <span class="text-sm font-bold">FC Elite</span>
+                        </div>
+                        <span class="text-3xl text-gray-500">-</span>
+                        <div class="text-center">
+                            <span class="text-5xl font-black block">1</span>
+                            <span class="text-sm font-bold">Racing</span>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-sm glass-light px-4 py-2 rounded-full inline-block">
+                        ⚽ Buteurs: Dubois x2, Lambert, Laurent
+                    </p>
+                </div>
+            </div>
+
+            <div class="p-4">
+                <div class="flex items-center justify-between text-xl mb-3">
+                    <div class="flex gap-5">
+                        <button class="hover:text-red-400 transition like-btn" onclick="toggleLike(this)">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                        <button class="hover:text-primary-400 transition">
+                            <i class="fa-regular fa-comment"></i>
+                        </button>
+                        <button class="hover:text-green-400 transition">
+                            <i class="fa-regular fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <button class="hover:text-amber-400 transition bookmark-btn" onclick="toggleBookmark(this)">
+                        <i class="fa-regular fa-bookmark"></i>
+                    </button>
+                </div>
+                <p class="text-sm font-bold mb-1">452 J'aime</p>
+                <p class="text-sm"><span class="font-bold mr-1">FC Elite Officiel</span>Quelle performance de nos
+                    joueurs cet après-midi ! 🔥 Une maîtrise totale du jeu. Bravo les gars ! #TeamFCE #Victoire</p>
+                <button class="text-gray-500 text-sm mt-2 hover:text-gray-300 transition">Voir les 12
+                    commentaires</button>
+            </div>
+        </article>
+
+        <!-- Post 2: Event Announcement -->
+        <article class="card overflow-hidden">
+            <div class="flex items-center justify-between p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full overflow-hidden">
+                        <img src="https://randomuser.me/api/portraits/men/55.jpg" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm">Le Président</p>
+                        <p class="text-xs text-gray-500">Hier</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-4 pb-4">
+                <h3 class="font-bold text-lg mb-2">📢 Barbecue de fin de saison</h3>
+                <p class="text-sm text-gray-400 leading-relaxed mb-4">
+                    Bonjour à tous, n'oubliez pas de vous inscrire pour le grand barbecue du club ce samedi !
+                    Les formulaires sont disponibles au club house ou via le bouton ci-dessous.
+                </p>
+                <button
+                    class="w-full glass-light text-primary-400 font-bold py-3 rounded-xl text-sm hover:bg-primary-500/20 transition">
+                    <i class="fa-solid fa-calendar-check mr-2"></i>Réserver ma place
+                </button>
+            </div>
+        </article>
+
+        <!-- Post 3: Photo -->
+        <article class="card overflow-hidden">
+            <div class="flex items-center justify-between p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full overflow-hidden">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm">Pierre Dubois</p>
+                        <p class="text-xs text-gray-500">Hier • Photo</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="aspect-square overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?auto=format&fit=crop&w=800&q=80"
+                    class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+            </div>
+
+            <div class="p-4">
+                <div class="flex items-center justify-between text-xl mb-3">
+                    <div class="flex gap-5">
+                        <button class="text-red-400 like-btn active">
+                            <i class="fa-solid fa-heart"></i>
+                        </button>
+                        <button class="hover:text-primary-400 transition">
+                            <i class="fa-regular fa-comment"></i>
+                        </button>
+                        <button class="hover:text-green-400 transition">
+                            <i class="fa-regular fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <button class="hover:text-amber-400 transition">
+                        <i class="fa-regular fa-bookmark"></i>
+                    </button>
+                </div>
+                <p class="text-sm font-bold mb-1">328 J'aime</p>
+                <p class="text-sm"><span class="font-bold mr-1">Pierre Dubois</span>Premier entraînement de la semaine ✅
+                    On prépare le match de samedi 💪 #Football #Training</p>
+            </div>
+        </article>
+    </div>
+
+    <!-- Create Post FAB -->
+    {% if roles.is_coach %}
+    <a href="/create-post"
+        class="fixed bottom-24 md:bottom-8 right-4 w-14 h-14 btn-primary rounded-full flex items-center justify-center shadow-xl shadow-primary-500/30 hover:scale-110 transition-transform">
+        <i class="fa-solid fa-plus text-xl"></i>
+    </a>
+    {% endif %}
+</div>
+
+<style>
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .like-btn.active i,
+    .like-btn:active i {
+        transform: scale(1.2);
+    }
+</style>
+
+<script>
+    function toggleLike(btn) {
+        const icon = btn.querySelector('i');
+        if (icon.classList.contains('fa-regular')) {
+            icon.classList.remove('fa-regular');
+            icon.classList.add('fa-solid');
+            btn.classList.add('text-red-400');
+        } else {
+            icon.classList.remove('fa-solid');
+            icon.classList.add('fa-regular');
+            btn.classList.remove('text-red-400');
+        }
+    }
+
+    function toggleBookmark(btn) {
+        const icon = btn.querySelector('i');
+        if (icon.classList.contains('fa-regular')) {
+            icon.classList.remove('fa-regular');
+            icon.classList.add('fa-solid');
+            btn.classList.add('text-amber-400');
+        } else {
+            icon.classList.remove('fa-solid');
+            icon.classList.add('fa-regular');
+            btn.classList.remove('text-amber-400');
+        }
+    }
+</script>
+{% endblock %}

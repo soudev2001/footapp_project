@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Aide - FootApp{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold mb-6">Aide & Support</h1>
+
+    <!-- FAQ -->
+    <div class="space-y-4 mb-8">
+        <h2 class="font-bold text-lg">Questions frequentes</h2>
+
+        <details class="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden group">
+            <summary
+                class="p-4 cursor-pointer flex items-center justify-between font-medium hover:bg-gray-700/30 transition">
+                Comment creer un club?
+                <i class="fa-solid fa-chevron-down group-open:rotate-180 transition"></i>
+            </summary>
+            <div class="p-4 pt-0 text-gray-400 text-sm">
+                Seuls les administrateurs peuvent creer un nouveau club. Contactez notre equipe support pour en faire la
+                demande.
+            </div>
+        </details>
+
+        <details class="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden group">
+            <summary
+                class="p-4 cursor-pointer flex items-center justify-between font-medium hover:bg-gray-700/30 transition">
+                Comment ajouter des joueurs a l'effectif?
+                <i class="fa-solid fa-chevron-down group-open:rotate-180 transition"></i>
+            </summary>
+            <div class="p-4 pt-0 text-gray-400 text-sm">
+                Les coaches et administrateurs peuvent ajouter des joueurs depuis la section "Effectif". Cliquez sur
+                "Ajouter un joueur" et remplissez le formulaire.
+            </div>
+        </details>
+
+        <details class="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden group">
+            <summary
+                class="p-4 cursor-pointer flex items-center justify-between font-medium hover:bg-gray-700/30 transition">
+                Comment envoyer une convocation?
+                <i class="fa-solid fa-chevron-down group-open:rotate-180 transition"></i>
+            </summary>
+            <div class="p-4 pt-0 text-gray-400 text-sm">
+                Creez un evenement depuis le calendrier. Une fois l'evenement cree, les joueurs du club recevront
+                automatiquement une notification.
+            </div>
+        </details>
+
+        <details class="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden group">
+            <summary
+                class="p-4 cursor-pointer flex items-center justify-between font-medium hover:bg-gray-700/30 transition">
+                Comment changer mon mot de passe?
+                <i class="fa-solid fa-chevron-down group-open:rotate-180 transition"></i>
+            </summary>
+            <div class="p-4 pt-0 text-gray-400 text-sm">
+                Allez dans Profil > Parametres > Compte, puis cliquez sur "Changer le mot de passe".
+            </div>
+        </details>
+    </div>
+
+    <!-- Contact -->
+    <div class="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl p-6 border border-blue-500/20">
+        <h2 class="font-bold text-lg mb-4">Besoin d'aide supplementaire?</h2>
+        <p class="text-gray-400 text-sm mb-4">Notre equipe support est disponible pour repondre a vos questions.</p>
+
+        <div class="space-y-3">
+            <a href="mailto:support@footapp.fr"
+                class="flex items-center gap-3 bg-white/10 rounded-xl p-4 hover:bg-white/20 transition">
+                <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-envelope text-blue-400"></i>
+                </div>
+                <div>
+                    <div class="font-medium text-sm">Email</div>
+                    <div class="text-xs text-gray-400">support@footapp.fr</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

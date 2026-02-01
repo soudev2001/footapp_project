@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture - FootApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <!-- Header de navigation -->
+    <header
+        class="bg-white border-b border-gray-200 sticky top-0 z-50 px-6 py-4 flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-3">
+            <a href="index.html" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition">
+                <i class="fa-solid fa-arrow-left"></i> Retour
+            </a>
+            <h1 class="text-lg font-bold border-l border-gray-200 pl-4 ml-2">Architecture du Système</h1>
+        </div>
+        <button onclick="window.print()"
+            class="text-sm bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200 transition">
+            <i class="fa-solid fa-print mr-2"></i> Imprimer
+        </button>
+    </header>
+
+    <main class="p-8 max-w-[1600px] mx-auto">
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 overflow-hidden">
+            <div class="mermaid">
+                stateDiagram-v2
+                direction TB
+
+                %% --- STYLES ---
+                classDef public fill:#f0f9ff,stroke:#0ea5e9,color:#0c4a6e,stroke-width:2px;
+                classDef auth fill:#eef2ff,stroke:#6366f1,color:#312e81,stroke-width:2px;
+                classDef admin fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,stroke-width:2px;
+                classDef club fill:#ecfdf5,stroke:#10b981,color:#064e3b,stroke-width:2px;
+                classDef mobile fill:#fff1f2,stroke:#f43f5e,color:#881337,stroke-width:2px;
+
+                %% --- WEB PUBLIC ---
+                state "🌐 Site Vitrine" as WebGroup {
+                direction LR
+                Index : 🏠 Accueil<br />(index.html)
+                PublicClub : 📢 Vue Fan/Club<br />(public-club.html)
+                Ranking : 🏆 Classement<br />(ranking.html)
+                }
+                class WebGroup public
+
+                %% --- AUTHENTIFICATION ---
+                state "🔐 Authentification" as AuthGroup {
+                direction TB
+                Login : 🔑 Connexion<br />(login.html)
+                Register : 📝 Inscription<br />(register.html)
+                Forgot : ❓ Mot de passe oublié<br />(forgot-password.html)
+                }
+                class AuthGroup auth
+
+                %% --- ADMIN SAAS ---
+                state "🚀 Super Admin (SaaS)" as AdminGroup {
+                Admin : 🛠 Panel Admin<br />(admin.html)
+                Inv : 📄 Facture<br />(invoice.html)
+                }
+                class AdminGroup admin
+
+                %% --- CLUB BACK OFFICE ---
+                state "🏢 Club Back-Office" as ClubGroup {
+                Dashboard : 📊 Tableau de Bord<br />(dashboard.html)
+                }
+                class ClubGroup club
+
+                %% --- APP MOBILE ---
+                state "📱 Application Mobile" as AppGroup {
+                direction TB
+                AppHome : 🏠 App Home<br />(app.html)
+
+                state "Social" as SocialSection {
+                Feed : 📰 Fil d'Actu<br />(feed.html)
+                CreatePost : ✏️ Créer Post<br />(create-post.html)
+                }
+
+                state "Messagerie" as ChatSection {
+                ChatInbox : 💬 Boîte de réception<br />(chat-inbox.html)
+                ChatDetail : 🗣 Conversation<br />(chat-conversation.html)
+                }
+
+                state "Gestion Sportive" as SportSection {
+                Calendar : 📅 Calendrier<br />(calendar.html)
+                MatchCenter : ⚽ Match Center<br />(match-center.html)
+                Roster : 👥 Effectif<br />(roster.html)
+                Tactics : 📋 Tactique<br />(tactics.html)
+                Attendance : ✅ Présence<br />(attendance.html)
+                CreateEvent : ➕ Créer Event<br />(create-event.html)
+                }
+
+                state "Profil & Admin" as ProfileSection {
+                Profile : 👤 Profil Joueur<br />(profile.html)
+                EditProfile : ✏️ Modifier Profil<br />(edit-profile.html)
+                Docs : 📄 Documents<br />(documents.html)
+                Settings : ⚙️ Paramètres<br />(settings.html)
+                Notifs : 🔔 Notifications<br />(notifications.html)
+                Resa : 🎫 Réservations<br />(reservation.html)
+                }
+
+                state "Boutique" as ShopSection {
+                Product : 🛒 Produit<br />(shop-product.html)
+                Checkout : 💳 Paiement<br />(checkout.html)
+                }
+                }
+                class AppGroup mobile
+
+                %% --- LIENS & LOGIQUE ---
+                Index --> Login
+                Index --> Register
+                Index --> PublicClub
+                PublicClub --> Ranking
+
+                Login --> Admin
+                Login --> Dashboard
+                Login --> AppHome
+
+                Dashboard --> Index : Prévisualiser
+                Dashboard --> Inv : Facturation
+
+                AppHome --> Feed
+                AppHome --> ChatInbox
+                AppHome --> Calendar
+                AppHome --> ShopSection
+
+                ChatInbox --> ChatDetail
+
+                Feed --> CreatePost
+                Calendar --> MatchCenter
+                Calendar --> CreateEvent
+
+                Roster --> Profile
+                Profile --> EditProfile
+                Profile --> Docs
+            </div>
+        </div>
+    </main>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            flowchart: { curve: 'basis', padding: 20 }
+        });
+    </script>
+</body>
+
+</html>

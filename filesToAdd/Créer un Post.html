@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouveau Post - FootApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-800 max-w-md mx-auto min-h-screen relative shadow-2xl flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white p-4 sticky top-0 z-20 flex justify-between items-center border-b border-gray-100">
+        <button onclick="history.back()" class="text-gray-500 hover:text-black font-medium">Annuler</button>
+        <h1 class="font-bold text-base">Créer une publication</h1>
+        <button onclick="publishPost()"
+            class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md hover:bg-blue-700 transition">Publier</button>
+    </header>
+
+    <!-- Content -->
+    <main class="flex-1 bg-white p-4">
+
+        <!-- User Info -->
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-sm">
+                <i class="fa-solid fa-shield-cat"></i>
+            </div>
+            <div>
+                <p class="font-bold text-sm text-gray-900">FC Canvas Officiel</p>
+                <div
+                    class="flex items-center gap-1 text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md w-fit cursor-pointer">
+                    <i class="fa-solid fa-earth-americas"></i>
+                    <span>Public</span>
+                    <i class="fa-solid fa-caret-down ml-1"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Text Input -->
+        <textarea id="postText"
+            class="w-full h-32 p-2 text-lg border-none focus:ring-0 resize-none placeholder-gray-400 mb-4"
+            placeholder="Quoi de neuf au club ? Résultat de match, annonce..."></textarea>
+
+        <!-- Media Preview Area (Empty initially) -->
+        <div id="mediaPreview" class="hidden relative w-full h-48 bg-gray-100 rounded-xl mb-4 overflow-hidden group">
+            <img src="https://images.unsplash.com/photo-1522778119026-d647f0565c6a?auto=format&fit=crop&w=800&q=80"
+                class="w-full h-full object-cover">
+            <button onclick="removeMedia()"
+                class="absolute top-2 right-2 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Actions List -->
+        <div class="border-t border-gray-100 pt-2">
+            <button onclick="triggerUpload()"
+                class="w-full flex items-center gap-4 p-3 hover:bg-gray-50 rounded-xl transition text-left">
+                <i class="fa-solid fa-image text-green-500 text-xl w-6"></i>
+                <span class="font-medium text-gray-700">Photo / Vidéo</span>
+            </button>
+            <button class="w-full flex items-center gap-4 p-3 hover:bg-gray-50 rounded-xl transition text-left">
+                <i class="fa-solid fa-user-tag text-blue-500 text-xl w-6"></i>
+                <span class="font-medium text-gray-700">Identifier des joueurs</span>
+            </button>
+            <button class="w-full flex items-center gap-4 p-3 hover:bg-gray-50 rounded-xl transition text-left">
+                <i class="fa-solid fa-location-dot text-red-500 text-xl w-6"></i>
+                <span class="font-medium text-gray-700">Ajouter un lieu</span>
+            </button>
+            <button class="w-full flex items-center gap-4 p-3 hover:bg-gray-50 rounded-xl transition text-left">
+                <i class="fa-solid fa-trophy text-yellow-500 text-xl w-6"></i>
+                <span class="font-medium text-gray-700">Ajouter un score</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Keyboard Spacer simulation -->
+    <div class="h-64 bg-gray-100 hidden" id="keyboardSpacer"></div>
+
+    <script>
+        function triggerUpload() {
+            // Simulation d'upload
+            document.getElementById('mediaPreview').classList.remove('hidden');
+        }
+
+        function removeMedia() {
+            document.getElementById('mediaPreview').classList.add('hidden');
+        }
+
+        function publishPost() {
+            const text = document.getElementById('postText').value;
+            if (!text && document.getElementById('mediaPreview').classList.contains('hidden')) {
+                alert("Veuillez écrire un message ou ajouter une photo.");
+                return;
+            }
+
+            // Animation de chargement
+            const btn = document.querySelector('header button:last-child');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+
+            setTimeout(() => {
+                alert("Publication réussie !");
+                window.location.href = 'feed.html';
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>

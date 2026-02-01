@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Coach - FootApp{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold flex items-center gap-3">
+                <span class="w-10 h-10 gradient-accent rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-whistle text-black"></i>
+                </span>
+                Tableau de bord
+            </h1>
+            <p class="text-gray-400 mt-1">Bonjour, {{ current_user.profile.first_name or 'Coach' }}! Voici votre resume.
+            </p>
+        </div>
+        <div class="flex gap-3">
+            <a href="/coach/create-event"
+                class="btn-primary px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i>
+                Nouvel evenement
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="card p-5 group">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-gray-400 text-sm">Joueurs</p>
+                    <p class="text-3xl font-black mt-1">{{ stats.total_players or 18 }}</p>
+                </div>
+                <div
+                    class="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-1 text-xs">
+                <span class="text-green-400"><i class="fa-solid fa-circle-check"></i></span>
+                <span class="text-gray-400">{{ stats.fit_players or 16 }} aptes</span>
+            </div>
+        </div>
+
+        <div class="card p-5 group">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-gray-400 text-sm">Matchs</p>
+                    <p class="text-3xl font-black mt-1">{{ stats.matches_played or 22 }}</p>
+                </div>
+                <div
+                    class="w-12 h-12 gradient-success rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-futbol"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-1 text-xs">
+                <span class="text-green-400 font-semibold">{{ stats.wins or 15 }}V</span>
+                <span class="text-gray-400">{{ stats.draws or 3 }}N</span>
+                <span class="text-red-400">{{ stats.losses or 4 }}D</span>
+            </div>
+        </div>
+
+        <div class="card p-5 group">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-gray-400 text-sm">Buts</p>
+                    <p class="text-3xl font-black mt-1">{{ stats.goals_scored or 45 }}</p>
+                </div>
+                <div
+                    class="w-12 h-12 gradient-accent rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-ranking-star text-black"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-1 text-xs text-gray-400">
+                <span>{{ stats.goals_conceded or 22 }} encaisses</span>
+                <span class="text-green-400 ml-auto font-semibold">+{{ (stats.goals_scored or 45) -
+                    (stats.goals_conceded or 22) }}</span>
+            </div>
+        </div>
+
+        <div class="card p-5 group">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-gray-400 text-sm">Position</p>
+                    <p class="text-3xl font-black mt-1 text-gradient">1er</p>
+                </div>
+                <div
+                    class="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-trophy text-white"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-1 text-xs text-gray-400">
+                <span>48 pts - Division 2</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-6">
+        <!-- Main Column -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Next Match -->
+            <div class="card overflow-hidden">
+                <div class="p-5 flex items-center justify-between border-b border-white/5">
+                    <h2 class="font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-circle text-red-500 text-xs animate-pulse"></i>
+                        Prochain match
+                    </h2>
+                    <span class="text-xs text-gray-400">Dans 3 jours</span>
+                </div>
+                <div class="p-6 bg-gradient-to-r from-primary-600/10 via-transparent to-purple-600/10">
+                    <div class="flex items-center justify-center gap-8">
+                        <div class="text-center">
+                            <div
+                                class="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center text-3xl font-black mb-3 shadow-lg shadow-primary-500/30">
+                                FC</div>
+                            <span class="font-semibold">FC Elite</span>
+                            <div class="text-[10px] text-green-400 mt-1">DOMICILE</div>
+                        </div>
+                        <div class="text-center px-6">
+                            <div class="text-4xl font-black text-gray-600">VS</div>
+                            <div class="mt-2 text-sm text-gray-400">
+                                <div class="font-semibold">08 Fev 2026</div>
+                                <div>15:00</div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div
+                                class="w-20 h-20 bg-gray-700 rounded-2xl flex items-center justify-center text-3xl font-black mb-3">
+                                RC</div>
+                            <span class="font-semibold">Racing FC</span>
+                            <div class="text-[10px] text-gray-400 mt-1">EXTERIEUR</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <a href="/coach/match-center"
+                            class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-semibold text-sm text-center transition">
+                            <i class="fa-solid fa-list-ul mr-2"></i>Convoquer
+                        </a>
+                        <a href="/coach/tactics"
+                            class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-semibold text-sm text-center transition">
+                            <i class="fa-solid fa-chess-board mr-2"></i>Tactiques
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Events -->
+            <div class="card">
+                <div class="p-5 flex items-center justify-between border-b border-white/5">
+                    <h2 class="font-bold">Evenements a venir</h2>
+                    <a href="/calendar" class="text-primary-400 text-sm hover:text-primary-300 transition">Voir tout</a>
+                </div>
+                <div class="divide-y divide-white/5">
+                    {% for event in upcoming_events %}
+                    <a href="/event/{{ event.id }}"
+                        class="p-4 flex items-center gap-4 hover:bg-white/5 transition group">
+                        <div
+                            class="w-14 h-14 rounded-xl flex flex-col items-center justify-center
+                            {% if event.type == 'training' %}bg-green-500/20{% elif event.type == 'match' %}bg-red-500/20{% else %}bg-blue-500/20{% endif %}">
+                            <span
+                                class="text-lg font-bold 
+                                {% if event.type == 'training' %}text-green-400{% elif event.type == 'match' %}text-red-400{% else %}text-blue-400{% endif %}">
+                                {{ event.date.strftime('%d') if event.date else '--' }}
+                            </span>
+                            <span
+                                class="text-[10px] uppercase 
+                                {% if event.type == 'training' %}text-green-400{% elif event.type == 'match' %}text-red-400{% else %}text-blue-400{% endif %}">
+                                {{ event.date.strftime('%b') if event.date else '' }}
+                            </span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium truncate">{{ event.title }}</div>
+                            <div class="text-sm text-gray-400">{{ event.time or '18:00' }} - {{ event.location or
+                                'Terrain A' }}</div>
+                        </div>
+                        <div class="hidden sm:flex items-center gap-2">
+                            <div class="flex -space-x-2">
+                                <img src="https://randomuser.me/api/portraits/men/{{ loop.index }}.jpg"
+                                    class="w-7 h-7 rounded-full border-2 border-surface-900">
+                                <img src="https://randomuser.me/api/portraits/men/{{ loop.index + 10 }}.jpg"
+                                    class="w-7 h-7 rounded-full border-2 border-surface-900">
+                                <div
+                                    class="w-7 h-7 rounded-full bg-gray-700 border-2 border-surface-900 flex items-center justify-center text-[10px]">
+                                    +8</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-600 group-hover:text-primary-400 transition"></i>
+                    </a>
+                    {% else %}
+                    <!-- Sample events when empty -->
+                    <div class="p-4 flex items-center gap-4 hover:bg-white/5 transition group">
+                        <div class="w-14 h-14 rounded-xl flex flex-col items-center justify-center bg-green-500/20">
+                            <span class="text-lg font-bold text-green-400">03</span>
+                            <span class="text-[10px] uppercase text-green-400">Fev</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium truncate">Entrainement Technique</div>
+                            <div class="text-sm text-gray-400">18:00 - Terrain A</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-600 group-hover:text-primary-400 transition"></i>
+                    </div>
+                    <div class="p-4 flex items-center gap-4 hover:bg-white/5 transition group">
+                        <div class="w-14 h-14 rounded-xl flex flex-col items-center justify-center bg-red-500/20">
+                            <span class="text-lg font-bold text-red-400">08</span>
+                            <span class="text-[10px] uppercase text-red-400">Fev</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium truncate">Match vs Racing FC</div>
+                            <div class="text-sm text-gray-400">15:00 - Stade Municipal</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-600 group-hover:text-primary-400 transition"></i>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Side Column -->
+        <div class="space-y-6">
+            <!-- Quick Actions -->
+            <div class="card p-5">
+                <h2 class="font-bold mb-4">Actions rapides</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="/coach/roster"
+                        class="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-primary-500/20 transition group">
+                        <i
+                            class="fa-solid fa-users text-xl text-primary-400 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-xs font-medium">Effectif</span>
+                    </a>
+                    <a href="/coach/attendance"
+                        class="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-green-500/20 transition group">
+                        <i
+                            class="fa-solid fa-clipboard-check text-xl text-green-400 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-xs font-medium">Presences</span>
+                    </a>
+                    <a href="/coach/tactics"
+                        class="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-amber-500/20 transition group">
+                        <i
+                            class="fa-solid fa-chess-board text-xl text-amber-400 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-xs font-medium">Tactiques</span>
+                    </a>
+                    <a href="/feed"
+                        class="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-purple-500/20 transition group">
+                        <i
+                            class="fa-solid fa-newspaper text-xl text-purple-400 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-xs font-medium">Publier</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Top Scorers -->
+            <div class="card">
+                <div class="p-5 flex items-center justify-between border-b border-white/5">
+                    <h2 class="font-bold">Meilleurs buteurs</h2>
+                </div>
+                <div class="p-3 space-y-2">
+                    <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition">
+                        <span
+                            class="w-6 h-6 bg-amber-400/20 text-amber-400 rounded-lg flex items-center justify-center text-xs font-bold">1</span>
+                        <img src="https://randomuser.me/api/portraits/men/19.jpg"
+                            class="w-9 h-9 rounded-full object-cover">
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium text-sm truncate">Pierre Dubois</div>
+                            <div class="text-[10px] text-gray-400">#9 Attaquant</div>
+                        </div>
+                        <span class="text-lg font-black text-amber-400">15</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition">
+                        <span
+                            class="w-6 h-6 bg-gray-500/20 text-gray-400 rounded-lg flex items-center justify-center text-xs font-bold">2</span>
+                        <img src="https://randomuser.me/api/portraits/men/20.jpg"
+                            class="w-9 h-9 rounded-full object-cover">
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium text-sm truncate">Olivier Laurent</div>
+                            <div class="text-[10px] text-gray-400">#11 Attaquant</div>
+                        </div>
+                        <span class="text-lg font-black">12</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition">
+                        <span
+                            class="w-6 h-6 bg-orange-500/20 text-orange-400 rounded-lg flex items-center justify-center text-xs font-bold">3</span>
+                        <img src="https://randomuser.me/api/portraits/men/18.jpg"
+                            class="w-9 h-9 rounded-full object-cover">
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium text-sm truncate">Romain Lambert</div>
+                            <div class="text-[10px] text-gray-400">#10 Milieu</div>
+                        </div>
+                        <span class="text-lg font-black">8</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Injuries -->
+            <div class="card">
+                <div class="p-5 flex items-center justify-between border-b border-white/5">
+                    <h2 class="font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-kit-medical text-red-400"></i>
+                        Indisponibles
+                    </h2>
+                    <span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-full">2</span>
+                </div>
+                <div class="p-3 space-y-2">
+                    <div class="flex items-center gap-3 p-2 rounded-xl bg-red-500/5">
+                        <img src="https://randomuser.me/api/portraits/men/13.jpg"
+                            class="w-9 h-9 rounded-full object-cover opacity-50">
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium text-sm truncate">Nicolas Petit</div>
+                            <div class="text-[10px] text-red-400">Cheville - 2 sem.</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-2 rounded-xl bg-red-500/5">
+                        <img src="https://randomuser.me/api/portraits/men/14.jpg"
+                            class="w-9 h-9 rounded-full object-cover opacity-50">
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium text-sm truncate">Marc Lefevre</div>
+                            <div class="text-[10px] text-red-400">Genou - 4 sem.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

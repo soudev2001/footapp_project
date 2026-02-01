@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block title %}Calendrier - FootApp{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold">Calendrier</h1>
+            <p class="text-gray-400 text-sm">Vos événements et matchs</p>
+        </div>
+        {% if roles.is_coach %}
+        <a href="/coach/create-event"
+            class="btn-primary px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i>
+            Nouvel événement
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Calendar Card -->
+    <div class="card p-6 mb-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold" id="currentMonth">Février 2026</h2>
+            <div class="flex gap-2">
+                <button onclick="prevMonth()"
+                    class="w-10 h-10 rounded-xl glass-light hover:bg-white/10 flex items-center justify-center transition">
+                    <i class="fa-solid fa-chevron-left text-gray-400"></i>
+                </button>
+                <button onclick="nextMonth()"
+                    class="w-10 h-10 rounded-xl glass-light hover:bg-white/10 flex items-center justify-center transition">
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Days Header -->
+        <div class="grid grid-cols-7 text-center text-xs font-bold text-gray-500 mb-4">
+            <div>Lun</div>
+            <div>Mar</div>
+            <div>Mer</div>
+            <div>Jeu</div>
+            <div>Ven</div>
+            <div class="text-amber-400">Sam</div>
+            <div class="text-amber-400">Dim</div>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="grid grid-cols-7 gap-2" id="calendarGrid">
+            <!-- Previous month days -->
+            <div class="day-cell text-gray-600">27</div>
+            <div class="day-cell text-gray-600">28</div>
+            <div class="day-cell text-gray-600">29</div>
+            <div class="day-cell text-gray-600">30</div>
+            <div class="day-cell text-gray-600">31</div>
+
+            <!-- Current month days -->
+            <div class="day-cell has-match" data-date="2026-02-01">1</div>
+            <div class="day-cell" data-date="2026-02-02">2</div>
+
+            <div class="day-cell has-training" data-date="2026-02-03">3</div>
+            <div class="day-cell" data-date="2026-02-04">4</div>
+            <div class="day-cell" data-date="2026-02-05">5</div>
+            <div class="day-cell has-training" data-date="2026-02-06">6</div>
+            <div class="day-cell" data-date="2026-02-07">7</div>
+            <div class="day-cell has-match" data-date="2026-02-08">8</div>
+            <div class="day-cell" data-date="2026-02-09">9</div>
+
+            <div class="day-cell has-training" data-date="2026-02-10">10</div>
+            <div class="day-cell" data-date="2026-02-11">11</div>
+            <div class="day-cell" data-date="2026-02-12">12</div>
+            <div class="day-cell has-training" data-date="2026-02-13">13</div>
+            <div class="day-cell" data-date="2026-02-14">14</div>
+            <div class="day-cell has-match" data-date="2026-02-15">15</div>
+            <div class="day-cell" data-date="2026-02-16">16</div>
+
+            <div class="day-cell has-training" data-date="2026-02-17">17</div>
+            <div class="day-cell" data-date="2026-02-18">18</div>
+            <div class="day-cell" data-date="2026-02-19">19</div>
+            <div class="day-cell has-training" data-date="2026-02-20">20</div>
+            <div class="day-cell" data-date="2026-02-21">21</div>
+            <div class="day-cell has-match" data-date="2026-02-22">22</div>
+            <div class="day-cell" data-date="2026-02-23">23</div>
+
+            <div class="day-cell has-training" data-date="2026-02-24">24</div>
+            <div class="day-cell" data-date="2026-02-25">25</div>
+            <div class="day-cell" data-date="2026-02-26">26</div>
+            <div class="day-cell has-training" data-date="2026-02-27">27</div>
+            <div class="day-cell" data-date="2026-02-28">28</div>
+
+            <!-- Next month days -->
+            <div class="day-cell text-gray-600">1</div>
+            <div class="day-cell text-gray-600">2</div>
+        </div>
+
+        <!-- Legend -->
+        <div class="flex gap-6 mt-6 pt-4 border-t border-white/10">
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                <span class="text-xs text-gray-400">Match</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                <span class="text-xs text-gray-400">Entraînement</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                <span class="text-xs text-gray-400">Réunion</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Events List -->
+    <div class="mb-4">
+        <h3 class="font-bold text-lg mb-4">Événements à venir</h3>
+    </div>
+
+    <div class="space-y-4">
+        <!-- Match Event -->
+        <div class="card p-5 flex gap-4 group cursor-pointer hover:border-red-500/30"
+            onclick="location.href='/coach/match-center'">
+            <div class="w-16 h-16 bg-red-500/20 rounded-xl flex flex-col items-center justify-center">
+                <span class="text-xs font-bold text-red-400 uppercase">Sam</span>
+                <span class="text-xl font-black text-red-400">08</span>
+            </div>
+            <div class="flex-1">
+                <div class="flex justify-between items-start">
+                    <span class="text-[10px] font-bold text-red-400 uppercase tracking-wider">Championnat • J15</span>
+                    <span
+                        class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full font-bold">CONVOQUÉ</span>
+                </div>
+                <h3 class="font-bold mt-1">FC Elite vs Racing FC</h3>
+                <div class="flex items-center gap-4 mt-2 text-xs text-gray-400">
+                    <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> 15:00</span>
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Domicile</span>
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-gray-600 group-hover:text-primary-400 self-center transition"></i>
+        </div>
+
+        <!-- Training Event -->
+        <div class="card p-5 flex gap-4 group cursor-pointer hover:border-green-500/30">
+            <div class="w-16 h-16 bg-green-500/20 rounded-xl flex flex-col items-center justify-center">
+                <span class="text-xs font-bold text-green-400 uppercase">Mar</span>
+                <span class="text-xl font-black text-green-400">10</span>
+            </div>
+            <div class="flex-1">
+                <span class="text-[10px] font-bold text-green-400 uppercase tracking-wider">Entraînement</span>
+                <h3 class="font-bold mt-1">Séance Tactique</h3>
+                <div class="flex items-center gap-4 mt-2 text-xs text-gray-400">
+                    <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> 18:30</span>
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-shirt"></i> Terrain B</span>
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-gray-600 group-hover:text-primary-400 self-center transition"></i>
+        </div>
+
+        <!-- Match Event -->
+        <div class="card p-5 flex gap-4 group cursor-pointer hover:border-red-500/30">
+            <div class="w-16 h-16 bg-red-500/20 rounded-xl flex flex-col items-center justify-center">
+                <span class="text-xs font-bold text-red-400 uppercase">Sam</span>
+                <span class="text-xl font-black text-red-400">15</span>
+            </div>
+            <div class="flex-1">
+                <div class="flex justify-between items-start">
+                    <span class="text-[10px] font-bold text-red-400 uppercase tracking-wider">Championnat • J16</span>
+                    <span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-bold">EN
+                        ATTENTE</span>
+                </div>
+                <h3 class="font-bold mt-1">Lyon FC vs FC Elite</h3>
+                <div class="flex items-center gap-4 mt-2 text-xs text-gray-400">
+                    <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> 19:00</span>
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Extérieur</span>
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-gray-600 group-hover:text-primary-400 self-center transition"></i>
+        </div>
+    </div>
+</div>
+
+<style>
+    .day-cell {
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 12px;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s;
+    }
+
+    .day-cell:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .day-cell.selected {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .day-cell.today {
+        color: #6366f1;
+        font-weight: 800;
+        border: 2px solid #6366f1;
+    }
+
+    .day-cell.has-match::after {
+        content: '';
+        position: absolute;
+        bottom: 4px;
+        width: 6px;
+        height: 6px;
+        background: #ef4444;
+        border-radius: 50%;
+    }
+
+    .day-cell.has-training::after {
+        content: '';
+        position: absolute;
+        bottom: 4px;
+        width: 6px;
+        height: 6px;
+        background: #22c55e;
+        border-radius: 50%;
+    }
+
+    .day-cell.has-meeting::after {
+        content: '';
+        position: absolute;
+        bottom: 4px;
+        width: 6px;
+        height: 6px;
+        background: #3b82f6;
+        border-radius: 50%;
+    }
+</style>
+
+<script>
+    document.querySelectorAll('.day-cell[data-date]').forEach(cell => {
+        cell.addEventListener('click', function () {
+            document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+
+    // Mark today
+    const today = new Date();
+    if (today.getMonth() === 1 && today.getFullYear() === 2026) { // February 2026
+        const todayCell = document.querySelector(`[data-date="2026-02-0${today.getDate()}"]`) ||
+            document.querySelector(`[data-date="2026-02-${today.getDate()}"]`);
+        if (todayCell) todayCell.classList.add('today');
+    }
+</script>
+{% endblock %}

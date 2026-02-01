@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel - FootApp{% endblock %}
+
+{% block content %}
+<div class="flex h-[calc(100vh-5rem)] -mt-20 pt-20">
+    <!-- Sidebar -->
+    <aside class="hidden md:flex w-72 bg-gray-900 flex-col shadow-2xl z-20">
+        <div class="p-8 flex items-center gap-3 border-b border-gray-800">
+            <div
+                class="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg flex items-center justify-center text-white shadow-lg shadow-red-500/30">
+                <i class="fa-solid fa-shield text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-white font-bold tracking-wide text-lg">ADMIN</h1>
+                <p class="text-gray-500 text-xs uppercase tracking-widest font-bold">FootApp HQ</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2 mt-6">
+            <button onclick="switchTab('requests')" id="nav-requests"
+                class="nav-item w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-800 rounded-xl transition-all duration-200 active group text-left">
+                <i class="fa-solid fa-list-check w-5 text-center text-blue-400"></i>
+                <span class="font-medium text-white">Demandes</span>
+                <span id="badge-requests"
+                    class="ml-auto bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
+            </button>
+            <button onclick="switchTab('metrics')" id="nav-metrics"
+                class="nav-item w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-800 rounded-xl transition-all duration-200 group text-left">
+                <i class="fa-solid fa-chart-pie w-5 text-center text-purple-400"></i>
+                <span class="font-medium text-gray-400 group-hover:text-white">Métriques</span>
+            </button>
+            <button onclick="switchTab('clubs')" id="nav-clubs"
+                class="nav-item w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-800 rounded-xl transition-all duration-200 group text-left">
+                <i class="fa-solid fa-futbol w-5 text-center text-green-400"></i>
+                <span class="font-medium text-gray-400 group-hover:text-white">Clubs</span>
+            </button>
+            <button onclick="switchTab('users')" id="nav-users"
+                class="nav-item w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-800 rounded-xl transition-all duration-200 group text-left">
+                <i class="fa-solid fa-users w-5 text-center text-amber-400"></i>
+                <span class="font-medium text-gray-400 group-hover:text-white">Utilisateurs</span>
+            </button>
+            <button onclick="switchTab('settings')" id="nav-settings"
+                class="nav-item w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-800 rounded-xl transition-all duration-200 group text-left">
+                <i class="fa-solid fa-gear w-5 text-center text-gray-400"></i>
+                <span class="font-medium text-gray-400 group-hover:text-white">Paramètres</span>
+            </button>
+        </nav>
+
+        <div class="p-6 border-t border-gray-800">
+            <a href="/logout"
+                class="flex items-center gap-3 text-red-400 hover:text-red-300 text-sm font-bold px-4 py-2 hover:bg-red-500/10 rounded-lg transition">
+                <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-8 md:p-12 bg-surface-950">
+        <!-- TAB: DEMANDES (Requests) -->
+        <div id="tab-requests" class="animate-slide-up">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold">Demandes d'inscription</h2>
+                    <p class="text-gray-400 mt-1">Gérez l'accès à la plateforme.</p>
+                </div>
+                <a href="/admin/seed"
+                    class="btn-primary px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-database"></i>
+                    Seed Data
+                </a>
+            </div>
+
+            <div class="card overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-white/5 text-gray-400 uppercase text-xs font-bold tracking-wider">
+                        <tr>
+                            <th class="p-5">Date</th>
+                            <th class="p-5">Club / Organisation</th>
+                            <th class="p-5">Plan</th>
+                            <th class="p-5">Statut</th>
+                            <th class="p-5 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="p-5 text-sm text-gray-500 font-medium">2026-02-01</td>
+                            <td class="p-5">
+                                <div class="font-bold">FC Elite Paris</div>
+                                <div class="text-xs text-gray-500 mt-0.5">contact@fcelite.fr</div>
+                            </td>
+                            <td class="p-5">
+                                <span
+                                    class="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-500/20 text-purple-400">ELITE</span>
+                            </td>
+                            <td class="p-5">
+                                <span
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-400">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Actif
+                                </span>
+                            </td>
+                            <td class="p-5 text-right">
+                                <button class="text-gray-500"><i class="fa-solid fa-check"></i></button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="p-5 text-sm text-gray-500 font-medium">2026-01-28</td>
+                            <td class="p-5">
+                                <div class="font-bold">Racing Club</div>
+                                <div class="text-xs text-gray-500 mt-0.5">admin@racing.fr</div>
+                            </td>
+                            <td class="p-5">
+                                <span
+                                    class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-500/20 text-blue-400">PRO</span>
+                            </td>
+                            <td class="p-5">
+                                <span
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> En attente
+                                </span>
+                            </td>
+                            <td class="p-5 text-right">
+                                <button class="btn-primary px-4 py-2 rounded-lg text-sm font-bold">Valider</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: METRIQUES -->
+        <div id="tab-metrics" class="hidden animate-slide-up">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold">Tableau de Bord</h2>
+                <p class="text-gray-400 mt-1">Métriques clés de la plateforme.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="card p-6 group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 gradient-success rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fa-solid fa-sack-dollar"></i>
+                        </div>
+                        <span
+                            class="text-xs font-bold text-green-400 bg-green-500/20 px-2 py-1 rounded-full">+12%</span>
+                    </div>
+                    <div class="text-3xl font-extrabold mb-1">4,250€</div>
+                    <div class="text-sm text-gray-400 font-medium">Revenu Mensuel (MRR)</div>
+                </div>
+                <div class="card p-6 group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <span class="text-xs font-bold text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full">+24</span>
+                    </div>
+                    <div class="text-3xl font-extrabold mb-1">{{ stats.total_clubs or 142 }}</div>
+                    <div class="text-sm text-gray-400 font-medium">Clubs Actifs</div>
+                </div>
+                <div class="card p-6 group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fa-solid fa-mobile-screen"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-extrabold mb-1">{{ stats.total_users or '15.2K' }}</div>
+                    <div class="text-sm text-gray-400 font-medium">Utilisateurs App</div>
+                </div>
+                <div class="card p-6 group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 gradient-accent rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fa-solid fa-trophy text-black"></i>
+                        </div>
+                        <span class="text-xs font-bold text-green-400 bg-green-500/20 px-2 py-1 rounded-full">98%</span>
+                    </div>
+                    <div class="text-3xl font-extrabold mb-1">98%</div>
+                    <div class="text-sm text-gray-400 font-medium">Satisfaction</div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="card p-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-40 h-40 bg-primary-500/10 rounded-full blur-3xl"></div>
+                <h3 class="text-xl font-bold mb-2 relative z-10">Croissance des inscriptions</h3>
+                <p class="text-gray-400 mb-6 relative z-10">6 derniers mois</p>
+                <div class="flex items-end gap-4 h-48 w-full relative z-10">
+                    <div
+                        class="w-full bg-white/10 rounded-t-lg hover:bg-primary-500 hover:shadow-lg hover:shadow-primary-500/30 transition-all cursor-pointer h-[40%]">
+                    </div>
+                    <div
+                        class="w-full bg-white/10 rounded-t-lg hover:bg-primary-500 hover:shadow-lg hover:shadow-primary-500/30 transition-all cursor-pointer h-[55%]">
+                    </div>
+                    <div
+                        class="w-full bg-white/10 rounded-t-lg hover:bg-primary-500 hover:shadow-lg hover:shadow-primary-500/30 transition-all cursor-pointer h-[45%]">
+                    </div>
+                    <div
+                        class="w-full bg-white/10 rounded-t-lg hover:bg-primary-500 hover:shadow-lg hover:shadow-primary-500/30 transition-all cursor-pointer h-[70%]">
+                    </div>
+                    <div
+                        class="w-full bg-white/10 rounded-t-lg hover:bg-primary-500 hover:shadow-lg hover:shadow-primary-500/30 transition-all cursor-pointer h-[85%]">
+                    </div>
+                    <div class="w-full gradient-primary rounded-t-lg shadow-lg shadow-primary-500/30 h-[95%]"></div>
+                </div>
+                <div class="flex justify-between mt-4 text-xs text-gray-500 font-bold uppercase">
+                    <span>Sept</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Fev</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CLUBS -->
+        <div id="tab-clubs" class="hidden animate-slide-up">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold">Gestion des Clubs</h2>
+                    <p class="text-gray-400 mt-1">Liste de tous les clubs enregistrés.</p>
+                </div>
+                <button class="btn-primary px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i>
+                    Nouveau Club
+                </button>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for club in clubs %}
+                <div class="card p-6 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div
+                            class="w-14 h-14 gradient-primary rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+                            {{ club.name[:2] if club.name else 'FC' }}
+                        </div>
+                        <div>
+                            <h3 class="font-bold">{{ club.name }}</h3>
+                            <p class="text-sm text-gray-400">{{ club.city or 'Paris' }}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 text-sm">
+                        <div><span class="text-gray-400">Joueurs:</span> <span class="font-bold">{{ club.player_count or
+                                18 }}</span></div>
+                        <div><span class="text-gray-400">Matchs:</span> <span class="font-bold">{{ club.match_count or
+                                22 }}</span></div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="card p-6 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div
+                            class="w-14 h-14 gradient-primary rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+                            FC</div>
+                        <div>
+                            <h3 class="font-bold">FC Elite Paris</h3>
+                            <p class="text-sm text-gray-400">Paris</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 text-sm">
+                        <div><span class="text-gray-400">Joueurs:</span> <span class="font-bold">18</span></div>
+                        <div><span class="text-gray-400">Matchs:</span> <span class="font-bold">22</span></div>
+                    </div>
+                </div>
+                <div class="card p-6 group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div
+                            class="w-14 h-14 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+                            RC</div>
+                        <div>
+                            <h3 class="font-bold">Racing Club</h3>
+                            <p class="text-sm text-gray-400">Lyon</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 text-sm">
+                        <div><span class="text-gray-400">Joueurs:</span> <span class="font-bold">22</span></div>
+                        <div><span class="text-gray-400">Matchs:</span> <span class="font-bold">20</span></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- TAB: USERS -->
+        <div id="tab-users" class="hidden animate-slide-up">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold">Utilisateurs</h2>
+                    <p class="text-gray-400 mt-1">Gérez tous les comptes utilisateurs.</p>
+                </div>
+            </div>
+            <div class="card p-12 text-center">
+                <i class="fa-solid fa-users text-4xl text-gray-600 mb-4"></i>
+                <h3 class="text-xl font-bold">Gestion Utilisateurs</h3>
+                <p class="text-gray-400 mt-2">Utilisez l'API pour gérer les utilisateurs.</p>
+                <a href="/api/users" class="btn-primary px-6 py-3 rounded-xl font-bold mt-6 inline-block">
+                    Voir API
+                </a>
+            </div>
+        </div>
+
+        <!-- TAB: SETTINGS -->
+        <div id="tab-settings" class="hidden animate-slide-up">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold">Paramètres Système</h2>
+                <p class="text-gray-400 mt-1">Configuration de la plateforme.</p>
+            </div>
+            <div class="card p-12 text-center">
+                <i class="fa-solid fa-gear text-4xl text-gray-600 mb-4"></i>
+                <h3 class="text-xl font-bold">Configuration</h3>
+                <p class="text-gray-400 mt-2">Cette fonctionnalité sera disponible prochainement.</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function switchTab(tabId) {
+        ['requests', 'metrics', 'clubs', 'users', 'settings'].forEach(t => {
+            const tab = document.getElementById('tab-' + t);
+            const nav = document.getElementById('nav-' + t);
+            if (tab) tab.classList.add('hidden');
+            if (nav) {
+                nav.classList.remove('active');
+                nav.querySelector('span:first-of-type')?.classList.remove('text-white');
+                nav.querySelector('span:first-of-type')?.classList.add('text-gray-400');
+            }
+        });
+
+        const activeTab = document.getElementById('tab-' + tabId);
+        const activeNav = document.getElementById('nav-' + tabId);
+        if (activeTab) activeTab.classList.remove('hidden');
+        if (activeNav) {
+            activeNav.classList.add('active');
+            activeNav.querySelector('span:first-of-type')?.classList.remove('text-gray-400');
+            activeNav.querySelector('span:first-of-type')?.classList.add('text-white');
+        }
+    }
+</script>
+
+<style>
+    .nav-item.active {
+        background-color: rgba(59, 130, 246, 0.1);
+        border-left: 4px solid #6366f1;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Présences - FootApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .status-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e5e7eb;
+            color: #9ca3af;
+            transition: all 0.2s;
+        }
+
+        .status-btn.active {
+            transform: scale(1.1);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-btn.present.active {
+            background-color: #10b981;
+        }
+
+        .status-btn.absent.active {
+            background-color: #ef4444;
+        }
+
+        .status-btn.late.active {
+            background-color: #f59e0b;
+        }
+
+        .status-btn.injured.active {
+            background-color: #6b7280;
+        }
+    </style>
+</head>
+
+<body class="max-w-md mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white p-4 sticky top-0 z-20 border-b border-gray-100 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <button onclick="history.back()" class="text-gray-400 hover:text-black"><i
+                    class="fa-solid fa-arrow-left text-xl"></i></button>
+            <div>
+                <h1 class="font-bold text-gray-900 leading-tight">Feuille de présence</h1>
+                <p class="text-xs text-gray-500">Entraînement • Mar 24 Oct</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <span class="block text-2xl font-bold text-blue-600" id="presentCount">0/14</span>
+            <span class="text-[10px] font-bold text-gray-400 uppercase">Présents</span>
+        </div>
+    </header>
+
+    <!-- List -->
+    <main class="flex-1 p-4 pb-24 space-y-3">
+
+        <!-- Player Row -->
+        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden"><img
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Kylian" class="w-full h-full"></div>
+                <div>
+                    <p class="font-bold text-sm text-gray-900">Kylian M.</p>
+                    <p class="text-xs text-gray-400">Attaquant</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button class="status-btn present" onclick="setStatus(this, 'present')"><i
+                        class="fa-solid fa-check"></i></button>
+                <button class="status-btn late" onclick="setStatus(this, 'late')"><i
+                        class="fa-solid fa-clock"></i></button>
+                <button class="status-btn absent" onclick="setStatus(this, 'absent')"><i
+                        class="fa-solid fa-xmark"></i></button>
+                <button class="status-btn injured" onclick="setStatus(this, 'injured')"><i
+                        class="fa-solid fa-user-injured"></i></button>
+            </div>
+        </div>
+
+        <!-- Player Row -->
+        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden"><img
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Enzo" class="w-full h-full"></div>
+                <div>
+                    <p class="font-bold text-sm text-gray-900">Enzo L.</p>
+                    <p class="text-xs text-gray-400">Milieu</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button class="status-btn present" onclick="setStatus(this, 'present')"><i
+                        class="fa-solid fa-check"></i></button>
+                <button class="status-btn late" onclick="setStatus(this, 'late')"><i
+                        class="fa-solid fa-clock"></i></button>
+                <button class="status-btn absent" onclick="setStatus(this, 'absent')"><i
+                        class="fa-solid fa-xmark"></i></button>
+                <button class="status-btn injured" onclick="setStatus(this, 'injured')"><i
+                        class="fa-solid fa-user-injured"></i></button>
+            </div>
+        </div>
+
+        <!-- Player Row -->
+        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden"><img
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Leo" class="w-full h-full"></div>
+                <div>
+                    <p class="font-bold text-sm text-gray-900">Léo D.</p>
+                    <p class="text-xs text-gray-400">Défenseur</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button class="status-btn present" onclick="setStatus(this, 'present')"><i
+                        class="fa-solid fa-check"></i></button>
+                <button class="status-btn late" onclick="setStatus(this, 'late')"><i
+                        class="fa-solid fa-clock"></i></button>
+                <button class="status-btn absent" onclick="setStatus(this, 'absent')"><i
+                        class="fa-solid fa-xmark"></i></button>
+                <button class="status-btn injured" onclick="setStatus(this, 'injured')"><i
+                        class="fa-solid fa-user-injured"></i></button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Actions -->
+    <div class="bg-white border-t border-gray-100 p-4 sticky bottom-0 z-20">
+        <button onclick="saveAttendance()"
+            class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition">
+            Valider la feuille
+        </button>
+    </div>
+
+    <script>
+        let count = 0;
+        const total = 3; // Demo
+
+        function setStatus(btn, status) {
+            // Reset siblings
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+
+            // Activate clicked
+            btn.classList.add('active');
+
+            // Update counter logic (Simplified)
+            updateCounter();
+        }
+
+        function updateCounter() {
+            const presents = document.querySelectorAll('.status-btn.present.active').length;
+            const lates = document.querySelectorAll('.status-btn.late.active').length;
+            document.getElementById('presentCount').innerText = `${presents + lates}/${total}`;
+        }
+
+        function saveAttendance() {
+            const btn = document.querySelector('button[onclick="saveAttendance()"]');
+            const original = btn.innerText;
+            btn.innerText = "Enregistré !";
+            btn.classList.remove('bg-blue-600');
+            btn.classList.add('bg-green-600');
+            setTimeout(() => {
+                btn.innerText = original;
+                btn.classList.add('bg-blue-600');
+                btn.classList.remove('bg-green-600');
+                window.location.href = 'tactics.html';
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>

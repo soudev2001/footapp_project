@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FootApp - Mobile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #111827; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; }
+        .device-frame { width: 375px; height: 780px; background: #fff; border-radius: 50px; border: 14px solid #1f2937; position: relative; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .app-content { height: calc(100% - 44px - 80px); overflow-y: auto; background: #f9fafb; position: relative; }
+        .bottom-nav { height: 80px; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding-top: 10px; position: absolute; bottom: 0; width: 100%; z-index: 50; }
+        .nav-btn { display: flex; flex-col; align-items: center; gap: 4px; width: 60px; color: #9ca3af; transition: color 0.2s; }
+        .nav-btn.active { color: #2563eb; }
+        @media (max-width: 640px) { body { background: #f9fafb; display: block; padding: 0; height: auto; } .device-frame { width: 100%; height: 100vh; border: none; border-radius: 0; box-shadow: none; } }
+    </style>
+</head>
+<body>
+    <div class="device-frame">
+        <div style="height: 44px; background:white;"></div> <!-- Fake Status Bar -->
+        <div class="app-content">
+            <div id="appHeader" class="bg-blue-600 text-white p-6 pt-8 rounded-b-[30px] shadow-lg mb-4 relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="font-bold tracking-wide text-sm opacity-90"><i class="fa-solid fa-shield-cat mr-2"></i>FC Canvas</span>
+                        <a href="/notifications" class="relative p-2 bg-white/10 rounded-full"><i class="fa-solid fa-bell"></i></a>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-1">Salut, Kylian</h2>
+                </div>
+            </div>
+            <div class="px-5 pb-6">
+                <h3 class="font-bold text-gray-800 mb-4 text-lg">Menu Rapide</h3>
+                <div class="grid grid-cols-4 gap-3">
+                    <a href="/roster" class="aspect-square bg-white rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 border border-gray-100"><i class="fa-solid fa-users text-blue-500 text-lg"></i><span class="text-[10px] font-bold text-gray-600">Effectif</span></a>
+                    <a href="/calendar" class="aspect-square bg-white rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 border border-gray-100"><i class="fa-solid fa-calendar-days text-pink-500 text-lg"></i><span class="text-[10px] font-bold text-gray-600">Calendrier</span></a>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-nav">
+            <a href="/app" class="nav-btn active"><i class="fa-solid fa-house text-xl"></i></a>
+            <a href="/chat-inbox" class="nav-btn"><i class="fa-solid fa-comment text-xl"></i></a>
+            <div class="w-14 h-14 -mt-6 bg-gray-900 rounded-full flex items-center justify-center text-white shadow-lg border-[4px] border-[#f3f4f6]"><i class="fa-solid fa-qrcode text-xl"></i></div>
+            <a href="/shop-product" class="nav-btn"><i class="fa-solid fa-bag-shopping text-xl"></i></a>
+            <a href="/profile" class="nav-btn"><i class="fa-solid fa-user text-xl"></i></a>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedCms = JSON.parse(localStorage.getItem('footapp_cms'));
+            if (savedCms && savedCms.primaryColor) {
+                document.getElementById('appHeader').style.backgroundColor = savedCms.primaryColor;
+                const style = document.createElement('style');
+                style.innerHTML = `.nav-btn.active { color: ${savedCms.primaryColor} !important; }`;
+                document.head.appendChild(style);
+            }
+        });
+    </script>
+</body>
+</html>

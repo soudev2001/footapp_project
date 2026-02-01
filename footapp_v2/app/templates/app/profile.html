@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block title %}Mon Profil - FootApp{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Cover Header -->
+    <div class="relative h-48 md:h-56 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600"></div>
+        <img src="https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?auto=format&fit=crop&w=800&q=80"
+            class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-40">
+
+        <!-- Settings Button -->
+        <a href="/settings"
+            class="absolute top-4 right-4 w-10 h-10 glass-light rounded-xl flex items-center justify-center hover:bg-white/20 transition">
+            <i class="fa-solid fa-gear"></i>
+        </a>
+
+        <!-- Profile Picture -->
+        <div class="absolute -bottom-16 left-1/2 -translate-x-1/2">
+            <div class="relative">
+                <div class="w-32 h-32 rounded-full border-4 border-surface-900 shadow-2xl overflow-hidden bg-gray-800">
+                    {% if current_user.profile.avatar %}
+                    <img src="{{ current_user.profile.avatar }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <img src="https://randomuser.me/api/portraits/men/{{ range(1,50) | random }}.jpg"
+                        class="w-full h-full object-cover">
+                    {% endif %}
+                </div>
+                <div class="absolute bottom-2 right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-surface-900">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Block -->
+    <div class="pt-20 text-center px-4 mb-8">
+        <h1 class="text-2xl font-extrabold">{{ current_user.profile.first_name or 'Joueur' }} {{
+            current_user.profile.last_name or '' }}</h1>
+        <p class="text-primary-400 font-bold text-sm mt-1">{{ current_user.profile.position or 'Attaquant' }} • N° {{
+            current_user.profile.jersey_number or 10 }}</p>
+
+        <!-- Quick Stats -->
+        <div class="flex justify-center gap-4 mt-6">
+            <div class="card p-4 min-w-[80px]">
+                <div class="text-xs text-gray-400 font-bold uppercase">Matchs</div>
+                <div class="text-2xl font-black mt-1">{{ player_stats.matches or 24 }}</div>
+            </div>
+            <div class="card p-4 min-w-[80px]">
+                <div class="text-xs text-gray-400 font-bold uppercase">Buts</div>
+                <div class="text-2xl font-black text-green-400 mt-1">{{ player_stats.goals or 18 }}</div>
+            </div>
+            <div class="card p-4 min-w-[80px]">
+                <div class="text-xs text-gray-400 font-bold uppercase">Assists</div>
+                <div class="text-2xl font-black text-primary-400 mt-1">{{ player_stats.assists or 7 }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="px-4 space-y-6 pb-8">
+        <!-- Attributes Section -->
+        <section class="card p-6">
+            <h3 class="font-bold mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-chart-simple text-primary-400"></i>
+                Attributs
+            </h3>
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between text-xs mb-1.5 font-bold text-gray-400">
+                        <span>Vitesse</span>
+                        <span>{{ attributes.speed or 88 }}</span>
+                    </div>
+                    <div class="w-full bg-white/10 rounded-full h-2.5">
+                        <div class="gradient-primary h-2.5 rounded-full transition-all duration-1000"
+                            style="width: {{ attributes.speed or 88 }}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-xs mb-1.5 font-bold text-gray-400">
+                        <span>Tir</span>
+                        <span>{{ attributes.shooting or 82 }}</span>
+                    </div>
+                    <div class="w-full bg-white/10 rounded-full h-2.5">
+                        <div class="gradient-success h-2.5 rounded-full transition-all duration-1000"
+                            style="width: {{ attributes.shooting or 82 }}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-xs mb-1.5 font-bold text-gray-400">
+                        <span>Technique</span>
+                        <span>{{ attributes.technique or 85 }}</span>
+                    </div>
+                    <div class="w-full bg-white/10 rounded-full h-2.5">
+                        <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-2.5 rounded-full transition-all duration-1000"
+                            style="width: {{ attributes.technique or 85 }}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-xs mb-1.5 font-bold text-gray-400">
+                        <span>Physique</span>
+                        <span>{{ attributes.physical or 70 }}</span>
+                    </div>
+                    <div class="w-full bg-white/10 rounded-full h-2.5">
+                        <div class="gradient-accent h-2.5 rounded-full transition-all duration-1000"
+                            style="width: {{ attributes.physical or 70 }}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-xs mb-1.5 font-bold text-gray-400">
+                        <span>Intelligence</span>
+                        <span>{{ attributes.intelligence or 78 }}</span>
+                    </div>
+                    <div class="w-full bg-white/10 rounded-full h-2.5">
+                        <div class="bg-gradient-to-r from-cyan-500 to-blue-500 h-2.5 rounded-full transition-all duration-1000"
+                            style="width: {{ attributes.intelligence or 78 }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Personal Info -->
+        <section class="card p-6">
+            <h3 class="font-bold mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-id-card text-amber-400"></i>
+                Informations Personnelles
+            </h3>
+            <ul class="space-y-4 text-sm">
+                <li class="flex justify-between items-center py-2 border-b border-white/5">
+                    <span class="text-gray-400">Email</span>
+                    <span class="font-medium">{{ current_user.email or 'player@fcelite.fr' }}</span>
+                </li>
+                <li class="flex justify-between items-center py-2 border-b border-white/5">
+                    <span class="text-gray-400">Date de naissance</span>
+                    <span class="font-medium">{{ current_user.profile.birth_date or '20 Déc. 1998' }}</span>
+                </li>
+                <li class="flex justify-between items-center py-2 border-b border-white/5">
+                    <span class="text-gray-400">Pied fort</span>
+                    <span class="font-medium">{{ current_user.profile.preferred_foot or 'Droit' }}</span>
+                </li>
+                <li class="flex justify-between items-center py-2 border-b border-white/5">
+                    <span class="text-gray-400">Taille</span>
+                    <span class="font-medium">{{ current_user.profile.height or '1m80' }}</span>
+                </li>
+                <li class="flex justify-between items-center py-2">
+                    <span class="text-gray-400">Taille Maillot</span>
+                    <span class="font-medium">{{ current_user.profile.shirt_size or 'M' }}</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Recent Performances -->
+        <section class="card p-6">
+            <h3 class="font-bold mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-star text-amber-400"></i>
+                Dernières Performances
+            </h3>
+            <div class="space-y-3">
+                <div class="flex items-center gap-4 p-3 glass-light rounded-xl">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-futbol text-green-400"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-medium">But vs Racing FC</div>
+                        <div class="text-xs text-gray-400">Samedi dernier • 34'</div>
+                    </div>
+                    <span class="text-green-400 font-bold">+1</span>
+                </div>
+                <div class="flex items-center gap-4 p-3 glass-light rounded-xl">
+                    <div class="w-12 h-12 bg-primary-500/20 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-hands-helping text-primary-400"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-medium">Passe D. vs Lyon FC</div>
+                        <div class="text-xs text-gray-400">Il y a 2 semaines • 67'</div>
+                    </div>
+                    <span class="text-primary-400 font-bold">+1</span>
+                </div>
+                <div class="flex items-center gap-4 p-3 glass-light rounded-xl">
+                    <div class="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-trophy text-amber-400"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-medium">Homme du match</div>
+                        <div class="text-xs text-gray-400">vs Marseille FC • 9.2 Note</div>
+                    </div>
+                    <i class="fa-solid fa-medal text-amber-400"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Action Button -->
+        <a href="/edit-profile"
+            class="btn-primary w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2">
+            <i class="fa-solid fa-pen-to-square"></i>
+            Modifier mon profil
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion - FootApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex overflow-hidden max-h-[600px]">
+        <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Bon retour 👋</h1>
+            <form onsubmit="handleLogin(event)" class="space-y-5 mt-6">
+                <input type="email" id="email" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Email" required>
+                <input type="password" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Mot de passe" required>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 transition">Se connecter</button>
+            </form>
+            <div class="mt-8 text-xs text-center text-gray-400">
+                <button onclick="fillLogin('admin@footapp.com')" class="underline mr-2">Admin</button>
+                <button onclick="fillLogin('president@fccanvas.com')" class="underline mr-2">Club</button>
+                <button onclick="fillLogin('player@fccanvas.com')" class="underline">Joueur</button>
+            </div>
+        </div>
+        <div class="hidden md:block w-1/2 bg-blue-600 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-700 opacity-90"></div>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-white p-12 text-center z-10">
+                <i class="fa-solid fa-shield-cat text-6xl mb-4"></i>
+                <h2 class="text-2xl font-bold">Gérez votre club</h2>
+            </div>
+        </div>
+    </div>
+    <script>
+        function fillLogin(email) { document.getElementById('email').value = email; }
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            if (email === 'admin@footapp.com') window.location.href = '/admin';
+            else if (email === 'president@fccanvas.com') window.location.href = '/dashboard';
+            else window.location.href = '/app';
+        }
+    </script>
+</body>
+</html>

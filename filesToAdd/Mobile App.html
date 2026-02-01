@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FootApp - Mobile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #111827;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .device-frame {
+            width: 375px;
+            height: 780px;
+            background: #fff;
+            border-radius: 50px;
+            border: 14px solid #1f2937;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #1f2937;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            z-index: 50;
+        }
+
+        .status-bar {
+            height: 44px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            position: relative;
+            z-index: 40;
+        }
+
+        .app-content {
+            height: calc(100% - 44px - 80px);
+            overflow-y: auto;
+            background: #f9fafb;
+            position: relative;
+        }
+
+        .bottom-nav {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-around;
+            padding-top: 10px;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            z-index: 50;
+        }
+
+        .nav-btn {
+            display: flex;
+            flex-col;
+            align-items: center;
+            gap: 4px;
+            width: 60px;
+            color: #9ca3af;
+            transition: color 0.2s;
+        }
+
+        .nav-btn.active {
+            color: #2563eb;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="fixed left-10 top-1/2 -translate-y-1/2 hidden lg:block text-white max-w-xs">
+        <h1 class="text-4xl font-bold mb-4 leading-tight">Accueil App</h1>
+        <p class="text-gray-400 mb-8 leading-relaxed">C'est le hub central. Utilisez la barre du bas pour naviguer vers
+            les autres fonctionnalités (Chat, Boutique, Profil).</p>
+        <a href="index.html" class="text-blue-400 hover:text-blue-300 underline text-sm">Retour au site web</a>
+    </div>
+
+    <div class="device-frame">
+        <div class="notch"></div>
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="flex gap-1"><i class="fa-solid fa-signal"></i><i class="fa-solid fa-wifi"></i><i
+                    class="fa-solid fa-battery-full"></i></div>
+        </div>
+
+        <div class="app-content">
+
+            <!-- HEADER -->
+            <div id="appHeader"
+                class="bg-blue-600 text-white p-6 pt-8 rounded-b-[30px] shadow-lg mb-4 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                <div class="relative z-10">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
+                                <i class="fa-solid fa-shield-cat"></i></div>
+                            <span class="font-bold tracking-wide text-sm opacity-90">FC Canvas</span>
+                        </div>
+                        <a href="notifications.html"
+                            class="relative p-2 bg-white/10 rounded-full hover:bg-white/20 transition cursor-pointer">
+                            <i class="fa-solid fa-bell"></i>
+                            <span
+                                class="absolute top-1 right-1.5 w-2 h-2 bg-red-400 rounded-full border border-white"></span>
+                        </a>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-1">Salut, Kylian</h2>
+                    <p class="text-blue-100 text-sm font-medium opacity-80">Prêt à marquer ce week-end ? ⚽</p>
+                </div>
+            </div>
+
+            <div class="px-5 pb-6">
+                <!-- NEXT MATCH CARD -->
+                <h3 class="font-bold text-gray-800 mb-4 text-lg">Prochain Match</h3>
+                <div onclick="location.href='match-center.html'"
+                    class="bg-white p-5 rounded-3xl shadow-lg shadow-gray-200/50 mb-8 relative overflow-hidden group cursor-pointer border border-gray-100 transition hover:-translate-y-1">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-green-500"></div>
+                    <div class="flex justify-between items-start mb-5">
+                        <span class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Championnat •
+                            J12</span>
+                        <span
+                            class="bg-green-100 text-green-700 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">CONVOQUÉ</span>
+                    </div>
+
+                    <div class="flex items-center justify-between mb-6 px-2">
+                        <div class="flex flex-col items-center gap-2">
+                            <div
+                                class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 text-xl shadow-inner border border-gray-100">
+                                <i class="fa-solid fa-shield"></i></div>
+                            <span class="font-bold text-sm text-gray-800">FCC</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="text-2xl font-black text-gray-200">VS</div>
+                            <div class="text-xs font-bold text-gray-400 mt-1">15:00</div>
+                        </div>
+                        <div class="flex flex-col items-center gap-2">
+                            <div
+                                class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 text-xl shadow-inner border border-red-50">
+                                <i class="fa-solid fa-shield-dog"></i></div>
+                            <span class="font-bold text-sm text-gray-800">US Paris</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="flex items-center gap-4 text-xs text-gray-500 border-t border-gray-100 pt-4 mb-4 font-medium">
+                        <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-blue-500"></i>
+                            Samedi 24 Oct</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-red-500"></i>
+                            Domicile</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button
+                            class="bg-gray-900 text-white py-3 rounded-xl font-bold text-xs shadow-lg transform active:scale-95 transition">Je
+                            participe</button>
+                        <button
+                            class="bg-white border border-gray-200 text-gray-500 py-3 rounded-xl font-bold text-xs hover:bg-gray-50 transition">Absent</button>
+                    </div>
+                </div>
+
+                <!-- QUICK MENU -->
+                <h3 class="font-bold text-gray-800 mb-4 text-lg">Menu Rapide</h3>
+                <div class="grid grid-cols-4 gap-3">
+                    <a href="roster.html"
+                        class="aspect-square bg-white rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 hover:shadow-md transition border border-gray-100">
+                        <i class="fa-solid fa-users text-blue-500 text-lg mb-1"></i>
+                        <span class="text-[10px] font-bold text-gray-600">Effectif</span>
+                    </a>
+                    <a href="feed.html"
+                        class="aspect-square bg-white rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 hover:shadow-md transition border border-gray-100">
+                        <i class="fa-solid fa-newspaper text-purple-500 text-lg mb-1"></i>
+                        <span class="text-[10px] font-bold text-gray-600">Actu</span>
+                    </a>
+                    <a href="calendar.html"
+                        class="aspect-square bg-white rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 hover:shadow-md transition border border-gray-100">
+                        <i class="fa-solid fa-calendar-days text-pink-500 text-lg mb-1"></i>
+                        <span class="text-[10px] font-bold text-gray-600">Calendrier</span>
+                    </a>
+                    <a href="documents.html"
+                        class="aspect-square bg-white rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 hover:shadow-md transition border border-gray-100">
+                        <i class="fa-solid fa-file-contract text-orange-500 text-lg mb-1"></i>
+                        <span class="text-[10px] font-bold text-gray-600">Licence</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div class="bottom-nav">
+            <a href="app.html" class="nav-btn active"><i class="fa-solid fa-house text-xl"></i><span
+                    class="text-[9px]">Accueil</span></a>
+            <a href="chat-inbox.html" class="nav-btn"><i class="fa-solid fa-comment text-xl"></i><span
+                    class="text-[9px]">Chat</span></a>
+            <div
+                class="w-14 h-14 -mt-6 bg-gray-900 rounded-full flex items-center justify-center text-white shadow-lg border-[4px] border-[#f3f4f6]">
+                <i class="fa-solid fa-qrcode text-xl"></i></div>
+            <a href="shop-product.html" class="nav-btn"><i class="fa-solid fa-bag-shopping text-xl"></i><span
+                    class="text-[9px]">Shop</span></a>
+            <a href="profile.html" class="nav-btn"><i class="fa-solid fa-user text-xl"></i><span
+                    class="text-[9px]">Profil</span></a>
+        </div>
+    </div>
+
+    <script>
+        // CMS Integration: Apply colors from Dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedCms = JSON.parse(localStorage.getItem('footapp_cms'));
+            if (savedCms && savedCms.primaryColor) {
+                const color = savedCms.primaryColor;
+                document.getElementById('appHeader').style.backgroundColor = color;
+
+                // Injecter style pour l'icône active
+                const style = document.createElement('style');
+                style.innerHTML = `.nav-btn.active { color: ${color} !important; }`;
+                document.head.appendChild(style);
+            }
+        });
+    </script>
+</body>
+
+</html>

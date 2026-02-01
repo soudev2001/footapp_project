@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FC Canvas - Officiel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-100 font-sans text-gray-800 max-w-md mx-auto min-h-screen shadow-2xl relative overflow-y-auto">
+
+    <!-- Cover & Profile -->
+    <header class="bg-white relative mb-4">
+        <div class="h-32 bg-gradient-to-r from-blue-600 to-blue-800"></div>
+        <div class="px-4 pb-4">
+            <div class="relative -top-10 flex justify-between items-end mb-[-20px]">
+                <div class="w-24 h-24 bg-white rounded-full p-1 shadow-lg">
+                    <div
+                        class="w-full h-full bg-blue-100 rounded-full flex items-center justify-center text-3xl text-blue-600">
+                        <i class="fa-solid fa-shield-cat"></i>
+                    </div>
+                </div>
+                <button
+                    class="bg-blue-600 text-white px-6 py-2 rounded-full font-bold text-sm shadow-md hover:bg-blue-700 transition mb-10">
+                    Suivre
+                </button>
+            </div>
+
+            <h1 class="text-2xl font-bold text-gray-900 mt-2">FC Canvas</h1>
+            <p class="text-gray-500 text-sm">Club de Football Amateur • Depuis 1998</p>
+
+            <div class="flex gap-4 mt-4 text-sm border-t border-gray-100 pt-4">
+                <div class="text-center">
+                    <span class="block font-bold text-gray-900">1.2k</span>
+                    <span class="text-gray-400 text-xs">Abonnés</span>
+                </div>
+                <div class="text-center">
+                    <span class="block font-bold text-gray-900">14</span>
+                    <span class="text-gray-400 text-xs">Équipes</span>
+                </div>
+                <div class="text-center">
+                    <span class="block font-bold text-gray-900">R1</span>
+                    <span class="text-gray-400 text-xs">Niveau</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Tabs -->
+    <div class="bg-white sticky top-0 z-10 shadow-sm border-b border-gray-200 flex text-sm font-bold text-gray-500">
+        <button class="flex-1 py-3 text-blue-600 border-b-2 border-blue-600">Actu</button>
+        <button class="flex-1 py-3 hover:text-gray-800">Matchs</button>
+        <button onclick="location.href='ranking.html'" class="flex-1 py-3 hover:text-gray-800">Classement</button>
+    </div>
+
+    <main class="p-4 space-y-4">
+
+        <!-- Last Result -->
+        <div class="bg-white rounded-xl p-4 shadow-sm border-l-4 border-green-500">
+            <p class="text-xs font-bold text-gray-400 uppercase mb-3">Dernier Match • U13 A</p>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs">
+                        FCC</div>
+                    <span class="font-bold text-lg">4</span>
+                </div>
+                <span class="text-gray-300 text-sm">-</span>
+                <div class="flex items-center gap-3">
+                    <span class="font-bold text-lg text-gray-400">1</span>
+                    <div
+                        class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 font-bold text-xs">
+                        USP</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post -->
+        <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+            <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=600&q=80"
+                class="w-full h-48 object-cover">
+            <div class="p-4">
+                <h3 class="font-bold text-gray-900 mb-1">Tournoi de Pâques 🐣</h3>
+                <p class="text-sm text-gray-600 mb-3">Nos U11 finissent sur le podium ! Bravo à toute l'équipe pour ce
+                    parcours exceptionnel.</p>
+                <div class="flex items-center justify-between text-xs text-gray-400">
+                    <span>Il y a 2 jours</span>
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-heart text-red-500"></i> 142</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shop Promo -->
+        <div
+            class="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl p-4 text-white flex items-center justify-between">
+            <div>
+                <p class="font-bold mb-1">Boutique Officielle</p>
+                <p class="text-xs text-gray-300">Soutenez le club !</p>
+            </div>
+            <button onclick="location.href='shop-product.html'"
+                class="bg-white text-gray-900 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-100">Visiter</button>
+        </div>
+
+    </main>
+
+    <!-- Login CTA -->
+    <div class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 p-4 flex gap-3">
+        <button onclick="location.href='login.html'"
+            class="flex-1 bg-gray-100 text-gray-800 py-3 rounded-xl font-bold text-sm">Connexion</button>
+        <button onclick="location.href='register.html'"
+            class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Rejoindre le club</button>
+    </div>
+
+</body>
+
+</html>

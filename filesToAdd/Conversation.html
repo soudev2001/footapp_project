@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discussion - FootApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #111827;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .device-frame {
+            width: 375px;
+            height: 780px;
+            background: #fff;
+            border-radius: 50px;
+            border: 14px solid #1f2937;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #1f2937;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            z-index: 50;
+        }
+
+        .app-content {
+            height: 100%;
+            display: flex;
+            flex-col;
+            background: #e5e5e5;
+            /* WhatsApp-like bg color */
+        }
+
+        /* Message Bubbles */
+        .msg-bubble {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 16px;
+            position: relative;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 2px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .msg-sent {
+            background-color: #2563eb;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-received {
+            background-color: white;
+            color: #1f2937;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Animations */
+        .msg-enter {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #9ca3af;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+            margin: 0 1px;
+        }
+
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* Reaction Heart */
+        .reaction-heart {
+            position: absolute;
+            bottom: -8px;
+            right: -4px;
+            background: white;
+            border-radius: 50%;
+            padding: 2px;
+            font-size: 10px;
+            color: #ef4444;
+            border: 1px solid #f3f4f6;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            animation: popIn 0.2s ease-out;
+        }
+
+        /* Info Panel Slide */
+        .info-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 30;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .info-panel.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="device-frame">
+        <div class="notch"></div>
+
+        <div class="app-content pt-10 relative">
+
+            <!-- Header -->
+            <div class="bg-white/90 backdrop-blur-md p-3 flex items-center gap-3 border-b border-gray-200 shadow-sm z-20 cursor-pointer"
+                onclick="toggleInfo()">
+                <button onclick="event.stopPropagation(); window.location.href='chat-inbox.html'"
+                    class="text-blue-600 hover:bg-blue-50 p-2 rounded-full transition">
+                    <i class="fa-solid fa-chevron-left text-xl"></i>
+                </button>
+
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="w-9 h-9 rounded-full bg-blue-100 overflow-hidden relative border border-gray-200">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Thomas"
+                            class="w-full h-full object-cover">
+                        <div
+                            class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full">
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-sm text-gray-900 leading-tight">Coach Thomas</h1>
+                        <p class="text-[10px] text-blue-600 font-medium truncate" id="statusText">En ligne</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 text-blue-600 pr-2">
+                    <button class="hover:opacity-70"><i class="fa-solid fa-video"></i></button>
+                    <button class="hover:opacity-70"><i class="fa-solid fa-phone"></i></button>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div id="chatContainer" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 relative bg-[#f0f2f5]">
+                <!-- Background Pattern -->
+                <div class="absolute inset-0 opacity-[0.03] pointer-events-none"
+                    style="background-image: url('data:image/svg+xml,%3Csvg width=\'64\' height=\'64\' viewBox=\'0 0 64 64\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M8 16c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zm33.414-6l5.95-5.95L45.95.636 38.536 8.05 31.12.636 29.707 2.05 37.12 9.464l-7.414 7.414 1.414 1.414 7.414-7.414 7.414 7.414 1.414-1.414-7.414-7.414zM40 16c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zM9 42c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zM41 42c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zM17 54c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zM49 54c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0-2c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zM9 16C4.029 16 0 11.97 0 7S4.029-2 9-2s9 4.03 9 9-4.029 9-9 9zM41 16c-4.971 0-9-4.03-9-9s4.029-9 9-9 9 4.03 9 9-4.029 9-9 9zM9 42c-4.971 0-9-4.03-9-9s4.029-9 9-9 9 4.03 9 9-4.029 9-9 9zM41 42c-4.971 0-9-4.03-9-9s4.029-9 9-9 9 4.03 9 9-4.029 9-9 9zM17 54c-4.971 0-9-4.03-9-9s4.029-9 9-9 9 4.03 9 9-4.029 9-9 9zM49 54c-4.971 0-9-4.03-9-9s4.029-9 9-9 9 4.03 9 9-4.029 9-9 9z\' fill=\'%239C92AC\' fill-opacity=\'1\' fill-rule=\'evenodd\'/%3E%3C/svg%3E');">
+                </div>
+
+                <div class="flex justify-center my-2 relative z-10"><span
+                        class="text-[10px] text-gray-500 bg-gray-200/80 px-3 py-1 rounded-full shadow-sm backdrop-blur-sm">Hier
+                        14:30</span></div>
+
+                <!-- Received Msg -->
+                <div class="msg-bubble msg-received z-10" ondblclick="react(this)">
+                    Salut Kylian, tu seras disponible pour le match de coupe samedi ?
+                    <div class="text-[9px] text-gray-400 text-right mt-1">14:30</div>
+                </div>
+
+                <!-- Sent Msg -->
+                <div class="msg-bubble msg-sent z-10" ondblclick="react(this)">
+                    Oui Coach ! Présent 💪
+                    <div class="text-[9px] text-blue-200 text-right mt-1 flex justify-end items-center gap-1">14:35 <i
+                            class="fa-solid fa-check-double"></i></div>
+                    <div class="reaction-heart"><i class="fa-solid fa-heart"></i></div>
+                </div>
+
+                <!-- Received Msg -->
+                <div class="msg-bubble msg-received z-10" ondblclick="react(this)">
+                    Super. On vise la qualif ! Repose-toi bien.
+                    <div class="text-[9px] text-gray-400 text-right mt-1">14:36</div>
+                </div>
+
+                <!-- Typing Indicator (Hidden by default) -->
+                <div id="typingIndicator" class="msg-bubble msg-received hidden z-10 w-fit">
+                    <div class="typing-indicator flex items-center py-1">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="bg-white p-3 border-t border-gray-200 flex items-end gap-2 z-20">
+                <button class="text-blue-600 hover:bg-blue-50 p-2.5 rounded-full transition flex-shrink-0"
+                    onclick="document.getElementById('fileInput').click()">
+                    <i class="fa-solid fa-plus text-lg"></i>
+                </button>
+                <input type="file" id="fileInput" class="hidden" onchange="sendImage(this)">
+
+                <div class="flex-1 bg-gray-100 rounded-2xl flex items-center px-4 py-2">
+                    <input id="msgInput" type="text" placeholder="Message..."
+                        class="w-full bg-transparent text-sm focus:outline-none max-h-24"
+                        onkeypress="handleEnter(event)">
+                </div>
+
+                <button onclick="sendMsg()" id="sendBtn"
+                    class="w-10 h-10 bg-blue-600 rounded-full text-white flex items-center justify-center hover:bg-blue-700 transition shadow-md flex-shrink-0 transform active:scale-95">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Info Panel (Right Side) -->
+            <div id="infoPanel" class="info-panel shadow-2xl flex flex-col">
+                <div class="bg-white p-4 border-b border-gray-100 flex items-center gap-3">
+                    <button onclick="toggleInfo()" class="text-gray-500 hover:text-black"><i
+                            class="fa-solid fa-xmark text-xl"></i></button>
+                    <h2 class="font-bold">Infos du contact</h2>
+                </div>
+                <div class="p-6 flex flex-col items-center border-b border-gray-100">
+                    <div
+                        class="w-24 h-24 rounded-full bg-blue-100 overflow-hidden mb-4 border-4 border-white shadow-lg">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Thomas"
+                            class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold text-xl">Coach Thomas</h3>
+                    <p class="text-gray-500 text-sm mb-4">+33 6 12 34 56 78</p>
+                    <div class="flex gap-4 w-full justify-center">
+                        <button
+                            class="flex flex-col items-center gap-1 text-blue-600 p-2 rounded-xl hover:bg-blue-50 w-16">
+                            <i class="fa-solid fa-phone text-xl mb-1"></i>
+                            <span class="text-[10px]">Appel</span>
+                        </button>
+                        <button
+                            class="flex flex-col items-center gap-1 text-blue-600 p-2 rounded-xl hover:bg-blue-50 w-16">
+                            <i class="fa-solid fa-video text-xl mb-1"></i>
+                            <span class="text-[10px]">Vidéo</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-4 space-y-2">
+                    <button class="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl">
+                        <span class="text-sm font-medium">Médias partagés</span>
+                        <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                    </button>
+                    <button class="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl">
+                        <span class="text-sm font-medium text-red-500">Bloquer</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('chatContainer');
+        const input = document.getElementById('msgInput');
+        const typing = document.getElementById('typingIndicator');
+
+        // Scroll to bottom on load
+        container.scrollTop = container.scrollHeight;
+
+        function handleEnter(e) { if (e.key === 'Enter') sendMsg(); }
+
+        function sendMsg() {
+            const text = input.value.trim();
+            if (!text) return;
+
+            addMessage(text, 'sent');
+            input.value = '';
+
+            // Simulation réponse
+            simulateReply();
+        }
+
+        function sendImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgHtml = `<img src="${e.target.result}" class="rounded-lg max-w-full h-auto border border-white/20">`;
+                    addMessage(imgHtml, 'sent', true);
+                    simulateReply();
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function addMessage(content, type, isHtml = false) {
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const div = document.createElement('div');
+            div.className = `msg-bubble msg-${type} msg-enter z-10`;
+
+            if (isHtml) div.innerHTML = content + `<div class="text-[9px] text-white/80 text-right mt-1">${time}</div>`;
+            else div.innerHTML = `${content}<div class="text-[9px] ${type === 'sent' ? 'text-blue-100' : 'text-gray-400'} text-right mt-1 flex justify-end items-center gap-1">${time} ${type === 'sent' ? '<i class="fa-solid fa-check"></i>' : ''}</div>`;
+
+            // Insert before typing indicator
+            container.insertBefore(div, typing);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function simulateReply() {
+            document.getElementById('statusText').innerText = "En train d'écrire...";
+            typing.classList.remove('hidden');
+            container.scrollTop = container.scrollHeight;
+
+            setTimeout(() => {
+                typing.classList.add('hidden');
+                document.getElementById('statusText').innerText = "En ligne";
+
+                const responses = ["Bien reçu !", "Ok ça marche.", "On voit ça à l'entraînement.", "👍"];
+                const randomResp = responses[Math.floor(Math.random() * responses.length)];
+
+                addMessage(randomResp, 'received');
+            }, 1500 + Math.random() * 1000);
+        }
+
+        // Double click to like
+        function react(el) {
+            // Remove existing heart if any
+            const existing = el.querySelector('.reaction-heart');
+            if (existing) {
+                existing.remove();
+                return;
+            }
+
+            const heart = document.createElement('div');
+            heart.className = 'reaction-heart';
+            heart.innerHTML = '<i class="fa-solid fa-heart"></i>';
+            el.appendChild(heart);
+        }
+
+        function toggleInfo() {
+            document.getElementById('infoPanel').classList.toggle('open');
+        }
+    </script>
+</body>
+
+</html>

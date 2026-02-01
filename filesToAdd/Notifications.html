@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - FootApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .unread {
+            background-color: #eff6ff;
+        }
+
+        .unread-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #2563eb;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body class="bg-white font-sans text-gray-800 max-w-md mx-auto min-h-screen relative shadow-2xl flex flex-col">
+
+    <!-- Header -->
+    <header class="p-4 flex items-center gap-3 border-b border-gray-100 sticky top-0 bg-white z-10">
+        <button onclick="history.back()"><i class="fa-solid fa-arrow-left text-xl text-gray-600"></i></button>
+        <h1 class="text-lg font-bold">Notifications</h1>
+        <button class="ml-auto text-blue-600 text-sm font-bold">Tout marquer lu</button>
+    </header>
+
+    <main class="flex-1 overflow-y-auto">
+
+        <div class="px-4 py-2 bg-gray-50 text-xs font-bold text-gray-500 uppercase">Aujourd'hui</div>
+
+        <!-- Notif 1 (Convocation) -->
+        <div class="p-4 border-b border-gray-100 unread flex gap-3 cursor-pointer hover:bg-blue-50 transition">
+            <div
+                class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm">Vous avez été <strong>convoqué</strong> pour le match contre <span
+                        class="font-bold">US Paris</span>.</p>
+                <p class="text-xs text-blue-600 font-bold mt-1">Répondre maintenant</p>
+            </div>
+            <div class="flex flex-col items-end gap-2">
+                <span class="text-[10px] text-gray-400">14:30</span>
+                <span class="unread-dot"></span>
+            </div>
+        </div>
+
+        <!-- Notif 2 (Message) -->
+        <div class="p-4 border-b border-gray-100 unread flex gap-3 cursor-pointer hover:bg-blue-50 transition">
+            <div class="w-10 h-10 rounded-full bg-blue-100 overflow-hidden flex-shrink-0">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Thomas" class="w-full h-full">
+            </div>
+            <div class="flex-1">
+                <p class="text-sm"><span class="font-bold">Coach Thomas</span> a envoyé un message dans <span
+                        class="font-bold">Groupe U13</span>.</p>
+                <p class="text-xs text-gray-500 mt-1 truncate">"N'oubliez pas les protège-tibias..."</p>
+            </div>
+            <span class="text-[10px] text-gray-400">10:45</span>
+        </div>
+
+        <div class="px-4 py-2 bg-gray-50 text-xs font-bold text-gray-500 uppercase">Hier</div>
+
+        <!-- Notif 3 (Shop) -->
+        <div class="p-4 border-b border-gray-100 flex gap-3 cursor-pointer hover:bg-gray-50 transition">
+            <div
+                class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-tag"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm">Nouvel article disponible dans la boutique : <strong>Pack Entraînement 2024</strong>.
+                </p>
+            </div>
+            <span class="text-[10px] text-gray-400">Hier</span>
+        </div>
+
+        <!-- Notif 4 (Like) -->
+        <div class="p-4 border-b border-gray-100 flex gap-3 cursor-pointer hover:bg-gray-50 transition">
+            <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-heart"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm"><span class="font-bold">Enzo</span> et 12 autres ont aimé votre commentaire.</p>
+            </div>
+            <span class="text-[10px] text-gray-400">Hier</span>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

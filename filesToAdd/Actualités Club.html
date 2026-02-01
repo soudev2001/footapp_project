@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FootApp - Actualités</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .story-ring {
+            background: linear-gradient(45deg, #f59e0b, #ec4899, #8b5cf6);
+            padding: 2px;
+            border-radius: 50%;
+        }
+
+        .like-anim:active {
+            transform: scale(1.3);
+            color: #ef4444;
+            transition: 0.1s;
+        }
+    </style>
+</head>
+
+<body class="pb-24 max-w-md mx-auto bg-gray-50 min-h-screen shadow-2xl border-x border-gray-200">
+
+    <!-- Header Sticky -->
+    <header
+        class="bg-white/90 backdrop-blur-md sticky top-0 z-50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-shield-cat text-blue-600 text-2xl"></i>
+            <h1 class="font-bold text-lg tracking-tight">Club News</h1>
+        </div>
+        <div class="flex gap-4 text-gray-600">
+            <i class="fa-regular fa-heart text-xl hover:text-red-500 transition"></i>
+            <i class="fa-regular fa-paper-plane text-xl hover:text-blue-500 transition"></i>
+        </div>
+    </header>
+
+    <!-- Stories (Matchs du week-end) -->
+    <div class="bg-white py-4 overflow-x-auto whitespace-nowrap border-b border-gray-100 scrollbar-hide">
+        <div class="inline-flex gap-4 px-4">
+            <div class="flex flex-col items-center gap-1 cursor-pointer">
+                <div class="story-ring relative">
+                    <div class="w-16 h-16 rounded-full border-2 border-white bg-gray-200 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1522778119026-d647f0565c6a?auto=format&fit=crop&w=100&q=80"
+                            class="w-full h-full object-cover">
+                    </div>
+                    <div
+                        class="absolute bottom-0 right-0 bg-blue-600 text-white text-[10px] px-1 rounded border border-white">
+                        U13</div>
+                </div>
+                <span class="text-xs font-medium text-gray-600">Résumés</span>
+            </div>
+            <div class="flex flex-col items-center gap-1 cursor-pointer">
+                <div class="story-ring">
+                    <div class="w-16 h-16 rounded-full border-2 border-white bg-gray-200 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=100&q=80"
+                            class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <span class="text-xs font-medium text-gray-600">Tournoi</span>
+            </div>
+            <!-- Add story wrapper -->
+            <div class="flex flex-col items-center gap-1 cursor-pointer">
+                <div
+                    class="w-[68px] h-[68px] rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400">
+                    <i class="fa-solid fa-plus text-xl"></i>
+                </div>
+                <span class="text-xs font-medium text-gray-400">Ajouter</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feed Content -->
+    <main class="flex flex-col gap-4 py-4">
+
+        <!-- Post 1: Résultat de match -->
+        <article class="bg-white border-y border-gray-100 pb-2">
+            <div class="flex items-center justify-between p-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white"><i
+                            class="fa-solid fa-shield-cat text-xs"></i></div>
+                    <div>
+                        <p class="font-bold text-sm">FC Canvas Officiel</p>
+                        <p class="text-xs text-gray-400">Il y a 2h • Score en direct</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-ellipsis text-gray-400"></i>
+            </div>
+
+            <div
+                class="relative w-full aspect-[4/3] bg-gray-900 flex flex-col items-center justify-center text-white p-6">
+                <div
+                    class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-4.0.3')] bg-cover bg-center opacity-30">
+                </div>
+                <h3 class="relative z-10 text-sm font-bold tracking-widest uppercase mb-4 text-blue-400">Victoire
+                    Écrasante !</h3>
+                <div class="relative z-10 flex items-center gap-8">
+                    <div class="text-center">
+                        <span class="text-4xl font-black block">4</span>
+                        <span class="text-sm font-bold">FCC</span>
+                    </div>
+                    <span class="text-2xl text-gray-400">-</span>
+                    <div class="text-center">
+                        <span class="text-4xl font-black block">1</span>
+                        <span class="text-sm font-bold">USP</span>
+                    </div>
+                </div>
+                <p class="relative z-10 mt-6 text-sm bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full">Buteurs:
+                    Kylian x2, Enzo, Leo</p>
+            </div>
+
+            <div class="px-4 pt-3 pb-1">
+                <div class="flex items-center justify-between text-2xl mb-2">
+                    <div class="flex gap-4">
+                        <i class="fa-regular fa-heart hover:text-red-500 cursor-pointer like-anim"></i>
+                        <i class="fa-regular fa-comment hover:text-blue-500 cursor-pointer"></i>
+                        <i class="fa-regular fa-paper-plane hover:text-green-500 cursor-pointer"></i>
+                    </div>
+                    <i class="fa-regular fa-bookmark text-gray-400 cursor-pointer"></i>
+                </div>
+                <p class="text-sm font-bold mb-1">452 J'aime</p>
+                <p class="text-sm"><span class="font-bold mr-1">FC Canvas Officiel</span>Quelle performance de nos U15
+                    cet après-midi ! 🔥 Une maîtrise totale du jeu. Bravo les gars ! #TeamFCC #Victoire</p>
+                <p class="text-gray-400 text-xs mt-2 cursor-pointer">Voir les 12 commentaires</p>
+            </div>
+        </article>
+
+        <!-- Post 2: Annonce Événement -->
+        <article class="bg-white border-y border-gray-100 pb-2">
+            <div class="flex items-center justify-between p-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden"><img
+                            src="https://api.dicebear.com/7.x/avataaars/svg?seed=Pres" class="w-full h-full"></div>
+                    <div>
+                        <p class="font-bold text-sm">Le Président</p>
+                        <p class="text-xs text-gray-400">Hier</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-4 py-2">
+                <h3 class="font-bold text-lg mb-2">📢 Barbecue de fin de saison</h3>
+                <p class="text-sm text-gray-700 leading-relaxed">
+                    Bonjour à tous, n'oubliez pas de vous inscrire pour le grand barbecue du club ce samedi ! Les
+                    formulaires sont disponibles au club house ou via le bouton ci-dessous.
+                </p>
+            </div>
+
+            <div class="px-4 py-3">
+                <button onclick="location.href='reservation.html'"
+                    class="w-full bg-blue-50 text-blue-600 font-bold py-2 rounded-lg text-sm hover:bg-blue-100 transition">
+                    Réserver ma place
+                </button>
+            </div>
+        </article>
+
+    </main>
+
+    <!-- Bottom Nav (Shared) -->
+    <nav class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 flex justify-around py-3 pb-5 z-50">
+        <a href="feed.html" class="flex flex-col items-center text-blue-600">
+            <i class="fa-solid fa-newspaper text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Actu</span>
+        </a>
+        <a href="app.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-calendar-days text-xl mb-1"></i>
+            <span class="text-[10px] font-medium">Planning</span>
+        </a>
+        <a href="tactics.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-users-gear text-xl mb-1"></i>
+            <span class="text-[10px] font-medium">Gestion</span>
+        </a>
+        <a href="profile.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-user text-xl mb-1"></i>
+            <span class="text-[10px] font-medium">Profil</span>
+        </a>
+    </nav>
+
+</body>
+
+</html>

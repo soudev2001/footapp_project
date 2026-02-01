@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Club - FC Canvas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .nav-item.active {
+            background-color: #eff6ff;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            color: #4b5563;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d1d5db;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 flex h-screen overflow-hidden font-sans text-gray-800">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex z-30">
+        <div class="h-20 flex items-center px-6 border-b border-gray-50">
+            <div class="flex items-center gap-3 text-blue-600">
+                <i class="fa-solid fa-shield-cat text-2xl"></i>
+                <span class="font-extrabold text-xl tracking-tight text-gray-900">FC Canvas</span>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">Gestion</div>
+            <nav class="space-y-1">
+                <button onclick="switchTab('cms')" id="nav-cms"
+                    class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition active">
+                    <i class="fa-solid fa-wand-magic-sparkles w-5 text-center"></i> Site & App
+                </button>
+                <button onclick="switchTab('users')" id="nav-users"
+                    class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition">
+                    <i class="fa-solid fa-users w-5 text-center"></i> Membres
+                </button>
+                <button onclick="switchTab('subscription')" id="nav-subscription"
+                    class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition">
+                    <i class="fa-solid fa-receipt w-5 text-center"></i> Abonnement
+                </button>
+            </nav>
+        </div>
+
+        <div class="mt-auto p-4 border-t border-gray-100">
+            <a href="index.html"
+                class="flex items-center gap-3 text-red-500 hover:text-red-700 text-sm font-bold px-3 py-2 rounded-lg hover:bg-red-50 transition">
+                <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Déconnexion
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        <!-- Topbar -->
+        <header class="h-20 bg-white border-b border-gray-200 flex justify-between items-center px-8 z-20 shadow-sm">
+            <h1 id="pageTitle" class="text-2xl font-bold text-gray-900">Personnalisation</h1>
+            <div class="flex items-center gap-4">
+                <a href="index.html" target="_blank"
+                    class="text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-full transition flex items-center gap-2">
+                    <i class="fa-solid fa-external-link-alt text-xs"></i> Voir le site
+                </a>
+                <div
+                    class="h-10 w-10 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold shadow-md cursor-pointer">
+                    JD
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 relative">
+
+            <!-- SECTION: CMS -->
+            <div id="tab-cms" class="fade-in max-w-4xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="p-8 border-b border-gray-100">
+                        <h2 class="text-lg font-bold text-gray-900 mb-1">Apparence de votre marque</h2>
+                        <p class="text-gray-500 text-sm">Ces paramètres affectent le site web et l'application mobile.
+                        </p>
+                    </div>
+
+                    <form onsubmit="saveCMS(event)" class="p-8 space-y-8">
+                        <!-- Hero Text -->
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="md:col-span-1">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Message d'accueil</label>
+                                <p class="text-xs text-gray-400">Le titre principal sur la page d'accueil.</p>
+                            </div>
+                            <div class="md:col-span-2 space-y-4">
+                                <div>
+                                    <input type="text" name="heroTitle" id="heroTitle"
+                                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition font-bold text-lg"
+                                        placeholder="Bienvenue...">
+                                </div>
+                                <div>
+                                    <textarea name="heroSubtitle" id="heroSubtitle"
+                                        class="w-full p-3 border border-gray-300 rounded-lg h-24 focus:ring-2 focus:ring-blue-500 outline-none transition text-sm"
+                                        placeholder="Sous-titre..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="border-gray-100">
+
+                        <!-- Branding Color -->
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="md:col-span-1">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Couleur Principale</label>
+                                <p class="text-xs text-gray-400">Définit l'identité visuelle de vos boutons et en-têtes.
+                                </p>
+                            </div>
+                            <div class="md:col-span-2">
+                                <div class="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                    <input type="color" id="primaryColor" name="primaryColor"
+                                        class="h-14 w-14 rounded cursor-pointer border-0 bg-transparent p-0">
+                                    <div class="flex-1">
+                                        <div class="text-xs font-bold text-gray-500 uppercase mb-1">Code HEX</div>
+                                        <input type="text" id="colorText"
+                                            class="font-mono text-gray-800 bg-transparent outline-none w-full font-bold"
+                                            readonly>
+                                    </div>
+                                    <div class="h-10 w-24 rounded-lg shadow-md flex items-center justify-center text-white font-bold text-xs"
+                                        id="previewBtn">
+                                        Aperçu
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-4">
+                            <button type="submit"
+                                class="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition shadow-lg transform active:scale-95">
+                                Sauvegarder les changements
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SECTION: USERS -->
+            <div id="tab-users" class="hidden fade-in max-w-5xl mx-auto">
+                <div
+                    class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden min-h-[500px] flex flex-col">
+                    <div
+                        class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50/50">
+                        <div class="relative w-full sm:w-auto">
+                            <i
+                                class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="searchUser" onkeyup="filterUsers()" placeholder="Rechercher..."
+                                class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 w-full sm:w-64">
+                        </div>
+                        <button onclick="toggleModal('userModal')"
+                            class="w-full sm:w-auto bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 transition shadow-md flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Ajouter un membre
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left">
+                            <thead class="bg-white text-gray-400 uppercase text-xs border-b border-gray-100 font-bold">
+                                <tr>
+                                    <th class="p-5">Membre</th>
+                                    <th class="p-5">Rôle</th>
+                                    <th class="p-5">Catégorie</th>
+                                    <th class="p-5 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable" class="divide-y divide-gray-50 text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                        <div id="emptyUsers"
+                            class="hidden flex flex-col items-center justify-center h-64 text-gray-400">
+                            <i class="fa-solid fa-user-slash text-3xl mb-3"></i>
+                            <p>Aucun membre trouvé.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: SUBSCRIPTION -->
+            <div id="tab-subscription" class="hidden fade-in max-w-4xl mx-auto">
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div
+                        class="md:col-span-2 bg-white p-8 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-10 -mt-10"></div>
+                        <h2 class="font-bold text-xl mb-6 text-gray-900 relative z-10">Mon Abonnement</h2>
+
+                        <div class="flex items-center gap-4 mb-8">
+                            <div
+                                class="h-16 w-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-blue-500/30">
+                                <i class="fa-solid fa-rocket"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-500 font-bold uppercase tracking-wider">Plan Actuel</div>
+                                <div class="text-3xl font-extrabold text-gray-900">PRO</div>
+                            </div>
+                            <div class="ml-auto text-right hidden sm:block">
+                                <div class="text-2xl font-bold text-gray-900">29€</div>
+                                <div class="text-xs text-gray-400">/ mois</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 mb-8">
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-600 font-medium"><i
+                                        class="fa-solid fa-users text-blue-500 w-6"></i> Licenciés</span>
+                                <span class="font-bold">45 / 100</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2.5">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
+                            </div>
+
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-600 font-medium"><i
+                                        class="fa-solid fa-hard-drive text-purple-500 w-6"></i> Stockage
+                                    (Photos/Docs)</span>
+                                <span class="font-bold">2.1 GB / 5 GB</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2.5">
+                                <div class="bg-purple-600 h-2.5 rounded-full" style="width: 42%"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <button
+                                class="flex-1 bg-white border border-gray-300 text-gray-700 py-2.5 rounded-lg font-bold hover:bg-gray-50 transition">Factures</button>
+                            <button
+                                class="flex-1 bg-gray-900 text-white py-2.5 rounded-lg font-bold hover:bg-black transition">Mettre
+                                à niveau</button>
+                        </div>
+                    </div>
+
+                    <div
+                        class="md:col-span-1 bg-gradient-to-b from-blue-600 to-blue-700 p-8 rounded-2xl shadow-xl text-white flex flex-col justify-between">
+                        <div>
+                            <div class="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold mb-4">Support
+                                Premium</div>
+                            <h3 class="font-bold text-lg leading-tight mb-2">Besoin d'aide pour configurer ?</h3>
+                            <p class="text-blue-100 text-sm">Notre équipe est disponible pour vous aider à importer vos
+                                membres.</p>
+                        </div>
+                        <button
+                            class="w-full bg-white text-blue-600 py-3 rounded-xl font-bold text-sm hover:bg-blue-50 transition mt-6">
+                            Contacter le support
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal Add User -->
+    <div id="userModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-gray-900">Ajouter un membre</h3>
+                <button onclick="toggleModal('userModal')" class="text-gray-400 hover:text-gray-600"><i
+                        class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form onsubmit="addUser(event)" class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Prénom</label>
+                        <input name="firstName" required
+                            class="w-full p-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Nom</label>
+                        <input name="lastName" required
+                            class="w-full p-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Email</label>
+                    <input type="email" name="email" required
+                        class="w-full p-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Rôle</label>
+                        <select name="role"
+                            class="w-full p-2.5 border border-gray-300 rounded-lg focus:border-blue-500 outline-none bg-white">
+                            <option value="Joueur">Joueur</option>
+                            <option value="Coach">Coach</option>
+                            <option value="Parent">Parent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Catégorie</label>
+                        <select name="category"
+                            class="w-full p-2.5 border border-gray-300 rounded-lg focus:border-blue-500 outline-none bg-white">
+                            <option value="U11">U11</option>
+                            <option value="U13">U13</option>
+                            <option value="Sénior">Sénior</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 mt-2 shadow-lg shadow-blue-500/30">Créer
+                    le compte</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Navigation Logic
+        function switchTab(tabId) {
+            ['cms', 'users', 'subscription'].forEach(t => {
+                document.getElementById('tab-' + t).classList.add('hidden');
+                document.getElementById('nav-' + t).classList.remove('active');
+            });
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('nav-' + tabId).classList.add('active');
+
+            const titles = { 'cms': 'Site & App', 'users': 'Membres du Club', 'subscription': 'Mon Abonnement' };
+            document.getElementById('pageTitle').innerText = titles[tabId];
+        }
+
+        // Modal Logic
+        function toggleModal(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // --- USERS MANAGEMENT (LocalStorage) ---
+        const defaultUsers = [
+            { id: 1, firstName: "Thomas", lastName: "Tuchel", role: "Coach", category: "U13", email: "thomas@coach.com" },
+            { id: 2, firstName: "Kylian", lastName: "M.", role: "Joueur", category: "Sénior", email: "kiki@psg.fr" },
+            { id: 3, firstName: "Antoine", lastName: "G.", role: "Joueur", category: "Sénior", email: "grizou@atletico.es" }
+        ];
+
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem('footapp_users')) || defaultUsers;
+            const filter = document.getElementById('searchUser')?.value.toLowerCase() || "";
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = '';
+
+            let count = 0;
+            users.forEach(u => {
+                if (u.firstName.toLowerCase().includes(filter) || u.lastName.toLowerCase().includes(filter)) {
+                    count++;
+                    const roleColor = u.role === 'Coach' ? 'bg-purple-100 text-purple-600' : (u.role === 'Joueur' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600');
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50 transition border-b border-gray-50 last:border-0";
+                    tr.innerHTML = `
+                        <td class="p-5 font-medium flex items-center gap-4">
+                            <div class="w-10 h-10 ${roleColor} rounded-full flex items-center justify-center font-bold text-sm shadow-sm">
+                                ${u.firstName[0]}${u.lastName[0]}
+                            </div>
+                            <div>
+                                <div class="text-gray-900 font-bold">${u.firstName} ${u.lastName}</div>
+                                <div class="text-xs text-gray-400 font-normal">${u.email}</div>
+                            </div>
+                        </td>
+                        <td class="p-5">
+                            <span class="inline-block px-2.5 py-0.5 rounded text-xs font-bold ${roleColor}">${u.role}</span>
+                        </td>
+                        <td class="p-5"><span class="text-gray-600 font-medium bg-gray-100 px-2 py-1 rounded text-xs">${u.category}</span></td>
+                        <td class="p-5 text-right">
+                            <button onclick="deleteUser(${u.id})" class="text-gray-300 hover:text-red-500 transition px-2"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
+
+            if (count === 0) document.getElementById('emptyUsers').classList.remove('hidden');
+            else document.getElementById('emptyUsers').classList.add('hidden');
+        }
+
+        function addUser(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const newUser = {
+                id: Date.now(),
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                email: formData.get('email'),
+                role: formData.get('role'),
+                category: formData.get('category')
+            };
+
+            let users = JSON.parse(localStorage.getItem('footapp_users')) || defaultUsers;
+            users.push(newUser);
+            localStorage.setItem('footapp_users', JSON.stringify(users));
+
+            toggleModal('userModal');
+            e.target.reset();
+            loadUsers();
+        }
+
+        function deleteUser(id) {
+            if (confirm('Voulez-vous vraiment supprimer ce membre ?')) {
+                let users = JSON.parse(localStorage.getItem('footapp_users')) || defaultUsers;
+                users = users.filter(u => u.id !== id);
+                localStorage.setItem('footapp_users', JSON.stringify(users));
+                loadUsers();
+            }
+        }
+
+        function filterUsers() { loadUsers(); }
+
+
+        // --- CMS MANAGEMENT ---
+        function loadSettings() {
+            const defaultSettings = { heroTitle: "Gérez votre club comme un pro", heroSubtitle: "La solution tout-en-un pour les clubs amateurs et semi-pros.", primaryColor: "#2563eb" };
+            const settings = JSON.parse(localStorage.getItem('footapp_cms')) || defaultSettings;
+
+            document.getElementById('heroTitle').value = settings.heroTitle;
+            document.getElementById('heroSubtitle').value = settings.heroSubtitle;
+            document.getElementById('primaryColor').value = settings.primaryColor;
+
+            updateColorPreview(settings.primaryColor);
+        }
+
+        function updateColorPreview(color) {
+            document.getElementById('colorText').value = color;
+            document.getElementById('previewBtn').style.backgroundColor = color;
+        }
+
+        function saveCMS(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const newSettings = {
+                heroTitle: formData.get('heroTitle'),
+                heroSubtitle: formData.get('heroSubtitle'),
+                primaryColor: formData.get('primaryColor')
+            };
+            localStorage.setItem('footapp_cms', JSON.stringify(newSettings));
+
+            // Visual feedback
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Sauvegardé';
+            btn.classList.add('bg-green-600');
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.remove('bg-green-600');
+            }, 2000);
+        }
+
+        document.getElementById('primaryColor').addEventListener('input', (e) => updateColorPreview(e.target.value));
+
+        // Init
+        loadUsers();
+        loadSettings();
+    </script>
+</body>
+
+</html>

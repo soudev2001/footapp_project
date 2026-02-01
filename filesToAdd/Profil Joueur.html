@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FootApp - Profil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .clip-path-header {
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+        }
+
+        .stat-bar {
+            transition: width 1s ease-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-800 max-w-md mx-auto min-h-screen shadow-2xl relative pb-20">
+
+    <!-- Header / Cover -->
+    <div class="relative bg-gray-900 h-64 clip-path-header">
+        <div
+            class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a')] bg-cover bg-center opacity-40">
+        </div>
+        <div class="absolute top-4 right-4 text-white cursor-pointer hover:text-gray-300">
+            <i class="fa-solid fa-gear text-xl"></i>
+        </div>
+        <div class="absolute -bottom-12 left-1/2 -translate-x-1/2">
+            <div class="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gray-200">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Kylian" class="w-full h-full bg-white">
+            </div>
+            <div class="absolute bottom-2 right-2 bg-green-500 w-6 h-6 rounded-full border-4 border-white"></div>
+        </div>
+    </div>
+
+    <!-- Info Block -->
+    <div class="pt-16 text-center px-4">
+        <h1 class="text-2xl font-extrabold text-gray-900">Kylian M.</h1>
+        <p class="text-blue-600 font-bold text-sm mb-4">Attaquant • Numéro 10</p>
+
+        <div class="flex justify-center gap-4 mb-8">
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 min-w-[80px]">
+                <div class="text-xs text-gray-400 font-bold uppercase">Matchs</div>
+                <div class="text-xl font-black text-gray-800">24</div>
+            </div>
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 min-w-[80px]">
+                <div class="text-xs text-gray-400 font-bold uppercase">Buts</div>
+                <div class="text-xl font-black text-green-600">18</div>
+            </div>
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 min-w-[80px]">
+                <div class="text-xs text-gray-400 font-bold uppercase">Assists</div>
+                <div class="text-xl font-black text-blue-600">7</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Sections -->
+    <div class="px-6 space-y-6">
+
+        <!-- Stats Bars -->
+        <section>
+            <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2"><i
+                    class="fa-solid fa-chart-simple text-blue-500"></i> Attributs</h3>
+            <div class="space-y-3">
+                <div>
+                    <div class="flex justify-between text-xs mb-1 font-bold text-gray-500">
+                        <span>Vitesse</span>
+                        <span>88</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-500 h-2 rounded-full stat-bar" style="width: 88%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-xs mb-1 font-bold text-gray-500">
+                        <span>Tir</span>
+                        <span>82</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full stat-bar" style="width: 82%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-xs mb-1 font-bold text-gray-500">
+                        <span>Physique</span>
+                        <span>70</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-yellow-500 h-2 rounded-full stat-bar" style="width: 70%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Personal Info -->
+        <section class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="font-bold text-gray-800 mb-3 text-sm border-b border-gray-100 pb-2">Informations Personnelles
+            </h3>
+            <ul class="space-y-3 text-sm">
+                <li class="flex justify-between">
+                    <span class="text-gray-500">Date de naissance</span>
+                    <span class="font-medium">20 Déc. 1998</span>
+                </li>
+                <li class="flex justify-between">
+                    <span class="text-gray-500">Pied fort</span>
+                    <span class="font-medium">Droit</span>
+                </li>
+                <li class="flex justify-between">
+                    <span class="text-gray-500">Taille Maillot</span>
+                    <span class="font-medium">M</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Actions -->
+        <button class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg">
+            <i class="fa-solid fa-pen-to-square mr-2"></i> Modifier mon profil
+        </button>
+
+        <div class="h-4"></div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 flex justify-around py-3 pb-5 z-50">
+        <a href="feed.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-newspaper text-xl mb-1"></i>
+            <span class="text-[10px] font-medium">Actu</span>
+        </a>
+        <a href="app.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-calendar-days text-xl mb-1"></i>
+            <span class="text-[10px] font-medium">Planning</span>
+        </a>
+        <a href="tactics.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-users-gear text-xl mb-1"></i>
+            <span class="text-[10px] font-medium">Gestion</span>
+        </a>
+        <a href="profile.html" class="flex flex-col items-center text-blue-600">
+            <i class="fa-solid fa-user text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Profil</span>
+        </a>
+    </nav>
+
+</body>
+
+</html>

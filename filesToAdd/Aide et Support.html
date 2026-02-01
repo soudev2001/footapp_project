@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aide - FootApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Responsive Hybrid Layout */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 480px;
+                margin: 40px auto;
+                border-radius: 30px;
+                overflow: hidden;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                min-height: 800px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .app-container {
+                width: 100%;
+                min-height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        details>summary {
+            list-style: none;
+        }
+
+        details>summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details[open] summary~* {
+            animation: sweep .3s ease-in-out;
+        }
+
+        @keyframes sweep {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px)
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="app-container bg-gray-50 relative flex flex-col">
+
+        <!-- Header -->
+        <header class="bg-blue-600 p-6 text-white pb-12 rounded-b-[40px] shadow-lg relative z-10">
+            <div class="flex items-center gap-3 mb-6">
+                <button onclick="history.back()" class="text-blue-100 hover:text-white transition"><i
+                        class="fa-solid fa-arrow-left text-xl"></i></button>
+                <h1 class="font-bold text-lg">Centre d'aide</h1>
+            </div>
+            <h2 class="text-2xl font-bold mb-2">Besoin d'aide ?</h2>
+            <p class="text-blue-200 text-sm mb-4">Trouvez des réponses ou contactez-nous.</p>
+
+            <div class="relative">
+                <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                <input type="text" placeholder="Rechercher une question..."
+                    class="w-full py-3 pl-12 pr-4 rounded-xl text-gray-800 focus:outline-none shadow-lg shadow-blue-900/10 placeholder-gray-400">
+            </div>
+        </header>
+
+        <main class="flex-1 p-6 -mt-6 space-y-6 overflow-y-auto">
+
+            <!-- Quick Actions -->
+            <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                <button
+                    class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex-shrink-0 w-28 flex flex-col items-center gap-2 hover:bg-gray-50 transition">
+                    <i class="fa-solid fa-key text-blue-500 text-xl"></i>
+                    <span class="text-xs font-bold text-gray-600">Compte</span>
+                </button>
+                <button
+                    class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex-shrink-0 w-28 flex flex-col items-center gap-2 hover:bg-gray-50 transition">
+                    <i class="fa-solid fa-file-invoice-dollar text-green-500 text-xl"></i>
+                    <span class="text-xs font-bold text-gray-600">Paiements</span>
+                </button>
+                <button
+                    class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex-shrink-0 w-28 flex flex-col items-center gap-2 hover:bg-gray-50 transition">
+                    <i class="fa-solid fa-calendar-check text-purple-500 text-xl"></i>
+                    <span class="text-xs font-bold text-gray-600">Events</span>
+                </button>
+            </div>
+
+            <!-- FAQ -->
+            <section>
+                <h3 class="font-bold text-gray-900 mb-3 ml-1">Questions fréquentes</h3>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <details class="group border-b border-gray-50">
+                        <summary
+                            class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition">
+                            <span class="font-bold text-sm text-gray-700">Comment changer ma photo ?</span>
+                            <i class="fa-solid fa-chevron-down text-gray-400 group-open:rotate-180 transition"></i>
+                        </summary>
+                        <div class="px-4 pb-4 text-sm text-gray-600 bg-gray-50/50">
+                            Allez dans l'onglet "Profil", puis cliquez sur "Modifier". Appuyez sur votre avatar actuel
+                            pour en télécharger un nouveau depuis votre galerie.
+                        </div>
+                    </details>
+                    <details class="group border-b border-gray-50">
+                        <summary
+                            class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition">
+                            <span class="font-bold text-sm text-gray-700">Je ne reçois pas les notifs</span>
+                            <i class="fa-solid fa-chevron-down text-gray-400 group-open:rotate-180 transition"></i>
+                        </summary>
+                        <div class="px-4 pb-4 text-sm text-gray-600 bg-gray-50/50">
+                            1. Vérifiez dans "Paramètres > Notifications" que les alertes sont activées.<br>
+                            2. Vérifiez les réglages de votre téléphone pour autoriser FootApp.
+                        </div>
+                    </details>
+                    <details class="group">
+                        <summary
+                            class="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition">
+                            <span class="font-bold text-sm text-gray-700">Comment payer ma cotisation ?</span>
+                            <i class="fa-solid fa-chevron-down text-gray-400 group-open:rotate-180 transition"></i>
+                        </summary>
+                        <div class="px-4 pb-4 text-sm text-gray-600 bg-gray-50/50">
+                            Rendez-vous dans la section "Documents" de votre profil. Si une cotisation est due, un
+                            bouton "Payer" sera visible à côté de la facture.
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Contact Form -->
+            <section class="pb-8">
+                <h3 class="font-bold text-gray-900 mb-3 ml-1">Contactez le support</h3>
+                <form onsubmit="event.preventDefault(); alert('Message envoyé !'); history.back();" class="space-y-3">
+                    <select
+                        class="w-full p-3 border border-gray-200 rounded-xl bg-white text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                        <option>Problème technique</option>
+                        <option>Question sur mon club</option>
+                        <option>Signalement</option>
+                        <option>Autre</option>
+                    </select>
+                    <textarea
+                        class="w-full p-3 border border-gray-200 rounded-xl bg-white text-sm h-32 outline-none resize-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Décrivez votre problème en détail..."></textarea>
+                    <button
+                        class="w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold shadow-lg hover:bg-black transition transform active:scale-95">Envoyer
+                        le message</button>
+                </form>
+            </section>
+
+        </main>
+    </div>
+
+</body>
+
+</html>

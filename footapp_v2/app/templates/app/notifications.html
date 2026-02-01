@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Notifications - FootApp{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Notifications</h1>
+        <button onclick="markAllRead()" class="text-sm text-primary-400 font-bold hover:text-primary-300 transition">
+            Tout marquer lu
+        </button>
+    </div>
+
+    <!-- Today -->
+    <div class="mb-4">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-1">Aujourd'hui</p>
+
+        <!-- Notification: Convocation -->
+        <div class="card p-4 mb-3 flex gap-4 cursor-pointer hover:border-green-500/30 notification unread" data-id="1">
+            <div
+                class="w-12 h-12 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-calendar-check text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm">Vous avez été <strong class="text-green-400">convoqué</strong> pour le match contre
+                    <span class="font-bold">Racing FC</span>.</p>
+                <a href="/calendar"
+                    class="text-xs text-primary-400 font-bold mt-1 inline-block hover:text-primary-300">Répondre
+                    maintenant →</a>
+            </div>
+            <div class="flex flex-col items-end gap-2">
+                <span class="text-[10px] text-gray-500">14:30</span>
+                <span class="unread-dot w-2 h-2 rounded-full bg-primary-500"></span>
+            </div>
+        </div>
+
+        <!-- Notification: Message -->
+        <div class="card p-4 mb-3 flex gap-4 cursor-pointer hover:border-primary-500/30 notification unread"
+            data-id="2">
+            <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1">
+                <p class="text-sm"><span class="font-bold">Coach Thomas</span> a envoyé un message dans <span
+                        class="font-bold text-primary-400">Groupe U15</span>.</p>
+                <p class="text-xs text-gray-500 mt-1 truncate">"N'oubliez pas les protège-tibias pour samedi..."</p>
+            </div>
+            <span class="text-[10px] text-gray-500">10:45</span>
+        </div>
+    </div>
+
+    <!-- Yesterday -->
+    <div class="mb-4">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-1">Hier</p>
+
+        <!-- Notification: Shop -->
+        <div class="card p-4 mb-3 flex gap-4 cursor-pointer notification" data-id="3">
+            <div
+                class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-tag text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm">Nouvel article disponible dans la boutique : <strong class="text-purple-400">Pack
+                        Entraînement 2026</strong>.</p>
+            </div>
+            <span class="text-[10px] text-gray-500">Hier</span>
+        </div>
+
+        <!-- Notification: Like -->
+        <div class="card p-4 mb-3 flex gap-4 cursor-pointer notification" data-id="4">
+            <div class="w-12 h-12 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-heart text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm"><span class="font-bold">Romain</span> et <span class="font-bold">12 autres</span> ont
+                    aimé votre commentaire.</p>
+            </div>
+            <span class="text-[10px] text-gray-500">Hier</span>
+        </div>
+
+        <!-- Notification: Event Reminder -->
+        <div class="card p-4 mb-3 flex gap-4 cursor-pointer notification" data-id="5">
+            <div
+                class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-bell text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm"><strong class="text-amber-400">Rappel:</strong> Entraînement demain à 18h30 au
+                    Terrain B.</p>
+            </div>
+            <span class="text-[10px] text-gray-500">Hier</span>
+        </div>
+    </div>
+
+    <!-- Earlier -->
+    <div>
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-1">Cette semaine</p>
+
+        <!-- Notification: Goal -->
+        <div class="card p-4 mb-3 flex gap-4 cursor-pointer notification" data-id="6">
+            <div
+                class="w-12 h-12 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-futbol text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm">Félicitations ! Votre <strong class="text-green-400">but</strong> a été enregistré
+                    (FC Elite 2-1 Lyon FC).</p>
+            </div>
+            <span class="text-[10px] text-gray-500">Lun</span>
+        </div>
+
+        <!-- Notification: Document -->
+        <div class="card p-4 flex gap-4 cursor-pointer notification" data-id="7">
+            <div
+                class="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-file-pdf text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm">Nouveau document disponible : <strong>Convocation Officielle - Match J16</strong>.
+                </p>
+            </div>
+            <span class="text-[10px] text-gray-500">Dim</span>
+        </div>
+    </div>
+</div>
+
+<style>
+    .notification.unread {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+        border-color: rgba(99, 102, 241, 0.2);
+    }
+
+    .notification:hover .unread-dot {
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+</style>
+
+<script>
+    function markAllRead() {
+        document.querySelectorAll('.notification.unread').forEach(notif => {
+            notif.classList.remove('unread');
+            const dot = notif.querySelector('.unread-dot');
+            if (dot) dot.remove();
+        });
+    }
+
+    // Click to mark as read
+    document.querySelectorAll('.notification').forEach(notif => {
+        notif.addEventListener('click', function () {
+            this.classList.remove('unread');
+            const dot = this.querySelector('.unread-dot');
+            if (dot) dot.remove();
+        });
+    });
+</script>
+{% endblock %}

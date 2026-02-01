@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FootApp - Réservations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-800 max-w-md mx-auto min-h-screen relative shadow-2xl">
+
+    <!-- Header -->
+    <header class="bg-white p-4 sticky top-0 z-20 shadow-sm flex items-center gap-3">
+        <a href="app.html" class="text-gray-500 hover:text-black"><i class="fa-solid fa-arrow-left text-xl"></i></a>
+        <h1 class="text-lg font-bold">Réservations</h1>
+    </header>
+
+    <main class="p-4 pb-24">
+
+        <!-- Category Selector -->
+        <div class="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
+            <button
+                class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap shadow-md">Tous</button>
+            <button
+                class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap">Soins
+                / Kiné</button>
+            <button
+                class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap">Terrains</button>
+            <button
+                class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap">Événements</button>
+        </div>
+
+        <!-- Calendar Strip -->
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <span class="font-bold text-gray-900">Octobre 2023</span>
+                <i class="fa-solid fa-calendar text-blue-500"></i>
+            </div>
+            <div class="flex justify-between">
+                <div class="flex flex-col items-center gap-1 opacity-50">
+                    <span class="text-xs font-bold text-gray-400">Lun</span>
+                    <span class="text-sm font-bold">23</span>
+                </div>
+                <div
+                    class="flex flex-col items-center gap-1 bg-blue-600 text-white px-2 py-1 rounded-lg shadow-lg transform scale-110">
+                    <span class="text-xs font-bold text-blue-200">Mar</span>
+                    <span class="text-sm font-bold">24</span>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                    <span class="text-xs font-bold text-gray-400">Mer</span>
+                    <span class="text-sm font-bold">25</span>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                    <span class="text-xs font-bold text-gray-400">Jeu</span>
+                    <span class="text-sm font-bold">26</span>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                    <span class="text-xs font-bold text-gray-400">Ven</span>
+                    <span class="text-sm font-bold">27</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Slots -->
+        <h2 class="font-bold text-lg mb-4">Disponibilités</h2>
+
+        <div class="space-y-4">
+            <!-- Slot 1 -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4">
+                <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center text-green-600 text-2xl">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-gray-900">Consultation Kiné</h3>
+                        <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded">3
+                            places</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1"><i class="fa-regular fa-clock mr-1"></i> 18:00 - 18:30</p>
+                    <p class="text-xs text-gray-500"><i class="fa-solid fa-location-dot mr-1"></i> Salle Médicale</p>
+                </div>
+                <button onclick="alert('Réservation confirmée !')"
+                    class="bg-gray-900 text-white px-4 rounded-lg font-bold text-xs hover:bg-gray-700">Réserver</button>
+            </div>
+
+            <!-- Slot 2 -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4">
+                <div
+                    class="w-16 h-16 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 text-2xl">
+                    <i class="fa-solid fa-fire"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-gray-900">Barbecue Club</h3>
+                        <span
+                            class="bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-1 rounded">Samedi</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1"><i class="fa-regular fa-clock mr-1"></i> 12:00 - 16:00</p>
+                    <p class="text-xs text-gray-500"><i class="fa-solid fa-utensils mr-1"></i> Club House</p>
+                </div>
+                <button
+                    class="bg-gray-900 text-white px-4 rounded-lg font-bold text-xs hover:bg-gray-700">S'inscrire</button>
+            </div>
+
+            <!-- Slot 3 (Full) -->
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex gap-4 opacity-60">
+                <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-2xl">
+                    <i class="fa-solid fa-dumbbell"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-gray-700">Salle Musculation</h3>
+                        <span class="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded">Complet</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1"><i class="fa-regular fa-clock mr-1"></i> 19:00 - 20:00</p>
+                </div>
+                <button disabled
+                    class="bg-gray-300 text-white px-4 rounded-lg font-bold text-xs cursor-not-allowed">Réserver</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 flex justify-around py-3 pb-5 z-50">
+        <a href="feed.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-newspaper text-xl mb-1"></i>
+            <span class="text-[10px] font-medium">Actu</span>
+        </a>
+        <a href="app.html" class="flex flex-col items-center text-blue-600">
+            <i class="fa-solid fa-calendar-days text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Planning</span>
+        </a>
+        <a href="tactics.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-users-gear text-xl mb-1"></i>
+            <span class="text-[10px] font-medium">Gestion</span>
+        </a>
+        <a href="profile.html" class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+            <i class="fa-solid fa-user text-xl mb-1"></i>
+            <span class="text-[10px] font-medium">Profil</span>
+        </a>
+    </nav>
+
+</body>
+
+</html>

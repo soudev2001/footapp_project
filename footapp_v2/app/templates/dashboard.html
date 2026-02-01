@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>.content-section { display: none; } .content-section.active { display: block; }</style>
+</head>
+<body class="bg-gray-100 flex h-screen overflow-hidden font-sans">
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex"><div class="p-6 text-blue-600 font-bold text-lg"><i class="fa-solid fa-shield-cat mr-2"></i>FC Canvas</div>
+    <nav class="flex-1 px-4 mt-4 space-y-1"><button onclick="switchTab('cms')" class="w-full text-left p-3 hover:bg-gray-50 rounded">Site & App</button><button onclick="switchTab('users')" class="w-full text-left p-3 hover:bg-gray-50 rounded">Membres</button></nav>
+    <div class="p-4 border-t"><a href="/" class="text-red-500 font-bold text-sm">Déconnexion</a></div></aside>
+    <main class="flex-1 p-8 overflow-y-auto">
+        <h1 id="pageTitle" class="text-2xl font-bold mb-6">Configuration</h1>
+        <div id="tab-cms" class="content-section active bg-white p-6 rounded shadow"><h2 class="font-bold mb-4">CMS</h2><form onsubmit="saveCMS(event)"><input id="heroTitle" class="border p-2 w-full mb-2" placeholder="Titre"><input type="color" id="primaryColor" class="h-10 cursor-pointer"><button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Sauvegarder</button></form></div>
+        <div id="tab-users" class="content-section bg-white p-6 rounded shadow"><h2 class="font-bold mb-4">Membres</h2><p>Liste des joueurs...</p></div>
+    </main>
+    <script>
+        function switchTab(id) { document.querySelectorAll('.content-section').forEach(e=>e.classList.remove('active')); document.getElementById('tab-'+id).classList.add('active'); }
+        function saveCMS(e) { e.preventDefault(); localStorage.setItem('footapp_cms', JSON.stringify({heroTitle: document.getElementById('heroTitle').value, primaryColor: document.getElementById('primaryColor').value})); alert('Sauvegardé'); }
+    </script>
+</body>
+</html>

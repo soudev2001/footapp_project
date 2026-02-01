@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FootApp{% endblock %}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        },
+                        'accent': {
+                            400: '#facc15',
+                            500: '#eab308',
+                        },
+                        'surface': {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'slide-in': 'slideIn 0.3s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1, #8b5cf6);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #4f46e5, #7c3aed);
+        }
+
+        /* Animations */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+            }
+
+            to {
+                box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-light {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Gradients */
+        .gradient-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+        }
+
+        .gradient-accent {
+            background: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
+        }
+
+        .gradient-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .gradient-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .gradient-mesh {
+            background:
+                radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.3) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.2) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 50%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Input styling */
+        .input-premium {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .input-premium:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Mobile nav */
+        .mobile-nav {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Badge pulse */
+        .badge-pulse::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: inherit;
+            animation: pulse 2s ease-out infinite;
+        }
+
+        /* Shimmer loading */
+        .shimmer {
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* Active nav item */
+        .nav-active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.1));
+            color: #a5b4fc;
+        }
+
+        /* Page transitions */
+        .page-enter {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+
+<body class="bg-surface-950 text-white min-h-screen flex flex-col overflow-x-hidden">
+    <!-- Background mesh -->
+    <div class="fixed inset-0 gradient-mesh pointer-events-none"></div>
+
+    <!-- Desktop Navbar -->
+    <nav class="hidden md:block glass fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <a href="/" class="flex items-center gap-3 group">
+                    <div
+                        class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-futbol text-white"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-lg tracking-tight">Foot<span
+                                class="text-primary-400">App</span></span>
+                        {% if roles.is_admin %}
+                        <span
+                            class="ml-2 text-[9px] font-bold bg-gradient-to-r from-red-500 to-orange-500 px-2 py-0.5 rounded-full uppercase tracking-wider">Admin</span>
+                        {% elif roles.is_coach %}
+                        <span
+                            class="ml-2 text-[9px] font-bold bg-gradient-to-r from-amber-500 to-yellow-500 px-2 py-0.5 rounded-full uppercase tracking-wider text-black">Coach</span>
+                        {% endif %}
+                    </div>
+                </a>
+
+                <!-- Navigation -->
+                <div class="flex items-center gap-1">
+                    {% for item in nav_items %}
+                    <a href="{{ item.url }}"
+                        class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200 group">
+                        <i
+                            class="fa-solid {{ item.icon }} text-primary-400 group-hover:scale-110 transition-transform"></i>
+                        <span>{{ item.name }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-3">
+                    <a href="/nav-demo"
+                        class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
+                        title="Toutes les pages">
+                        <i class="fa-solid fa-compass text-gray-400 hover:text-white"></i>
+                    </a>
+
+                    {% if current_user.is_authenticated %}
+                    <a href="/notifications"
+                        class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors relative">
+                        <i class="fa-solid fa-bell text-gray-400 hover:text-white"></i>
+                        <span
+                            class="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full border-2 border-surface-950 badge-pulse"></span>
+                    </a>
+
+                    <div class="relative group">
+                        <button
+                            class="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-white/5 transition-colors">
+                            <div
+                                class="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center font-bold text-sm shadow-md">
+                                {{ current_user.profile.first_name[:1] if current_user.profile.first_name else 'U' }}
+                            </div>
+                            <span class="text-sm font-medium hidden lg:inline">{{ current_user.profile.first_name or
+                                'User' }}</span>
+                            <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div
+                            class="absolute right-0 top-full mt-2 w-56 glass rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">
+                            <div class="p-4 border-b border-white/10">
+                                <div class="font-semibold">{{ current_user.profile.first_name }} {{
+                                    current_user.profile.last_name }}</div>
+                                <div class="text-xs text-gray-400 truncate">{{ current_user.email }}</div>
+                            </div>
+                            <div class="p-2">
+                                <a href="/profile"
+                                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-white/5 transition-colors">
+                                    <i class="fa-solid fa-user text-primary-400 w-4"></i>
+                                    Mon Profil
+                                </a>
+                                <a href="/settings"
+                                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-white/5 transition-colors">
+                                    <i class="fa-solid fa-gear text-gray-400 w-4"></i>
+                                    Parametres
+                                </a>
+                                <hr class="my-2 border-white/10">
+                                <a href="/logout"
+                                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-colors">
+                                    <i class="fa-solid fa-right-from-bracket w-4"></i>
+                                    Deconnexion
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="/login" class="btn-primary px-5 py-2.5 rounded-xl text-sm font-semibold">
+                        Connexion
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 pt-20 pb-24 md:pb-8 relative z-10">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 pt-4 space-y-2">
+            {% for category, message in messages %}
+            <div class="flex items-center gap-3 p-4 rounded-xl animate-slide-up
+                    {% if category == 'error' %}bg-red-500/20 border border-red-500/30 text-red-300
+                    {% elif category == 'success' %}bg-green-500/20 border border-green-500/30 text-green-300
+                    {% else %}bg-primary-500/20 border border-primary-500/30 text-primary-300{% endif %}">
+                <i
+                    class="fa-solid {% if category == 'error' %}fa-circle-exclamation{% elif category == 'success' %}fa-circle-check{% else %}fa-circle-info{% endif %}"></i>
+                <span class="text-sm font-medium">{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="page-enter">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden mobile-nav fixed bottom-0 left-0 right-0 z-50 px-2 py-3 safe-area-inset-bottom">
+        <div class="flex justify-around items-center max-w-md mx-auto">
+            {% if current_user.is_authenticated %}
+            {% for item in nav_items[:5] %}
+            <a href="{{ item.url }}"
+                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+                <i class="fa-solid {{ item.icon }} text-lg"></i>
+                <span class="text-[10px] font-medium">{{ item.name }}</span>
+            </a>
+            {% endfor %}
+            {% else %}
+            <a href="/"
+                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="text-[10px] font-medium">Accueil</span>
+            </a>
+            <a href="/feed"
+                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
+                <i class="fa-solid fa-newspaper text-lg"></i>
+                <span class="text-[10px] font-medium">News</span>
+            </a>
+            <a href="/login"
+                class="flex items-center justify-center w-14 h-14 -mt-6 gradient-primary rounded-2xl shadow-lg shadow-primary-500/30">
+                <i class="fa-solid fa-right-to-bracket text-xl"></i>
+            </a>
+            <a href="/public-club"
+                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
+                <i class="fa-solid fa-futbol text-lg"></i>
+                <span class="text-[10px] font-medium">Clubs</span>
+            </a>
+            <a href="/help"
+                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
+                <i class="fa-solid fa-circle-question text-lg"></i>
+                <span class="text-[10px] font-medium">Aide</span>
+            </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>
