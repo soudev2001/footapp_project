@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+{% block title %}Pointage Elite - FootLogic{% endblock %}
+
+{% block content %}
+<div class="page-enter max-w-5xl mx-auto px-4 py-8">
+    <!-- Header Hero -->
+    <div class="glass p-8 rounded-[40px] border-white/5 mb-10 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-amber-500/10"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row justify-between gap-8">
+            <div class="flex-1">
+                <div class="flex items-center gap-4 mb-4">
+                    <span
+                        class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary-500/20">
+                        <i class="fa-solid fa-clipboard-check text-white text-xl"></i>
+                    </span>
+                    <h1 class="text-3xl font-black italic uppercase tracking-tight">Pointage Elite</h1>
+                </div>
+
+                <div class="relative group max-w-md">
+                    <select onchange="window.location.href='/coach/attendance/' + this.value"
+                        class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-12 text-sm font-black text-primary-400 cursor-pointer appearance-none focus:outline-none focus:border-primary-500/50 transition-all">
+                        {% for event in events %}
+                        <option value="{{ event._id }}" class="bg-surface-950 text-white" {% if selected_event and
+                            selected_event._id==event._id %}selected{% endif %}>
+                            {{ event.title }} • {{ event.date.strftime('%d %b %H:%M') }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="absolute inset-y-0 right-6 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-chevron-down text-primary-400 text-xs"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-6 items-center">
+                <div class="text-center group">
+                    <p
+                        class="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] mb-1 group-hover:text-primary-400 transition-colors">
+                        Taux de Présence</p>
+                    <div class="relative">
+                        <span class="text-5xl font-black text-white italic leading-none"
+                            id="presentPercentage">0%</span>
+                        <div class="h-1 w-full bg-white/5 mt-2 rounded-full overflow-hidden">
+                            <div id="percentageBar" class="h-full gradient-primary transition-all duration-1000"
+                                style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-px h-16 bg-white/10"></div>
+                <div class="text-right">
+                    <span class="block text-4xl font-black text-primary-400" id="presentCount">0/0</span>
+                    <span class="text-[9px] font-black text-white/20 uppercase tracking-widest leading-none">Athlètes
+                        Confirmés</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls & Filters -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+        <div class="lg:col-span-2 relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-6 top-1/2 -translate-y-1/2 text-white/20"></i>
+            <input type="text" id="playerSearch" placeholder="Rechercher un athlète..." oninput="filterPlayers()"
+                class="w-full glass bg-white/5 border border-white/10 rounded-[28px] py-5 pl-16 pr-6 text-sm font-bold placeholder:text-white/20 focus:outline-none focus:border-primary-500/50 transition-all">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <button onclick="markAll('present')"
+                class="glass-light bg-white/5 border border-white/5 py-4 rounded-[28px] font-black text-[10px] hover:bg-primary-500 hover:text-black hover:border-transparent transition-all flex items-center justify-center gap-3 group">
+                <i class="fa-solid fa-check-double text-primary-500 group-hover:text-black"></i>
+                PRÉSENTS
+            </button>
+            <button onclick="markAll('reset')"
+                class="glass bg-white/5 border border-white/5 py-4 rounded-[28px] font-black text-[10px] text-white/40 hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-3">
+                <i class="fa-solid fa-rotate-left"></i>
+                RESET
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-32" id="playerList">
+        {% for player in players %}
+        {% set status = attendance_data.get(player._id|string, '') %}
+        <div class="player-row glass p-6 rounded-[32px] border-white/5 flex items-center justify-between group hover:bg-white/5 transition-all duration-500 animate-slide-in"
+            style="animation-delay: {{ loop.index0 * 0.05 }}s" data-player-id="{{ player._id }}"
+            data-name="{{ player.name|lower }}">
+            <div class="flex items-center gap-5">
+                <div class="relative">
+                    <div
+                        class="w-16 h-16 rounded-[24px] overflow-hidden border-2 border-white/5 group-hover:border-primary-500/30 transition-all duration-700">
+                        <img src="{{ player.photo or 'https://ui-avatars.com/api/?name=' + player.name + '&background=1f2937&color=fff' }}"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    </div>
+                </div>
+                <div>
+                    <p
+                        class="font-black text-xl italic group-hover:text-primary-400 transition-colors leading-none mb-2">
+                        {{ player.name }}</p>
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="px-2 py-0.5 rounded-lg bg-white/5 text-[8px] font-black text-white/40 uppercase tracking-widest border border-white/5">
+                            {{ player.position }}
+                        </span>
+                        <span class="text-[10px] font-bold text-white/20 italic">#{{ player.jersey_number or '--'
+                            }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-1.5 p-1 bg-black/40 rounded-2xl border border-white/5 backdrop-blur-xl">
+                <button class="status-btn present {% if status == 'present' %}active{% endif %}"
+                    onclick="setStatus(this, 'present')" title="Présent">
+                    <i class="fa-solid fa-check"></i>
+                </button>
+                <button class="status-btn late {% if status == 'late' %}active{% endif %}"
+                    onclick="setStatus(this, 'late')" title="Retard">
+                    <i class="fa-solid fa-clock"></i>
+                </button>
+                <button class="status-btn absent {% if status == 'absent' %}active{% endif %}"
+                    onclick="setStatus(this, 'absent')" title="Absent">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <button class="status-btn injured {% if status == 'injured' %}active{% endif %}"
+                    onclick="setStatus(this, 'injured')" title="Blessé">
+                    <i class="fa-solid fa-user-injured"></i>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Floating Save Control -->
+    <div class="fixed bottom-10 left-0 right-0 px-6 z-50 pointer-events-none">
+        <div class="max-w-md mx-auto pointer-events-auto">
+            <div class="glass p-3 rounded-[32px] border-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)]">
+                <button onclick="saveAttendance()" id="saveBtn"
+                    class="w-full gradient-primary py-5 rounded-[24px] font-black text-xs text-black uppercase tracking-[0.2em] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                    Synchroniser les données
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .status-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.15);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .status-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.6);
+        transform: scale(1.1);
+    }
+
+    .status-btn.active {
+        box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.5);
+        transform: scale(1.15);
+    }
+
+    .status-btn.present.active {
+        background: #84cc16;
+        color: black;
+    }
+
+    .status-btn.absent.active {
+        background: #ef4444;
+        color: white;
+    }
+
+    .status-btn.late.active {
+        background: #facc15;
+        color: black;
+    }
+
+    .status-btn.injured.active {
+        background: #64748b;
+        color: white;
+    }
+
+    .animate-slide-in {
+        animation: slideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
+    }
+
+    @keyframes slideIn {
+        0% {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+</style>
+
+<script>
+    const totalPlayers = {{ players| length }};
+    const eventId = "{{ selected_event._id if selected_event else '' }}";
+
+    function setStatus(btn, status) {
+        const parent = btn.parentElement;
+        const wasActive = btn.classList.contains('active');
+
+        parent.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+        if (!wasActive) {
+            btn.classList.add('active');
+        }
+        updateCounter();
+    }
+
+    function markAll(status) {
+        if (status === 'reset') {
+            document.querySelectorAll('.status-btn').forEach(btn => btn.classList.remove('active'));
+        } else {
+            document.querySelectorAll('.status-btn.' + status).forEach(btn => {
+                const parent = btn.parentElement;
+                parent.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        }
+        updateCounter();
+    }
+
+    function updateCounter() {
+        const presents = document.querySelectorAll('.status-btn.present.active').length;
+        const lates = document.querySelectorAll('.status-btn.late.active').length;
+        const count = presents + lates;
+        const percentage = totalPlayers > 0 ? Math.round((count / totalPlayers) * 100) : 0;
+
+        document.getElementById('presentCount').innerText = `${count}/${totalPlayers}`;
+        document.getElementById('presentPercentage').innerText = `${percentage}%`;
+        document.getElementById('percentageBar').style.width = `${percentage}%`;
+    }
+
+    function filterPlayers() {
+        const query = document.getElementById('playerSearch').value.toLowerCase();
+        document.querySelectorAll('.player-row').forEach(row => {
+            const name = row.dataset.name;
+            if (name.includes(query)) {
+                row.style.display = 'flex';
+                row.style.opacity = '1';
+                row.style.transform = 'scale(1)';
+            } else {
+                row.style.display = 'none';
+                row.style.opacity = '0';
+                row.style.transform = 'scale(0.9)';
+            }
+        });
+    }
+
+    function saveAttendance() {
+        if (!eventId) return;
+
+        const btn = document.getElementById('saveBtn');
+        const originalHTML = btn.innerHTML;
+
+        const attendanceData = {};
+        document.querySelectorAll('[data-player-id]').forEach(row => {
+            const playerId = row.getAttribute('data-player-id');
+            const activeBtn = row.querySelector('.status-btn.active');
+            if (activeBtn) {
+                const status = Array.from(activeBtn.classList).find(c =>
+                    ['present', 'late', 'absent', 'injured'].includes(c)
+                );
+                attendanceData[playerId] = status;
+            }
+        });
+
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> SYNCHRONISATON...';
+        btn.disabled = true;
+
+        fetch('/coach/attendance/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                event_id: eventId,
+                attendance: attendanceData
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    btn.innerHTML = '<i class="fa-solid fa-shield-check"></i> SYNC TERMINÉE';
+                    btn.style.background = '#84cc16';
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 2000);
+                }
+            })
+            .catch(error => {
+                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ERREUR';
+                btn.style.background = '#ef4444';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 3000);
+            });
+    }
+
+    // Initialize counter
+    updateCounter();
+</script>
+{% endblock %}

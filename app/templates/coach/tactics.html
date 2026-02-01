@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+{% block title %}Tactique Elite - FootLogic{% endblock %}
+
+{% block content %}
+<div class="h-[calc(100vh-100px)] flex flex-col lg:flex-row gap-6 p-6 page-enter">
+    <!-- Sidebar / Players List -->
+    <div class="w-full lg:w-96 flex flex-col gap-6">
+        <div class="glass p-6 rounded-[40px] border-white/5 flex-1 flex flex-col overflow-hidden">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="font-black text-white italic uppercase text-sm tracking-widest">Effectif</h2>
+                    <p class="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] mt-1">CLIQUEZ POUR PLACER
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar" id="availablePlayers">
+                {% for player in players %}
+                <div onclick="selectPlayer('{{ player._id }}', '{{ player.name }}', '{{ player.jersey_number or '?' }}', '{{ player.position }}')"
+                    class="p-4 rounded-[24px] bg-white/5 border border-white/5 flex items-center justify-between group hover:border-primary-500/30 transition cursor-pointer player-card"
+                    data-player-id="{{ player._id }}">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center font-black text-xs shadow-lg group-hover:scale-110 transition-transform">
+                            {{ player.jersey_number or '?' }}
+                        </div>
+                        <div>
+                            <p class="text-sm font-black text-white italic">{{ player.name }}</p>
+                            <p class="text-[9px] text-white/20 font-black uppercase tracking-widest">{{ player.position
+                                }}</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-plus text-white/10 group-hover:text-primary-400"></i>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="glass p-8 rounded-[40px] border-white/5 bg-gradient-to-br from-primary-500/10 to-transparent">
+            <h3 class="font-black text-white text-xs uppercase tracking-widest mb-6">Configuration Système</h3>
+            <div class="relative group">
+                <select id="formationSelect" onchange="updateFormation()"
+                    class="w-full bg-surface-950 border border-white/10 py-4 px-6 rounded-2xl text-sm font-black italic outline-none focus:ring-2 focus:ring-primary-500 transition appearance-none cursor-pointer">
+                    <option value="4-3-3" {% if lineup.formation=='4-3-3' %}selected{% endif %}>4 - 3 - 3 ATTAQUE
+                    </option>
+                    <option value="4-4-2" {% if lineup.formation=='4-4-2' %}selected{% endif %}>4 - 4 - 2 CLASSIQUE
+                    </option>
+                    <option value="3-5-2" {% if lineup.formation=='3-5-2' %}selected{% endif %}>3 - 5 - 2 DYNAMIQUE
+                    </option>
+                    <option value="4-2-3-1" {% if lineup.formation=='4-2-3-1' %}selected{% endif %}>4 - 2 - 3 - 1
+                        MODERNE</option>
+                </select>
+                <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none text-primary-400">
+                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pitch Area -->
+    <div class="flex-1 glass rounded-[40px] border-white/5 bg-emerald-950/20 relative overflow-hidden group shadow-2xl"
+        id="pitch">
+        <!-- Pitch Markings (SVG for precise scale) -->
+        <div class="absolute inset-0 opacity-20 pointer-events-none">
+            <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <rect x="5" y="5" width="90" height="90" fill="none" stroke="white" stroke-width="0.5" rx="5" />
+                <line x1="5" y1="50" x2="95" y2="50" stroke="white" stroke-width="0.5" />
+                <circle cx="50" cy="50" r="10" fill="none" stroke="white" stroke-width="0.5" />
+                <rect x="30" y="5" width="40" height="12" fill="none" stroke="white" stroke-width="0.5" />
+                <rect x="30" y="83" width="40" height="12" fill="none" stroke="white" stroke-width="0.5" />
+            </svg>
+        </div>
+
+        <!-- Players Context Area -->
+        <div class="absolute inset-0 z-10" id="pitchArea">
+            <!-- Player slots will be injected here -->
+        </div>
+
+        <!-- Pitch Controls -->
+        <div class="absolute top-10 right-10 flex flex-col gap-4 z-20">
+            <button onclick="saveTactics()" id="saveBtn"
+                class="w-14 h-14 rounded-2xl gradient-primary border border-white/20 flex items-center justify-center text-white hover:scale-105 active:scale-95 transition shadow-2xl shadow-primary-500/20"
+                title="Sauvegarder">
+                <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+            </button>
+            <button onclick="resetPitch()"
+                class="w-14 h-14 rounded-2xl glass hover:bg-white/10 border border-white/20 flex items-center justify-center text-white transition shadow-2xl"
+                title="Réinitialiser">
+                <i class="fa-solid fa-rotate-left text-lg"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<template id="playerSlotTemplate">
+    <div class="absolute flex flex-col items-center transition-all duration-500 cursor-pointer group/slot"
+        style="left: 50%; top: 50%;">
+        <div
+            class="slot-circle w-14 h-14 rounded-2xl glass-light border-2 border-dashed border-white/20 flex items-center justify-center font-black text-white/20 group-hover/slot:border-primary-500/50 transition-all">
+            <!-- Content Injected -->
+        </div>
+        <p
+            class="slot-name mt-3 glass px-4 py-1.5 rounded-xl text-[9px] font-black text-white/40 uppercase tracking-widest border border-white/5 shadow-2xl backdrop-blur-md">
+            POSITION
+        </p>
+    </div>
+</template>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+    }
+
+    .player-card.selected {
+        opacity: 0.3;
+        pointer-events: none;
+        border-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .slot-circle.filled {
+        background: white;
+        color: black;
+        border-style: solid;
+        border-color: #000;
+        border-width: 4px;
+        box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+</style>
+
+<script>
+    const pitchArea = document.getElementById('pitchArea');
+    const slotTemplate = document.getElementById('playerSlotTemplate');
+    const starters = {{ lineup.starters| tojson | safe }};
+    const initialFormation = "{{ lineup.formation }}";
+
+    let activeSlot = null;
+    let assignment = { ...starters };
+
+    const formations = {
+        '4-3-3': {
+            'GK': [50, 85],
+            'LB': [15, 65], 'CB1': [38, 70], 'CB2': [62, 70], 'RB': [85, 65],
+            'CDM': [50, 55], 'CM1': [30, 45], 'CM2': [70, 45],
+            'LW': [20, 25], 'ST': [50, 15], 'RW': [80, 25]
+        },
+        '4-4-2': {
+            'GK': [50, 85],
+            'LB': [15, 70], 'CB1': [38, 72], 'CB2': [62, 72], 'RB': [85, 70],
+            'LM': [15, 45], 'CM1': [38, 48], 'CM2': [62, 48], 'RM': [85, 45],
+            'ST1': [40, 20], 'ST2': [60, 20]
+        },
+        '3-5-2': {
+            'GK': [50, 85],
+            'CB1': [25, 70], 'CB2': [50, 72], 'CB3': [75, 70],
+            'LWB': [10, 50], 'RWB': [90, 50],
+            'CDM': [50, 58], 'CM1': [35, 45], 'CM2': [65, 45],
+            'ST1': [40, 20], 'ST2': [60, 20]
+        },
+        '4-2-3-1': {
+            'GK': [50, 85],
+            'LB': [15, 70], 'CB1': [38, 72], 'CB2': [62, 72], 'RB': [85, 70],
+            'CDM1': [40, 55], 'CDM2': [60, 55],
+            'LAM': [25, 35], 'CAM': [50, 35], 'RAM': [75, 35],
+            'ST': [50, 15]
+        }
+    };
+
+    function updateFormation() {
+        const formation = document.getElementById('formationSelect').value;
+        const config = formations[formation] || formations['4-3-3'];
+
+        pitchArea.innerHTML = '';
+        Object.entries(config).forEach(([pos, coords]) => {
+            const clone = slotTemplate.content.cloneNode(true);
+            const container = clone.querySelector('div');
+            container.style.left = coords[0] + '%';
+            container.style.top = coords[1] + '%';
+            container.setAttribute('data-pos', pos);
+            container.onclick = () => activateSlot(container);
+
+            const nameEl = clone.querySelector('.slot-name');
+            nameEl.innerText = pos;
+
+            // Check if already assigned
+            if (assignment[pos]) {
+                const playerId = assignment[pos];
+                const playerCard = document.querySelector(`[data-player-id="${playerId}"]`);
+                if (playerCard) {
+                    fillSlot(container, playerCard.querySelector('p').innerText, playerCard.querySelector('.gradient-primary').innerText);
+                    playerCard.classList.add('selected');
+                }
+            }
+
+            pitchArea.appendChild(clone);
+        });
+    }
+
+    function activateSlot(el) {
+        if (activeSlot) activeSlot.querySelector('.slot-circle').classList.remove('border-primary-500', 'border-solid');
+        activeSlot = el;
+        activeSlot.querySelector('.slot-circle').classList.add('border-primary-500', 'border-solid', 'border-2');
+    }
+
+    function selectPlayer(id, name, number, pos) {
+        if (!activeSlot) {
+            alert("Sélectionnez d'abord un emplacement sur le terrain");
+            return;
+        }
+
+        const currentPos = activeSlot.getAttribute('data-pos');
+
+        // Remove old player from selection if swapped
+        const oldId = assignment[currentPos];
+        if (oldId) {
+            const oldCard = document.querySelector(`[data-player-id="${oldId}"]`);
+            if (oldCard) oldCard.classList.remove('selected');
+        }
+
+        assignment[currentPos] = id;
+        fillSlot(activeSlot, name, number);
+        document.querySelector(`[data-player-id="${id}"]`).classList.add('selected');
+        activeSlot = null;
+    }
+
+    function fillSlot(slot, name, number) {
+        const circle = slot.querySelector('.slot-circle');
+        circle.innerHTML = number;
+        circle.classList.add('filled', 'text-black');
+        circle.classList.remove('text-white/20', 'border-primary-500');
+
+        const nameEl = slot.querySelector('.slot-name');
+        nameEl.innerText = name.split(' ')[0].toUpperCase();
+        nameEl.classList.remove('text-white/40');
+        nameEl.classList.add('text-primary-400');
+    }
+
+    function resetPitch() {
+        assignment = {};
+        document.querySelectorAll('.player-card').forEach(c => c.classList.remove('selected'));
+        updateFormation();
+    }
+
+    function saveTactics() {
+        const btn = document.getElementById('saveBtn');
+        const formation = document.getElementById('formationSelect').value;
+
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        btn.disabled = true;
+
+        fetch('/coach/tactics/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                formation: formation,
+                starters: assignment
+            })
+        })
+            .then(r => r.json())
+            .then(d => {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                btn.classList.replace('gradient-primary', 'bg-green-500');
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i>';
+                    btn.classList.replace('bg-green-500', 'gradient-primary');
+                    btn.disabled = false;
+                }, 2000);
+            });
+    }
+
+    // Initialize
+    updateFormation();
+</script>
+{% endblock %}

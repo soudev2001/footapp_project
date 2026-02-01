@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Accès Refusé - FootLogic{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
+    <div class="relative mb-12">
+        <!-- Background Decoration -->
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-red-600 rounded-full mix-blend-overlay filter blur-[100px] opacity-30">
+        </div>
+
+        <h1 class="text-[12rem] font-black leading-none text-white/5 select-none">403</h1>
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div
+                class="w-32 h-32 rounded-3xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center rotate-12 shadow-2xl animate-float">
+                <i class="fa-solid fa-hand text-white text-6xl -rotate-12"></i>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="text-5xl font-black text-white light:text-slate-900 mb-4 italic uppercase tracking-tighter">Carton Rouge
+        !</h2>
+    <p class="text-lg text-gray-400 light:text-slate-500 max-w-md mx-auto mb-10 font-medium">
+        Aïe ! L'arbitre siffle une faute. Cette zone est réservée aux membres autorisés du staff.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-4">
+        <a href="{{ url_for('main.index') }}"
+            class="bg-gradient-to-r from-red-500 to-red-700 px-10 py-4 rounded-2xl font-black transition flex items-center justify-center gap-3 uppercase tracking-widest text-xs shadow-lg shadow-red-500/30 hover:shadow-red-500/50">
+            <i class="fa-solid fa-house"></i>
+            Retour au vestiaire
+        </a>
+        <a href="javascript:history.back()"
+            class="glass-light px-10 py-4 rounded-2xl font-black hover:bg-white/10 transition border border-white/5 uppercase tracking-widest text-xs">
+            Action précédente
+        </a>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="mt-20 grid grid-cols-2 lg:grid-cols-4 gap-8 opacity-50 hover:opacity-100 transition duration-500">
+        <a href="{{ url_for('auth.login') }}"
+            class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-red-400 transition">Connexion</a>
+        <a href="{{ url_for('main.feed') }}"
+            class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-red-400 transition">Fil
+            d'actu</a>
+        <a href="{{ url_for('main.public_club') }}"
+            class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-red-400 transition">Club
+            Public</a>
+        <a href="{{ url_for('main.help') }}"
+            class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-red-400 transition">Support</a>
+    </div>
+</div>
+
+<style>
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0) rotate(12deg);
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(15deg);
+        }
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+</style>
+{% endblock %}
+
+

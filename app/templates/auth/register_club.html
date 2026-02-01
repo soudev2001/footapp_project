@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Enregistrer votre Club - FootLogic Elite{% endblock %}
+
+{% block content %}
+<div class="page-enter min-h-[85vh] flex items-center justify-center px-4 py-8">
+    <div
+        class="glass max-w-5xl w-full flex flex-col md:flex-row rounded-[40px] shadow-2xl overflow-hidden border-white/5">
+        <!-- Register Section -->
+        <div class="w-full md:w-1/2 p-10 lg:p-14">
+            <div class="mb-10">
+                <a href="{{ url_for('auth.login') }}"
+                    class="inline-flex items-center gap-2 text-white/40 hover:text-primary-400 transition mb-6 group">
+                    <i class="fa-solid fa-arrow-left text-xs group-hover:-translate-x-1 transition-transform"></i>
+                    <span class="text-xs font-black uppercase tracking-widest">Retour connexion</span>
+                </a>
+                <h1 class="text-4xl font-black mb-3 light:text-slate-900">Propulsez votre <span
+                        class="text-gradient">Club</span></h1>
+                <p class="text-white/40 light:text-slate-500 text-sm italic font-medium">Rejoignez l'élite de la gestion
+                    sportive.</p>
+            </div>
+
+            <form method="POST" class="space-y-6">
+                <!-- Club Info -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2 lg:col-span-1">
+                        <label
+                            class="block text-[10px] font-black uppercase tracking-[0.2em] text-white/30 light:text-slate-400 mb-2 ml-1">Nom
+                            du Club</label>
+                        <div class="relative group">
+                            <i
+                                class="fa-solid fa-shield-cat absolute left-5 top-1/2 -translate-y-1/2 text-white/20 light:text-slate-400 group-focus-within:text-primary-400 transition"></i>
+                            <input type="text" name="club_name" required
+                                class="w-full bg-white/5 light:bg-slate-100 border border-white/10 light:border-slate-200 rounded-2xl py-4 pl-14 pr-4 text-white light:text-slate-900 placeholder:text-white/10 light:placeholder:text-slate-400 focus:outline-none focus:border-primary-500/50 focus:bg-white/10 light:focus:bg-white transition-all font-medium"
+                                placeholder="ex: Paris Saint-Germain">
+                        </div>
+                    </div>
+                    <div class="col-span-2 lg:col-span-1">
+                        <label
+                            class="block text-[10px] font-black uppercase tracking-[0.2em] text-white/30 light:text-slate-400 mb-2 ml-1">Ville</label>
+                        <div class="relative group">
+                            <i
+                                class="fa-solid fa-location-dot absolute left-5 top-1/2 -translate-y-1/2 text-white/20 light:text-slate-400 group-focus-within:text-primary-400 transition"></i>
+                            <input type="text" name="city" required
+                                class="w-full bg-white/5 light:bg-slate-100 border border-white/10 light:border-slate-200 rounded-2xl py-4 pl-14 pr-4 text-white light:text-slate-900 placeholder:text-white/10 light:placeholder:text-slate-400 focus:outline-none focus:border-primary-500/50 focus:bg-white/10 light:focus:bg-white transition-all font-medium"
+                                placeholder="ex: Paris">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Info -->
+                <div>
+                    <label
+                        class="block text-[10px] font-black uppercase tracking-[0.2em] text-white/30 light:text-slate-400 mb-2 ml-1">Email
+                        Administrateur</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-envelope absolute left-5 top-1/2 -translate-y-1/2 text-white/20 light:text-slate-400 group-focus-within:text-primary-400 transition"></i>
+                        <input type="email" name="email" required
+                            class="w-full bg-white/5 light:bg-slate-100 border border-white/10 light:border-slate-200 rounded-2xl py-4 pl-14 pr-4 text-white light:text-slate-900 placeholder:text-white/10 light:placeholder:text-slate-400 focus:outline-none focus:border-primary-500/50 focus:bg-white/10 light:focus:bg-white transition-all font-medium"
+                            placeholder="admin@votreclub.fr">
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-[10px] font-black uppercase tracking-[0.2em] text-white/30 light:text-slate-400 mb-2 ml-1">Mot
+                        de passe</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-lock absolute left-5 top-1/2 -translate-y-1/2 text-white/20 light:text-slate-400 group-focus-within:text-primary-400 transition"></i>
+                        <input type="password" name="password" required
+                            class="w-full bg-white/5 light:bg-slate-100 border border-white/10 light:border-slate-200 rounded-2xl py-4 pl-14 pr-4 text-white light:text-slate-900 placeholder:text-white/10 light:placeholder:text-slate-400 focus:outline-none focus:border-primary-500/50 focus:bg-white/10 light:focus:bg-white transition-all font-medium"
+                            placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit"
+                        class="w-full gradient-primary py-5 rounded-2xl text-white font-black text-lg shadow-2xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest italic">
+                        CRÉER MON ESPACE CLUB
+                    </button>
+                    <p class="text-center mt-6 text-[10px] text-white/20 font-black uppercase tracking-[0.2em]">
+                        Essai gratuit de 30 jours • Sans engagement
+                    </p>
+                </div>
+            </form>
+        </div>
+
+        <!-- SaaS Benefits -->
+        <div
+            class="hidden md:flex w-1/2 bg-gradient-to-br from-primary-600 to-green-600 relative items-center justify-center p-14 overflow-hidden">
+            <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+            </div>
+
+            <div class="relative z-10 space-y-12">
+                <div class="text-center">
+                    <h2 class="text-4xl font-black mb-6 italic tracking-tight uppercase leading-none">LA GESTION
+                        TOTALÉMENT <br> <span class="text-white/60">AUTOMATISÉE</span></h2>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="glass p-6 rounded-3xl border-white/10 flex gap-5 items-center">
+                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-users-gear text-white"></i>
+                        </div>
+                        <div>
+                            <p class="font-black text-xs uppercase tracking-widest">Effectifs Illimités</p>
+                            <p class="text-[10px] text-white/60 mt-1">Gérez vos coachs, joueurs et staffs globalement.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="glass p-6 rounded-3xl border-white/10 flex gap-5 items-center">
+                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-credit-card text-white"></i>
+                        </div>
+                        <div>
+                            <p class="font-black text-xs uppercase tracking-widest">Cotisations & Boutique</p>
+                            <p class="text-[10px] text-white/60 mt-1">Collectez les paiements via Stripe nativement.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass p-6 rounded-3xl border-white/10 flex gap-5 items-center">
+                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-chart-line text-white"></i>
+                        </div>
+                        <div>
+                            <p class="font-black text-xs uppercase tracking-widest">Analytics Performance</p>
+                            <p class="text-[10px] text-white/60 mt-1">Suivez les stats collectives en temps réel.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

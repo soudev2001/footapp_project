@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Créer un Événement - FootLogic{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <a href="{{ url_for('main.calendar') }}" class="text-gray-400 hover:text-white transition font-medium">
+            <i class="fa-solid fa-arrow-left mr-2"></i>Retour
+        </a>
+        <h1 class="text-xl font-bold">Nouvel Événement</h1>
+        <div class="w-20"></div>
+    </div>
+
+    <!-- Form -->
+    <form action="{{ url_for('coach.create_event') }}" method="POST" class="space-y-6" onsubmit="handleSubmit(event)">
+        <!-- Event Type Selection -->
+        <div>
+            <label class="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Type d'événement</label>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <input type="radio" name="event_type" id="match" value="match" class="hidden peer" checked>
+                    <label for="match"
+                        class="card p-5 flex flex-col items-center justify-center cursor-pointer transition peer-checked:border-primary-500 peer-checked:bg-primary-500/10 hover:border-gray-600">
+                        <div
+                            class="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center mb-3 shadow-lg">
+                            <i class="fa-solid fa-trophy text-xl"></i>
+                        </div>
+                        <span class="font-bold">Match</span>
+                    </label>
+                </div>
+                <div>
+                    <input type="radio" name="event_type" id="training" value="training" class="hidden peer">
+                    <label for="training"
+                        class="card p-5 flex flex-col items-center justify-center cursor-pointer transition peer-checked:border-green-500 peer-checked:bg-green-500/10 hover:border-gray-600">
+                        <div
+                            class="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-3 shadow-lg">
+                            <i class="fa-solid fa-stopwatch text-xl"></i>
+                        </div>
+                        <span class="font-bold">Entraînement</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Details -->
+        <div class="card p-6 space-y-5">
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Titre / Adversaire</label>
+                <input type="text" name="title" placeholder="Ex: vs Racing FC" required
+                    class="w-full input-premium rounded-xl py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Date</label>
+                    <input type="date" name="date" required
+                        class="w-full input-premium rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Heure</label>
+                    <input type="time" name="time" required
+                        class="w-full input-premium rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Lieu</label>
+                <div class="relative">
+                    <i class="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <input type="text" name="location" placeholder="Stade Municipal, Paris"
+                        class="w-full input-premium rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Description (optionnel)</label>
+                <textarea name="description" rows="3" placeholder="Informations supplémentaires..."
+                    class="w-full input-premium rounded-xl py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
+            </div>
+        </div>
+
+        <!-- Convocation Settings -->
+        <div class="card p-6">
+            <div class="flex justify-between items-center mb-4">
+                <span class="font-bold">Convocations</span>
+                <button type="button" onclick="toggleAllPlayers()"
+                    class="text-xs text-primary-400 font-bold hover:text-primary-300 transition">
+                    Tout cocher
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <label class="flex items-center justify-between cursor-pointer group">
+                    <span class="text-sm group-hover:text-white transition">Convoquer tout l'effectif</span>
+                    <input type="checkbox" name="convoke_all" checked
+                        class="w-5 h-5 rounded bg-surface-800 border-gray-600 text-primary-500 focus:ring-primary-500 focus:ring-offset-0">
+                </label>
+                <div class="border-t border-white/10 pt-4">
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-sm group-hover:text-white transition">Envoyer rappel (J-1)</span>
+                        <input type="checkbox" name="send_reminder" checked
+                            class="w-5 h-5 rounded bg-surface-800 border-gray-600 text-primary-500 focus:ring-primary-500 focus:ring-offset-0">
+                    </label>
+                </div>
+                <div class="border-t border-white/10 pt-4">
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-sm group-hover:text-white transition">Demander confirmation présence</span>
+                        <input type="checkbox" name="require_confirmation" checked
+                            class="w-5 h-5 rounded bg-surface-800 border-gray-600 text-primary-500 focus:ring-primary-500 focus:ring-offset-0">
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submitBtn"
+            class="w-full btn-primary py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2">
+            <i class="fa-solid fa-calendar-plus"></i>
+            Publier l'événement
+        </button>
+    </form>
+</div>
+
+<script>
+    function handleSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const originalHTML = btn.innerHTML;
+
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Création...';
+        btn.disabled = true;
+
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Événement créé !';
+            btn.classList.add('bg-green-500');
+
+            setTimeout(() => {
+                window.location.href = '{{ url_for("main.calendar") }}';
+            }, 1000);
+        }, 800);
+    }
+
+    function toggleAllPlayers() {
+        const checkbox = document.querySelector('input[name="convoke_all"]');
+        checkbox.checked = !checkbox.checked;
+    }
+</script>
+{% endblock %}
+
+

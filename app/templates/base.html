@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FootLogic Elite{% endblock %}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        // Check for saved theme or default to dark
+        if (localStorage.getItem('color-theme') === 'light' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+            document.documentElement.classList.add('light');
+        } else {
+            document.documentElement.classList.remove('light');
+        }
+
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': {
+                            50: '#f7fee7',
+                            100: '#ecfccb',
+                            200: '#d9f99d',
+                            300: '#bef264',
+                            400: '#a3e635',
+                            500: '#84cc16',
+                            600: '#65a30d',
+                            700: '#4d7c0f',
+                            800: '#3f6212',
+                            900: '#365314',
+                            950: '#1a2e05',
+                        },
+                        'accent': {
+                            400: '#facc15',
+                            500: '#eab308',
+                        },
+                        'surface': {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            800: '#1e293b',
+                            900: '#050505',
+                            950: '#020617',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'slide-in': 'slideIn 0.3s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            background-color: #020617;
+            /* surface-950 */
+            color: #ffffff;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .light body {
+            background-color: #f8fafc;
+            /* slate-50 */
+            color: #020617;
+            /* slate-950 */
+        }
+
+        /* Glass Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .light .glass {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #e2e8f0;
+            /* slate-200 */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Light mode specific overrides */
+        .light .text-white\/40 {
+            color: #64748b;
+        }
+
+        .light .text-white\/20 {
+            color: #94a3b8;
+        }
+
+        .light .text-white\/10 {
+            color: #cbd5e1;
+        }
+
+        .light .border-white\/5 {
+            border-color: #e2e8f0;
+        }
+
+        .light .border-white\/10 {
+            border-color: #cbd5e1;
+        }
+
+        .light .bg-surface-950\/40 {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .light .text-gray-300 {
+            color: #475569;
+        }
+
+        .light .text-gray-400 {
+            color: #64748b;
+        }
+
+        .light .bg-white\/5 {
+            background-color: rgba(226, 232, 240, 0.5);
+        }
+
+        .light .hover\:bg-white\/5:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Responsive Safe Area */
+        .safe-area-inset-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Shimmer loading */
+        .shimmer {
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        .light .shimmer {
+            background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.05) 50%, transparent 100%);
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* Active nav item */
+        .nav-active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .light .nav-active {
+            background-color: rgba(132, 204, 22, 0.1);
+            /* primary-500/10 */
+            color: #4d7c0f;
+            /* primary-700 */
+            border: 1px solid rgba(132, 204, 22, 0.2);
+        }
+
+        /* Logo visibility */
+        .light .light-logo {
+            display: block !important;
+        }
+
+        .light .dark-logo {
+            display: none !important;
+        }
+
+        .dark-logo {
+            display: block;
+        }
+
+        .light-logo {
+            display: none;
+        }
+
+        /* Mobile nav glass effect */
+        .mobile-nav {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Page transitions */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-enter {
+            animation: slideUp 0.4s ease-out forwards;
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+
+<body class="bg-surface-950 text-white min-h-screen flex flex-col overflow-x-hidden">
+    <!-- Background mesh -->
+    <div class="fixed inset-0 gradient-mesh pointer-events-none"></div>
+
+    <!-- Desktop Navbar -->
+    <nav class="hidden md:block glass fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <a href="/" class="flex items-center gap-3 group">
+                    <div class="relative">
+                        <div
+                            class="absolute -inset-1 bg-gradient-to-r from-primary-600 to-accent-400 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-300">
+                        </div>
+                        <div
+                            class="relative w-12 h-12 rounded-xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+                            <img src="{{ url_for('static', filename='img/logo_dark.png') }}"
+                                class="w-full h-full object-cover dark-logo">
+                            <img src="{{ url_for('static', filename='img/logo_light.png') }}"
+                                class="w-full h-full object-cover light-logo">
+                        </div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-black text-xl tracking-tight leading-none italic uppercase">FOOT<span
+                                class="text-primary-500">LOGIC</span></span>
+                        <span class="text-[8px] font-bold text-gray-500 uppercase tracking-[0.2em] mt-0.5">SaaS
+                            Management</span>
+                    </div>
+                </a>
+
+                <!-- Navigation -->
+                <div class="flex items-center gap-1">
+                    {% for item in nav_items %}
+                    <a href="{{ item.url }}"
+                        class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200 group">
+                        <i
+                            class="fa-solid {{ item.icon }} text-primary-400 group-hover:scale-110 transition-transform"></i>
+                        <span>{{ item.name }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-3">
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle"
+                        class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all group overflow-hidden relative">
+                        <i id="theme-toggle-dark-icon"
+                            class="fa-solid fa-moon text-primary-400 group-hover:scale-110 transition-transform absolute dark:static dark:opacity-100 opacity-0 transform translate-y-10 dark:translate-y-0"></i>
+                        <i id="theme-toggle-light-icon"
+                            class="fa-solid fa-sun text-yellow-400 group-hover:scale-110 transition-transform absolute light:static light:opacity-100 opacity-0 transform translate-y-10 light:translate-y-0"></i>
+                    </button>
+
+                    <a href="{{ url_for('main.nav_demo') }}"
+                        class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
+                        title="Toutes les pages">
+                        <i class="fa-solid fa-compass text-gray-400 hover:text-white"></i>
+                    </a>
+
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('main.notifications') }}"
+                        class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors relative">
+                        <i class="fa-solid fa-bell text-gray-400 hover:text-white"></i>
+                        <span
+                            class="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full border-2 border-black badge-pulse"></span>
+                    </a>
+
+                    <div class="relative group">
+                        <button
+                            class="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-white/5 transition-colors">
+                            <div
+                                class="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center font-bold text-sm shadow-md">
+                                {{ current_user.profile.first_name[:1] if current_user.profile.first_name else 'U' }}
+                            </div>
+                            <span class="text-sm font-medium hidden lg:inline">{{ current_user.profile.first_name or
+                                'User' }}</span>
+                            <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div
+                            class="absolute right-0 top-full mt-2 w-56 glass rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">
+                            <div class="p-4 border-b border-white/10">
+                                <div class="font-semibold">{{ current_user.profile.first_name }} {{
+                                    current_user.profile.last_name }}</div>
+                                <div class="text-xs text-gray-400 truncate">{{ current_user.email }}</div>
+                            </div>
+                            <div class="p-2">
+                                <a href="{{ url_for('main.profile') }}"
+                                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-white/5 transition-colors">
+                                    <i class="fa-solid fa-user text-primary-400 w-4"></i>
+                                    Mon Profil
+                                </a>
+                                <a href="{{ url_for('main.settings') }}"
+                                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-white/5 transition-colors">
+                                    <i class="fa-solid fa-gear text-gray-400 w-4"></i>
+                                    Parametres
+                                </a>
+                                <hr class="my-2 border-white/10">
+                                <a href="{{ url_for('auth.logout') }}"
+                                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-colors">
+                                    <i class="fa-solid fa-right-from-bracket w-4"></i>
+                                    Deconnexion
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="{{ url_for('auth.login') }}"
+                        class="btn-primary px-5 py-2.5 rounded-xl text-sm font-semibold">
+                        Connexion
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 pt-20 pb-24 md:pb-8 relative z-10">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 pt-4 space-y-2">
+            {% for category, message in messages %}
+            <div class="flex items-center gap-3 p-4 rounded-xl animate-slide-up
+                    {% if category == 'error' %}bg-red-500/20 border border-red-500/30 text-red-300
+                    {% elif category == 'success' %}bg-green-500/20 border border-green-500/30 text-green-300
+                    {% else %}bg-primary-500/20 border border-primary-500/30 text-primary-300{% endif %}">
+                <i
+                    class="fa-solid {% if category == 'error' %}fa-circle-exclamation{% elif category == 'success' %}fa-circle-check{% else %}fa-circle-info{% endif %}"></i>
+                <span class="text-sm font-medium">{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="page-enter">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden mobile-nav fixed bottom-0 left-0 right-0 z-50 px-2 py-3 safe-area-inset-bottom">
+        <div class="flex justify-around items-center max-w-md mx-auto">
+            {% if current_user.is_authenticated %}
+            {% for item in nav_items[:5] %}
+            <a href="{{ item.url }}"
+                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+                <i class="fa-solid {{ item.icon }} text-lg"></i>
+                <span class="text-[10px] font-medium">{{ item.name }}</span>
+            </a>
+            {% endfor %}
+            {% else %}
+            <a href="{{ url_for('main.index') }}"
+                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="text-[10px] font-medium">Accueil</span>
+            </a>
+            <a href="{{ url_for('main.feed') }}"
+                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
+                <i class="fa-solid fa-newspaper text-lg"></i>
+                <span class="text-[10px] font-medium">News</span>
+            </a>
+            <a href="{{ url_for('auth.login') }}"
+                class="flex items-center justify-center w-14 h-14 -mt-6 gradient-primary rounded-2xl shadow-lg shadow-primary-500/30">
+                <i class="fa-solid fa-right-to-bracket text-xl"></i>
+            </a>
+            <a href="{{ url_for('main.public_club') }}"
+                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
+                <i class="fa-solid fa-futbol text-lg"></i>
+                <span class="text-[10px] font-medium">Clubs</span>
+            </a>
+            <a href="{{ url_for('main.help') }}"
+                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
+                <i class="fa-solid fa-circle-question text-lg"></i>
+                <span class="text-[10px] font-medium">Aide</span>
+            </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        themeToggleBtn.addEventListener('click', function () {
+            // toggle icons inside botton (optional since we use light: prefix)
+
+            // if set via local storage previously
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    document.documentElement.classList.remove('light');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.add('light');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            } else {
+                if (document.documentElement.classList.contains('light')) {
+                    document.documentElement.classList.remove('light');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.add('light');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            }
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>
+
+

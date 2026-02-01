@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Effectif - FootLogic Elite{% endblock %}
+
+{% block content %}
+<div class="page-enter max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div>
+            <h1 class="text-4xl font-black flex items-center gap-4">
+                <span
+                    class="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary-500/20">
+                    <i class="fa-solid fa-users text-white text-2xl"></i>
+                </span>
+                Effectif Complet
+            </h1>
+            <p class="text-white/40 mt-2 font-medium italic tracking-wide">Gérez vos joueurs, suivez leurs performances
+                et organisez votre équipe.</p>
+        </div>
+        <div class="flex gap-4">
+            <button
+                class="bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-4 rounded-2xl font-black text-xs flex items-center gap-2 transition-all">
+                <i class="fa-solid fa-file-export"></i>
+                EXPORTER LISTE
+            </button>
+            <a href="{{ url_for('coach.add_player') }}"
+                class="gradient-accent px-8 py-4 rounded-2xl font-black text-xs flex items-center gap-3 shadow-xl shadow-yellow-500/20 hover:scale-[1.02] active:scale-95 transition-all text-black">
+                <i class="fa-solid fa-user-plus"></i>
+                AJOUTER UN JOUEUR
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters & Stats Summary -->
+    <div class="grid lg:grid-cols-4 gap-6 mb-10">
+        <div class="lg:col-span-3 glass p-6 rounded-[32px] border-white/5 flex flex-wrap items-center gap-6">
+            <div class="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
+                <i class="fa-solid fa-magnifying-glass text-white/20"></i>
+                <input type="text" placeholder="Rechercher un joueur..."
+                    class="bg-transparent border-none outline-none text-sm font-medium w-48 placeholder:text-white/10">
+            </div>
+            <div class="flex gap-2">
+                <button
+                    class="px-4 py-2 rounded-xl bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest transition-all">Tous</button>
+                <button
+                    class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest transition-all">GK</button>
+                <button
+                    class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest transition-all">DEF</button>
+                <button
+                    class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest transition-all">MID</button>
+                <button
+                    class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest transition-all">ATT</button>
+            </div>
+        </div>
+        <div
+            class="glass p-6 rounded-[32px] border-white/5 bg-gradient-to-br from-primary-500/10 to-transparent flex flex-col justify-center">
+            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Moyenne d'âge</p>
+            <p class="text-2xl font-black uppercase italic">24.5 ANS</p>
+        </div>
+    </div>
+
+    <!-- Roster Sections -->
+    <div class="space-y-12">
+        {% for pos_label, pos_key in [('Gardiens', 'GK'), ('Défenseurs', 'DEF'), ('Milieux', 'MID'), ('Attaquants',
+        'ATT')] %}
+        <section>
+            <div class="flex items-center gap-4 mb-6 px-4">
+                <h2 class="text-xl font-black uppercase tracking-widest">{{ pos_label }}</h2>
+                <div class="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent"></div>
+                <span class="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">{{
+                    by_position[pos_key]|length }} JOUEURS</span>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for player in by_position[pos_key] %}
+                <div
+                    class="glass p-6 rounded-[32px] border-white/5 hover:border-primary-500/30 transition-all group relative overflow-hidden">
+                    <!-- Background Accent -->
+                    <div
+                        class="absolute -right-4 -bottom-4 w-24 h-24 bg-primary-500/5 rounded-full blur-2xl group-hover:bg-primary-500/10 transition-colors">
+                    </div>
+
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-5 mb-6">
+                            <div class="relative">
+                                <div
+                                    class="w-16 h-16 rounded-2xl overflow-hidden shadow-2xl border border-white/5 group-hover:scale-105 transition-transform duration-500">
+                                    <img src="{{ player.photo or 'https://ui-avatars.com/api/?name=' + player.name + '&background=0D0D0D&color=fff' }}"
+                                        class="w-full h-full object-cover">
+                                </div>
+                                <div
+                                    class="absolute -bottom-2 -right-2 w-8 h-8 gradient-primary rounded-xl flex items-center justify-center text-xs font-black shadow-lg">
+                                    {{ player.jersey_number or '--' }}
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-black text-lg mb-0.5 group-hover:text-primary-400 transition-colors">{{
+                                    player.name }}</h3>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-white/20">{{
+                                        player.position }}</span>
+                                    <span class="w-1 h-1 bg-white/10 rounded-full"></span>
+                                    <span
+                                        class="text-[10px] font-black uppercase tracking-widest {% if player.status == 'active' %}text-green-500{% else %}text-red-500{% endif %}">
+                                        {{ player.status|upper }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4 mb-6">
+                            <div class="bg-white/5 rounded-2xl p-3 text-center border border-white/5">
+                                <p class="text-xs font-black">{{ player.stats.goals or 0 }}</p>
+                                <p class="text-[7px] font-black text-white/20 uppercase tracking-widest mt-1 italic">
+                                    Buts</p>
+                            </div>
+                            <div class="bg-white/5 rounded-2xl p-3 text-center border border-white/5">
+                                <p class="text-xs font-black">{{ player.stats.assists or 0 }}</p>
+                                <p class="text-[7px] font-black text-white/20 uppercase tracking-widest mt-1 italic">
+                                    Passes</p>
+                            </div>
+                            <div class="bg-white/5 rounded-2xl p-3 text-center border border-white/5">
+                                <p class="text-xs font-black text-primary-400">{{ player.stats.matches_played or 0 }}
+                                </p>
+                                <p class="text-[7px] font-black text-white/20 uppercase tracking-widest mt-1 italic">
+                                    Matchs</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <a href="{{ url_for('coach.player_detail', player_id=player._id) }}"
+                                class="flex-1 bg-white/5 hover:bg-white/10 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all text-center">
+                                ANALYSER
+                            </a>
+                            <a href="{{ url_for('coach.edit_player', player_id=player._id) }}"
+                                class="w-12 bg-white/5 hover:bg-white/10 py-3 rounded-xl text-center transition-all border border-white/5">
+                                <i class="fa-solid fa-pen-to-square text-[10px] text-white/20"></i>
+                            </a>
+                            <form action="{{ url_for('coach.delete_player', player_id=player._id) }}" method="POST"
+                                onsubmit="return confirm('Supprimer ce joueur ?')" class="contents">
+                                <button type="submit"
+                                    class="w-12 bg-red-500/5 hover:bg-red-500/10 py-3 rounded-xl text-center transition-all border border-red-500/10 group-hover:border-red-500/30">
+                                    <i
+                                        class="fa-solid fa-trash-can text-[10px] text-red-500/20 group-hover:text-red-500/50"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% if not by_position[pos_key] %}
+                <div class="md:col-span-2 lg:col-span-3 glass p-10 rounded-[40px] border-white/5 text-center">
+                    <p class="text-white/20 font-black uppercase tracking-widest text-xs italic">Aucun joueur dans cette
+                        catégorie</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

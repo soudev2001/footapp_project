@@ -1,0 +1,122 @@
+/* FootLogic Premium Design System */
+
+:root {
+    --primary-gradient: linear-gradient(135deg, #84cc16 0%, #facc15 100%);
+    --secondary-gradient: linear-gradient(135deg, #020617 0%, #050505 50%, #020617 100%);
+    --success-gradient: linear-gradient(135deg, #22c55e 0%, #84cc16 100%);
+    --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --info-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    --amber-gradient: linear-gradient(135deg, #a3e635 0%, #facc15 100%);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --card-border: rgba(255, 255, 255, 0.08);
+}
+
+.gradient-bg {
+    background: var(--secondary-gradient);
+    background-attachment: fixed;
+}
+
+.gradient-primary {
+    background: var(--primary-gradient);
+}
+
+.gradient-success {
+    background: var(--success-gradient);
+}
+
+.gradient-danger {
+    background: var(--danger-gradient);
+}
+
+.gradient-warning {
+    background: var(--warning-gradient);
+}
+
+.gradient-info {
+    background: var(--info-gradient);
+}
+
+.gradient-pink {
+    background: var(--amber-gradient);
+}
+
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.float-animation {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.pulse-soft {
+    animation: pulse-soft 3s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Typography Enhancements */
+.text-gradient {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}

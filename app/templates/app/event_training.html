@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Détail Entraînement - FootLogic{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Header with Background Image -->
+    <div class="relative h-64 rounded-3xl overflow-hidden mb-10 shadow-2xl">
+        <img src="https://images.unsplash.com/photo-1517466787929-bc90951d64b8?auto=format&fit=crop&w=1200&q=80"
+            class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-8">
+            <div class="flex items-center gap-2 mb-3">
+                <span
+                    class="bg-green-500 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest text-white shadow-lg shadow-green-500/20">Entraînement</span>
+                <span
+                    class="bg-white/10 backdrop-blur-md text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest text-white border border-white/10">Saison
+                    2025/26</span>
+            </div>
+            <h1 class="text-4xl font-extrabold text-white">Perfectionnement Tactique</h1>
+            <p class="text-gray-300 mt-2 flex items-center gap-4">
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-calendar text-primary-400"></i>
+                    Mercredi 4 Février
+                </span>
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-clock text-primary-400"></i>
+                    18:30 - 20:00
+                </span>
+            </p>
+        </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="md:col-span-2 space-y-8">
+            <!-- Objectives -->
+            <section>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-3">
+                    <i class="fa-solid fa-bullseye text-primary-400"></i>
+                    Objectifs de la séance
+                </h2>
+                <div class="card p-6 space-y-4">
+                    <div class="flex gap-4">
+                        <div
+                            class="w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                        </div>
+                        <p class="text-gray-300">Transition rapide défense-attaque (Contre-pressing).</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div
+                            class="w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                        </div>
+                        <p class="text-gray-300">Placement tactique lors des phases arrêtées défensives.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div
+                            class="w-6 h-6 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                        </div>
+                        <p class="text-gray-300">Amélioration de la finition devant le but (Exercices cadrés).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Detailed Plan -->
+            <section>
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-3">
+                    <i class="fa-solid fa-list-check text-primary-400"></i>
+                    Déroulement détaillé
+                </h2>
+                <div class="space-y-4">
+                    <div class="card p-5 border-l-4 border-primary-500 transition hover:bg-white/5">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-white">Échauffement Dynamique</h3>
+                            <span class="text-xs font-bold text-gray-500">20 min</span>
+                        </div>
+                        <p class="text-sm text-gray-400 italic">Course légère, réveil musculaire et travail de
+                            coordination avec ballon.</p>
+                    </div>
+                    <div class="card p-5 border-l-4 border-green-500 transition hover:bg-white/5">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-white">Atelier Technique : Passes Courtes</h3>
+                            <span class="text-xs font-bold text-gray-500">25 min</span>
+                        </div>
+                        <p class="text-sm text-gray-400 italic">Circuits de passes en triangle avec changement de
+                            direction constant.</p>
+                    </div>
+                    <div class="card p-5 border-l-4 border-amber-500 transition hover:bg-white/5">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-white">Opposition : Jeu Réduit</h3>
+                            <span class="text-xs font-bold text-gray-500">35 min</span>
+                        </div>
+                        <p class="text-sm text-gray-400 italic">Match 5vs5 sur terrain réduit privilégieant la
+                            possession de balle.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Sidebar Info -->
+        <div class="space-y-6">
+            <!-- Location -->
+            <div class="card p-6">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Lieu</h3>
+                <div class="flex items-center gap-3 text-white font-bold mb-4">
+                    <i class="fa-solid fa-location-dot text-red-400"></i>
+                    Stade Municipal - Terrain C
+                </div>
+                <div class="w-full h-32 rounded-xl bg-gray-800 flex items-center justify-center text-gray-600">
+                    <i class="fa-solid fa-map-location-dot text-4xl"></i>
+                </div>
+                <button class="w-full mt-4 glass-light py-2 rounded-xl text-xs font-bold hover:bg-white/10 transition">
+                    Ouvrir dans Maps
+                </button>
+            </div>
+
+            <!-- Attendance Preview -->
+            <div class="card p-6">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Présences</h3>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex -space-x-3">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                            class="w-8 h-8 rounded-full border-2 border-surface-900">
+                        <img src="https://randomuser.me/api/portraits/men/44.jpg"
+                            class="w-8 h-8 rounded-full border-2 border-surface-900">
+                        <img src="https://randomuser.me/api/portraits/men/12.jpg"
+                            class="w-8 h-8 rounded-full border-2 border-surface-900">
+                        <div
+                            class="w-8 h-8 rounded-full bg-gray-800 border-2 border-surface-900 flex items-center justify-center text-[10px] text-gray-400 font-bold">
+                            +12</div>
+                    </div>
+                    <span class="text-green-400 font-black">85%</span>
+                </div>
+                <p class="text-[10px] text-gray-500 text-center uppercase font-bold tracking-widest">Taux de présence
+                    moyen</p>
+                <a href="{{ url_for('main.attendance') }}"
+                    class="w-full mt-6 btn-primary py-3 rounded-xl text-sm font-bold block text-center shadow-lg shadow-primary-500/20 transition">
+                    Gérer les présences
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
