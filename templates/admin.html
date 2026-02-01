@@ -1,8 +1,212 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head><title>Super Admin</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></head>
-<body class="bg-gray-50 flex h-screen overflow-hidden font-sans">
-    <aside class="w-72 bg-gray-900 text-white flex flex-col shadow-2xl"><div class="p-8"><h1 class="font-bold">SUPER ADMIN</h1></div></aside>
-    <main class="flex-1 p-8"><h1 class="text-3xl font-bold mb-4">Dashboard SaaS</h1><p>Vue d'ensemble des clubs inscrits.</p></main>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - FootApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="min-h-screen gradient-bg text-white">
+    <!-- Navbar -->
+    <nav class="glass border-b border-white/10 py-3 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/" class="flex items-center gap-3">
+                <div class="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-futbol text-white"></i>
+                </div>
+                <span class="font-bold text-lg">FootApp</span>
+            </a>
+            <div class="flex items-center gap-6">
+                <a href="/dashboard"
+                    class="text-white/60 hover:text-white font-medium flex items-center gap-2 text-sm transition">
+                    <i class="fa-solid fa-gauge"></i>Dashboard
+                </a>
+                <a href="/admin"
+                    class="text-white font-semibold flex items-center gap-2 text-sm bg-white/10 px-4 py-2 rounded-xl">
+                    <i class="fa-solid fa-gear text-amber-500"></i>Admin
+                </a>
+                <div class="w-px h-6 bg-white/10 mx-2"></div>
+                <a href="/login"
+                    class="text-white/40 hover:text-white transition text-xs font-bold uppercase tracking-widest">
+                    Déconnexion
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-3xl font-extrabold flex items-center gap-3">
+                    <span
+                        class="w-12 h-12 bg-amber-500/20 rounded-2xl flex items-center justify-center text-amber-500 shadow-lg">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </span>
+                    Administration Système
+                </h1>
+                <p class="text-white/60 mt-1">Gérez les paramètres globaux de FC Elite Paris</p>
+            </div>
+            <div class="flex gap-3">
+                <button
+                    class="glass px-5 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 hover:bg-white/10 transition">
+                    <i class="fa-solid fa-download text-blue-400"></i>Exporter Données
+                </button>
+            </div>
+        </div>
+
+        <!-- Admin Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- User Management -->
+            <div class="card p-6 group">
+                <div
+                    class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-500 group-hover:text-white transition-all text-blue-400">
+                    <i class="fa-solid fa-users-gear text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Gestion Utilisateurs</h3>
+                <p class="text-xs text-white/50 mb-6 leading-relaxed">Gérez les comptes joueurs, coachs et parents.
+                    Définissez les accès et rôles.</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-white/30 tracking-widest uppercase">24 Actifs</span>
+                    <button
+                        class="bg-white/5 px-4 py-2 rounded-xl text-xs font-bold hover:bg-white/10 transition">Gérer</button>
+                </div>
+            </div>
+
+            <!-- Club Settings -->
+            <div class="card p-6 group">
+                <div
+                    class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-500 group-hover:text-white transition-all text-purple-400">
+                    <i class="fa-solid fa-building-shippable text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Paramètres Club</h3>
+                <p class="text-xs text-white/50 mb-6 leading-relaxed">Modifiez les informations légales, le logo, les
+                    couleurs et les documents du club.</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-white/30 tracking-widest uppercase">FC Elite Paris</span>
+                    <button
+                        class="bg-white/5 px-4 py-2 rounded-xl text-xs font-bold hover:bg-white/10 transition">Modifier</button>
+                </div>
+            </div>
+
+            <!-- Subscriptions -->
+            <div class="card p-6 group">
+                <div
+                    class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-500 group-hover:text-white transition-all text-green-400">
+                    <i class="fa-solid fa-credit-card text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Cotisations & Abos</h3>
+                <p class="text-xs text-white/50 mb-6 leading-relaxed">Suivi des paiements des licences et abonnements
+                    premium FootApp.</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-white/30 tracking-widest uppercase">85% Payé</span>
+                    <button
+                        class="bg-white/5 px-4 py-2 rounded-xl text-xs font-bold hover:bg-white/10 transition">Voir</button>
+                </div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="card p-6 group">
+                <div
+                    class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-amber-500 group-hover:text-white transition-all text-amber-500">
+                    <i class="fa-solid fa-envelope-open-text text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Automatisations</h3>
+                <p class="text-xs text-white/50 mb-6 leading-relaxed">Configurez les alertes SMS/Email automatiques pour
+                    les matchs et entraînements.</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-white/30 tracking-widest uppercase">12 Actives</span>
+                    <button
+                        class="bg-white/5 px-4 py-2 rounded-xl text-xs font-bold hover:bg-white/10 transition">Configurer</button>
+                </div>
+            </div>
+
+            <!-- Integrations -->
+            <div class="card p-6 group">
+                <div
+                    class="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-cyan-500 group-hover:text-white transition-all text-cyan-400">
+                    <i class="fa-solid fa-plug text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Intégrations</h3>
+                <p class="text-xs text-white/50 mb-6 leading-relaxed">Connectez votre site web, vos réseaux sociaux ou
+                    vos outils d'analyse vidéo.</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-white/30 tracking-widest uppercase">5 Connectés</span>
+                    <button
+                        class="bg-white/5 px-4 py-2 rounded-xl text-xs font-bold hover:bg-white/10 transition">Accéder</button>
+                </div>
+            </div>
+
+            <!-- Data & Security -->
+            <div class="card p-6 group border-red-500/20">
+                <div
+                    class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-red-500 group-hover:text-white transition-all text-red-500">
+                    <i class="fa-solid fa-shield-virus text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Sécurité & Logs</h3>
+                <p class="text-xs text-white/50 mb-6 leading-relaxed">Consultez l'historique des actions et gérez la
+                    conformité RGPD du club.</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-white/30 tracking-widest uppercase">Statut OK</span>
+                    <button
+                        class="bg-red-500/10 px-4 py-2 rounded-xl text-xs font-bold text-red-400 hover:bg-red-500 hover:text-white transition">Logs</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Log -->
+        <div class="card">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center">
+                <h3 class="font-bold">Journal d'Audit</h3>
+                <span class="text-[10px] text-white/30 font-black uppercase tracking-widest">Temps Réel</span>
+            </div>
+            <div class="p-0">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-white/2 text-[10px] uppercase font-black text-white/30">
+                        <tr>
+                            <th class="p-4">Action</th>
+                            <th class="p-4">Utilisateur</th>
+                            <th class="p-4">Détail</th>
+                            <th class="p-4">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="p-4 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                                Login
+                            </td>
+                            <td class="p-4 font-bold">Coach Martin</td>
+                            <td class="p-4 text-white/50">Connexion réussie IP: 192.168.1.1</td>
+                            <td class="p-4 text-xs text-white/30">Aujourd'hui, 10:30</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="p-4 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                                Update
+                            </td>
+                            <td class="p-4 font-bold">Admin</td>
+                            <td class="p-4 text-white/50">Mise à jour des couleurs du club</td>
+                            <td class="p-4 text-xs text-white/30">Aujourd'hui, 09:15</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="p-4 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                Config
+                            </td>
+                            <td class="p-4 font-bold">Secrétaire</td>
+                            <td class="p-4 text-white/50">Activation de l'intégration SMS</td>
+                            <td class="p-4 text-xs text-white/30">Hier, 17:02</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 </body>
+
 </html>

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Boutique - Pack Entraînement - FootApp{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="grid lg:grid-cols-2 gap-12 items-start">
+        <!-- Product Images -->
+        <div class="space-y-4">
+            <div class="aspect-square rounded-[40px] overflow-hidden shadow-2xl relative group">
+                <img src="https://images.unsplash.com/photo-1517466787929-bc90951d64b8?auto=format&fit=crop&q=80&w=1200"
+                    class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                <div class="absolute top-6 left-6">
+                    <span
+                        class="bg-primary-500 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest text-white shadow-lg shadow-primary-500/30">Officiel
+                        Club</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-4 gap-4">
+                <div
+                    class="aspect-square rounded-2xl overflow-hidden border-2 border-primary-500 shadow-lg cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1517466787929-bc90951d64b8?auto=format&fit=crop&q=80&w=300"
+                        class="w-full h-full object-cover">
+                </div>
+                <div
+                    class="aspect-square rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=300"
+                        class="w-full h-full object-cover opacity-50">
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="flex flex-col">
+            <div class="mb-8">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fa-solid fa-star text-amber-400 text-xs"></i>
+                    <i class="fa-solid fa-star text-amber-400 text-xs"></i>
+                    <i class="fa-solid fa-star text-amber-400 text-xs"></i>
+                    <i class="fa-solid fa-star text-amber-400 text-xs"></i>
+                    <i class="fa-solid fa-star text-amber-400 text-xs text-white/20"></i>
+                    <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest ml-2">4.8 (128
+                        Avis)</span>
+                </div>
+                <h1 class="text-4xl font-extrabold text-white mb-2">Pack Entraînement Pro</h1>
+                <p class="text-gray-400">Saison 2025/2026 • Nike Performance</p>
+                <div class="mt-6 text-3xl font-black text-primary-400">45.00€</div>
+            </div>
+
+            <div class="card p-8 mb-8">
+                <h3 class="font-bold text-white text-xs uppercase tracking-widest mb-4">Sélectionner la Taille</h3>
+                <div class="flex gap-4">
+                    {% for size in ['S', 'M', 'L', 'XL'] %}
+                    <button
+                        class="w-12 h-12 rounded-xl {% if size == 'M' %}bg-primary-500 text-white shadow-lg shadow-primary-500/30{% else %}bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10{% endif %} font-black transition">
+                        {{ size }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="space-y-6 mb-10">
+                <p class="text-gray-400 leading-relaxed">
+                    Le pack officiel pour toutes les séances d'entraînement de la saison. Conçu en collaboration avec
+                    nos partenaires techniques pour offrir une respirabilité optimale et une durabilité accrue.
+                </p>
+                <ul class="space-y-3">
+                    <li class="flex items-center gap-3 text-sm text-gray-300">
+                        <i class="fa-solid fa-check text-green-400"></i>
+                        Technologie Dry-Fit anti-transpiration
+                    </li>
+                    <li class="flex items-center gap-3 text-sm text-gray-300">
+                        <i class="fa-solid fa-check text-green-400"></i>
+                        Maillot + Short + Chaussettes
+                    </li>
+                    <li class="flex items-center gap-3 text-sm text-gray-300">
+                        <i class="fa-solid fa-check text-green-400"></i>
+                        Logo du club floqué haute définition
+                    </li>
+                </ul>
+            </div>
+
+            <div class="flex gap-4">
+                <a href="{{ url_for('main.checkout') }}"
+                    class="flex-1 btn-primary py-4 rounded-2xl font-bold text-lg shadow-2xl shadow-primary-500/20 text-center transition">
+                    Commander maintenant
+                </a>
+                <button
+                    class="w-16 h-16 rounded-2xl glass-light flex items-center justify-center text-xl hover:bg-white/10 transition">
+                    <i class="fa-regular fa-heart"></i>
+                </button>
+            </div>
+
+            <p class="text-center text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-6">
+                Livraison gratuite au club house sous 48h
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

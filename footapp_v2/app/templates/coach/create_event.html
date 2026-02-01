@@ -5,7 +5,7 @@
 <div class="max-w-xl mx-auto px-4 py-6">
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
-        <a href="/calendar" class="text-gray-400 hover:text-white transition font-medium">
+        <a href="{{ url_for('main.calendar') }}" class="text-gray-400 hover:text-white transition font-medium">
             <i class="fa-solid fa-arrow-left mr-2"></i>Retour
         </a>
         <h1 class="text-xl font-bold">Nouvel Événement</h1>
@@ -13,7 +13,7 @@
     </div>
 
     <!-- Form -->
-    <form action="/coach/create-event" method="POST" class="space-y-6" onsubmit="handleSubmit(event)">
+    <form action="{{ url_for('coach.create_event') }}" method="POST" class="space-y-6" onsubmit="handleSubmit(event)">
         <!-- Event Type Selection -->
         <div>
             <label class="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Type d'événement</label>
@@ -136,7 +136,7 @@
             btn.classList.add('bg-green-500');
 
             setTimeout(() => {
-                window.location.href = '/calendar';
+                window.location.href = '{{ url_for("main.calendar") }}';
             }, 1000);
         }, 800);
     }

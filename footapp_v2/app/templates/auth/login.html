@@ -2,141 +2,126 @@
 {% block title %}Connexion - FootApp{% endblock %}
 
 {% block content %}
-<div class="min-h-[85vh] flex items-center justify-center px-4 py-8">
+<div class="page-enter min-h-[85vh] flex items-center justify-center px-4 py-8">
     <div
-        class="bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-4xl flex overflow-hidden border border-white/10">
-
-        <!-- Left Side: Login Form -->
-        <div class="w-full md:w-1/2 p-8 md:p-10 flex flex-col justify-center">
-            <div class="mb-8">
-                <a href="/" class="flex items-center gap-2 mb-6 group w-fit">
-                    <i class="fa-solid fa-arrow-left text-gray-400 group-hover:text-primary-400 transition"></i>
-                    <span class="text-sm font-bold text-gray-400 group-hover:text-primary-400 transition">Retour</span>
+        class="glass max-w-5xl w-full flex flex-col md:flex-row rounded-[40px] shadow-2xl overflow-hidden border-white/5">
+        <!-- Login Section -->
+        <div class="w-full md:w-1/2 p-10 lg:p-14">
+            <div class="mb-10">
+                <a href="{{ url_for('main.index') }}"
+                    class="inline-flex items-center gap-2 text-white/40 hover:text-primary-400 transition mb-6 group">
+                    <i class="fa-solid fa-arrow-left text-xs group-hover:-translate-x-1 transition-transform"></i>
+                    <span class="text-xs font-black uppercase tracking-widest">Retour</span>
                 </a>
-                <h1 class="text-3xl font-extrabold mb-2">Bon retour 👋</h1>
-                <p class="text-gray-400 text-sm">Entrez vos identifiants pour accéder à votre espace.</p>
+                <h1 class="text-4xl font-black mb-3">Bon Retour</h1>
+                <p class="text-white/40 text-sm">Entrez vos accès pour gérer votre univers club.</p>
             </div>
 
-            <form method="POST" action="/login" id="loginForm" class="space-y-5">
+            <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-6">
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Email</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <label
+                        class="block text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-2 ml-1">Email</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-envelope absolute left-5 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition"></i>
                         <input type="email" name="email" id="emailInput" required
-                            class="w-full pl-12 p-4 input-premium rounded-xl text-white placeholder-gray-500 focus:outline-none"
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-14 pr-4 text-white placeholder:text-white/10 focus:outline-none focus:border-primary-500/50 focus:bg-white/10 transition-all font-medium"
                             placeholder="nom@exemple.com">
                     </div>
                 </div>
+
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Mot de
-                        passe</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                        <input type="password" name="password" id="passwordInput" required
-                            class="w-full pl-12 p-4 input-premium rounded-xl text-white placeholder-gray-500 focus:outline-none"
-                            placeholder="••••••••">
+                    <div class="flex justify-between items-center mb-2 ml-1">
+                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Mot de
+                            passe</label>
+                        <a href="{{ url_for('auth.forgot_password') }}"
+                            class="text-[10px] font-black uppercase tracking-widest text-primary-400 hover:text-primary-300 transition">Oublié
+                            ?</a>
                     </div>
-                    <div class="flex justify-end mt-2">
-                        <a href="/forgot-password"
-                            class="text-xs text-primary-400 hover:text-primary-300 transition">Mot de passe oublié ?</a>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-lock absolute left-5 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition"></i>
+                        <input type="password" name="password" id="passwordInput" required
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-14 pr-4 text-white placeholder:text-white/10 focus:outline-none focus:border-primary-500/50 focus:bg-white/10 transition-all font-medium"
+                            placeholder="••••••••">
                     </div>
                 </div>
 
-                <button type="submit" id="submitBtn"
-                    class="w-full btn-primary py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 group">
-                    <span>Se connecter</span>
-                    <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                <button type="submit"
+                    class="w-full gradient-primary py-4 rounded-2xl text-white font-black text-lg shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    Connexion
                 </button>
             </form>
 
-            <div class="mt-8 pt-6 border-t border-white/10">
-                <p class="text-xs text-center text-gray-500 mb-4 font-mono glass-light p-2 rounded-lg">
-                    <i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i>
-                    Comptes Démo (Cliquez pour remplir)
-                </p>
-                <div class="grid grid-cols-1 gap-3">
+            <div class="mt-10 pt-8 border-t border-white/5">
+                <p class="text-center text-xs font-black uppercase tracking-[0.2em] text-white/20 mb-6 italic">Comptes
+                    Démo</p>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <button type="button" onclick="fillLogin('admin@footapp.fr', 'admin123')"
-                        class="flex items-center gap-3 p-3 rounded-xl glass-light hover:bg-white/10 transition group">
-                        <div
-                            class="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-                            <i class="fa-solid fa-shield text-white"></i>
-                        </div>
-                        <div class="text-left flex-1">
-                            <div class="font-bold text-sm">Super Admin</div>
-                            <div class="text-xs text-gray-500">admin@footapp.fr</div>
-                        </div>
-                        <i
-                            class="fa-solid fa-arrow-right text-gray-500 group-hover:text-primary-400 group-hover:translate-x-1 transition-all"></i>
+                        class="glass p-3 rounded-xl hover:bg-white/10 transition border-white/5 text-center group">
+                        <i class="fa-solid fa-shield text-amber-500 mb-1 group-hover:scale-110 transition"></i>
+                        <p class="text-[8px] font-black uppercase text-white/40">Admin</p>
                     </button>
                     <button type="button" onclick="fillLogin('coach@fcelite.fr', 'coach123')"
-                        class="flex items-center gap-3 p-3 rounded-xl glass-light hover:bg-white/10 transition group">
-                        <div class="w-10 h-10 gradient-accent rounded-xl flex items-center justify-center shadow-lg">
-                            <i class="fa-solid fa-whistle text-black"></i>
-                        </div>
-                        <div class="text-left flex-1">
-                            <div class="font-bold text-sm">Coach</div>
-                            <div class="text-xs text-gray-500">coach@fcelite.fr</div>
-                        </div>
-                        <i
-                            class="fa-solid fa-arrow-right text-gray-500 group-hover:text-primary-400 group-hover:translate-x-1 transition-all"></i>
+                        class="glass p-3 rounded-xl hover:bg-white/10 transition border-white/5 text-center group">
+                        <i class="fa-solid fa-whistle text-primary-400 mb-1 group-hover:scale-110 transition"></i>
+                        <p class="text-[8px] font-black uppercase text-white/40">Coach</p>
                     </button>
                     <button type="button" onclick="fillLogin('player1@fcelite.fr', 'player123')"
-                        class="flex items-center gap-3 p-3 rounded-xl glass-light hover:bg-white/10 transition group">
-                        <div class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-lg">
-                            <i class="fa-solid fa-user text-white"></i>
-                        </div>
-                        <div class="text-left flex-1">
-                            <div class="font-bold text-sm">Joueur</div>
-                            <div class="text-xs text-gray-500">player1@fcelite.fr</div>
-                        </div>
-                        <i
-                            class="fa-solid fa-arrow-right text-gray-500 group-hover:text-primary-400 group-hover:translate-x-1 transition-all"></i>
+                        class="glass p-3 rounded-xl hover:bg-white/10 transition border-white/5 text-center group">
+                        <i class="fa-solid fa-user text-green-400 mb-1 group-hover:scale-110 transition"></i>
+                        <p class="text-[8px] font-black uppercase text-white/40">Joueur</p>
+                    </button>
+                    <button type="button" onclick="fillLogin('fan@fcelite.fr', 'fan123')"
+                        class="glass p-3 rounded-xl hover:bg-white/10 transition border-white/5 text-center group">
+                        <i class="fa-solid fa-heart text-pink-500 mb-1 group-hover:scale-110 transition"></i>
+                        <p class="text-[8px] font-black uppercase text-white/40">Fan</p>
                     </button>
                 </div>
             </div>
 
-            <p class="text-center mt-6 text-gray-400 text-sm">
-                Pas encore de compte?
-                <a href="/register"
-                    class="text-primary-400 hover:text-primary-300 font-semibold transition">S'inscrire</a>
+            <div class="mt-10 p-6 rounded-3xl bg-primary-500/5 border border-primary-500/20 text-center">
+                <p class="text-[10px] font-black uppercase tracking-widest text-primary-400 mb-2 italic">Vous êtes un
+                    club ?</p>
+                <a href="{{ url_for('auth.register_club') }}"
+                    class="text-sm font-black text-white hover:text-primary-300 transition uppercase tracking-widest">Enregistrez
+                    votre Club</a>
+            </div>
+
+            <p class="text-center mt-10 text-white/40 text-xs">
+                Besoin d'un compte fan ?
+                <a href="{{ url_for('auth.register') }}"
+                    class="text-primary-400 font-black hover:text-primary-300 transition uppercase tracking-widest ml-1">S'inscrire</a>
             </p>
         </div>
 
-        <!-- Right Side: Visual -->
-        <div class="hidden md:block w-1/2 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-br from-primary-600 via-purple-600 to-pink-600"></div>
-            <div class="absolute inset-0 flex flex-col items-center justify-center text-white p-12 text-center z-10">
-                <div
-                    class="w-20 h-20 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center mb-6 shadow-2xl animate-float">
-                    <i class="fa-solid fa-futbol text-4xl"></i>
-                </div>
-                <h2 class="text-2xl font-bold mb-4 leading-tight">Gérez votre club<br>en toute simplicité</h2>
-                <p class="text-white/70 text-sm leading-relaxed max-w-xs">
-                    Accédez aux statistiques, gérez les entraînements et personnalisez l'expérience de vos joueurs
-                    depuis un seul endroit.
-                </p>
+        <div
+            class="hidden md:flex w-1/2 bg-gradient-to-br from-primary-600 to-green-600 relative items-center justify-center p-14 overflow-hidden">
+            <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+            </div>
 
-                <!-- Stats preview -->
-                <div class="flex gap-6 mt-8 glass-light rounded-2xl p-4">
+            <div class="relative z-10 text-center">
+                <div
+                    class="w-24 h-24 bg-white/10 backdrop-blur-2xl rounded-[32px] flex items-center justify-center mx-auto mb-8 shadow-2xl animate-float border border-white/10">
+                    <i class="fa-solid fa-futbol text-4xl text-white"></i>
+                </div>
+                <h2 class="text-4xl font-black mb-6 italic tracking-tight leading-inner uppercase text-white">
+                    L'Excellence <br>
+                    Digitalisée</h2>
+                <p class="text-white/70 text-sm leading-relaxed max-w-xs mx-auto font-medium italic">
+                    "Automatisez votre club comme un professionnel. De l'adhésion au terrain."
+                </p>
+                <div class="mt-10 flex justify-center gap-6 text-white">
                     <div class="text-center">
-                        <div class="text-2xl font-black">500+</div>
-                        <div class="text-[10px] text-white/60 uppercase tracking-wider">Clubs</div>
+                        <p class="text-2xl font-black">1.2k</p>
+                        <p class="text-[8px] font-black uppercase tracking-widest opacity-60">Académies</p>
                     </div>
-                    <div class="w-px bg-white/20"></div>
-                    <div class="text-center">
-                        <div class="text-2xl font-black">15K+</div>
-                        <div class="text-[10px] text-white/60 uppercase tracking-wider">Joueurs</div>
+                    <div class="text-center border-l border-white/20 pl-6">
+                        <p class="text-2xl font-black">200k</p>
+                        <p class="text-[8px] font-black uppercase tracking-widest opacity-60">Licenciés</p>
                     </div>
                 </div>
             </div>
-
-            <!-- Decorative elements -->
-            <div class="absolute -bottom-20 -right-20 w-60 h-60 bg-white/10 rounded-full blur-3xl"></div>
-            <div class="absolute top-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-
-            <!-- Background Image -->
-            <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1000&q=80"
-                class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-20">
         </div>
     </div>
 </div>
@@ -145,27 +130,20 @@
     function fillLogin(email, password) {
         const emailInput = document.getElementById('emailInput');
         const passwordInput = document.getElementById('passwordInput');
+        const form = emailInput.closest('form');
 
         emailInput.value = email;
         passwordInput.value = password;
 
-        // Visual highlight effect
-        emailInput.classList.add('ring-2', 'ring-primary-500', 'border-primary-500');
-        passwordInput.classList.add('ring-2', 'ring-primary-500', 'border-primary-500');
+        // Visual feedback
+        [emailInput, passwordInput].forEach(input => {
+            input.classList.add('border-primary-500', 'bg-white/10');
+        });
 
+        // Small delay for visual effect then submit
         setTimeout(() => {
-            emailInput.classList.remove('ring-2', 'ring-primary-500', 'border-primary-500');
-            passwordInput.classList.remove('ring-2', 'ring-primary-500', 'border-primary-500');
-        }, 800);
-
-        // Focus on submit button
-        document.getElementById('submitBtn').focus();
+            form.submit();
+        }, 300);
     }
-
-    // Optional: Auto-submit animation
-    document.getElementById('loginForm').addEventListener('submit', function (e) {
-        const btn = document.getElementById('submitBtn');
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Connexion...';
-    });
 </script>
 {% endblock %}

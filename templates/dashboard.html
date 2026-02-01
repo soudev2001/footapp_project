@@ -1,24 +1,309 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Club</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord - FootApp</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>.content-section { display: none; } .content-section.active { display: block; }</style>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body class="bg-gray-100 flex h-screen overflow-hidden font-sans">
-    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex"><div class="p-6 text-blue-600 font-bold text-lg"><i class="fa-solid fa-shield-cat mr-2"></i>FC Canvas</div>
-    <nav class="flex-1 px-4 mt-4 space-y-1"><button onclick="switchTab('cms')" class="w-full text-left p-3 hover:bg-gray-50 rounded">Site & App</button><button onclick="switchTab('users')" class="w-full text-left p-3 hover:bg-gray-50 rounded">Membres</button></nav>
-    <div class="p-4 border-t"><a href="/" class="text-red-500 font-bold text-sm">Déconnexion</a></div></aside>
-    <main class="flex-1 p-8 overflow-y-auto">
-        <h1 id="pageTitle" class="text-2xl font-bold mb-6">Configuration</h1>
-        <div id="tab-cms" class="content-section active bg-white p-6 rounded shadow"><h2 class="font-bold mb-4">CMS</h2><form onsubmit="saveCMS(event)"><input id="heroTitle" class="border p-2 w-full mb-2" placeholder="Titre"><input type="color" id="primaryColor" class="h-10 cursor-pointer"><button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Sauvegarder</button></form></div>
-        <div id="tab-users" class="content-section bg-white p-6 rounded shadow"><h2 class="font-bold mb-4">Membres</h2><p>Liste des joueurs...</p></div>
+
+<body class="min-h-screen gradient-bg text-white">
+    <!-- Navbar -->
+    <nav class="glass border-b border-white/10 py-3 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/" class="flex items-center gap-3">
+                <div class="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-futbol text-white"></i>
+                </div>
+                <span class="font-bold text-lg">FootApp</span>
+            </a>
+            <div class="flex items-center gap-6">
+                <a href="/dashboard"
+                    class="text-white font-semibold flex items-center gap-2 text-sm bg-white/10 px-4 py-2 rounded-xl">
+                    <i class="fa-solid fa-gauge text-blue-400"></i>Dashboard
+                </a>
+                <a href="/app"
+                    class="text-white/60 hover:text-white font-medium flex items-center gap-2 text-sm transition">
+                    <i class="fa-solid fa-mobile-screen"></i>Mode App
+                </a>
+                <a href="/manager"
+                    class="text-white/60 hover:text-white font-medium flex items-center gap-2 text-sm transition font-semibold">
+                    <i class="fa-solid fa-whistle text-purple-400"></i>Manager
+                </a>
+                <div class="w-px h-6 bg-white/10 mx-2"></div>
+                <div class="flex items-center gap-3">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                        class="w-8 h-8 rounded-full border border-white/20">
+                    <span class="text-sm font-medium hidden md:block">Kylian Dubois</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+            <div>
+                <h1 class="text-3xl font-bold">Bonjour, Kylian ! 👋</h1>
+                <p class="text-white/60 mt-1">Voici ce qui se passe dans votre club aujourd'hui.</p>
+            </div>
+            <div class="flex gap-3">
+                <a href="/chat-inbox"
+                    class="glass px-5 py-3 rounded-2xl flex items-center gap-2 text-sm font-bold relative hover:bg-white/10 transition">
+                    <i class="fa-solid fa-comments"></i>Messages
+                    <span
+                        class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-[#1e1b4b]">3</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Access Services -->
+        <h2 class="text-sm uppercase tracking-widest font-black text-white/30 mb-4">Services Directs</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-10">
+            <a href="/roster" class="card p-4 text-center group">
+                <div
+                    class="w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 text-blue-400 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <p class="text-xs font-bold">Effectif</p>
+            </a>
+            <a href="/calendar" class="card p-4 text-center group">
+                <div
+                    class="w-12 h-12 bg-green-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 text-green-400 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-calendar-days"></i>
+                </div>
+                <p class="text-xs font-bold">Calendrier</p>
+            </a>
+            <a href="/stats" class="card p-4 text-center group">
+                <div
+                    class="w-12 h-12 bg-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 text-purple-400 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <p class="text-xs font-bold">Stats</p>
+            </a>
+            <a href="/ranking" class="card p-4 text-center group">
+                <div
+                    class="w-12 h-12 bg-amber-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 text-amber-400 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <p class="text-xs font-bold">Classement</p>
+            </a>
+            <a href="/shop" class="card p-4 text-center group">
+                <div
+                    class="w-12 h-12 bg-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 text-pink-400 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-shopping-bag"></i>
+                </div>
+                <p class="text-xs font-bold">Boutique</p>
+            </a>
+            <a href="/profile" class="card p-4 text-center group">
+                <div
+                    class="w-12 h-12 bg-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 text-cyan-400 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <p class="text-xs font-bold">Profil</p>
+            </a>
+            <a href="/admin" class="card p-4 text-center group border-amber-500/20">
+                <div
+                    class="w-12 h-12 bg-amber-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 text-amber-500 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-gear"></i>
+                </div>
+                <p class="text-xs font-bold">Admin</p>
+            </a>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Left Column: Upcoming & Activities -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Prochain Match -->
+                <div class="card overflow-hidden relative">
+                    <div class="absolute top-0 right-0 p-8">
+                        <i class="fa-solid fa-futbol text-8xl text-white/5 opacity-20 -rotate-12"></i>
+                    </div>
+                    <div class="p-8 relative z-10">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full font-bold">PROCHAIN
+                                MATCH</span>
+                            <span class="text-xs text-white/40">Championnat Division 2</span>
+                        </div>
+                        <div class="grid grid-cols-3 items-center text-center">
+                            <div>
+                                <div
+                                    class="w-20 h-20 gradient-primary rounded-3xl flex items-center justify-center text-2xl font-black mx-auto mb-3 shadow-xl">
+                                    FC</div>
+                                <p class="font-bold">FC Elite</p>
+                                <p class="text-xs text-white/40">Domicile</p>
+                            </div>
+                            <div>
+                                <p class="text-4xl font-black text-white/20 mb-1">VS</p>
+                                <div class="glass px-3 py-1 rounded-lg inline-block">
+                                    <p class="text-sm font-bold text-amber-400">Sam 08 Fév</p>
+                                    <p class="text-[10px] text-white/60">15:00</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div
+                                    class="w-20 h-20 bg-gray-800 rounded-3xl flex items-center justify-center text-2xl font-black mx-auto mb-3 border border-white/10">
+                                    RC</div>
+                                <p class="font-bold">Racing FC</p>
+                                <p class="text-xs text-white/40">Extérieur</p>
+                            </div>
+                        </div>
+                        <div
+                            class="mt-8 flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-location-dot text-white/40"></i>
+                                <p class="text-xs text-white/60">Stade Municipal de Paris</p>
+                            </div>
+                            <div class="flex -space-x-2">
+                                <img src="https://randomuser.me/api/portraits/men/1.jpg"
+                                    class="w-6 h-6 rounded-full border-2 border-[#1e1b4b]">
+                                <img src="https://randomuser.me/api/portraits/men/2.jpg"
+                                    class="w-6 h-6 rounded-full border-2 border-[#1e1b4b]">
+                                <img src="https://randomuser.me/api/portraits/men/3.jpg"
+                                    class="w-6 h-6 rounded-full border-2 border-[#1e1b4b]">
+                                <div
+                                    class="w-6 h-6 rounded-full bg-white/10 border-2 border-[#1e1b4b] flex items-center justify-center text-[8px] font-bold">
+                                    +18</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activités Récentes -->
+                <div class="card">
+                    <div class="p-6 border-b border-white/5 flex justify-between items-center">
+                        <h3 class="font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-list-ul text-blue-400"></i>Activités Récentes
+                        </h3>
+                        <a href="#" class="text-xs text-blue-400 hover:underline">Voir tout</a>
+                    </div>
+                    <div class="divide-y divide-white/5">
+                        <div class="p-5 flex gap-4 hover:bg-white/5 transition">
+                            <div
+                                class="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center text-green-400 flex-shrink-0">
+                                <i class="fa-solid fa-clipboard-check"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold">Convocation publiée</p>
+                                <p class="text-xs text-white/50 mt-1">Le Coach Martin a publié la convocation pour le
+                                    match contre Racing FC.</p>
+                                <p class="text-[10px] text-white/30 mt-2">Il y a 2 heures</p>
+                            </div>
+                        </div>
+                        <div class="p-5 flex gap-4 hover:bg-white/5 transition">
+                            <div
+                                class="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center text-purple-400 flex-shrink-0">
+                                <i class="fa-solid fa-bullhorn"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold">Annonce du Club</p>
+                                <p class="text-xs text-white/50 mt-1">Le nouveau maillot 2025-26 est disponible dans la
+                                    boutique!</p>
+                                <p class="text-[10px] text-white/30 mt-2">Il y a 5 heures</p>
+                            </div>
+                        </div>
+                        <div class="p-5 flex gap-4 hover:bg-white/5 transition">
+                            <div
+                                class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 flex-shrink-0">
+                                <i class="fa-solid fa-message"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold">Nouveau message</p>
+                                <p class="text-xs text-white/50 mt-1">Thomas Bernard vous a envoyé un message direct.
+                                </p>
+                                <p class="text-[10px] text-white/30 mt-2">Hier à 18:45</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Stats & Notifications -->
+            <div class="space-y-8">
+                <!-- My Stats Card -->
+                <div class="card p-6 bg-gradient-to-br from-blue-500/10 to-transparent">
+                    <h3 class="font-bold mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-blue-400"></i>Mes Stats Saison
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
+                            <p class="text-2xl font-black text-amber-400">15</p>
+                            <p class="text-[10px] text-white/50 uppercase font-bold mt-1">Buts</p>
+                        </div>
+                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
+                            <p class="text-2xl font-black text-blue-400">8</p>
+                            <p class="text-[10px] text-white/50 uppercase font-bold mt-1">Passes D.</p>
+                        </div>
+                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
+                            <p class="text-2xl font-black">22</p>
+                            <p class="text-[10px] text-white/50 uppercase font-bold mt-1">Matchs</p>
+                        </div>
+                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
+                            <p class="text-2xl font-black text-green-400">7.8</p>
+                            <p class="text-[10px] text-white/50 uppercase font-bold mt-1">Moyenne</p>
+                        </div>
+                    </div>
+                    <a href="/profile"
+                        class="block w-full mt-6 py-3 rounded-xl border border-white/10 text-center text-xs font-bold hover:bg-white/5 transition">
+                        Voir mon profil complet
+                    </a>
+                </div>
+
+                <!-- Team Rankings Preview -->
+                <div class="card p-6">
+                    <h3 class="font-bold mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-amber-400"></i>Classement
+                    </h3>
+                    <div class="space-y-4">
+                        <div
+                            class="flex items-center justify-between p-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                            <div class="flex items-center gap-3">
+                                <span class="font-black text-amber-400 w-4">1</span>
+                                <span class="font-bold text-sm">FC Elite Paris</span>
+                            </div>
+                            <span class="font-black">49 pts</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2">
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-white/30 w-4">2</span>
+                                <span class="text-sm font-medium">Racing FC</span>
+                            </div>
+                            <span class="text-sm font-bold opacity-60">47 pts</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2">
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-white/30 w-4">3</span>
+                                <span class="text-sm font-medium">Olympique FC</span>
+                            </div>
+                            <span class="text-sm font-bold opacity-60">45 pts</span>
+                        </div>
+                    </div>
+                    <a href="/ranking"
+                        class="block w-full mt-4 text-center text-[10px] uppercase tracking-widest font-black text-white/30 hover:text-white transition">
+                        Voir classement complet
+                    </a>
+                </div>
+
+                <!-- Notifications Popup-like element -->
+                <div class="card p-6 border-pink-500/20">
+                    <h3 class="font-bold mb-4 flex items-center gap-2 text-pink-400">
+                        <i class="fa-solid fa-gift"></i>Offre Boutique
+                    </h3>
+                    <p class="text-xs text-white/60 leading-relaxed mb-4">
+                        -20% sur tout l'équipement entraînement pour les membres du club. Utilisez le code
+                        <strong>ELITE2026</strong>.
+                    </p>
+                    <a href="/shop"
+                        class="gradient-pink w-full py-3 rounded-xl block text-center text-xs font-bold shadow-lg">
+                        En profiter maintenant
+                    </a>
+                </div>
+            </div>
+        </div>
     </main>
-    <script>
-        function switchTab(id) { document.querySelectorAll('.content-section').forEach(e=>e.classList.remove('active')); document.getElementById('tab-'+id).classList.add('active'); }
-        function saveCMS(e) { e.preventDefault(); localStorage.setItem('footapp_cms', JSON.stringify({heroTitle: document.getElementById('heroTitle').value, primaryColor: document.getElementById('primaryColor').value})); alert('Sauvegardé'); }
-    </script>
 </body>
+
 </html>

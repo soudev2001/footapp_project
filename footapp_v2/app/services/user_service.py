@@ -10,6 +10,17 @@ class UserService:
         self.db = db
         self.collection = db.users
     
+    def get_all(self):
+        """Get all users"""
+        return list(self.collection.find())
+
+    def get_members_by_club(self, club_id):
+        """Get all users linked to a specific club"""
+        from bson import ObjectId
+        if isinstance(club_id, str):
+            club_id = ObjectId(club_id)
+        return list(self.collection.find({'club_id': club_id}))
+
     def get_by_id(self, user_id):
         """Get user by ID"""
         return self.collection.find_one({'_id': ObjectId(user_id)})
@@ -86,31 +97,29 @@ def get_nav_for_role(role):
     """Get navigation items based on user role"""
     all_nav = {
         'admin': [
-            {'name': 'Dashboard', 'url': '/dashboard', 'icon': 'fa-gauge'},
-            {'name': 'Admin', 'url': '/admin-panel', 'icon': 'fa-shield'},
-            {'name': 'Effectif', 'url': '/roster', 'icon': 'fa-users'},
-            {'name': 'Calendrier', 'url': '/calendar', 'icon': 'fa-calendar'},
-            {'name': 'Tactiques', 'url': '/tactics', 'icon': 'fa-chess-board'},
+            {'name': 'Accueil', 'url': '/', 'icon': 'fa-house'},
+            {'name': 'Console Gestion', 'url': '/admin/panel', 'icon': 'fa-shield-halved'},
+            {'name': 'Site Public', 'url': '/public-club', 'icon': 'fa-globe'},
         ],
         'coach': [
-            {'name': 'Dashboard', 'url': '/dashboard', 'icon': 'fa-gauge'},
-            {'name': 'Effectif', 'url': '/roster', 'icon': 'fa-users'},
-            {'name': 'Calendrier', 'url': '/calendar', 'icon': 'fa-calendar'},
-            {'name': 'Presences', 'url': '/attendance', 'icon': 'fa-clipboard-check'},
-            {'name': 'Tactiques', 'url': '/tactics', 'icon': 'fa-chess-board'},
+            {'name': 'Dashboard', 'url': '/coach/dashboard', 'icon': 'fa-gauge'},
+            {'name': 'Effectif', 'url': '/coach/roster', 'icon': 'fa-users'},
+            {'name': 'Tactiques', 'url': '/coach/tactics', 'icon': 'fa-chess-board'},
+            {'name': 'Match Center', 'url': '/coach/match-center', 'icon': 'fa-gamepad'},
+            {'name': 'Social', 'url': '/feed', 'icon': 'fa-rss'},
         ],
         'player': [
-            {'name': 'Accueil', 'url': '/app-home', 'icon': 'fa-house'},
-            {'name': 'Calendrier', 'url': '/calendar', 'icon': 'fa-calendar'},
-            {'name': 'Equipe', 'url': '/roster', 'icon': 'fa-users'},
-            {'name': 'Messages', 'url': '/chat-inbox', 'icon': 'fa-comments'},
-            {'name': 'Profil', 'url': '/profile', 'icon': 'fa-user'},
+            {'name': 'Accueil', 'url': '/player/home', 'icon': 'fa-house'},
+            {'name': 'Mon Équipe', 'url': '/player/team', 'icon': 'fa-people-group'},
+            {'name': 'Planning', 'url': '/player/calendar', 'icon': 'fa-calendar-days'},
+            {'name': 'Documents', 'url': '/player/documents', 'icon': 'fa-file-invoice'},
+            {'name': 'Social', 'url': '/feed', 'icon': 'fa-rss'},
         ],
         'fan': [
             {'name': 'Accueil', 'url': '/', 'icon': 'fa-house'},
-            {'name': 'Actualites', 'url': '/feed', 'icon': 'fa-newspaper'},
-            {'name': 'Club', 'url': '/public-club', 'icon': 'fa-futbol'},
-            {'name': 'Classement', 'url': '/ranking', 'icon': 'fa-ranking-star'},
+            {'name': 'Actualités', 'url': '/feed', 'icon': 'fa-newspaper'},
+            {'name': 'Clubs', 'url': '/public-club', 'icon': 'fa-futbol'},
+            {'name': 'Boutique', 'url': '/shop-product', 'icon': 'fa-bag-shopping'},
         ]
     }
     return all_nav.get(role, all_nav['fan'])

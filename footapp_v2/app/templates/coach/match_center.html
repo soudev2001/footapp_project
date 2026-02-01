@@ -1,274 +1,243 @@
 {% extends "base.html" %}
-{% block title %}Match Center - FootApp{% endblock %}
+{% block title %}Match Center Elite - FootApp{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
+<div class="max-w-4xl mx-auto page-enter px-4 py-8">
     <!-- Scoreboard Header -->
     <div
-        class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-6 pb-16 rounded-b-3xl relative overflow-hidden shadow-2xl">
-        <!-- Background decorations -->
-        <div
-            class="absolute -top-20 -right-20 w-60 h-60 bg-primary-600 rounded-full mix-blend-overlay filter blur-3xl opacity-30">
-        </div>
-        <div
-            class="absolute -bottom-20 -left-20 w-60 h-60 bg-purple-600 rounded-full mix-blend-overlay filter blur-3xl opacity-30">
-        </div>
+        class="glass p-10 rounded-[48px] border-white/5 relative overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] mb-10">
+        <!-- Background accents -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-primary-500/10 rounded-full blur-[120px] -mr-48 -mt-48"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px] -ml-48 -mb-48"></div>
 
-        <div class="flex justify-between items-center mb-8 relative z-10">
-            <a href="/coach/dashboard"
-                class="w-10 h-10 glass-light rounded-xl flex items-center justify-center hover:bg-white/20 transition">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-            <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Championnat R1 • J15</span>
-            <button
-                class="w-10 h-10 glass-light rounded-xl flex items-center justify-center hover:bg-white/20 transition">
-                <i class="fa-solid fa-share-nodes"></i>
-            </button>
-        </div>
+        <div class="relative z-10">
+            <div class="flex justify-between items-center mb-12">
+                <a href="{{ url_for('coach.dashboard') }}"
+                    class="w-12 h-12 glass rounded-2xl flex items-center justify-center hover:bg-white/10 transition border border-white/5">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                </a>
+                <div class="text-center">
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">CHAMPIONNAT R1 • JOURNÉE
+                        15</p>
+                </div>
+                <button
+                    class="w-12 h-12 glass rounded-2xl flex items-center justify-center hover:bg-white/10 transition border border-white/5">
+                    <i class="fa-solid fa-share-nodes text-xs"></i>
+                </button>
+            </div>
 
-        <!-- Score Display -->
-        <div class="flex items-center justify-between relative z-10 px-4">
-            <div class="flex flex-col items-center gap-3 w-1/3">
-                <div
-                    class="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center text-3xl font-black shadow-lg shadow-primary-500/30">
-                    FC
+            <!-- Score Display -->
+            <div class="flex items-center justify-between px-6">
+                <!-- Home Team -->
+                <div class="flex flex-col items-center gap-4 w-1/3 group">
+                    <div
+                        class="w-24 h-24 gradient-primary rounded-[32px] flex items-center justify-center text-4xl font-black shadow-2xl shadow-primary-500/30 group-hover:scale-105 transition-transform duration-500">
+                        FC
+                    </div>
+                    <div class="text-center">
+                        <span class="block font-black text-lg italic tracking-tight">FC ELITE</span>
+                        <span
+                            class="text-[9px] font-black text-green-400 uppercase tracking-widest mt-1">DOMICILE</span>
+                    </div>
                 </div>
-                <span class="font-bold">FC Elite</span>
-                <span class="text-[10px] text-green-400 uppercase tracking-wider">Domicile</span>
-            </div>
-            <div class="flex flex-col items-center w-1/3">
-                <div class="text-5xl md:text-6xl font-black mb-2">2 - 1</div>
-                <span
-                    class="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full animate-pulse flex items-center gap-1">
-                    <span class="w-2 h-2 bg-white rounded-full"></span>
-                    LIVE 72'
-                </span>
-            </div>
-            <div class="flex flex-col items-center gap-3 w-1/3">
-                <div class="w-20 h-20 bg-gray-700 rounded-2xl flex items-center justify-center text-3xl font-black">
-                    RC
+
+                <!-- Clock & Score -->
+                <div class="flex flex-col items-center w-1/3">
+                    <div class="flex items-center gap-6 mb-4">
+                        <span class="text-6xl md:text-8xl font-black italic tracking-tighter text-gradient">2</span>
+                        <span class="text-4xl font-black text-white/5 italic">-</span>
+                        <span class="text-6xl md:text-8xl font-black italic tracking-tighter text-white/20">1</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-3">
+                        <div
+                            class="px-5 py-2 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 group">
+                            <span
+                                class="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.8)]"></span>
+                            <span class="text-xs font-black italic text-red-400">LIVE 72'</span>
+                        </div>
+                    </div>
                 </div>
-                <span class="font-bold">Racing FC</span>
-                <span class="text-[10px] text-gray-400 uppercase tracking-wider">Extérieur</span>
+
+                <!-- Away Team -->
+                <div class="flex flex-col items-center gap-4 w-1/3 group">
+                    <div
+                        class="w-24 h-24 bg-white/5 border border-white/10 rounded-[32px] flex items-center justify-center text-4xl font-black shadow-2xl group-hover:scale-105 transition-transform duration-500">
+                        RC
+                    </div>
+                    <div class="text-center">
+                        <span class="block font-black text-lg italic tracking-tight text-white/40">RACING FC</span>
+                        <span
+                            class="text-[9px] font-black text-white/20 uppercase tracking-widest mt-1">EXTÉRIEUR</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Tabs -->
-    <div
-        class="flex bg-surface-800 border border-white/10 mx-4 -mt-8 rounded-2xl shadow-xl relative z-20 overflow-hidden">
-        <button onclick="switchMatchTab('resume')" id="tab-resume"
-            class="flex-1 py-4 text-sm font-bold text-primary-400 border-b-2 border-primary-500 transition">Résumé</button>
-        <button onclick="switchMatchTab('compos')" id="tab-compos"
-            class="flex-1 py-4 text-sm font-bold text-gray-500 hover:text-white transition">Compositions</button>
-        <button onclick="switchMatchTab('stats')" id="tab-stats"
-            class="flex-1 py-4 text-sm font-bold text-gray-500 hover:text-white transition">Stats</button>
-    </div>
+    <!-- Layout Container -->
+    <div class="grid lg:grid-cols-3 gap-10">
+        <!-- Main Timeline & Stats -->
+        <div class="lg:col-span-2 space-y-10">
+            <!-- Navigation Tabs -->
+            <div class="flex bg-white/5 p-1.5 rounded-2xl border border-white/5">
+                <button onclick="switchMatchTab('resume')" id="tab-resume"
+                    class="flex-1 py-4 text-[10px] font-black uppercase tracking-[0.2em] bg-primary-500 text-white rounded-xl shadow-lg transition-all">RÉSUMÉ</button>
+                <button onclick="switchMatchTab('stats')" id="tab-stats"
+                    class="flex-1 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20 hover:text-white transition-all">STATISTIQUES</button>
+                <button onclick="switchMatchTab('compos')" id="tab-compos"
+                    class="flex-1 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20 hover:text-white transition-all">LINEUP</button>
+            </div>
 
-    <!-- Content -->
-    <div class="px-4 py-6">
-        <!-- Resume Tab -->
-        <div id="content-resume" class="space-y-4">
-            <h3 class="font-bold text-lg mb-4">Timeline du match</h3>
-
-            <!-- Timeline -->
-            <div class="relative pl-8">
-                <!-- Timeline line -->
-                <div class="absolute left-3 top-0 bottom-0 w-0.5 bg-white/10"></div>
+            <!-- Resume Content -->
+            <div id="content-resume" class="space-y-8">
+                <div class="flex items-center gap-4 mb-2 px-4">
+                    <h2 class="text-sm font-black uppercase tracking-widest text-white/20 italic">Timeline de la
+                        Rencontre</h2>
+                    <div class="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent"></div>
+                </div>
 
                 <!-- Event: Yellow Card -->
-                <div class="relative mb-6">
+                <div class="relative pl-12">
+                    <div class="absolute left-0 top-0 bottom-0 w-px bg-white/5 ml-[23px]"></div>
                     <div
-                        class="absolute -left-5 w-8 h-8 rounded-full bg-surface-800 border-2 border-white/20 flex items-center justify-center text-xs font-bold">
+                        class="absolute left-0 top-6 w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center text-xs font-black border-4 border-surface-950 z-10 shadow-xl">
                         72'</div>
-                    <div class="card p-4 flex items-center gap-4 ml-4">
-                        <div class="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-square text-amber-400"></i>
+                    <div
+                        class="glass p-6 rounded-[32px] border-white/5 flex items-center gap-6 group hover:border-amber-500/20 transition-all">
+                        <div
+                            class="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center border border-amber-500/20">
+                            <i
+                                class="fa-solid fa-square text-amber-500 text-xl shadow-[0_0_15px_rgba(245,158,11,0.3)]"></i>
                         </div>
-                        <div>
-                            <p class="font-bold">Carton Jaune</p>
-                            <p class="text-sm text-gray-400">M. Dupont (Racing FC)</p>
+                        <div class="flex-1">
+                            <p class="font-black text-white italic">CARTON JAUNE</p>
+                            <p class="text-[10px] text-white/20 font-black uppercase tracking-widest mt-1">M. DUPONT
+                                (RACING FC)</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Event: Goal -->
-                <div class="relative mb-6">
+                <div class="relative pl-12">
+                    <div class="absolute left-0 top-0 bottom-0 w-px bg-white/5 ml-[23px]"></div>
                     <div
-                        class="absolute -left-5 w-8 h-8 rounded-full gradient-primary flex items-center justify-center text-xs font-bold shadow-lg shadow-primary-500/30">
+                        class="absolute left-0 top-6 w-12 h-12 gradient-success rounded-2xl flex items-center justify-center text-xs font-black border-4 border-surface-950 z-10 shadow-xl">
                         55'</div>
-                    <div class="card p-4 flex items-center gap-4 ml-4 border-l-4 border-primary-500">
-                        <div class="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-futbol text-green-400"></i>
+                    <div
+                        class="glass p-8 rounded-[40px] border-primary-500/20 bg-gradient-to-br from-primary-500/10 to-transparent flex items-center gap-8 relative overflow-hidden group">
+                        <div
+                            class="w-16 h-16 gradient-primary rounded-3xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-futbol text-white text-3xl"></i>
                         </div>
                         <div class="flex-1">
-                            <p class="font-bold text-green-400">GOAAAAL ! (2-1)</p>
-                            <p class="text-sm text-gray-400">Pierre Dubois (Passe de Olivier L.)</p>
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="text-2xl font-black italic tracking-tight text-gradient">GOAAAAL !</h3>
+                                <span
+                                    class="px-3 py-1 bg-green-500/10 text-green-400 text-[10px] font-black rounded-full border border-green-500/20">SCORE:
+                                    2-1</span>
+                            </div>
+                            <p class="text-[10px] text-white/40 font-black uppercase tracking-widest">PIERRE DUBOIS
+                                (PASSE DE OLIVIER L.)</p>
                         </div>
-                        <span class="text-2xl">⚽</span>
                     </div>
                 </div>
+            </div>
 
-                <!-- Event: Half-time -->
-                <div class="relative mb-6">
-                    <div
-                        class="absolute -left-5 w-8 h-8 rounded-full bg-surface-800 border-2 border-white/20 flex items-center justify-center text-xs font-bold">
-                        45'</div>
-                    <div class="glass-light p-3 rounded-xl ml-4 text-center">
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Mi-temps (1-1)</p>
-                    </div>
-                </div>
-
-                <!-- Event: Goal -->
-                <div class="relative mb-6">
-                    <div
-                        class="absolute -left-5 w-8 h-8 rounded-full gradient-primary flex items-center justify-center text-xs font-bold shadow-lg shadow-primary-500/30">
-                        34'</div>
-                    <div class="card p-4 flex items-center gap-4 ml-4 border-l-4 border-primary-500">
-                        <div class="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-futbol text-green-400"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-green-400">But (1-1)</p>
-                            <p class="text-sm text-gray-400">Romain Lambert (FC Elite)</p>
-                        </div>
-                        <span class="text-2xl">⚽</span>
-                    </div>
-                </div>
-
-                <!-- Event: Opponent Goal -->
-                <div class="relative mb-6">
-                    <div
-                        class="absolute -left-5 w-8 h-8 rounded-full bg-red-500/20 border-2 border-red-500/50 flex items-center justify-center text-xs font-bold text-red-400">
-                        12'</div>
-                    <div class="card p-4 flex items-center gap-4 ml-4 border-l-4 border-red-500/50">
-                        <div class="w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center">
-                            <i class="fa-solid fa-futbol text-red-400"></i>
+            <!-- Stats Content (Skeleton) -->
+            <div id="content-stats" class="hidden space-y-6">
+                <div class="glass p-10 rounded-[40px] border-white/5">
+                    <h3 class="text-sm font-black uppercase tracking-widest mb-10 italic">Indicateurs Clés</h3>
+                    <div class="space-y-8">
+                        <div>
+                            <div class="flex justify-between text-[10px] font-black uppercase tracking-widest mb-3">
+                                <span class="text-primary-400">FC ELITE (58%)</span>
+                                <span class="text-white/20">Possession</span>
+                                <span>RACING FC (42%)</span>
+                            </div>
+                            <div class="h-2 bg-white/5 rounded-full overflow-hidden flex">
+                                <div class="h-full gradient-primary" style="width: 58%"></div>
+                                <div class="h-full bg-white/10" style="width: 42%"></div>
+                            </div>
                         </div>
                         <div>
-                            <p class="font-bold text-red-400">But encaissé (0-1)</p>
-                            <p class="text-sm text-gray-400">J. Martin (Racing FC)</p>
+                            <div class="flex justify-between text-[10px] font-black uppercase tracking-widest mb-3">
+                                <span class="text-primary-400">12</span>
+                                <span class="text-white/20">Tirs Tentés</span>
+                                <span>8</span>
+                            </div>
+                            <div class="h-2 bg-white/5 rounded-full overflow-hidden flex">
+                                <div class="h-full gradient-primary" style="width: 60%"></div>
+                                <div class="h-full bg-white/10" style="width: 40%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Event: Kick-off -->
-                <div class="relative">
-                    <div
-                        class="absolute -left-5 w-8 h-8 rounded-full bg-surface-800 border-2 border-white/20 flex items-center justify-center text-xs font-bold">
-                        0'</div>
-                    <div class="glass-light p-3 rounded-xl ml-4 text-center">
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Coup d'envoi</p>
-                    </div>
-                </div>
             </div>
         </div>
 
-        <!-- Compositions Tab -->
-        <div id="content-compos" class="hidden">
-            <h3 class="font-bold text-lg mb-4">Composition FC Elite</h3>
-            <div class="card p-4 mb-4">
-                <div class="text-center text-sm text-gray-400 mb-4">Formation: 4-3-3</div>
-                <!-- Simplified formation view -->
-                <div class="grid grid-cols-5 gap-2 text-center">
-                    <div class="col-start-3 mb-4">
+        <!-- Sidebar / Bench -->
+        <div class="space-y-8">
+            <div class="glass p-8 rounded-[40px] border-white/5">
+                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] mb-8 text-white/20">Banc des Remplaçants
+                </h3>
+                <div class="space-y-4">
+                    {% for i in range(1, 4) %}
+                    <div class="flex items-center gap-4 group cursor-pointer">
                         <div
-                            class="w-10 h-10 gradient-primary rounded-full flex items-center justify-center mx-auto mb-1 text-xs font-bold">
-                            9</div>
-                        <span class="text-[10px]">Dubois</span>
+                            class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-xs group-hover:gradient-primary group-hover:text-white transition-all shadow-lg">
+                            {{ [12, 14, 16]|random }}
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs font-black uppercase tracking-wider italic">Remplaçant #{{ i }}</p>
+                            <p class="text-[8px] text-white/20 font-black uppercase">DISPONIBLE</p>
+                        </div>
+                        <button
+                            class="w-8 h-8 rounded-lg bg-white/5 hover:bg-green-500/20 text-white/20 hover:text-green-400 transition-colors border border-white/10">
+                            <i class="fa-solid fa-arrows-rotate text-[10px]"></i>
+                        </button>
                     </div>
-                </div>
-                <div class="grid grid-cols-3 gap-2 text-center mb-4">
-                    <div>
-                        <div
-                            class="w-10 h-10 gradient-primary rounded-full flex items-center justify-center mx-auto mb-1 text-xs font-bold">
-                            7</div>
-                        <span class="text-[10px]">Lambert</span>
-                    </div>
-                    <div>
-                        <div
-                            class="w-10 h-10 gradient-primary rounded-full flex items-center justify-center mx-auto mb-1 text-xs font-bold">
-                            10</div>
-                        <span class="text-[10px]">Petit</span>
-                    </div>
-                    <div>
-                        <div
-                            class="w-10 h-10 gradient-primary rounded-full flex items-center justify-center mx-auto mb-1 text-xs font-bold">
-                            11</div>
-                        <span class="text-[10px]">Laurent</span>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
-        </div>
 
-        <!-- Stats Tab -->
-        <div id="content-stats" class="hidden">
-            <h3 class="font-bold text-lg mb-4">Statistiques du match</h3>
+            <!-- Coach View Controls -->
+            {% if roles.is_coach %}
             <div class="space-y-4">
-                <!-- Possession -->
-                <div class="card p-4">
-                    <div class="flex justify-between text-sm mb-2">
-                        <span class="font-bold text-primary-400">58%</span>
-                        <span class="text-gray-400">Possession</span>
-                        <span class="font-bold">42%</span>
-                    </div>
-                    <div class="flex h-2 rounded-full overflow-hidden">
-                        <div class="gradient-primary" style="width: 58%"></div>
-                        <div class="bg-gray-600" style="width: 42%"></div>
-                    </div>
-                </div>
-                <!-- Shots -->
-                <div class="card p-4">
-                    <div class="flex justify-between text-sm mb-2">
-                        <span class="font-bold text-primary-400">12</span>
-                        <span class="text-gray-400">Tirs</span>
-                        <span class="font-bold">8</span>
-                    </div>
-                    <div class="flex h-2 rounded-full overflow-hidden">
-                        <div class="gradient-primary" style="width: 60%"></div>
-                        <div class="bg-gray-600" style="width: 40%"></div>
-                    </div>
-                </div>
-                <!-- Corners -->
-                <div class="card p-4">
-                    <div class="flex justify-between text-sm mb-2">
-                        <span class="font-bold text-primary-400">6</span>
-                        <span class="text-gray-400">Corners</span>
-                        <span class="font-bold">3</span>
-                    </div>
-                    <div class="flex h-2 rounded-full overflow-hidden">
-                        <div class="gradient-primary" style="width: 67%"></div>
-                        <div class="bg-gray-600" style="width: 33%"></div>
-                    </div>
-                </div>
+                <button
+                    class="w-full gradient-primary py-5 rounded-2xl font-black text-xs shadow-2xl shadow-primary-500/30 hover:scale-[1.02] active:scale-95 transition-all text-center tracking-widest">
+                    METTRE À JOUR LE SCORE
+                </button>
+                <button
+                    class="w-full bg-white/5 hover:bg-white/10 border border-white/10 py-5 rounded-2xl font-black text-xs text-white/40 transition-all italic tracking-widest">
+                    DÉCLARER FIN DU MATCH
+                </button>
             </div>
+            {% endif %}
         </div>
     </div>
-
-    <!-- Coach Actions -->
-    {% if roles.is_coach %}
-    <div class="sticky bottom-20 md:bottom-4 mx-4 mb-4">
-        <button class="w-full btn-primary py-4 rounded-xl font-bold flex items-center justify-center gap-2">
-            <i class="fa-solid fa-pen-to-square"></i>
-            Mettre à jour le match
-        </button>
-    </div>
-    {% endif %}
 </div>
 
 <script>
     function switchMatchTab(tab) {
         // Hide all content
-        ['resume', 'compos', 'stats'].forEach(t => {
-            document.getElementById('content-' + t).classList.add('hidden');
-            document.getElementById('tab-' + t).classList.remove('text-primary-400', 'border-b-2', 'border-primary-500');
-            document.getElementById('tab-' + t).classList.add('text-gray-500');
+        ['resume', 'stats', 'compos'].forEach(t => {
+            const content = document.getElementById('content-' + t);
+            const tabBtn = document.getElementById('tab-' + t);
+            if (content) content.classList.add('hidden');
+            if (tabBtn) {
+                tabBtn.classList.remove('bg-primary-500', 'text-white', 'shadow-lg');
+                tabBtn.classList.add('text-white/20');
+            }
         });
 
         // Show selected
-        document.getElementById('content-' + tab).classList.remove('hidden');
-        document.getElementById('tab-' + tab).classList.add('text-primary-400', 'border-b-2', 'border-primary-500');
-        document.getElementById('tab-' + tab).classList.remove('text-gray-500');
+        const activeContent = document.getElementById('content-' + tab);
+        const activeTab = document.getElementById('tab-' + tab);
+        if (activeContent) activeContent.classList.remove('hidden');
+        if (activeTab) {
+            activeTab.classList.remove('text-white/20');
+            activeTab.classList.add('bg-primary-500', 'text-white', 'shadow-lg');
+        }
     }
 </script>
 {% endblock %}

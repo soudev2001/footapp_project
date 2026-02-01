@@ -14,13 +14,109 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 @login_required
 @role_required('admin')
 def admin_panel():
-    """Admin dashboard panel"""
-    from app.services import get_club_service, get_user_service, get_player_service
-    from app.services.db import get_stats
+    """Club Admin Dashboard (SaaS)"""
+    from app.services import get_club_service, get_user_service
+    user_service = get_user_service()
+    club_service = get_club_service()
     
-    stats = get_stats()
+    user = user_service.get_by_id(session.get('user_id'))
+    club_id = user.get('club_id')
     
-    return render_template('admin/panel.html', stats=stats)
+    club = None
+    members = []
+    if club_id:
+        club = club_service.get_by_id(club_id)
+        members = user_service.get_members_by_club(club_id)
+    
+    # Mock specific stats
+    stats = {
+        'total_members': len(members),
+        'coaches': len([m for m in members if m.get('role') == 'coach']),
+        'players': len([m for m in members if m.get('role') == 'player']),
+        'mrr': "29.90" if club_id else "0.00"
+    }
+    
+    return render_template('admin/panel.html', club=club, members=members, stats=stats)
+
+@admin_bp.route('/add-member', methods=['POST'])
+@login_required
+@role_required('admin')
+def add_member():
+    """Add a new member to the club"""
+    from app.services import get_user_service
+    user_service = get_user_service()
+    
+    email = request.form.get('email')
+    role = request.form.get('role', 'player')
+    first_name = request.form.get('first_name')
+    last_name = request.form.get('last_name')
+    
+    # Use current admin's club_id
+    admin_user = user_service.get_by_id(session.get('user_id'))
+    club_id = admin_user.get('club_id')
+    
+    if user_service.get_by_email(email):
+        flash('Cet email est deja utilise.', 'error')
+    else:
+        profile = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'avatar': '',
+            'phone': ''
+        }
+        # In this demo, we use a simple password
+        user_service.create(email, 'Member123!', role=role, club_id=club_id, profile=profile)
+        flash(f'Membre {first_name} ajoute avec succes au club!', 'success')
+        
+    return redirect(url_for('admin.admin_panel'))
+
+@admin_bp.route('/invite-member', methods=['POST'])
+@login_required
+@role_required('admin')
+def invite_member():
+    """Send an invitation email (Simulated)"""
+    email = request.form.get('email')
+    flash(f'Invitation envoyee avec succes a {email}!', 'success')
+    return redirect(url_for('admin.admin_panel'))
+
+@admin_bp.route('/update-subscription', methods=['POST'])
+@login_required
+@role_required('admin')
+def update_subscription():
+    """Simulate subscription update"""
+    flash('Plan mis a jour avec succes!', 'success')
+    return redirect(url_for('admin.admin_panel'))
+
+@admin_bp.route('/update-club', methods=['POST'])
+@login_required
+@role_required('admin')
+def update_club():
+    """Update club configuration"""
+    from app.services import get_club_service, get_user_service
+    user_service = get_user_service()
+    club_service = get_club_service()
+    
+    admin_user = user_service.get_by_id(session.get('user_id'))
+    club_id = admin_user.get('club_id')
+    
+    if not club_id:
+        flash('Erreur: Aucun club associe.', 'error')
+        return redirect(url_for('admin.admin_panel'))
+        
+    name = request.form.get('name')
+    city = request.form.get('city')
+    founded_year = request.form.get('founded_year')
+    description = request.form.get('description')
+    
+    club_service.update(club_id, {
+        'name': name,
+        'city': city,
+        'founded_year': int(founded_year) if founded_year else 1985,
+        'description': description
+    })
+    
+    flash('Configuration du club mise a jour!', 'success')
+    return redirect(url_for('admin.admin_panel'))
 
 @admin_bp.route('/users')
 @login_required

@@ -1,43 +1,116 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - FootApp</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex overflow-hidden max-h-[600px]">
-        <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-            <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Bon retour 👋</h1>
-            <form onsubmit="handleLogin(event)" class="space-y-5 mt-6">
-                <input type="email" id="email" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Email" required>
-                <input type="password" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Mot de passe" required>
-                <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 transition">Se connecter</button>
+
+<body class="min-h-screen gradient-bg flex items-center justify-center p-6 bg-[#0a0a0c]">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px]">
+        </div>
+    </div>
+
+    <div class="max-w-md w-full relative z-10">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <a href="/" class="inline-flex items-center gap-3 group">
+                <div
+                    class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-futbol text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-black text-white">FootApp</span>
+            </a>
+            <h1 class="text-white text-3xl font-extrabold mt-6">Ravi de vous revoir !</h1>
+            <p class="text-white/50 mt-2">Connectez-vous pour gérer votre club</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="glass p-8 md:p-10 rounded-[32px] shadow-2xl">
+            <form action="/dashboard" method="GET" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-white/70 mb-2 ml-1">Email</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-blue-400 transition-colors"></i>
+                        <input type="email" placeholder="nom@exemple.com"
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all">
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-2 ml-1">
+                        <label class="text-sm font-bold text-white/70">Mot de passe</label>
+                        <a href="/forgot-password"
+                            class="text-xs text-blue-400 hover:text-blue-300 font-bold transition">Oublié ?</a>
+                    </div>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-blue-400 transition-colors"></i>
+                        <input type="password" placeholder="••••••••"
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all">
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 ml-1">
+                    <input type="checkbox" id="remember"
+                        class="w-4 h-4 rounded border-white/10 bg-white/5 text-blue-500 focus:ring-offset-0 focus:ring-0">
+                    <label for="remember" class="text-sm text-white/50">Se souvenir de moi</label>
+                </div>
+
+                <button type="submit"
+                    class="w-full gradient-primary py-4 rounded-2xl text-white font-bold text-lg shadow-xl shadow-blue-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    Se connecter
+                </button>
             </form>
-            <div class="mt-8 text-xs text-center text-gray-400">
-                <button onclick="fillLogin('admin@footapp.com')" class="underline mr-2">Admin</button>
-                <button onclick="fillLogin('president@fccanvas.com')" class="underline mr-2">Club</button>
-                <button onclick="fillLogin('player@fccanvas.com')" class="underline">Joueur</button>
+
+            <div class="mt-8 flex items-center gap-4 text-white/20">
+                <div class="flex-1 h-px bg-white/10"></div>
+                <span class="text-xs font-bold uppercase tracking-widest">Ou continuer avec</span>
+                <div class="flex-1 h-px bg-white/10"></div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-2 gap-4">
+                <button
+                    class="glass py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-white/10 transition group">
+                    <i class="fa-brands fa-google text-white/30 group-hover:text-red-400 transition-colors"></i>
+                    <span class="text-sm font-bold text-white/70">Google</span>
+                </button>
+                <button
+                    class="glass py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-white/10 transition group">
+                    <i class="fa-brands fa-apple text-white/30 group-hover:text-white transition-colors"></i>
+                    <span class="text-sm font-bold text-white/70">Apple</span>
+                </button>
             </div>
         </div>
-        <div class="hidden md:block w-1/2 bg-blue-600 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-700 opacity-90"></div>
-            <div class="absolute inset-0 flex flex-col items-center justify-center text-white p-12 text-center z-10">
-                <i class="fa-solid fa-shield-cat text-6xl mb-4"></i>
-                <h2 class="text-2xl font-bold">Gérez votre club</h2>
+
+        <p class="text-center mt-8 text-white/40">
+            Pas encore de compte ?
+            <a href="/register" class="text-blue-400 font-bold hover:text-blue-300 transition">S'inscrire
+                gratuitement</a>
+        </p>
+
+        <!-- Demo Accounts -->
+        <div class="mt-8 glass p-4 rounded-2xl">
+            <p
+                class="text-[10px] items-center justify-center flex uppercase tracking-widest font-black text-white/30 mb-2">
+                Comptes de Démo</p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="/manager"
+                    class="text-[10px] bg-purple-500/20 text-purple-400 px-3 py-1.5 rounded-full font-bold border border-purple-500/30 hover:bg-purple-500/30 transition">Coach/Manager</a>
+                <a href="/app"
+                    class="text-[10px] bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded-full font-bold border border-blue-500/30 hover:bg-blue-500/30 transition">Joueur</a>
+                <a href="/admin"
+                    class="text-[10px] bg-amber-500/20 text-amber-500 px-3 py-1.5 rounded-full font-bold border border-amber-500/30 hover:bg-amber-500/30 transition">Admin</a>
             </div>
         </div>
     </div>
-    <script>
-        function fillLogin(email) { document.getElementById('email').value = email; }
-        function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            if (email === 'admin@footapp.com') window.location.href = '/admin';
-            else if (email === 'president@fccanvas.com') window.location.href = '/dashboard';
-            else window.location.href = '/app';
-        }
-    </script>
 </body>
+
 </html>

@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% block title %}Profil Joueur - {{ player.name }} - FootApp Elite{% endblock %}
+
+{% block content %}
+<div class="page-enter max-w-5xl mx-auto px-4 py-8">
+    <!-- Back Button -->
+    <a href="{{ url_for('coach.roster') }}"
+        class="inline-flex items-center gap-2 text-white/40 hover:text-primary-400 font-black text-[10px] uppercase tracking-widest mb-8 transition-colors">
+        <i class="fa-solid fa-arrow-left text-[8px]"></i>
+        RETOUR À L'EFFECTIF
+    </a>
+
+    <!-- Player Profile Header -->
+    <div class="glass p-10 rounded-[40px] border-white/5 mb-10 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-primary-500/10 rounded-full blur-[120px] -mr-48 -mt-48"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row items-center gap-10">
+            <div class="relative group">
+                <div
+                    class="w-48 h-48 rounded-[48px] overflow-hidden shadow-2xl border-4 border-white/5 group-hover:scale-[1.02] transition-transform duration-700">
+                    <img src="{{ player.photo or 'https://ui-avatars.com/api/?name=' + player.name + '&size=256&background=0D0D0D&color=fff' }}"
+                        class="w-full h-full object-cover">
+                </div>
+                <div
+                    class="absolute -bottom-4 -right-4 w-16 h-16 gradient-primary rounded-[24px] flex items-center justify-center text-3xl font-black shadow-2xl border-4 border-surface-950">
+                    {{ player.jersey_number or '--' }}
+                </div>
+            </div>
+
+            <div class="flex-1 text-center md:text-left">
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-4">
+                    <span
+                        class="px-4 py-1.5 rounded-full bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest">
+                        {{ player.position }}
+                    </span>
+                    <span
+                        class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-widest">
+                        {{ player.status|upper }}
+                    </span>
+                </div>
+                <h1 class="text-5xl font-black mb-4 italic tracking-tight">{{ player.name|upper }}</h1>
+
+                <div class="flex flex-wrap justify-center md:justify-start gap-8 mt-8">
+                    <div class="text-center md:text-left">
+                        <p class="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] mb-1">Taille</p>
+                        <p class="font-black italic">{{ player.height or '175' }} cm</p>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <p class="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] mb-1">Poids</p>
+                        <p class="font-black italic">{{ player.weight or '70' }} kg</p>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <p class="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] mb-1">Âge</p>
+                        <p class="font-black italic">24 ans</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <a href="{{ url_for('coach.edit_player', player_id=player._id) }}"
+                    class="gradient-accent px-8 py-4 rounded-2xl font-black text-xs text-black shadow-xl shadow-yellow-500/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i> MODIFIER
+                </a>
+                <button
+                    class="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 px-8 py-4 rounded-2xl font-black text-xs transition-all">
+                    SIGNALER BLESSURE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-10">
+        <!-- Statistics Deep Dive -->
+        <div class="lg:col-span-2 space-y-10">
+            <div class="glass p-10 rounded-[40px] border-white/5 bg-gradient-to-br from-primary-500/5 to-transparent">
+                <h2 class="text-2xl font-black uppercase tracking-widest mb-10 flex items-center gap-4">
+                    <i class="fa-solid fa-chart-simple text-primary-400"></i>
+                    Performance Saison
+                </h2>
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="text-center group">
+                        <div
+                            class="text-5xl font-black italic mb-2 group-hover:scale-110 transition-transform duration-500">
+                            {{ player.stats.goals or 0 }}</div>
+                        <div class="h-1 w-8 gradient-primary mx-auto rounded-full mb-3"></div>
+                        <p class="text-[10px] font-black text-white/20 uppercase tracking-widest">BUTS</p>
+                    </div>
+                    <div class="text-center group">
+                        <div
+                            class="text-5xl font-black italic mb-2 group-hover:scale-110 transition-transform duration-500">
+                            {{ player.stats.assists or 0 }}</div>
+                        <div class="h-1 w-8 bg-amber-500 mx-auto rounded-full mb-3"></div>
+                        <p class="text-[10px] font-black text-white/20 uppercase tracking-widest">PASSES D.</p>
+                    </div>
+                    <div class="text-center group">
+                        <div
+                            class="text-5xl font-black italic mb-2 group-hover:scale-110 transition-transform duration-500">
+                            {{ player.stats.matches_played or 0 }}</div>
+                        <div class="h-1 w-8 bg-green-500 mx-auto rounded-full mb-3"></div>
+                        <p class="text-[10px] font-black text-white/20 uppercase tracking-widest">MATCHS</p>
+                    </div>
+                    <div class="text-center group">
+                        <div
+                            class="text-5xl font-black italic mb-2 group-hover:scale-110 transition-transform duration-500">
+                            7.8</div>
+                        <div class="h-1 w-8 bg-purple-500 mx-auto rounded-full mb-3"></div>
+                        <p class="text-[10px] font-black text-white/20 uppercase tracking-widest">NOTE MOY.</p>
+                    </div>
+                </div>
+
+                <div class="mt-16 space-y-8">
+                    <div>
+                        <div class="flex justify-between items-end mb-3">
+                            <span class="text-[10px] font-black uppercase tracking-widest">Taux de Passes
+                                Réussies</span>
+                            <span class="text-lg font-black italic">84%</span>
+                        </div>
+                        <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-full gradient-primary rounded-full shadow-lg shadow-primary-500/50"
+                                style="width: 84%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-end mb-3">
+                            <span class="text-[10px] font-black uppercase tracking-widest">Discipline (Sans
+                                carton)</span>
+                            <span class="text-lg font-black italic">92%</span>
+                        </div>
+                        <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-full bg-green-500 rounded-full shadow-lg shadow-green-500/50"
+                                style="width: 92%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Performances -->
+            <div class="space-y-6">
+                <h2 class="text-sm font-black uppercase tracking-[0.2em] px-4">Dernières Apparitions</h2>
+                <div class="space-y-4">
+                    <div
+                        class="glass p-6 rounded-[32px] border-white/5 flex items-center justify-between hover:bg-white/5 transition-all">
+                        <div class="flex items-center gap-6">
+                            <div
+                                class="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center font-black">
+                                RC</div>
+                            <div>
+                                <h4 class="font-black text-sm">vs Racing FC</h4>
+                                <p class="text-[10px] text-white/20 uppercase font-black">8 fév. 2026 • 90 MIN</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="text-center px-4 py-2 bg-white/5 rounded-xl border border-white/10">
+                                <span class="text-xs font-black block leading-none mb-1">1</span>
+                                <span class="text-[7px] text-white/20 font-black uppercase">But</span>
+                            </div>
+                            <div
+                                class="text-center px-4 py-2 bg-primary-500/10 border border-primary-500/20 rounded-xl">
+                                <span class="text-xs font-black block leading-none mb-1 text-primary-400">8.5</span>
+                                <span class="text-[7px] text-primary-400 font-black uppercase">Note</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Details -->
+        <div class="space-y-8">
+            <div class="glass p-8 rounded-[40px] border-white/5">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-6">Attributs Tactiques</h3>
+                <div class="space-y-5">
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                        <span
+                            class="text-[9px] font-black uppercase tracking-widest text-white/40 italic">Vitesse</span>
+                        <div class="flex gap-1">
+                            {% for i in range(5) %}<div
+                                class="w-3 h-1 rounded-full {% if i < 4 %}gradient-primary{% else %}bg-white/10{% endif %}">
+                            </div>{% endfor %}
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                        <span
+                            class="text-[9px] font-black uppercase tracking-widest text-white/40 italic">Finition</span>
+                        <div class="flex gap-1">
+                            {% for i in range(5) %}<div
+                                class="w-3 h-1 rounded-full {% if i < 5 %}gradient-accent{% else %}bg-white/10{% endif %}">
+                            </div>{% endfor %}
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                        <span
+                            class="text-[9px] font-black uppercase tracking-widest text-white/40 italic">Endurance</span>
+                        <div class="flex gap-1">
+                            {% for i in range(5) %}<div
+                                class="w-3 h-1 rounded-full {% if i < 3 %}bg-green-500{% else %}bg-white/10{% endif %}">
+                            </div>{% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass p-8 rounded-[40px] border-white/5 text-center">
+                <i class="fa-solid fa-notes-medical text-3xl text-white/10 mb-4 block"></i>
+                <h3 class="text-[10px] font-black uppercase tracking-widest mb-4">Notes Médicales</h3>
+                <p class="text-xs text-white/20 italic font-medium leading-relaxed">
+                    "Aucune contre-indication. État physique optimal pour la compétition. Légère tension aux
+                    ischio-jambiers signalée lors de la dernière séance."
+                </p>
+                <button
+                    class="w-full mt-8 bg-white/5 hover:bg-white/10 border border-white/10 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all">
+                    HISTORIQUE SANTÉ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,28 +1,141 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classement - FootApp</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body class="bg-gray-50 font-sans text-gray-800 max-w-md mx-auto min-h-screen shadow-2xl">
-    <header class="bg-white p-4 flex items-center gap-3 sticky top-0 border-b border-gray-100">
-        <button onclick="history.back()"><i class="fa-solid fa-arrow-left text-xl"></i></button>
-        <h1 class="font-bold text-lg">Championnat R1 - U13</h1>
-    </header>
-    <main class="p-4">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <table class="w-full text-sm">
-                <thead class="bg-gray-50 text-gray-500 font-bold border-b border-gray-100">
-                    <tr><th class="p-3 text-left w-12">#</th><th class="p-3 text-left">Équipe</th><th class="p-3 text-center w-12 text-black">Pts</th></tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50">
-                    <tr class="bg-green-50/50"><td class="p-3 font-bold text-green-600 border-l-4 border-green-500">1</td><td class="p-3 font-bold">FC Canvas</td><td class="p-3 text-center font-black">32</td></tr>
-                    <tr><td class="p-3 font-bold text-gray-500 pl-4">2</td><td class="p-3 font-medium">US Paris</td><td class="p-3 text-center font-bold">29</td></tr>
-                </tbody>
-            </table>
+
+<body class="min-h-screen gradient-bg text-white">
+    <!-- Navbar -->
+    <nav class="glass border-b border-white/10 py-3 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/" class="flex items-center gap-3">
+                <div class="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-futbol text-white"></i>
+                </div>
+                <span class="font-bold text-lg">FootApp</span>
+            </a>
+            <div class="flex items-center gap-6">
+                <a href="/dashboard"
+                    class="text-white/60 hover:text-white font-medium flex items-center gap-2 text-sm transition">
+                    <i class="fa-solid fa-gauge"></i>Dashboard
+                </a>
+                <a href="/ranking"
+                    class="text-white font-semibold flex items-center gap-2 text-sm bg-white/10 px-4 py-2 rounded-xl">
+                    <i class="fa-solid fa-trophy text-amber-400"></i>Classement
+                </a>
+                <a href="/stats"
+                    class="text-white/60 hover:text-white font-medium flex items-center gap-2 text-sm transition font-semibold">
+                    <i class="fa-solid fa-chart-line text-purple-400"></i>Stats
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-3xl font-extrabold flex items-center gap-3">
+                    <span
+                        class="w-12 h-12 bg-amber-500/20 rounded-2xl flex items-center justify-center text-amber-400 shadow-lg">
+                        <i class="fa-solid fa-trophy"></i>
+                    </span>
+                    Championnat D2
+                </h1>
+                <p class="text-white/60 mt-1">Saison 2025-2026 · Groupe A</p>
+            </div>
+            <select
+                class="glass px-4 py-3 rounded-xl text-sm font-bold bg-white/5 outline-none focus:border-blue-500/50">
+                <option>Division 2 · Groupe A</option>
+                <option>Coupe de France</option>
+                <option>Amicaux</option>
+            </select>
+        </div>
+
+        <!-- Ranking Table -->
+        <div class="card overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead
+                        class="bg-white/2 border-b border-white/5 text-[10px] font-black uppercase tracking-widest text-white/30">
+                        <tr>
+                            <th class="p-5 text-center w-16">Pos</th>
+                            <th class="p-5">Équipe</th>
+                            <th class="p-5 text-center">J</th>
+                            <th class="p-5 text-center">V</th>
+                            <th class="p-5 text-center">N</th>
+                            <th class="p-5 text-center">D</th>
+                            <th class="p-5 text-center">BP</th>
+                            <th class="p-5 text-center">BC</th>
+                            <th class="p-5 text-center">Diff</th>
+                            <th class="p-5 text-center bg-white/2">Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <tr class="hover:bg-amber-500/5 transition group bg-amber-500/5 border-l-2 border-amber-500">
+                            <td class="p-5 text-center font-black text-amber-400">1</td>
+                            <td class="p-5">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center text-xs font-black shadow-lg">
+                                        FC</div>
+                                    <div>
+                                        <p class="font-black text-sm">FC Elite Paris <span
+                                                class="text-[10px] ml-2 text-amber-400 font-black italic">MOI</span></p>
+                                        <p class="text-[10px] text-white/30 uppercase font-bold">Dernier: V-V-N-V-V</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-5 text-center font-bold">22</td>
+                            <td class="p-5 text-center text-green-400 font-bold">15</td>
+                            <td class="p-5 text-center">4</td>
+                            <td class="p-5 text-center text-red-400">3</td>
+                            <td class="p-5 text-center">45</td>
+                            <td class="p-5 text-center">18</td>
+                            <td class="p-5 text-center font-bold text-blue-400">+27</td>
+                            <td class="p-5 text-center font-black text-lg bg-amber-500/10 text-amber-500">49</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="p-5 text-center font-bold text-white/40">2</td>
+                            <td class="p-5">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center text-xs font-black">
+                                        RC</div>
+                                    <p class="font-bold text-sm text-white/80">Racing FC</p>
+                                </div>
+                            </td>
+                            <td class="p-5 text-center font-bold text-white/60">22</td>
+                            <td class="p-5 text-center text-white/60">14</td>
+                            <td class="p-5 text-center text-white/60">5</td>
+                            <td class="p-5 text-center text-white/60">3</td>
+                            <td class="p-5 text-center text-white/60">42</td>
+                            <td class="p-5 text-center text-white/60">20</td>
+                            <td class="p-5 text-center text-white/60">+22</td>
+                            <td class="p-5 text-center font-black text-lg bg-white/2">47</td>
+                        </tr>
+                        <!-- More rows... -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="mt-8 flex flex-wrap gap-6 p-6 glass rounded-2xl">
+            <div class="flex items-center gap-2 text-[10px] font-bold text-white/40">
+                <div class="w-3 h-3 bg-amber-500 rounded-sm"></div>Montée en D1
+            </div>
+            <div class="flex items-center gap-2 text-[10px] font-bold text-white/40">
+                <div class="w-3 h-3 bg-red-500/30 rounded-sm"></div>Zone rouge
+            </div>
         </div>
     </main>
 </body>
+
 </html>

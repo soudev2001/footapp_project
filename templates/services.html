@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services - FootApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="min-h-screen gradient-bg text-white">
+    <!-- Navbar -->
+    <nav class="glass py-4 px-6 border-b border-white/5 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/" class="flex items-center gap-3">
+                <div class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-futbol text-white"></i>
+                </div>
+                <span class="font-extrabold text-xl">FootApp</span>
+            </a>
+            <div class="flex items-center gap-6">
+                <a href="/" class="text-white/60 hover:text-white font-medium transition">Accueil</a>
+                <a href="/services" class="text-white font-semibold">Services</a>
+                <a href="/register" class="gradient-primary px-5 py-2.5 rounded-xl font-bold text-sm">
+                    Commencer
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="py-20 px-6 text-center relative overflow-hidden">
+        <div
+            class="absolute top-20 left-1/4 w-72 h-72 bg-blue-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-30">
+        </div>
+        <div
+            class="absolute bottom-10 right-1/4 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-30">
+        </div>
+
+        <div class="max-w-4xl mx-auto relative z-10">
+            <span class="text-purple-400 font-bold text-sm uppercase tracking-widest">Nos Services</span>
+            <h1 class="text-4xl md:text-6xl font-extrabold mt-4 mb-6 leading-tight">
+                Des solutions <span class="text-gradient">complètes</span> pour votre club
+            </h1>
+            <p class="text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
+                FootApp offre une suite d'outils puissants pour gérer tous les aspects de votre club de football amateur
+                ou semi-professionnel.
+            </p>
+        </div>
+    </header>
+
+    <!-- Services Grid -->
+    <section class="py-16 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Service 1: Convocations -->
+                <div class="card p-8 group hover:border-blue-500/50">
+                    <div
+                        class="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform float-animation shadow-lg">
+                        <i class="fa-solid fa-clipboard-check text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Convocations</h3>
+                    <p class="text-white/60 mb-4 leading-relaxed whitespace-normal overflow-visible">Créez et envoyez
+                        vos convocations en un clic. Gérez les réponses des joueurs en temps réel.</p>
+                    <ul class="space-y-2 text-sm text-white/50">
+                        <li class="flex items-center gap-2"><i
+                                class="fa-solid fa-check text-green-400"></i>Notifications automatiques</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Réponses en
+                            un tap</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Rappels
+                            intelligents</li>
+                    </ul>
+                </div>
+
+                <!-- Service 2: Calendrier -->
+                <a href="/calendar" class="card p-8 group hover:border-green-500/50">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform float-animation shadow-lg"
+                        style="animation-delay: 0.2s">
+                        <i class="fa-solid fa-calendar-days text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Calendrier</h3>
+                    <p class="text-white/60 mb-4 leading-relaxed">Planning partagé avec tous les matchs, entraînements
+                        et événements de votre club.</p>
+                    <ul class="space-y-2 text-sm text-white/50">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Sync avec
+                            votre agenda</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Vue équipe
+                            complète</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Filtres par
+                            type</li>
+                    </ul>
+                </a>
+
+                <!-- Service 3: Statistiques -->
+                <a href="/stats" class="card p-8 group hover:border-amber-500/50">
+                    <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform float-animation shadow-lg"
+                        style="animation-delay: 0.4s">
+                        <i class="fa-solid fa-chart-line text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Statistiques</h3>
+                    <p class="text-white/60 mb-4 leading-relaxed">Suivez les performances individuelles et collectives
+                        avec des graphiques détaillés.</p>
+                    <ul class="space-y-2 text-sm text-white/50">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Buts et
+                            passes décisives</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Analyses de
+                            performance</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Historique
+                            complet</li>
+                    </ul>
+                </a>
+
+                <!-- Service 4: Boutique -->
+                <a href="/shop" class="card p-8 group hover:border-pink-500/50">
+                    <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform float-animation shadow-lg"
+                        style="animation-delay: 0.6s">
+                        <i class="fa-solid fa-store text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Boutique</h3>
+                    <p class="text-white/60 mb-4 leading-relaxed">Vendez maillots, équipements et accessoires
+                        directement depuis l'application.</p>
+                    <ul class="space-y-2 text-sm text-white/50">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Paiements
+                            sécurisés</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Gestion des
+                            stocks</li>
+                        <li class="flex items-center gap-2"><i
+                                class="fa-solid fa-check text-green-400"></i>Personnalisation</li>
+                    </ul>
+                </a>
+
+                <!-- Service 5: Messagerie -->
+                <a href="/chat-inbox" class="card p-8 group hover:border-cyan-500/50">
+                    <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform float-animation shadow-lg"
+                        style="animation-delay: 0.8s">
+                        <i class="fa-solid fa-comments text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Messagerie</h3>
+                    <p class="text-white/60 mb-4 leading-relaxed">Communication centralisée entre joueurs, staff et
+                        dirigeants.</p>
+                    <ul class="space-y-2 text-sm text-white/50">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Groupes
+                            d'équipe</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Messages
+                            privés</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Annonces
+                            officielles</li>
+                    </ul>
+                </a>
+
+                <!-- Service 6: Cotisations -->
+                <div class="card p-8 group hover:border-violet-500/50">
+                    <div class="w-16 h-16 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform float-animation shadow-lg"
+                        style="animation-delay: 1s">
+                        <i class="fa-solid fa-coins text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Cotisations</h3>
+                    <p class="text-white/60 mb-4 leading-relaxed">Gestion automatisée des paiements et suivi des
+                        adhésions.</p>
+                    <ul class="space-y-2 text-sm text-white/50">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Rappels
+                            automatiques</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Paiement en
+                            ligne</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i>Suivi en
+                            temps réel</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-8 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <a href="/" class="flex items-center gap-3">
+                <div class="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-futbol text-white text-sm"></i>
+                </div>
+                <span class="font-bold">FootApp</span>
+            </a>
+            <div class="text-sm text-white/40">
+                &copy; 2026 FootApp. Tous droits réservés.
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

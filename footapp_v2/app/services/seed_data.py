@@ -18,21 +18,21 @@ def seed_all():
     # ========================================
     club1 = {
         'name': 'FC Elite Paris',
-        'logo': 'https://ui-avatars.com/api/?name=FC+Elite&background=1e40af&color=fff&size=128',
+        'logo': 'https://ui-avatars.com/api/?name=FC+Elite&background=2563eb&color=fff&size=128',
         'city': 'Paris',
         'founded_year': 1985,
-        'colors': {'primary': '#1e40af', 'secondary': '#fbbf24'},
+        'colors': {'primary': '#3b82f6', 'secondary': '#10b981'},
         'stadium': 'Stade Municipal de Paris',
         'description': 'Un club historique avec une passion pour le beau jeu.',
         'created_at': datetime.utcnow()
     }
     
     club2 = {
-        'name': 'AS Montagne',
-        'logo': 'https://ui-avatars.com/api/?name=AS+Montagne&background=059669&color=fff&size=128',
+        'name': 'AS Atlantis',
+        'logo': 'https://ui-avatars.com/api/?name=AS+Atlantis&background=10b981&color=fff&size=128',
         'city': 'Lyon',
         'founded_year': 1992,
-        'colors': {'primary': '#059669', 'secondary': '#ffffff'},
+        'colors': {'primary': '#059669', 'secondary': '#3b82f6'},
         'stadium': 'Complexe Sportif des Alpes',
         'description': 'La force du collectif depuis 1992.',
         'created_at': datetime.utcnow()
@@ -52,6 +52,8 @@ def seed_all():
                    {'first_name': 'Michel', 'last_name': 'Dupont', 'avatar': 'https://randomuser.me/api/portraits/men/1.jpg', 'phone': '0612345678'}),
         create_user('player1@fcelite.fr', generate_password_hash('player123'), 'player', club1_id,
                    {'first_name': 'Lucas', 'last_name': 'Martin', 'avatar': 'https://randomuser.me/api/portraits/men/2.jpg', 'phone': '0623456789'}),
+        create_user('fan@fcelite.fr', generate_password_hash('fan123'), 'fan', club1_id,
+                   {'first_name': 'Sophie', 'last_name': 'Bernard', 'avatar': 'https://randomuser.me/api/portraits/women/1.jpg', 'phone': '0634567890'}),
     ]
     
     user_ids = []
@@ -156,6 +158,70 @@ def seed_all():
     print(f"[Seed] Created {len(posts)} posts")
     
     # ========================================
+    # 7. CREATE SHOP PRODUCTS
+    # ========================================
+    products = [
+        {
+            'name': 'Maillot Officiel Domicile',
+            'price': 75.00,
+            'image': 'https://images.unsplash.com/photo-1541033513277-299ae2cd9df1?w=800',
+            'description': 'Le nouveau maillot pour la saison 2024. Technologie respirante.',
+            'category': 'Vetements',
+            'stock': 100,
+            'sizes': ['S', 'M', 'L', 'XL']
+        },
+        {
+            'name': 'Echarpe Fan Club',
+            'price': 15.00,
+            'image': 'https://images.unsplash.com/photo-1520903932296-5ed91222440e?w=800',
+            'description': 'Restez au chaud lors des matchs d hiver.',
+            'category': 'Accessoires',
+            'stock': 50,
+            'sizes': ['One Size']
+        },
+        {
+            'name': 'Ballon Officiel Match',
+            'price': 120.00,
+            'image': 'https://images.unsplash.com/photo-1614632537423-1e6c2e7a0aab?w=800',
+            'description': 'Ballon certifie FIFA Pro.',
+            'category': 'Equipement',
+            'stock': 20,
+            'sizes': ['5']
+        }
+    ]
+    mongo.db.products.insert_many(products)
+    print(f"[Seed] Created {len(products)} products")
+    
+    # ========================================
+    # 8. CREATE GALLERY ITEMS
+    # ========================================
+    gallery = [
+        {
+            'club_id': club1_id,
+            'url': 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800',
+            'caption': 'Victoire en Coupe',
+            'type': 'photo',
+            'created_at': now - timedelta(days=2)
+        },
+        {
+            'club_id': club1_id,
+            'url': 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800',
+            'caption': 'Entrainement matinal',
+            'type': 'photo',
+            'created_at': now - timedelta(days=5)
+        },
+        {
+            'club_id': club1_id,
+            'url': 'https://images.unsplash.com/photo-1517466787929-bc90951d64b8?w=800',
+            'caption': 'Photo d equipe',
+            'type': 'photo',
+            'created_at': now - timedelta(days=10)
+        }
+    ]
+    mongo.db.gallery.insert_many(gallery)
+    print(f"[Seed] Created {len(gallery)} gallery items")
+    
+    # ========================================
     # SUMMARY
     # ========================================
     print("\n" + "="*50)
@@ -167,6 +233,8 @@ def seed_all():
     print(f"  Events:  {len(events)}")
     print(f"  Matches: {len(matches)}")
     print(f"  Posts:   {len(posts)}")
+    print(f"  Shop:    {len(products)}")
+    print(f"  Gallery: {len(gallery)}")
     print("="*50)
     print("\nDemo credentials:")
     print("  Admin:  admin@footapp.fr / admin123")

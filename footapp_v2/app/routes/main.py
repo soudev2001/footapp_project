@@ -1,6 +1,6 @@
 # FootApp V2 - Main Routes (Public Pages)
 
-from flask import Blueprint, render_template, session
+from flask import Blueprint, render_template, session, redirect, url_for
 
 main_bp = Blueprint('main', __name__)
 
@@ -11,7 +11,12 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def index():
     """Landing page"""
-    return render_template('public/index.html')
+    if 'user_id' in session:
+        return redirect(url_for('main.app_home'))
+    
+    from app.services.db import get_stats
+    stats = get_stats()
+    return render_template('public/index.html', stats=stats)
 
 @main_bp.route('/nav-demo')
 def nav_demo():
@@ -21,7 +26,32 @@ def nav_demo():
 @main_bp.route('/public-club')
 def public_club():
     """Public club page"""
-    return render_template('public/club.html')
+    from flask import request
+    from app.services import get_club_service, get_match_service, get_post_service
+    
+    club_service = get_club_service()
+    match_service = get_match_service()
+    post_service = get_post_service()
+    
+    club_id = request.args.get('club_id')
+    
+    if club_id:
+        club = club_service.get_by_id(club_id)
+    else:
+        # Default to first club for landing
+        clubs = club_service.get_all()
+        club = clubs[0] if clubs else None
+    
+    if not club:
+        return redirect(url_for('main.index'))
+    
+    # Fetch related data
+    club_id = club['_id']
+    matches = match_service.get_by_club(club_id)
+    posts = post_service.get_by_club(club_id)
+    stats = club_service.get_stats(club_id)
+    
+    return render_template('public/club.html', club=club, matches=matches, posts=posts, stats=stats)
 
 @main_bp.route('/ranking')
 def ranking():
@@ -49,13 +79,15 @@ def page_404():
 
 @main_bp.route('/app-home')
 def app_home():
-    """App home - redirects based on role"""
+    """App home - redirects to correct blueprint routes to ensure data loading"""
     role = session.get('user_role', 'fan')
     if role == 'admin':
-        return render_template('admin/panel.html')
+        return redirect(url_for('admin.admin_panel'))
     elif role == 'coach':
+        # Point to coach dashboard (needs implementation or reuse existing)
         return render_template('coach/dashboard.html')
     elif role == 'player':
+        # Point to player home (needs implementation or reuse existing)
         return render_template('player/home.html')
     else:
         return render_template('app/home.html')
@@ -167,6 +199,7 @@ def event_training():
     return render_template('app/event_training.html')
 
 @main_bp.route('/architecture')
+@main_bp.route('/navigation_diagram')
 def architecture():
     """System architecture"""
     return render_template('admin/architecture.html')

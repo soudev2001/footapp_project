@@ -1,52 +1,159 @@
 {% extends "base.html" %}
-{% block title %}Accueil - FootApp{% endblock %}
+{% block title %}FootApp - Accueil{% endblock %}
 
 {% block content %}
-<div class="max-w-lg mx-auto px-4 py-6">
-    <!-- Welcome -->
-    <div class="mb-6">
-        <h1 class="text-xl font-bold">Bienvenue sur FootApp</h1>
-        <p class="text-gray-400 text-sm">Votre application de gestion de club</p>
-    </div>
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Welcome Header -->
+    <div class="relative p-8 rounded-[40px] overflow-hidden mb-10 shadow-2xl">
+        <div class="absolute inset-0 gradient-primary opacity-90"></div>
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
 
-    <!-- Quick Actions -->
-    <div class="grid grid-cols-2 gap-4 mb-8">
-        <a href="/feed"
-            class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition text-center">
-            <i class="fa-solid fa-newspaper text-3xl text-blue-400 mb-3"></i>
-            <div class="font-medium">Actualites</div>
-        </a>
-        <a href="/calendar"
-            class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-green-500 transition text-center">
-            <i class="fa-solid fa-calendar text-3xl text-green-400 mb-3"></i>
-            <div class="font-medium">Calendrier</div>
-        </a>
-        <a href="/roster"
-            class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition text-center">
-            <i class="fa-solid fa-users text-3xl text-purple-400 mb-3"></i>
-            <div class="font-medium">Equipe</div>
-        </a>
-        <a href="/chat-inbox"
-            class="bg-gray-800/50 rounded-xl p-6 border border-gray-700 hover:border-yellow-500 transition text-center">
-            <i class="fa-solid fa-comments text-3xl text-yellow-400 mb-3"></i>
-            <div class="font-medium">Messages</div>
-        </a>
-    </div>
-
-    <!-- Info Card -->
-    <div class="bg-blue-500/10 rounded-xl p-6 border border-blue-500/20">
-        <div class="flex items-start gap-4">
-            <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-circle-info text-blue-400"></i>
-            </div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div>
-                <h3 class="font-bold mb-1">Completez votre profil</h3>
-                <p class="text-sm text-gray-400 mb-3">Ajoutez vos informations pour une meilleure experience.</p>
-                <a href="/profile" class="text-blue-400 text-sm font-semibold hover:text-blue-300">
-                    Modifier le profil <i class="fa-solid fa-arrow-right ml-1"></i>
-                </a>
+                <h1 class="text-4xl font-black text-white mb-2 italic">Salut, {{ current_user.profile.first_name }} !
+                </h1>
+                <p class="text-primary-100 font-medium">Prêt pour le prochain match ? Ton équipe compte sur toi. ⚽️</p>
+            </div>
+            <div class="flex -space-x-4">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                    class="w-16 h-16 rounded-2xl border-4 border-white/20 shadow-xl">
+                <div
+                    class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex flex-col items-center justify-center text-white">
+                    <span class="text-xl font-black">10</span>
+                    <span class="text-[8px] font-bold uppercase">Numéro</span>
+                </div>
             </div>
         </div>
+    </div>
+
+    <!-- Next Event Tracker -->
+    <div class="grid md:grid-cols-3 gap-8 items-start mb-12">
+        <div class="md:col-span-2">
+            <h3 class="text-xs font-black text-gray-500 uppercase tracking-[0.2em] mb-4">Prochain Événement</h3>
+            <div class="card p-8 relative group cursor-pointer overflow-hidden">
+                <div class="absolute top-0 left-0 w-2 h-full gradient-success"></div>
+
+                <div class="flex justify-between items-start mb-8">
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="bg-primary-500 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest text-white shadow-lg">Championnat</span>
+                        <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Journée 12</span>
+                    </div>
+                    <span class="flex items-center gap-2 text-green-400 font-bold text-xs uppercase tracking-widest">
+                        <i class="fa-solid fa-check-circle"></i> Convoqué
+                    </span>
+                </div>
+
+                <div class="flex items-center justify-between mb-10">
+                    <div class="flex flex-col items-center gap-4">
+                        <div
+                            class="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center text-4xl border border-white/5 shadow-inner">
+                            <i class="fa-solid fa-shield-cat text-primary-400"></i>
+                        </div>
+                        <span class="font-black text-white text-lg">FC ELITE</span>
+                    </div>
+
+                    <div class="flex flex-col items-center">
+                        <div class="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] mb-2">Kickoff</div>
+                        <div class="text-4xl font-black text-gradient">15:00</div>
+                        <div class="text-[10px] font-bold text-gray-500 mt-2">Stade Municipal</div>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-4">
+                        <div
+                            class="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center text-4xl border border-white/5 shadow-inner">
+                            <i class="fa-solid fa-shield text-red-500"></i>
+                        </div>
+                        <span class="font-black text-white text-lg">RACING FC</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button
+                        class="flex-1 btn-primary py-4 rounded-2xl font-black tracking-widest transition active:scale-95">JE
+                        SERAI LÀ</button>
+                    <button
+                        class="flex-1 glass-light py-4 rounded-2xl font-black text-gray-400 hover:text-white transition">ABSENT</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-8">
+            <h3 class="text-xs font-black text-gray-500 uppercase tracking-[0.2em] mb-4">Social</h3>
+            <!-- Recent Notification Card -->
+            <div class="card p-6 border-l-4 border-amber-500">
+                <div class="flex items-center gap-4 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                        <i class="fa-solid fa-comment-dots"></i>
+                    </div>
+                    <p class="text-sm font-bold text-white">Nouveau Message</p>
+                </div>
+                <p class="text-xs text-gray-400 leading-relaxed mb-4 italic">"Salut Soufiane, n'oublie pas tes
+                    protège-tibias pour demain..."</p>
+                <a href="{{ url_for('main.chat_inbox') }}"
+                    class="text-[10px] font-black text-primary-400 uppercase tracking-widest hover:underline">Répondre
+                    au coach</a>
+            </div>
+
+            <!-- Quick Stats Card -->
+            <div class="card p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="font-black text-xs uppercase tracking-widest text-gray-500">Tes Stats</h4>
+                    <i class="fa-solid fa-chart-line text-primary-400"></i>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="text-center p-3 rounded-2xl bg-white/5">
+                        <p class="text-2xl font-black text-white">12</p>
+                        <p class="text-[8px] font-bold text-gray-500 uppercase">Buts</p>
+                    </div>
+                    <div class="text-center p-3 rounded-2xl bg-white/5">
+                        <p class="text-2xl font-black text-white">08</p>
+                        <p class="text-[8px] font-bold text-gray-500 uppercase">Assists</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Grid -->
+    <h3 class="text-xs font-black text-gray-500 uppercase tracking-[0.2em] mb-6">Navigation Rapide</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <a href="{{ url_for('main.feed') }}"
+            class="card p-6 flex flex-col items-center gap-4 group hover:bg-primary-500/5 hover:border-primary-500/30">
+            <div
+                class="w-12 h-12 rounded-2xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-xl group-hover:scale-110 transition">
+                <i class="fa-solid fa-rss"></i>
+            </div>
+            <span
+                class="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-white transition">Actualités</span>
+        </a>
+        <a href="{{ url_for('main.calendar') }}"
+            class="card p-6 flex flex-col items-center gap-4 group hover:bg-primary-500/5 hover:border-primary-500/30">
+            <div
+                class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center text-xl group-hover:scale-110 transition">
+                <i class="fa-solid fa-calendar-alt"></i>
+            </div>
+            <span
+                class="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-white transition">Calendrier</span>
+        </a>
+        <a href="{{ url_for('main.shop_product') }}"
+            class="card p-6 flex flex-col items-center gap-4 group hover:bg-primary-500/5 hover:border-primary-500/30">
+            <div
+                class="w-12 h-12 rounded-2xl bg-pink-500/20 text-pink-400 flex items-center justify-center text-xl group-hover:scale-110 transition">
+                <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+            <span
+                class="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-white transition">Boutique</span>
+        </a>
+        <a href="{{ url_for('main.documents') }}"
+            class="card p-6 flex flex-col items-center gap-4 group hover:bg-primary-500/5 hover:border-primary-500/30">
+            <div
+                class="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl group-hover:scale-110 transition">
+                <i class="fa-solid fa-file-contract"></i>
+            </div>
+            <span
+                class="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-white transition">Documents</span>
+        </a>
     </div>
 </div>
 {% endblock %}

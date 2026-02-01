@@ -1,325 +1,288 @@
-{% extends "base.html" %}
-{% block title %}Dashboard Coach - FootApp{% endblock %}
-
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-6">
+<div class="page-enter max-w-7xl mx-auto px-4 py-8">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>
-            <h1 class="text-2xl md:text-3xl font-bold flex items-center gap-3">
-                <span class="w-10 h-10 gradient-accent rounded-xl flex items-center justify-center shadow-lg">
-                    <i class="fa-solid fa-whistle text-black"></i>
+            <h1 class="text-4xl font-black flex items-center gap-4">
+                <span
+                    class="w-14 h-14 gradient-accent rounded-2xl flex items-center justify-center shadow-2xl shadow-yellow-500/20">
+                    <i class="fa-solid fa-whistle text-black text-2xl"></i>
                 </span>
-                Tableau de bord
+                Tableau de Bord
             </h1>
-            <p class="text-gray-400 mt-1">Bonjour, {{ current_user.profile.first_name or 'Coach' }}! Voici votre resume.
-            </p>
+            <p class="text-white/40 mt-2 font-medium italic tracking-wide">Bonjour Coach {{
+                current_user.profile.last_name or '' }}, prêt pour l'entraînement d'aujourd'hui ?</p>
         </div>
-        <div class="flex gap-3">
-            <a href="/coach/create-event"
-                class="btn-primary px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2">
+        <div class="flex gap-4">
+            <a href="{{ url_for('coach.create_event') }}"
+                class="gradient-primary px-8 py-4 rounded-2xl font-black text-sm flex items-center gap-3 shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
                 <i class="fa-solid fa-plus"></i>
-                Nouvel evenement
+                CRÉER UN ÉVÉNEMENT
             </a>
         </div>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div class="card p-5 group">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm">Joueurs</p>
-                    <p class="text-3xl font-black mt-1">{{ stats.total_players or 18 }}</p>
-                </div>
+    <!-- Quick Stats Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div class="glass p-6 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all">
+            <div class="flex items-start justify-between mb-4">
                 <div
-                    class="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-users"></i>
+                    class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-users text-white text-xl"></i>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">Effectif</p>
+                    <p class="text-3xl font-black">{{ players|length }}</p>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1 text-xs">
-                <span class="text-green-400"><i class="fa-solid fa-circle-check"></i></span>
-                <span class="text-gray-400">{{ stats.fit_players or 16 }} aptes</span>
+            <div
+                class="pt-4 border-t border-white/5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-green-400">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                16 Joueurs Aptes
             </div>
         </div>
 
-        <div class="card p-5 group">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm">Matchs</p>
-                    <p class="text-3xl font-black mt-1">{{ stats.matches_played or 22 }}</p>
-                </div>
+        <div class="glass p-6 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all">
+            <div class="flex items-start justify-between mb-4">
                 <div
-                    class="w-12 h-12 gradient-success rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-futbol"></i>
+                    class="w-12 h-12 gradient-success rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-futbol text-white text-xl"></i>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">Matchs</p>
+                    <p class="text-3xl font-black">{{ season_stats.total_matches or 0 }}</p>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1 text-xs">
-                <span class="text-green-400 font-semibold">{{ stats.wins or 15 }}V</span>
-                <span class="text-gray-400">{{ stats.draws or 3 }}N</span>
-                <span class="text-red-400">{{ stats.losses or 4 }}D</span>
+            <div class="pt-4 border-t border-white/5 flex gap-3 text-[10px] font-black uppercase tracking-widest">
+                <span class="text-green-400">{{ season_stats.wins or 0 }}V</span>
+                <span class="text-white/20">{{ season_stats.draws or 0 }}N</span>
+                <span class="text-red-400">{{ season_stats.losses or 0 }}D</span>
             </div>
         </div>
 
-        <div class="card p-5 group">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm">Buts</p>
-                    <p class="text-3xl font-black mt-1">{{ stats.goals_scored or 45 }}</p>
-                </div>
+        <div class="glass p-6 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all">
+            <div class="flex items-start justify-between mb-4">
                 <div
-                    class="w-12 h-12 gradient-accent rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-ranking-star text-black"></i>
+                    class="w-12 h-12 gradient-accent rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-ranking-star text-black text-xl"></i>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">Buts</p>
+                    <p class="text-3xl font-black">{{ season_stats.goals_scored or 0 }}</p>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1 text-xs text-gray-400">
-                <span>{{ stats.goals_conceded or 22 }} encaisses</span>
-                <span class="text-green-400 ml-auto font-semibold">+{{ (stats.goals_scored or 45) -
-                    (stats.goals_conceded or 22) }}</span>
+            <div
+                class="pt-4 border-t border-white/5 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/20">
+                <span>{{ season_stats.goals_conceded or 0 }} ENCAISSÉS</span>
+                <span class="text-green-400">+{{ (season_stats.goals_scored or 0) - (season_stats.goals_conceded or 0)
+                    }}</span>
             </div>
         </div>
 
-        <div class="card p-5 group">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-gray-400 text-sm">Position</p>
-                    <p class="text-3xl font-black mt-1 text-gradient">1er</p>
-                </div>
+        <div
+            class="glass p-6 rounded-[32px] border-white/5 bg-gradient-to-br from-amber-500/10 to-transparent group hover:bg-white/5 transition-all">
+            <div class="flex items-start justify-between mb-4">
                 <div
-                    class="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-trophy text-white"></i>
+                    class="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-trophy text-white text-xl"></i>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">Classement</p>
+                    <p class="text-3xl font-black text-gradient">#1</p>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1 text-xs text-gray-400">
-                <span>48 pts - Division 2</span>
+            <div class="pt-4 border-t border-white/5 text-[10px] font-black uppercase tracking-widest text-white/20">
+                PROMOTION D'HONNEUR
             </div>
         </div>
     </div>
 
-    <div class="grid lg:grid-cols-3 gap-6">
-        <!-- Main Column -->
-        <div class="lg:col-span-2 space-y-6">
-            <!-- Next Match -->
-            <div class="card overflow-hidden">
-                <div class="p-5 flex items-center justify-between border-b border-white/5">
-                    <h2 class="font-bold flex items-center gap-2">
-                        <i class="fa-solid fa-circle text-red-500 text-xs animate-pulse"></i>
-                        Prochain match
+    <div class="grid lg:grid-cols-3 gap-10">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-10">
+            <!-- Next Match Highlight -->
+            {% if upcoming_matches %}
+            {% set next_match = upcoming_matches[0] %}
+            <div class="glass rounded-[40px] border-white/5 overflow-hidden group">
+                <div class="p-6 border-b border-white/5 flex items-center justify-between">
+                    <h2 class="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3">
+                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                        PROCHAIN MATCH
                     </h2>
-                    <span class="text-xs text-gray-400">Dans 3 jours</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-white/20 italic">{{
+                        next_match.date }}</span>
                 </div>
-                <div class="p-6 bg-gradient-to-r from-primary-600/10 via-transparent to-purple-600/10">
-                    <div class="flex items-center justify-center gap-8">
-                        <div class="text-center">
+                <div class="p-10 bg-gradient-to-br from-primary-500/5 via-transparent to-purple-500/5">
+                    <div class="flex items-center justify-around gap-4">
+                        <div class="text-center group/team">
                             <div
-                                class="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center text-3xl font-black mb-3 shadow-lg shadow-primary-500/30">
-                                FC</div>
-                            <span class="font-semibold">FC Elite</span>
-                            <div class="text-[10px] text-green-400 mt-1">DOMICILE</div>
+                                class="w-24 h-24 gradient-primary rounded-[32px] flex items-center justify-center text-3xl font-black mb-4 shadow-2xl shadow-primary-500/20 group-hover/team:scale-105 transition-transform duration-500">
+                                FC
+                            </div>
+                            <p class="font-black uppercase tracking-widest text-sm">FC ELITE</p>
+                            <p class="text-[8px] font-black text-green-400 mt-1 uppercase tracking-widest">DOMICILE</p>
                         </div>
                         <div class="text-center px-6">
-                            <div class="text-4xl font-black text-gray-600">VS</div>
-                            <div class="mt-2 text-sm text-gray-400">
-                                <div class="font-semibold">08 Fev 2026</div>
-                                <div>15:00</div>
+                            <div class="text-5xl font-black text-white/5 italic">VS</div>
+                            <div class="mt-4">
+                                <p class="text-2xl font-black leading-none mb-1">{{ next_match.time }}</p>
+                                <p class="text-[10px] font-black text-white/20 uppercase tracking-widest">{{
+                                    next_match.location }}</p>
                             </div>
                         </div>
-                        <div class="text-center">
+                        <div class="text-center group/away">
                             <div
-                                class="w-20 h-20 bg-gray-700 rounded-2xl flex items-center justify-center text-3xl font-black mb-3">
-                                RC</div>
-                            <span class="font-semibold">Racing FC</span>
-                            <div class="text-[10px] text-gray-400 mt-1">EXTERIEUR</div>
+                                class="w-24 h-24 bg-white/5 border border-white/10 rounded-[32px] flex items-center justify-center text-3xl font-black mb-4 shadow-2xl group-hover/away:scale-105 transition-transform duration-500">
+                                RC
+                            </div>
+                            <p class="font-black uppercase tracking-widest text-sm">{{ next_match.opponent or
+                                'ADVERSAIRE' }}</p>
+                            <p class="text-[8px] font-black text-white/20 mt-1 uppercase tracking-widest">EXTÉRIEUR</p>
                         </div>
                     </div>
-                    <div class="flex gap-3 mt-6">
-                        <a href="/coach/match-center"
-                            class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-semibold text-sm text-center transition">
-                            <i class="fa-solid fa-list-ul mr-2"></i>Convoquer
+                    <div class="flex gap-4 mt-12">
+                        <a href="{{ url_for('coach.match_center') }}"
+                            class="flex-1 gradient-primary py-4 rounded-2xl font-black text-xs text-center shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                            CONVOQUER L'ÉQUIPE
                         </a>
-                        <a href="/coach/tactics"
-                            class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-semibold text-sm text-center transition">
-                            <i class="fa-solid fa-chess-board mr-2"></i>Tactiques
+                        <a href="{{ url_for('coach.tactics') }}"
+                            class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-4 rounded-2xl font-black text-xs text-center transition-all">
+                            PRÉPARER LA TACTIQUE
                         </a>
                     </div>
                 </div>
             </div>
+            {% endif %}
 
-            <!-- Upcoming Events -->
-            <div class="card">
-                <div class="p-5 flex items-center justify-between border-b border-white/5">
-                    <h2 class="font-bold">Evenements a venir</h2>
-                    <a href="/calendar" class="text-primary-400 text-sm hover:text-primary-300 transition">Voir tout</a>
+            <!-- Upcoming Events List -->
+            <div class="space-y-6">
+                <div class="flex items-center justify-between px-4">
+                    <h2 class="text-xl font-black uppercase tracking-widest">Agenda Semaine</h2>
+                    <a href="{{ url_for('main.calendar') }}"
+                        class="text-primary-400 text-[10px] font-black uppercase tracking-widest hover:text-primary-300 transition">Calendrier
+                        Complet</a>
                 </div>
-                <div class="divide-y divide-white/5">
+                <div class="space-y-4">
                     {% for event in upcoming_events %}
-                    <a href="/event/{{ event.id }}"
-                        class="p-4 flex items-center gap-4 hover:bg-white/5 transition group">
-                        <div
-                            class="w-14 h-14 rounded-xl flex flex-col items-center justify-center
-                            {% if event.type == 'training' %}bg-green-500/20{% elif event.type == 'match' %}bg-red-500/20{% else %}bg-blue-500/20{% endif %}">
-                            <span
-                                class="text-lg font-bold 
-                                {% if event.type == 'training' %}text-green-400{% elif event.type == 'match' %}text-red-400{% else %}text-blue-400{% endif %}">
-                                {{ event.date.strftime('%d') if event.date else '--' }}
-                            </span>
-                            <span
-                                class="text-[10px] uppercase 
-                                {% if event.type == 'training' %}text-green-400{% elif event.type == 'match' %}text-red-400{% else %}text-blue-400{% endif %}">
-                                {{ event.date.strftime('%b') if event.date else '' }}
-                            </span>
+                    <div
+                        class="glass p-5 rounded-[32px] border-white/5 flex items-center gap-6 hover:bg-white/5 transition-all group cursor-pointer">
+                        <div class="w-16 h-16 rounded-[22px] flex flex-col items-center justify-center 
+                            {% if event.event_type == 'training' %}bg-green-500/10 text-green-400{% elif event.event_type == 'match' %}bg-red-500/10 text-red-400{% else %}bg-blue-500/10 text-blue-400{% endif %} 
+                            border border-current/10">
+                            <span class="text-2xl font-black leading-none">{{ event.date.strftime('%d') if event.date
+                                else '--' }}</span>
+                            <span class="text-[8px] font-black uppercase tracking-widest mt-1">{{
+                                event.date.strftime('%b') if event.date else '' }}</span>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="font-medium truncate">{{ event.title }}</div>
-                            <div class="text-sm text-gray-400">{{ event.time or '18:00' }} - {{ event.location or
-                                'Terrain A' }}</div>
+                        <div class="flex-1">
+                            <h3 class="font-black text-lg mb-1">{{ event.title }}</h3>
+                            <p class="text-white/40 text-xs font-medium italic flex items-center gap-2">
+                                <i class="fa-solid fa-clock text-[10px]"></i> {{ event.time or '18:00' }}
+                                <span class="mx-2 opacity-20">|</span>
+                                <i class="fa-solid fa-location-dot text-[10px]"></i> {{ event.location or 'Terrain A' }}
+                            </p>
                         </div>
-                        <div class="hidden sm:flex items-center gap-2">
-                            <div class="flex -space-x-2">
-                                <img src="https://randomuser.me/api/portraits/men/{{ loop.index }}.jpg"
-                                    class="w-7 h-7 rounded-full border-2 border-surface-900">
-                                <img src="https://randomuser.me/api/portraits/men/{{ loop.index + 10 }}.jpg"
-                                    class="w-7 h-7 rounded-full border-2 border-surface-900">
-                                <div
-                                    class="w-7 h-7 rounded-full bg-gray-700 border-2 border-surface-900 flex items-center justify-center text-[10px]">
-                                    +8</div>
-                            </div>
+                        <div class="flex -space-x-3 group-hover:mr-2 transition-all">
+                            <img src="https://randomuser.me/api/portraits/men/1.jpg"
+                                class="w-8 h-8 rounded-full border-2 border-surface-950 shadow-xl">
+                            <img src="https://randomuser.me/api/portraits/men/2.jpg"
+                                class="w-8 h-8 rounded-full border-2 border-surface-950 shadow-xl">
+                            <div
+                                class="w-8 h-8 rounded-full bg-white/5 border-2 border-surface-950 flex items-center justify-center text-[8px] font-black">
+                                12+</div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-gray-600 group-hover:text-primary-400 transition"></i>
-                    </a>
-                    {% else %}
-                    <!-- Sample events when empty -->
-                    <div class="p-4 flex items-center gap-4 hover:bg-white/5 transition group">
-                        <div class="w-14 h-14 rounded-xl flex flex-col items-center justify-center bg-green-500/20">
-                            <span class="text-lg font-bold text-green-400">03</span>
-                            <span class="text-[10px] uppercase text-green-400">Fev</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="font-medium truncate">Entrainement Technique</div>
-                            <div class="text-sm text-gray-400">18:00 - Terrain A</div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-gray-600 group-hover:text-primary-400 transition"></i>
-                    </div>
-                    <div class="p-4 flex items-center gap-4 hover:bg-white/5 transition group">
-                        <div class="w-14 h-14 rounded-xl flex flex-col items-center justify-center bg-red-500/20">
-                            <span class="text-lg font-bold text-red-400">08</span>
-                            <span class="text-[10px] uppercase text-red-400">Fev</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="font-medium truncate">Match vs Racing FC</div>
-                            <div class="text-sm text-gray-400">15:00 - Stade Municipal</div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-gray-600 group-hover:text-primary-400 transition"></i>
+                        <i
+                            class="fa-solid fa-chevron-right text-white/10 group-hover:text-primary-400 transition-colors"></i>
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
 
-        <!-- Side Column -->
-        <div class="space-y-6">
-            <!-- Quick Actions -->
-            <div class="card p-5">
-                <h2 class="font-bold mb-4">Actions rapides</h2>
-                <div class="grid grid-cols-2 gap-3">
-                    <a href="/coach/roster"
-                        class="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-primary-500/20 transition group">
+        <!-- Sidebar Actions & Stats -->
+        <div class="space-y-8">
+            <!-- Secondary Actions -->
+            <div class="glass p-8 rounded-[40px] border-white/5">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-6">Gestion Club</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="{{ url_for('coach.roster') }}"
+                        class="glass p-4 rounded-2xl border-white/5 text-center group hover:bg-primary-500/10 transition-all">
                         <i
-                            class="fa-solid fa-users text-xl text-primary-400 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-xs font-medium">Effectif</span>
+                            class="fa-solid fa-id-card text-xl text-primary-400 mb-3 group-hover:scale-110 transition-transform"></i>
+                        <p class="text-[9px] font-black uppercase tracking-widest">Effectif</p>
                     </a>
-                    <a href="/coach/attendance"
-                        class="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-green-500/20 transition group">
+                    <a href="{{ url_for('coach.attendance') }}"
+                        class="glass p-4 rounded-2xl border-white/5 text-center group hover:bg-green-500/10 transition-all">
                         <i
-                            class="fa-solid fa-clipboard-check text-xl text-green-400 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-xs font-medium">Presences</span>
+                            class="fa-solid fa-check-double text-xl text-green-400 mb-3 group-hover:scale-110 transition-transform"></i>
+                        <p class="text-[9px] font-black uppercase tracking-widest">Présences</p>
                     </a>
-                    <a href="/coach/tactics"
-                        class="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-amber-500/20 transition group">
+                    <a href="{{ url_for('coach.tactics') }}"
+                        class="glass p-4 rounded-2xl border-white/5 text-center group hover:bg-amber-500/10 transition-all">
                         <i
-                            class="fa-solid fa-chess-board text-xl text-amber-400 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-xs font-medium">Tactiques</span>
+                            class="fa-solid fa-layer-group text-xl text-amber-400 mb-3 group-hover:scale-110 transition-transform"></i>
+                        <p class="text-[9px] font-black uppercase tracking-widest">Tactiques</p>
                     </a>
-                    <a href="/feed"
-                        class="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-purple-500/20 transition group">
+                    <a href="#"
+                        class="glass p-4 rounded-2xl border-white/5 text-center group hover:bg-purple-500/10 transition-all">
                         <i
-                            class="fa-solid fa-newspaper text-xl text-purple-400 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-xs font-medium">Publier</span>
+                            class="fa-solid fa-bullhorn text-xl text-purple-400 mb-3 group-hover:scale-110 transition-transform"></i>
+                        <p class="text-[9px] font-black uppercase tracking-widest">Annonces</p>
                     </a>
                 </div>
             </div>
 
-            <!-- Top Scorers -->
-            <div class="card">
-                <div class="p-5 flex items-center justify-between border-b border-white/5">
-                    <h2 class="font-bold">Meilleurs buteurs</h2>
+            <!-- Top Scorers Mini -->
+            <div class="glass p-8 rounded-[40px] border-white/5">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-6">Top Buteurs</h3>
+                <div class="space-y-5">
+                    {% for player in players|sort(attribute='stats.goals', reverse=True) %}
+                    {% if loop.index <= 3 %} <div class="flex items-center gap-4 group">
+                        <div class="relative">
+                            <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-xl">
+                                <img src="{{ player.photo or 'https://ui-avatars.com/api/?name=' + player.name }}"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <span
+                                class="absolute -top-2 -right-2 w-5 h-5 {% if loop.index == 1 %}bg-amber-500{% elif loop.index == 2 %}bg-slate-400{% else %}bg-orange-600{% endif %} rounded-lg text-[8px] flex items-center justify-center font-black shadow-lg shadow-black/50">{{
+                                loop.index }}</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs font-black uppercase tracking-wider mb-1">{{ player.name }}</p>
+                            <p class="text-[9px] text-white/20 font-black uppercase tracking-widest">#{{
+                                player.jersey_number }} • {{ player.position }}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-lg font-black leading-none">{{ player.stats.goals }}</p>
+                            <p class="text-[7px] font-black text-white/20 uppercase tracking-[0.2em]">BUTS</p>
+                        </div>
                 </div>
-                <div class="p-3 space-y-2">
-                    <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition">
-                        <span
-                            class="w-6 h-6 bg-amber-400/20 text-amber-400 rounded-lg flex items-center justify-center text-xs font-bold">1</span>
-                        <img src="https://randomuser.me/api/portraits/men/19.jpg"
-                            class="w-9 h-9 rounded-full object-cover">
-                        <div class="flex-1 min-w-0">
-                            <div class="font-medium text-sm truncate">Pierre Dubois</div>
-                            <div class="text-[10px] text-gray-400">#9 Attaquant</div>
-                        </div>
-                        <span class="text-lg font-black text-amber-400">15</span>
-                    </div>
-                    <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition">
-                        <span
-                            class="w-6 h-6 bg-gray-500/20 text-gray-400 rounded-lg flex items-center justify-center text-xs font-bold">2</span>
-                        <img src="https://randomuser.me/api/portraits/men/20.jpg"
-                            class="w-9 h-9 rounded-full object-cover">
-                        <div class="flex-1 min-w-0">
-                            <div class="font-medium text-sm truncate">Olivier Laurent</div>
-                            <div class="text-[10px] text-gray-400">#11 Attaquant</div>
-                        </div>
-                        <span class="text-lg font-black">12</span>
-                    </div>
-                    <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition">
-                        <span
-                            class="w-6 h-6 bg-orange-500/20 text-orange-400 rounded-lg flex items-center justify-center text-xs font-bold">3</span>
-                        <img src="https://randomuser.me/api/portraits/men/18.jpg"
-                            class="w-9 h-9 rounded-full object-cover">
-                        <div class="flex-1 min-w-0">
-                            <div class="font-medium text-sm truncate">Romain Lambert</div>
-                            <div class="text-[10px] text-gray-400">#10 Milieu</div>
-                        </div>
-                        <span class="text-lg font-black">8</span>
-                    </div>
-                </div>
+                {% endif %}
+                {% endfor %}
             </div>
+            <button
+                class="w-full mt-8 bg-white/5 hover:bg-white/10 border border-white/10 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all">
+                CLASSEMENT COMPLET
+            </button>
+        </div>
 
-            <!-- Injuries -->
-            <div class="card">
-                <div class="p-5 flex items-center justify-between border-b border-white/5">
-                    <h2 class="font-bold flex items-center gap-2">
-                        <i class="fa-solid fa-kit-medical text-red-400"></i>
-                        Indisponibles
-                    </h2>
-                    <span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-full">2</span>
-                </div>
-                <div class="p-3 space-y-2">
-                    <div class="flex items-center gap-3 p-2 rounded-xl bg-red-500/5">
-                        <img src="https://randomuser.me/api/portraits/men/13.jpg"
-                            class="w-9 h-9 rounded-full object-cover opacity-50">
-                        <div class="flex-1 min-w-0">
-                            <div class="font-medium text-sm truncate">Nicolas Petit</div>
-                            <div class="text-[10px] text-red-400">Cheville - 2 sem.</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 p-2 rounded-xl bg-red-500/5">
-                        <img src="https://randomuser.me/api/portraits/men/14.jpg"
-                            class="w-9 h-9 rounded-full object-cover opacity-50">
-                        <div class="flex-1 min-w-0">
-                            <div class="font-medium text-sm truncate">Marc Lefevre</div>
-                            <div class="text-[10px] text-red-400">Genou - 4 sem.</div>
-                        </div>
+        <!-- Health Status -->
+        <div class="glass p-8 rounded-[40px] border-white/5">
+            <h3 class="text-sm font-black uppercase tracking-widest mb-6 flex items-center justify-between">
+                Infirmerie
+                <span class="text-[10px] bg-red-500/20 text-red-500 px-2 py-0.5 rounded-lg">2</span>
+            </h3>
+            <div class="space-y-4 text-white/40">
+                <div class="flex items-center gap-4 p-3 rounded-2xl hover:bg-red-500/5 transition-all text-left">
+                    <i class="fa-solid fa-kit-medical text-red-500/40 text-lg"></i>
+                    <div>
+                        <p class="text-xs font-black uppercase">Nicolas Petit</p>
+                        <p class="text-[9px] italic">Cheville • 15 fév.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 {% endblock %}

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}FootApp{% endblock %}</title>
+    <title>{% block title %}FootLogic Elite{% endblock %}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +17,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script>
+        // Check for saved theme or default to dark
+        if (localStorage.getItem('color-theme') === 'light' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+            document.documentElement.classList.add('light');
+        } else {
+            document.documentElement.classList.remove('light');
+        }
+
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -25,16 +33,17 @@
                     },
                     colors: {
                         'primary': {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            200: '#c7d2fe',
-                            300: '#a5b4fc',
-                            400: '#818cf8',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            800: '#3730a3',
-                            900: '#312e81',
+                            50: '#f7fee7',
+                            100: '#ecfccb',
+                            200: '#d9f99d',
+                            300: '#bef264',
+                            400: '#a3e635',
+                            500: '#84cc16',
+                            600: '#65a30d',
+                            700: '#4d7c0f',
+                            800: '#3f6212',
+                            900: '#365314',
+                            950: '#1a2e05',
                         },
                         'accent': {
                             400: '#facc15',
@@ -60,75 +69,66 @@
         }
     </script>
 
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
     <style>
-        * {
+        <style>* {
             font-family: 'Inter', system-ui, sans-serif;
         }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        body {
+            @apply bg-surface-950 text-white transition-colors duration-300;
         }
 
-        ::-webkit-scrollbar-track {
-            background: #1e293b;
+        .light body {
+            @apply bg-slate-50 text-slate-900;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #6366f1, #8b5cf6);
-            border-radius: 3px;
+        /* Glass Effect */
+        .glass {
+            @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #4f46e5, #7c3aed);
+        .light .glass {
+            @apply bg-white/80 backdrop-blur-md border-slate-200 shadow-xl;
         }
 
-        /* Animations */
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-20px);
-            }
+        /* Light mode specific classes */
+        .light .text-white\/40 {
+            @apply text-slate-400;
         }
 
-        @keyframes glow {
-            from {
-                box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
-            }
-
-            to {
-                box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
-            }
+        .light .text-white\/20 {
+            @apply text-slate-300;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .light .text-white\/10 {
+            @apply text-slate-200;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
+        .light .border-white\/5 {
+            @apply border-slate-200;
+        }
 
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        .light .border-white\/10 {
+            @apply border-slate-300;
+        }
+
+        .light .bg-surface-950\/40 {
+            @apply bg-white/60;
+        }
+
+        /* Responsive Safe Area */
+        .safe-area-inset-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Shimmer loading */
+        .shimmer {
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
         }
 
         @keyframes shimmer {
@@ -141,125 +141,36 @@
             }
         }
 
-        /* Glassmorphism */
-        .glass {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .glass-light {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        /* Gradients */
-        .gradient-primary {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-        }
-
-        .gradient-accent {
-            background: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
-        }
-
-        .gradient-success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .gradient-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        }
-
-        .gradient-mesh {
-            background:
-                radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.3) 0px, transparent 50%),
-                radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.2) 0px, transparent 50%),
-                radial-gradient(at 0% 50%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
-                radial-gradient(at 80% 50%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
-                radial-gradient(at 0% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
-        }
-
-        .text-gradient {
-            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* Cards */
-        .card {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .card:hover {
-            border-color: rgba(99, 102, 241, 0.5);
-            box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.25);
-            transform: translateY(-2px);
-        }
-
-        /* Buttons */
-        .btn-primary {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5);
-            transform: translateY(-2px);
-        }
-
-        /* Input styling */
-        .input-premium {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .input-premium:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-
-        /* Mobile nav */
-        .mobile-nav {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Badge pulse */
-        .badge-pulse::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: inherit;
-            border-radius: inherit;
-            animation: pulse 2s ease-out infinite;
-        }
-
-        /* Shimmer loading */
-        .shimmer {
-            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-
         /* Active nav item */
         .nav-active {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.1));
-            color: #a5b4fc;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Mobile nav glass effect */
+        .mobile-nav {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         /* Page transitions */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .page-enter {
-            animation: slideUp 0.5s ease-out forwards;
+            animation: slideUp 0.4s ease-out forwards;
         }
     </style>
     {% block head %}{% endblock %}
@@ -275,20 +186,20 @@
             <div class="flex justify-between items-center">
                 <!-- Logo -->
                 <a href="/" class="flex items-center gap-3 group">
-                    <div
-                        class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                        <i class="fa-solid fa-futbol text-white"></i>
+                    <div class="relative">
+                        <div
+                            class="absolute -inset-1 bg-gradient-to-r from-primary-600 to-purple-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-300">
+                        </div>
+                        <div
+                            class="relative w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                            <i class="fa-solid fa-futbol text-white"></i>
+                        </div>
                     </div>
-                    <div>
-                        <span class="font-bold text-lg tracking-tight">Foot<span
-                                class="text-primary-400">App</span></span>
-                        {% if roles.is_admin %}
-                        <span
-                            class="ml-2 text-[9px] font-bold bg-gradient-to-r from-red-500 to-orange-500 px-2 py-0.5 rounded-full uppercase tracking-wider">Admin</span>
-                        {% elif roles.is_coach %}
-                        <span
-                            class="ml-2 text-[9px] font-bold bg-gradient-to-r from-amber-500 to-yellow-500 px-2 py-0.5 rounded-full uppercase tracking-wider text-black">Coach</span>
-                        {% endif %}
+                    <div class="flex flex-col">
+                        <span class="font-black text-xl tracking-tight leading-none text-white italic">FOOT<span
+                                class="text-primary-400">APP</span></span>
+                        <span class="text-[8px] font-bold text-gray-500 uppercase tracking-[0.2em] mt-0.5">V2
+                            Premium</span>
                     </div>
                 </a>
 
@@ -306,14 +217,14 @@
 
                 <!-- Right Actions -->
                 <div class="flex items-center gap-3">
-                    <a href="/nav-demo"
+                    <a href="{{ url_for('main.nav_demo') }}"
                         class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
                         title="Toutes les pages">
                         <i class="fa-solid fa-compass text-gray-400 hover:text-white"></i>
                     </a>
 
                     {% if current_user.is_authenticated %}
-                    <a href="/notifications"
+                    <a href="{{ url_for('main.notifications') }}"
                         class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors relative">
                         <i class="fa-solid fa-bell text-gray-400 hover:text-white"></i>
                         <span
@@ -341,18 +252,18 @@
                                 <div class="text-xs text-gray-400 truncate">{{ current_user.email }}</div>
                             </div>
                             <div class="p-2">
-                                <a href="/profile"
+                                <a href="{{ url_for('main.profile') }}"
                                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-white/5 transition-colors">
                                     <i class="fa-solid fa-user text-primary-400 w-4"></i>
                                     Mon Profil
                                 </a>
-                                <a href="/settings"
+                                <a href="{{ url_for('main.settings') }}"
                                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-white/5 transition-colors">
                                     <i class="fa-solid fa-gear text-gray-400 w-4"></i>
                                     Parametres
                                 </a>
                                 <hr class="my-2 border-white/10">
-                                <a href="/logout"
+                                <a href="{{ url_for('auth.logout') }}"
                                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-colors">
                                     <i class="fa-solid fa-right-from-bracket w-4"></i>
                                     Deconnexion
@@ -361,7 +272,8 @@
                         </div>
                     </div>
                     {% else %}
-                    <a href="/login" class="btn-primary px-5 py-2.5 rounded-xl text-sm font-semibold">
+                    <a href="{{ url_for('auth.login') }}"
+                        class="btn-primary px-5 py-2.5 rounded-xl text-sm font-semibold">
                         Connexion
                     </a>
                     {% endif %}
@@ -407,26 +319,26 @@
             </a>
             {% endfor %}
             {% else %}
-            <a href="/"
+            <a href="{{ url_for('main.index') }}"
                 class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
                 <i class="fa-solid fa-house text-lg"></i>
                 <span class="text-[10px] font-medium">Accueil</span>
             </a>
-            <a href="/feed"
+            <a href="{{ url_for('main.feed') }}"
                 class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
                 <i class="fa-solid fa-newspaper text-lg"></i>
                 <span class="text-[10px] font-medium">News</span>
             </a>
-            <a href="/login"
+            <a href="{{ url_for('auth.login') }}"
                 class="flex items-center justify-center w-14 h-14 -mt-6 gradient-primary rounded-2xl shadow-lg shadow-primary-500/30">
                 <i class="fa-solid fa-right-to-bracket text-xl"></i>
             </a>
-            <a href="/public-club"
+            <a href="{{ url_for('main.public_club') }}"
                 class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
                 <i class="fa-solid fa-futbol text-lg"></i>
                 <span class="text-[10px] font-medium">Clubs</span>
             </a>
-            <a href="/help"
+            <a href="{{ url_for('main.help') }}"
                 class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
                 <i class="fa-solid fa-circle-question text-lg"></i>
                 <span class="text-[10px] font-medium">Aide</span>

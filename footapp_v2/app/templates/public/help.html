@@ -1,78 +1,129 @@
 {% extends "base.html" %}
-{% block title %}Aide - FootApp{% endblock %}
+{% block title %}Centre d'Aide - FootApp{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-6">Aide & Support</h1>
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <!-- Header -->
+    <div class="text-center mb-16">
+        <h1 class="text-4xl font-extrabold text-white mb-4">Comment pouvons-nous vous aider ?</h1>
+        <p class="text-lg text-gray-400 max-w-2xl mx-auto">Recherchez dans notre base de connaissances ou contactez
+            notre équipe de support.</p>
 
-    <!-- FAQ -->
-    <div class="space-y-4 mb-8">
-        <h2 class="font-bold text-lg">Questions frequentes</h2>
-
-        <details class="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden group">
-            <summary
-                class="p-4 cursor-pointer flex items-center justify-between font-medium hover:bg-gray-700/30 transition">
-                Comment creer un club?
-                <i class="fa-solid fa-chevron-down group-open:rotate-180 transition"></i>
-            </summary>
-            <div class="p-4 pt-0 text-gray-400 text-sm">
-                Seuls les administrateurs peuvent creer un nouveau club. Contactez notre equipe support pour en faire la
-                demande.
-            </div>
-        </details>
-
-        <details class="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden group">
-            <summary
-                class="p-4 cursor-pointer flex items-center justify-between font-medium hover:bg-gray-700/30 transition">
-                Comment ajouter des joueurs a l'effectif?
-                <i class="fa-solid fa-chevron-down group-open:rotate-180 transition"></i>
-            </summary>
-            <div class="p-4 pt-0 text-gray-400 text-sm">
-                Les coaches et administrateurs peuvent ajouter des joueurs depuis la section "Effectif". Cliquez sur
-                "Ajouter un joueur" et remplissez le formulaire.
-            </div>
-        </details>
-
-        <details class="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden group">
-            <summary
-                class="p-4 cursor-pointer flex items-center justify-between font-medium hover:bg-gray-700/30 transition">
-                Comment envoyer une convocation?
-                <i class="fa-solid fa-chevron-down group-open:rotate-180 transition"></i>
-            </summary>
-            <div class="p-4 pt-0 text-gray-400 text-sm">
-                Creez un evenement depuis le calendrier. Une fois l'evenement cree, les joueurs du club recevront
-                automatiquement une notification.
-            </div>
-        </details>
-
-        <details class="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden group">
-            <summary
-                class="p-4 cursor-pointer flex items-center justify-between font-medium hover:bg-gray-700/30 transition">
-                Comment changer mon mot de passe?
-                <i class="fa-solid fa-chevron-down group-open:rotate-180 transition"></i>
-            </summary>
-            <div class="p-4 pt-0 text-gray-400 text-sm">
-                Allez dans Profil > Parametres > Compte, puis cliquez sur "Changer le mot de passe".
-            </div>
-        </details>
+        <div class="mt-8 max-w-xl mx-auto relative">
+            <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            <input type="text" placeholder="Rechercher une solution..."
+                class="w-full input-premium py-4 pl-12 pr-4 rounded-2xl text-white outline-none focus:ring-2 focus:ring-primary-500 shadow-2xl shadow-primary-500/10 transition">
+        </div>
     </div>
 
-    <!-- Contact -->
-    <div class="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl p-6 border border-blue-500/20">
-        <h2 class="font-bold text-lg mb-4">Besoin d'aide supplementaire?</h2>
-        <p class="text-gray-400 text-sm mb-4">Notre equipe support est disponible pour repondre a vos questions.</p>
+    <!-- Categories -->
+    <div class="grid md:grid-cols-3 gap-6 mb-16">
+        <div class="card p-6 flex flex-col items-center text-center group hover:border-primary-500/50 transition">
+            <div
+                class="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition">
+                <i class="fa-solid fa-user-gear text-2xl"></i>
+            </div>
+            <h3 class="font-bold mb-2">Compte & Profil</h3>
+            <p class="text-xs text-gray-500">Gérer vos accès, avatar et informations personnelles.</p>
+        </div>
+        <div class="card p-6 flex flex-col items-center text-center group hover:border-green-500/50 transition">
+            <div
+                class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition">
+                <i class="fa-solid fa-shield-cat text-2xl"></i>
+            </div>
+            <h3 class="font-bold mb-2">Gestion du Club</h3>
+            <p class="text-xs text-gray-500">Configuration du club, licences et staff.</p>
+        </div>
+        <div class="card p-6 flex flex-col items-center text-center group hover:border-amber-500/50 transition">
+            <div
+                class="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition">
+                <i class="fa-solid fa-credit-card text-2xl"></i>
+            </div>
+            <h3 class="font-bold mb-2">Paiements</h3>
+            <p class="text-xs text-gray-500">Abonnements, boutique et facturation.</p>
+        </div>
+    </div>
 
-        <div class="space-y-3">
-            <a href="mailto:support@footapp.fr"
-                class="flex items-center gap-3 bg-white/10 rounded-xl p-4 hover:bg-white/20 transition">
-                <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                    <i class="fa-solid fa-envelope text-blue-400"></i>
+    <!-- FAQ -->
+    <div class="mb-16">
+        <h2 class="text-2xl font-bold mb-8 flex items-center gap-3">
+            <i class="fa-solid fa-circle-question text-primary-400"></i>
+            Questions fréquentes
+        </h2>
+
+        <div class="space-y-4">
+            <details class="group card p-1 overflow-hidden transition-all">
+                <summary
+                    class="flex justify-between items-center p-4 cursor-pointer hover:bg-white/5 rounded-xl transition list-none">
+                    <span class="font-bold text-gray-200">Comment changer ma photo de profil ?</span>
+                    <i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition"></i>
+                </summary>
+                <div class="p-4 text-sm text-gray-400 leading-relaxed border-t border-white/5 mt-1">
+                    Rendez-vous sur votre onglet "Profil", cliquez sur "Modifier", puis appuyez sur votre avatar actuel
+                    pour choisir une nouvelle image dans votre bibliothèque.
                 </div>
-                <div>
-                    <div class="font-medium text-sm">Email</div>
-                    <div class="text-xs text-gray-400">support@footapp.fr</div>
+            </details>
+
+            <details class="group card p-1 overflow-hidden transition-all">
+                <summary
+                    class="flex justify-between items-center p-4 cursor-pointer hover:bg-white/5 rounded-xl transition list-none">
+                    <span class="font-bold text-gray-200">Je ne reçois pas les notifications push</span>
+                    <i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition"></i>
+                </summary>
+                <div class="p-4 text-sm text-gray-400 leading-relaxed border-t border-white/5 mt-1">
+                    Vérifiez deux points : <br>
+                    1. Dans l'onglet "Paramètres > Notifications" de l'app.<br>
+                    2. Dans les réglages système de votre téléphone pour autoriser FootApp.
                 </div>
-            </a>
+            </details>
+
+            <details class="group card p-1 overflow-hidden transition-all">
+                <summary
+                    class="flex justify-between items-center p-4 cursor-pointer hover:bg-white/5 rounded-xl transition list-none">
+                    <span class="font-bold text-gray-200">Comment payer ma cotisation annuelle ?</span>
+                    <i class="fa-solid fa-chevron-down text-gray-500 group-open:rotate-180 transition"></i>
+                </summary>
+                <div class="p-4 text-sm text-gray-400 leading-relaxed border-t border-white/5 mt-1">
+                    Accédez à la section "Documents" de votre profil. Si une cotisation est en attente, vous verrez un
+                    bouton "Payer" directement sur la ligne de la facture correspondante.
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="card p-8 md:p-12 relative overflow-hidden">
+        <div
+            class="absolute -bottom-24 -right-24 w-48 h-48 bg-primary-600 rounded-full mix-blend-overlay filter blur-3xl opacity-20">
+        </div>
+
+        <div class="relative z-10 grid md:grid-cols-2 gap-12">
+            <div>
+                <h2 class="text-3xl font-bold mb-4">Encore besoin d'aide ?</h2>
+                <p class="text-gray-400 mb-8">Si vous n'avez pas trouvé votre réponse, envoyez-nous un message et nous
+                    reviendrons vers vous sous 24h.</p>
+
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 text-gray-300">
+                        <i class="fa-solid fa-envelope text-primary-400"></i>
+                        <span>support@footapp.fr</span>
+                    </div>
+                    <div class="flex items-center gap-4 text-gray-300">
+                        <i class="fa-solid fa-phone text-primary-400"></i>
+                        <span>+33 1 23 45 67 89</span>
+                    </div>
+                </div>
+            </div>
+
+            <form action="#" class="space-y-4">
+                <input type="text" placeholder="Sujet"
+                    class="w-full input-premium py-3 px-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-primary-500 transition">
+                <textarea placeholder="Votre message..." rows="4"
+                    class="w-full input-premium py-3 px-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-primary-500 transition resize-none"></textarea>
+                <button type="submit" class="w-full btn-primary py-4 rounded-xl font-bold transition">
+                    Envoyer le message
+                </button>
+            </form>
         </div>
     </div>
 </div>

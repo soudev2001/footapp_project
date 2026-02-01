@@ -1,65 +1,99 @@
 {% extends "base.html" %}
-{% block title %}Modifier le profil - FootApp{% endblock %}
+{% block title %}Modifier le Profil - FootApp{% endblock %}
 
 {% block content %}
-<div class="max-w-lg mx-auto px-4 py-6">
-    <div class="flex items-center gap-4 mb-6">
-        <a href="/profile"
-            class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition">
-            <i class="fa-solid fa-arrow-left"></i>
-        </a>
-        <h1 class="text-xl font-bold">Modifier le profil</h1>
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-10">
+        <h1 class="text-3xl font-extrabold text-white">Éditer Profil</h1>
+        <a href="{{ url_for('main.profile') }}"
+            class="text-sm font-bold text-gray-500 hover:text-white transition">Annuler</a>
     </div>
 
-    <form method="POST" action="/player/profile/edit" class="space-y-6">
-        <!-- Avatar -->
-        <div class="flex justify-center">
-            <div class="relative">
+    <form action="#" method="POST" class="space-y-8">
+        <!-- Avatar Upload -->
+        <div class="flex flex-col items-center">
+            <div class="relative group cursor-pointer">
                 <div
-                    class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-3xl font-bold">
-                    {{ current_user.profile.first_name[:1] if current_user.profile.first_name else 'U' }}
+                    class="w-32 h-32 rounded-[40px] overflow-hidden border-4 border-primary-500/20 shadow-2xl transition group-hover:border-primary-500">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                        class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                 </div>
-                <button type="button"
-                    class="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center border-2 border-gray-900">
-                    <i class="fa-solid fa-camera text-xs"></i>
-                </button>
+                <div
+                    class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-[40px] transition duration-300">
+                    <i class="fa-solid fa-camera text-2xl text-white"></i>
+                </div>
+            </div>
+            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-4">Cliquer pour changer la photo
+            </p>
+        </div>
+
+        <!-- Identity Section -->
+        <div class="card p-6 md:p-8 space-y-6">
+            <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                <i class="fa-solid fa-user text-primary-400"></i>
+                Identité
+            </h3>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-gray-400 ml-1">Prénom</label>
+                    <input type="text" value="Soufiane"
+                        class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-gray-400 ml-1">Nom</label>
+                    <input type="text" value="Amrabat"
+                        class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition outline-none">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-gray-400 ml-1">Email</label>
+                <input type="email" value="soufiane@example.com"
+                    class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition outline-none opacity-50 cursor-not-allowed"
+                    readonly>
+                <p class="text-[9px] text-gray-600 font-medium ml-1 italic">L'adresse email ne peut pas être modifiée
+                    pour des raisons de sécurité.</p>
             </div>
         </div>
 
-        <!-- Form Fields -->
-        <div class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Prenom</label>
-                    <input type="text" name="first_name" value="{{ current_user.profile.first_name or '' }}"
-                        class="w-full bg-gray-800/50 border border-gray-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-blue-500 transition">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Nom</label>
-                    <input type="text" name="last_name" value="{{ current_user.profile.last_name or '' }}"
-                        class="w-full bg-gray-800/50 border border-gray-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-blue-500 transition">
-                </div>
-            </div>
+        <!-- Stats Section -->
+        <div class="card p-6 md:p-8 space-y-6">
+            <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                <i class="fa-solid fa-chart-simple text-amber-400"></i>
+                Infos Joueur
+            </h3>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Telephone</label>
-                <input type="tel" name="phone" value="{{ current_user.profile.phone or '' }}"
-                    class="w-full bg-gray-800/50 border border-gray-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-blue-500 transition"
-                    placeholder="06 12 34 56 78">
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">URL de l'avatar</label>
-                <input type="url" name="avatar" value="{{ current_user.profile.avatar or '' }}"
-                    class="w-full bg-gray-800/50 border border-gray-700 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-blue-500 transition"
-                    placeholder="https://...">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-gray-400 ml-1">Poste Préféré</label>
+                    <select
+                        class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white focus:ring-2 focus:ring-primary-500 outline-none appearance-none transition">
+                        <option>Gardien</option>
+                        <option>Défenseur</option>
+                        <option selected>Milieu</option>
+                        <option>Attaquant</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-gray-400 ml-1">Numéro Fétiche</label>
+                    <input type="number" value="10"
+                        class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white focus:ring-2 focus:ring-primary-500 outline-none transition">
+                </div>
             </div>
         </div>
 
-        <button type="submit"
-            class="w-full gradient-primary py-3 rounded-xl font-bold text-lg hover:opacity-90 transition">
-            Enregistrer les modifications
-        </button>
+        <!-- Actions -->
+        <div class="pt-4 flex flex-col gap-4">
+            <button type="submit"
+                class="w-full btn-primary py-4 rounded-2xl font-black text-lg shadow-2xl shadow-primary-500/20 transition transform active:scale-[0.98]">
+                Sauvegarder les modifications
+            </button>
+            <p class="text-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                Dernière modification : il y a 2 mois
+            </p>
+        </div>
     </form>
 </div>
 {% endblock %}
