@@ -22,7 +22,7 @@ services:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=YOUR_REAL_EMAIL@EXAMPLE.COM" # <-- UPDATE THIS
+      - "--certificatesresolvers.myresolver.acme.email=anibasoufiane2001@gmail.com" # Updated from your request
       - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
 
 networks:
