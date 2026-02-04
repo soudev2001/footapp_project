@@ -26,7 +26,7 @@ services:
       - FLASK_ENV=production
     networks:
       - default
-      - traefik_public
+      - root_default
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.footapp-prod.rule=Host(`takurte.fr`) || Host(`www.takurte.fr`)"
@@ -39,5 +39,5 @@ volumes:
 
 
 networks:
-  traefik_public:
+  root_default:
     external: true
