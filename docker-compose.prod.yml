@@ -41,6 +41,7 @@ services:
       - "traefik.http.middlewares.prod-redirect.redirectscheme.scheme=https"
       # Service
       - "traefik.http.services.footapp-prod.loadbalancer.server.port=5000"
+      - "traefik.docker.network=traefik_public"
 
 volumes:
   mongodb_data_prod:

@@ -30,6 +30,7 @@ services:
       - "traefik.http.routers.footapp-preprod.rule=Host(`preprod.takurte.fr`)"
       - "traefik.http.routers.footapp-preprod.entrypoints=web"
       - "traefik.http.services.footapp-preprod.loadbalancer.server.port=5000"
+      - "traefik.docker.network=traefik_public"
 
 volumes:
   mongodb_data_preprod:
