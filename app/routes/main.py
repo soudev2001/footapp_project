@@ -12,13 +12,11 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def index():
-    """Landing page"""
+    """Landing page as default entry point"""
     if 'user_id' in session:
         return redirect(url_for('main.app_home'))
     
-    from app.services.db import get_stats
-    stats = get_stats()
-    return render_template('public/index.html', stats=stats)
+    return render_template('public/index.html')
 
 @main_bp.route('/nav-demo')
 def nav_demo():

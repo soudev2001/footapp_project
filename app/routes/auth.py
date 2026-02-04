@@ -1,6 +1,6 @@
 # FootLogic V2 - Authentication Routes
 
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 from functools import wraps
 
 auth_bp = Blueprint('auth', __name__)
@@ -9,11 +9,32 @@ auth_bp = Blueprint('auth', __name__)
 # AUTH HELPERS
 # ============================================================
 
+def check_api_auth():
+    """Check for Bearer token in headers (for API Explorer support)"""
+    auth_header = request.headers.get('Authorization')
+    if auth_header and auth_header.startswith('Bearer '):
+        token = auth_header.split(' ')[1]
+        parts = token.split('.')
+        if len(parts) == 3 and parts[0] == 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9':
+            # Valid mock token format
+            user_id = parts[1]
+            role = parts[2]
+            
+            # Temporary populate session for this request
+            if 'user_id' not in session:
+                session['user_id'] = user_id
+                session['user_role'] = role
+                # For demo purposes, we trust the token role
+            return True
+    return False
+
 def login_required(f):
     """Decorator to require login"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
+        if 'user_id' not in session and not check_api_auth():
+            if request.is_json or 'application/json' in request.headers.get('Accept', ''):
+                return jsonify({'success': False, 'error': 'Unauthorized'}), 401
             flash('Veuillez vous connecter.', 'warning')
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
@@ -24,10 +45,17 @@ def role_required(*roles):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if 'user_role' not in session:
+            has_auth = 'user_id' in session or check_api_auth()
+            if not has_auth:
+                if request.is_json or 'application/json' in request.headers.get('Accept', ''):
+                    return jsonify({'success': False, 'error': 'Unauthorized'}), 401
                 flash('Acces non autorise.', 'error')
                 return redirect(url_for('auth.login'))
-            if session['user_role'] not in roles and 'admin' not in session['user_role']:
+            
+            user_role = session.get('user_role')
+            if user_role not in roles and 'admin' != user_role:
+                if request.is_json:
+                    return jsonify({'success': False, 'error': 'Forbidden'}), 403
                 flash('Vous n\'avez pas les permissions necessaires.', 'error')
                 return redirect(url_for('main.index'))
             return f(*args, **kwargs)
@@ -42,7 +70,7 @@ def role_required(*roles):
 def login():
     """Login page"""
     if request.method == 'POST':
-        email = request.form.get('email')
+        email = request.form.get('email', '').lower()
         password = request.form.get('password')
         
         from app.services import get_user_service
@@ -74,7 +102,7 @@ def register_club():
     if request.method == 'POST':
         club_name = request.form.get('club_name')
         city = request.form.get('city')
-        email = request.form.get('email')
+        email = request.form.get('email', '').lower()
         password = request.form.get('password')
         
         from app.services import get_user_service, get_club_service
@@ -87,7 +115,8 @@ def register_club():
             return redirect(url_for('auth.register_club'))
             
         # 1. Create Club
-        club = club_service.create(club_name, city=city)
+        colors = {'primary': '#84cc16', 'secondary': '#facc15'} # Default Elite colors
+        club = club_service.create(club_name, city=city, colors=colors)
         club_id = club['_id']
         
         # 2. Create Admin User
@@ -115,7 +144,7 @@ def register_club():
 def register():
     """User registration page (Default for Fans/Players)"""
     if request.method == 'POST':
-        email = request.form.get('email')
+        email = request.form.get('email', '').lower()
         password = request.form.get('password')
         password_confirm = request.form.get('password_confirm')
         first_name = request.form.get('first_name')
@@ -163,7 +192,7 @@ def logout():
 def forgot_password():
     """Forgot password page"""
     if request.method == 'POST':
-        email = request.form.get('email')
+        email = request.form.get('email', '').lower()
         
         from app.services import get_user_service
         from app.services.db import get_db

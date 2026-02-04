@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block title %}Roster Pro - Isy Club{% endblock %}
+
+{% block content %}
+<div class="page-enter max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+        <div>
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20 text-[9px] font-black uppercase tracking-[0.2em] text-primary-400 mb-4">
+                <i class="fa-solid fa-users-gear"></i> Base de Données Membres
+            </div>
+            <h1 class="text-5xl font-black italic uppercase tracking-tighter">Effectif <span
+                    class="text-gradient">Professionnel</span></h1>
+        </div>
+
+        <div class="flex gap-3">
+            <button
+                class="px-6 py-4 glass rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all border border-white/5 flex items-center gap-2">
+                <i class="fa-solid fa-file-export"></i> EXPORTER CSV
+            </button>
+            <button
+                class="px-6 py-4 gradient-primary rounded-2xl font-black text-[10px] uppercase tracking-widest text-black shadow-lg shadow-primary-500/20 hover:scale-[1.02] transition-all flex items-center gap-2">
+                <i class="fa-solid fa-user-plus"></i> NOUVEAU MEMBRE
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="glass p-6 rounded-[32px] border-white/5 mb-8 flex flex-wrap items-center gap-6">
+        <div class="flex-1 min-w-[300px] relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-6 top-1/2 -translate-y-1/2 text-white/20"></i>
+            <input type="text" placeholder="Rechercher un joueur, licence, parent..."
+                class="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-14 pr-6 text-sm font-bold focus:outline-none focus:border-primary-500 transition-all">
+        </div>
+
+        <select
+            class="bg-white/[0.03] border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold focus:outline-none focus:border-primary-500 appearance-none min-w-[160px]">
+            <option>Toutes les Équipes</option>
+            <option>U13</option>
+            <option>U15</option>
+            <option>Séniors</option>
+        </select>
+
+        <select
+            class="bg-white/[0.03] border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold focus:outline-none focus:border-primary-500 appearance-none min-w-[160px]">
+            <option>Statut Documents</option>
+            <option>Complet</option>
+            <option>Manquant</option>
+            <option>En Review</option>
+        </select>
+    </div>
+
+    <!-- Main Roster Table -->
+    <div class="glass rounded-[40px] border-white/5 overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-white/[0.02] border-b border-white/5">
+                    <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-white/20">Membre</th>
+                    <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-white/20">Catégorie</th>
+                    <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-white/20">Licence / ID
+                    </th>
+                    <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-white/20">Parents /
+                        Contact</th>
+                    <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-white/20">Santé</th>
+                    <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-right">
+                        Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+                {% for member in members %}
+                <tr class="hover:bg-white/[0.02] transition-colors group">
+                    <td class="px-8 py-6">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center font-black text-primary-500 shadow-xl overflow-hidden">
+                                {% if member.photo %}
+                                <img src="{{ member.photo }}" class="w-full h-full object-cover">
+                                {% else %}
+                                {{ member.name[:1] }}
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="font-black italic uppercase text-sm leading-tight">{{ member.name }}</p>
+                                <p class="text-[9px] font-bold text-white/20 uppercase tracking-widest mt-1">#{{
+                                    member.jersey_number or 'N/A' }} • {{ member.position or 'PRO' }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-8 py-6">
+                        <span
+                            class="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                            {{ member.category or 'U13' }}
+                        </span>
+                    </td>
+                    <td class="px-8 py-6">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2">
+                                <i
+                                    class="fa-solid fa-id-card text-[10px] {{ 'text-green-500' if member.documents.license.status == 'ready' else 'text-white/20' }}"></i>
+                                <span class="text-[10px] font-bold font-mono">{{ member.license_number or 'NON ASSIGNÉ'
+                                    }}</span>
+                            </div>
+                            <div class="flex gap-1">
+                                <div class="w-1.5 h-1.5 rounded-full {{ 'bg-green-500' if member.documents.medical_cert.status == 'ready' else 'bg-red-500/50' }}"
+                                    title="Medical Cert"></div>
+                                <div class="w-1.5 h-1.5 rounded-full {{ 'bg-green-500' if member.documents.id_card.status == 'ready' else 'bg-red-500/50' }}"
+                                    title="ID Card"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-8 py-6">
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-black uppercase text-white/40">
+                                <i class="fa-solid fa-person-breastfeeding mr-2"></i>{{ member.parents.mother.name or
+                                'Non renseigné' }}
+                            </p>
+                            <p class="text-[10px] font-black uppercase text-white/40">
+                                <i class="fa-solid fa-person mr-2"></i>{{ member.parents.father.name or 'Non renseigné'
+                                }}
+                            </p>
+                        </div>
+                    </td>
+                    <td class="px-8 py-6">
+                        {% if member.health_info.allergies %}
+                        <div class="flex flex-wrap gap-1">
+                            {% for allergy in member.health_info.allergies %}
+                            <span
+                                class="px-2 py-0.5 bg-red-500/10 text-red-400 text-[8px] font-black uppercase rounded border border-red-500/20">{{
+                                allergy }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <span class="text-[9px] font-black uppercase text-white/10 tracking-widest">RAS</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-8 py-6 text-right">
+                        <div class="flex justify-end gap-2">
+                            <button
+                                class="w-8 h-8 rounded-lg glass hover:bg-primary-500 hover:text-black transition-all flex items-center justify-center text-white/20">
+                                <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-lg glass hover:bg-white/10 transition-all flex items-center justify-center text-white/20">
+                                <i class="fa-solid fa-ellipsis text-[10px]"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-8 py-20 text-center">
+                        <div class="flex flex-col items-center">
+                            <i class="fa-solid fa-users-slash text-6xl text-white/5 mb-6"></i>
+                            <p class="text-white/20 font-black uppercase tracking-widest italic">Aucun membre dans cet
+                                effectif</p>
+                            <button
+                                class="mt-8 px-6 py-3 bg-white/5 hover:bg-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-primary-400 transition-all border border-white/5">
+                                AJOUTER LE PREMIER JOUEUR
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination / Footer Info -->
+    <div class="mt-8 flex justify-between items-center px-4">
+        <p class="text-[10px] font-black uppercase tracking-widest text-white/20">
+            Affichage de <span class="text-white">{{ members|length }}</span> membres au total
+        </p>
+        <div class="flex gap-2">
+            <button
+                class="w-10 h-10 rounded-xl glass border-white/5 flex items-center justify-center text-white/20 cursor-not-allowed">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button
+                class="w-10 h-10 rounded-xl glass border-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

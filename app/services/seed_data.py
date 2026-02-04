@@ -46,7 +46,7 @@ def seed_all():
     # 2. CREATE USERS
     # ========================================
     users = [
-        create_user('admin@FootLogic.fr', generate_password_hash('admin123'), 'admin', club1_id, 
+        create_user('admin@footlogic.fr', generate_password_hash('admin123'), 'admin', club1_id, 
                    {'first_name': 'Admin', 'last_name': 'System', 'avatar': '', 'phone': '0600000000'}),
         create_user('coach@fcelite.fr', generate_password_hash('coach123'), 'coach', club1_id,
                    {'first_name': 'Michel', 'last_name': 'Dupont', 'avatar': 'https://randomuser.me/api/portraits/men/1.jpg', 'phone': '0612345678'}),

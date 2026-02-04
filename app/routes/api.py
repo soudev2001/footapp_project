@@ -166,3 +166,27 @@ def health_check():
         'app': 'FootLogic V2'
     })
 
+@api_bp.route('/auth/login', methods=['POST'])
+def api_login():
+    """Mock API login for Explorer testing"""
+    data = request.json
+    email = data.get('email', '').lower()
+    # Simplified auth for demo explorer
+    from app.services import get_user_service
+    user_service = get_user_service()
+    user = user_service.get_by_email(email)
+    
+    if user:
+        # Generate a mock token (in a real app, use JWT)
+        mock_token = f"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.{str(user['_id'])}.{user['role']}"
+        return jsonify({
+            'success': True,
+            'token': mock_token,
+            'user': {
+                'id': str(user['_id']),
+                'role': user['role'],
+                'email': user['email']
+            }
+        })
+    return jsonify({'success': False, 'error': 'User not found'}), 404
+

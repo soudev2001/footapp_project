@@ -9,6 +9,8 @@ class IsyService:
         self.sponsors = self.db.sponsors
         self.payments = self.db.payments
         self.events = self.db.community_events
+        self.messages = self.db.club_messages
+        self.event_forums = self.db.event_forums
 
     # SPONSORS
     def get_sponsors(self, club_id):
@@ -55,6 +57,78 @@ class IsyService:
             data['date'] = datetime.fromisoformat(data['date'])
         result = self.events.insert_one(data)
         return self.events.find_one({'_id': result.inserted_id})
+
+
+    # OFFICIAL MESSAGING (One-way)
+    def send_broadcast(self, club_id, author_id, data):
+        """Send a one-way official club message"""
+        message = {
+            'club_id': ObjectId(club_id),
+            'author_id': ObjectId(author_id),
+            'title': data.get('title'),
+            'content': data.get('content'),
+            'targets': data.get('targets', []), # roles or team ids
+            'attachments': data.get('attachments', []),
+            'type': 'broadcast',
+            'created_at': datetime.utcnow()
+        }
+        result = self.messages.insert_one(message)
+        return self.messages.find_one({'_id': result.inserted_id})
+
+    def get_broadcasts(self, club_id, user_role=None, team_id=None):
+        """Get relevant broadcasts for a user"""
+        query = {'club_id': ObjectId(club_id)}
+        if user_role or team_id:
+            query['$or'] = [
+                {'targets': {'$size': 0}}, # Public to all club
+                {'targets': user_role},
+                {'targets': str(team_id) if team_id else None}
+            ]
+        return list(self.messages.find(query).sort('created_at', -1))
+
+    # CONVOCATIONS & LOGISTICS
+    def invite_to_event(self, event_id, player_ids):
+        """Invite players to an event (match/training)"""
+        convocations = []
+        for pid in player_ids:
+            convocations.append({
+                'player_id': pid,
+                'status': 'pending', # pending, confirmed, refused
+                'response_date': None
+            })
+        
+        return self.db.community_events.update_one(
+            {'_id': ObjectId(event_id)},
+            {'$set': {'convocations': convocations}}
+        )
+
+    def update_convocation_status(self, event_id, player_id, status):
+        """Update a player's response to an invitation"""
+        return self.db.community_events.update_one(
+            {'_id': ObjectId(event_id), 'convocations.player_id': str(player_id)},
+            {'$set': {
+                'convocations.$.status': status,
+                'convocations.$.response_date': datetime.utcnow()
+            }}
+        )
+
+    def update_event_logistics(self, event_id, tasks_data):
+        """Update logistical tasks (carpooling, etc)"""
+        return self.db.community_events.update_one(
+            {'_id': ObjectId(event_id)},
+            {'$set': {'logistics_tasks': tasks_data}}
+        )
+
+    # PERFORMANCE TRACKING
+    def save_match_performance(self, event_id, performance_data):
+        """Save post-match stats (scorers, assists, etc)"""
+        return self.db.community_events.update_one(
+            {'_id': ObjectId(event_id)},
+            {'$set': {
+                'performance_summary': performance_data,
+                'status': 'completed'
+            }}
+        )
 
 def get_isy_service():
     return IsyService()

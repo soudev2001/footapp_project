@@ -108,12 +108,14 @@ def get_nav_for_role(role):
         'admin': [
             {'name': 'Accueil', 'url': '/', 'icon': 'fa-house'},
             {'name': 'Isy HUB', 'url': '/isy/hub', 'icon': 'fa-rocket'},
+            {'name': 'Partenaires', 'url': '/isy/partners', 'icon': 'fa-crown'},
             {'name': 'Console Gestion', 'url': '/admin/panel', 'icon': 'fa-shield-halved'},
             {'name': 'Site Public', 'url': '/public-club', 'icon': 'fa-globe'},
         ],
         'coach': [
             {'name': 'Dashboard', 'url': '/coach/dashboard', 'icon': 'fa-gauge'},
             {'name': 'Isy HUB', 'url': '/isy/hub', 'icon': 'fa-rocket'},
+            {'name': 'Effectif Pro', 'url': '/isy/members', 'icon': 'fa-users-gear'},
             {'name': 'Effectif', 'url': '/coach/roster', 'icon': 'fa-users'},
             {'name': 'Tactiques', 'url': '/coach/tactics', 'icon': 'fa-chess-board'},
             {'name': 'Match Center', 'url': '/coach/match-center', 'icon': 'fa-gamepad'},
@@ -127,6 +129,7 @@ def get_nav_for_role(role):
             {'name': 'Planning', 'url': '/player/calendar', 'icon': 'fa-calendar-days'},
             {'name': 'Contrats', 'url': '/player/contracts', 'icon': 'fa-file-signature'},
             {'name': 'Documents', 'url': '/player/documents', 'icon': 'fa-file-invoice'},
+            {'name': 'Offres Privées', 'url': '/isy/partners', 'icon': 'fa-crown'},
             {'name': 'Social', 'url': '/feed', 'icon': 'fa-rss'},
         ],
         'fan': [
@@ -134,6 +137,7 @@ def get_nav_for_role(role):
             {'name': 'Actualités', 'url': '/feed', 'icon': 'fa-newspaper'},
             {'name': 'Clubs', 'url': '/public-club', 'icon': 'fa-futbol'},
             {'name': 'Boutique', 'url': '/shop-product', 'icon': 'fa-bag-shopping'},
+            {'name': 'Offres Privées', 'url': '/isy/partners', 'icon': 'fa-crown'},
         ]
     }
     return all_nav.get(role, all_nav['fan'])

@@ -53,7 +53,23 @@ class PlayerService:
             'height': kwargs.get('height', 175),
             'weight': kwargs.get('weight', 70),
             'status': kwargs.get('status', 'active'),
-            'created_at': datetime.utcnow()
+            'created_at': datetime.utcnow(),
+            # ISY CLUB PRO FEATURES
+            'parents': kwargs.get('parents', {
+                'father': {'name': '', 'phone': '', 'id': None},
+                'mother': {'name': '', 'phone': '', 'id': None}
+            }),
+            'health_info': kwargs.get('health_info', {
+                'allergies': [],
+                'medical_notes': '',
+                'emergency_contact': ''
+            }),
+            'documents': kwargs.get('documents', {
+                'license': {'status': 'missing', 'file': ''},
+                'medical_cert': {'status': 'missing', 'file': ''},
+                'id_card': {'status': 'missing', 'file': ''}
+            }),
+            'license_number': kwargs.get('license_number', '')
         }
         result = self.collection.insert_one(player)
         player['_id'] = result.inserted_id
@@ -107,6 +123,24 @@ class PlayerService:
     def delete(self, player_id):
         """Delete a player"""
         return self.collection.delete_one({'_id': ObjectId(player_id)})
+
+    # ROSTER PRO ACTIONS
+    def update_documents(self, player_id, doc_type, status, filename=None):
+        """Update a specific document status/file"""
+        update_data = {f'documents.{doc_type}.status': status}
+        if filename:
+            update_data[f'documents.{doc_type}.file'] = filename
+        return self.collection.update_one(
+            {'_id': ObjectId(player_id)},
+            {'$set': update_data}
+        )
+
+    def update_parent_info(self, player_id, parent_type, data):
+        """Update father or mother information"""
+        return self.collection.update_one(
+            {'_id': ObjectId(player_id)},
+            {'$set': {f'parents.{parent_type}': data}}
+        )
     
     def get_top_scorers(self, club_id, limit=5):
         """Get top scorers for a club"""

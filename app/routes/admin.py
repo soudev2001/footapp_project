@@ -9,6 +9,13 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 # ADMIN ROUTES
 # ============================================================
 
+@admin_bp.route('/dashboard')
+@login_required
+@role_required('admin')
+def dashboard():
+    """Alias for admin_panel to prevent BuildError"""
+    return redirect(url_for('admin.admin_panel'))
+
 @admin_bp.route('/')
 @admin_bp.route('/panel')
 @login_required
