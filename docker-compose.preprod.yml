@@ -31,6 +31,7 @@ services:
       - "traefik.http.routers.footapp-preprod.entrypoints=websecure"
       - "traefik.http.routers.footapp-preprod.tls=true"
       - "traefik.http.routers.footapp-preprod.tls.certresolver=letsencrypt"
+      - "traefik.http.services.footapp-preprod.loadbalancer.server.port=5000"
 
 volumes:
   mongodb_data_preprod:
