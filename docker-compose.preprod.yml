@@ -18,6 +18,8 @@ services:
     restart: always
     depends_on:
       - mongodb_preprod
+    ports:
+      - "5001:5000"
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - MONGO_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-secret}@mongodb_preprod:27017/${MONGO_DATABASE:-FootClubApp_PreProd}?authSource=admin
