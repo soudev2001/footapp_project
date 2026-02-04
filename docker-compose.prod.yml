@@ -24,12 +24,13 @@ services:
       - FLASK_ENV=production
     networks:
       - default
-      - root_default
+      - traefik_public
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.footapp-prod.rule=Host(`takurte.fr`) || Host(`www.takurte.fr`)"
+      - "traefik.http.routers.footapp-prod.entrypoints=websecure"
       - "traefik.http.routers.footapp-prod.tls=true"
-      - "traefik.http.routers.footapp-prod.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.footapp-prod.tls.certresolver=myresolver"
       - "traefik.http.services.footapp-prod.loadbalancer.server.port=5000"
 
 volumes:
@@ -37,5 +38,5 @@ volumes:
 
 
 networks:
-  root_default:
+  traefik_public:
     external: true

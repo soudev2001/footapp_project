@@ -1,0 +1,33 @@
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: footapp_traefik
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik_public
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOCKER_API_VERSION=1.44 # Critical fix for Ubuntu 24.04
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik_data/acme.json:/acme.json
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=your-email@example.com" # Replace with your email
+      - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
+      # Global HTTP to HTTPS redirect
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+
+networks:
+  traefik_public:
+    name: traefik_public # Explicit name so other composes can find it
