@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mongodb_preprod:
+    image: mongo:latest
+    container_name: footapp_mongodb_preprod
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-secret}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-FootClubApp_PreProd}
+    volumes:
+      - mongodb_data_preprod:/data/db
+    ports:
+      - "27018:27017" # Different external port for MongoDB if needed
+
+  web_preprod:
+    build: .
+    container_name: footapp_web_preprod
+    restart: always
+    depends_on:
+      - mongodb_preprod
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - MONGO_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-secret}@mongodb_preprod:27017/${MONGO_DATABASE:-FootClubApp_PreProd}?authSource=admin
+      - FLASK_ENV=development
+    ports:
+      - "5001:5000" # Mapped to port 5001 for pre-prod
+
+volumes:
+  mongodb_data_preprod:

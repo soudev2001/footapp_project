@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: footapp_mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-secret}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-FootClubApp}
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+
+  web:
+    build: .
+    container_name: footapp_web
+    restart: always
+    depends_on:
+      - mongodb
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - MONGO_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-secret}@mongodb:27017/${MONGO_DATABASE:-FootClubApp}?authSource=admin
+      - FLASK_ENV=production
+    ports:
+      - "5000:5000"
+
+volumes:
+  mongodb_data:
