@@ -3,9 +3,9 @@
 This guide explains how to deploy your application to a Hostinger Ubuntu VPS using Docker and Nginx.
 
 ## 1. Prerequisites
-- A Hostinger VPS with **Ubuntu 20.04/22.04 LTS**.
+- A Hostinger VPS with **Ubuntu 24.04 LTS** (Detected: `82.112.255.193`).
 - SSH access to your VPS.
-- A domain name with subdomains (e.g., `footapp.com`, `preprod.footapp.com`).
+- A domain name (or use the IP for testing).
 - GitHub Repository Secrets configured (`SSH_PRIVATE_KEY`, `SERVER_HOST`, `SERVER_USER`).
 
 ## 2. Multi-Environment Branching
@@ -20,11 +20,11 @@ This guide explains how to deploy your application to a Hostinger Ubuntu VPS usi
 ### Step 1: Push your code to GitHub
 Ensure all your project files (including `Dockerfile`, `docker-compose.yml`, etc.) are pushed to your GitHub repository.
 
-### Step 2: Clone on your VPS
-SSH into your VPS and run:
+### Step 2: Initialize Project Folder on VPS
+Sur votre terminal SSH (`root@82.112.255.193`), exécutez :
 ```bash
-git clone https://github.com/yourusername/footapp_project.git
-cd footapp_project
+mkdir -p ~/footapp_project && cd ~/footapp_project
+git clone https://github.com/soudev2001/footapp_project.git .
 ```
 
 ### Step 3: Configure Environment Variables
