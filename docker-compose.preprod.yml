@@ -24,18 +24,17 @@ services:
       - FLASK_ENV=development
     networks:
       - default
-      - traefik_public
+      - root_default
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.footapp-preprod.rule=Host(`preprod.takurte.fr`)"
       - "traefik.http.routers.footapp-preprod.entrypoints=web"
       - "traefik.http.services.footapp-preprod.loadbalancer.server.port=5000"
-      - "traefik.docker.network=traefik_public"
 
 volumes:
   mongodb_data_preprod:
 
 
 networks:
-  traefik_public:
+  root_default:
     external: true

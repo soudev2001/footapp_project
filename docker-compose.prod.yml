@@ -24,29 +24,19 @@ services:
       - FLASK_ENV=production
     networks:
       - default
-      - traefik_public
+      - root_default
     labels:
       - "traefik.enable=true"
-      # Router HTTPS
       - "traefik.http.routers.footapp-prod.rule=Host(`takurte.fr`) || Host(`www.takurte.fr`)"
-      - "traefik.http.routers.footapp-prod.entrypoints=websecure"
+      - "traefik.http.routers.footapp-prod.entrypoints=https"
       - "traefik.http.routers.footapp-prod.tls=true"
-      - "traefik.http.routers.footapp-prod.tls.certresolver=myresolver"
-      - "traefik.http.routers.footapp-prod.middlewares=prod-redirect"
-      # Router HTTP (for redirect)
-      - "traefik.http.routers.footapp-prod-http.rule=Host(`takurte.fr`) || Host(`www.takurte.fr`)"
-      - "traefik.http.routers.footapp-prod-http.entrypoints=web"
-      - "traefik.http.routers.footapp-prod-http.middlewares=prod-redirect"
-      # Middleware redirect
-      - "traefik.http.middlewares.prod-redirect.redirectscheme.scheme=https"
-      # Service
+      - "traefik.http.routers.footapp-prod.tls.certresolver=mytlschallenge"
       - "traefik.http.services.footapp-prod.loadbalancer.server.port=5000"
-      - "traefik.docker.network=traefik_public"
 
 volumes:
   mongodb_data_prod:
 
 
 networks:
-  traefik_public:
+  root_default:
     external: true
