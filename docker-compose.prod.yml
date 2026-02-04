@@ -32,6 +32,7 @@ services:
       - "traefik.http.routers.footapp-prod.tls=true"
       - "traefik.http.routers.footapp-prod.tls.certresolver=letsencrypt"
       - "traefik.http.services.footapp-prod.loadbalancer.server.port=5000"
+      - "traefik.docker.network=root_default"
 
 volumes:
   mongodb_data_prod:
