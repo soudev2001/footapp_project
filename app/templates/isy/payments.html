@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Paiements Elite - Isy Hub{% endblock %}
+
+{% block content %}
+<div class="page-enter max-w-6xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
+        <div>
+            <a href="{{ url_for('isy.hub') }}"
+                class="inline-flex items-center gap-2 text-white/40 hover:text-primary-400 font-black text-[10px] uppercase tracking-widest mb-6 transition-colors">
+                <i class="fa-solid fa-arrow-left text-[8px]"></i> RETOUR AU HUB
+            </a>
+            <h1 class="text-4xl font-black italic uppercase tracking-tighter">Gestion des <span
+                    class="text-gradient">Cotisations</span></h1>
+        </div>
+        <button onclick="toggleModal('addPaymentModal')"
+            class="gradient-primary px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-black shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-3">
+            <i class="fa-solid fa-plus"></i> ENREGISTRER UN PAIEMENT
+        </button>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="glass rounded-[48px] border-white/5 overflow-hidden">
+        <table class="w-full text-left">
+            <thead
+                class="bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/20 border-b border-white/5">
+                <tr>
+                    <th class="p-8">Membre</th>
+                    <th class="p-8">Description</th>
+                    <th class="p-8">Montant</th>
+                    <th class="p-8">Date</th>
+                    <th class="p-8">Status</th>
+                    <th class="p-8 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+                {% for payment in payments %}
+                <tr class="hover:bg-white/5 transition-all group">
+                    <td class="p-8">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center font-black text-sm italic">
+                                {{ payment.user_name[:1] if payment.user_name else '?' }}
+                            </div>
+                            <span class="font-black italic uppercase tracking-tight">{{ payment.user_name }}</span>
+                        </div>
+                    </td>
+                    <td class="p-8">
+                        <p class="text-white/60 text-sm font-medium italic">{{ payment.description }}</p>
+                    </td>
+                    <td class="p-8">
+                        <p class="text-xl font-black italic">{{ payment.amount }}€</p>
+                    </td>
+                    <td class="p-8">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-white/20">{{
+                            payment.date.strftime('%d %b %Y') }}</p>
+                    </td>
+                    <td class="p-8">
+                        {% if payment.status == 'confirmed' %}
+                        <span
+                            class="px-3 py-1 rounded-lg bg-green-500/10 text-green-400 text-[8px] font-black uppercase tracking-widest border border-green-500/20">CONFIRMÉ</span>
+                        {% else %}
+                        <span
+                            class="px-3 py-1 rounded-lg bg-amber-500/10 text-amber-500 text-[8px] font-black uppercase tracking-widest border border-amber-500/20">EN
+                            ATTENTE</span>
+                        {% endif %}
+                    </td>
+                    <td class="p-8 text-right">
+                        {% if payment.status == 'pending' %}
+                        <form action="{{ url_for('isy.confirm_payment', payment_id=payment._id) }}" method="POST"
+                            class="inline">
+                            <button type="submit"
+                                class="w-10 h-10 rounded-xl glass hover:bg-green-500 hover:text-black transition-all border border-white/10 group-hover:border-green-500/30">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                        <button
+                            class="w-10 h-10 rounded-xl glass hover:bg-white/10 transition-all border border-white/10 ml-2">
+                            <i class="fa-solid fa-ellipsis-vertical text-white/20"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="p-20 text-center text-white/10 italic">Aucun historique de paiement pour ce
+                        club.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Add Payment -->
+<div id="addPaymentModal"
+    class="fixed inset-0 z-[100] hidden bg-black/90 backdrop-blur-xl flex items-center justify-center p-6">
+    <div
+        class="glass max-w-lg w-full rounded-[48px] border-white/10 overflow-hidden animate-slide-up shadow-[0_32px_80px_-16px_rgba(0,0,0,0.8)]">
+        <div class="p-10 lg:p-12 relative overflow-hidden">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-primary-600/10 via-transparent to-transparent opacity-50">
+            </div>
+
+            <div class="flex justify-between items-center mb-10 relative z-10">
+                <h3 class="text-3xl font-black italic uppercase tracking-tighter leading-none">Nouveau <span
+                        class="text-gradient">Versement</span></h3>
+                <button onclick="toggleModal('addPaymentModal')"
+                    class="w-12 h-12 rounded-2xl glass hover:bg-white/10 flex items-center justify-center transition-all text-white/20 hover:text-white border border-white/10">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form action="{{ url_for('isy.payments') }}" method="POST" class="space-y-6 relative z-10">
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-3 ml-2">Email
+                        de l'adhérent</label>
+                    <input type="email" name="user_email" required placeholder="player@club.com"
+                        class="w-full bg-white/[0.03] border border-white/10 rounded-[28px] py-5 px-8 text-white focus:outline-none focus:border-primary-500 transition-all font-bold placeholder:text-white/10">
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label
+                            class="block text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-3 ml-2">Montant
+                            (€)</label>
+                        <input type="number" step="0.01" name="amount" required placeholder="49.90"
+                            class="w-full bg-white/[0.03] border border-white/10 rounded-[28px] py-5 px-8 text-white focus:outline-none focus:border-primary-500 transition-all font-bold placeholder:text-white/10">
+                    </div>
+                    <div>
+                        <label
+                            class="block text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-3 ml-2">Type</label>
+                        <select
+                            class="w-full bg-white/[0.03] border border-white/10 rounded-[28px] py-5 px-8 text-white focus:outline-none focus:border-primary-500 transition-all font-bold appearance-none">
+                            <option value="subscription">Cotisation</option>
+                            <option value="equipment">Équipement</option>
+                            <option value="event">Événement</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-3 ml-2">Description
+                        / Motif</label>
+                    <textarea name="description" rows="3" placeholder="Ex: Licence Saison 2025/2026..."
+                        class="w-full bg-white/[0.03] border border-white/10 rounded-[28px] py-5 px-8 text-white focus:outline-none focus:border-primary-500 transition-all font-bold placeholder:text-white/10 resize-none"></textarea>
+                </div>
+
+                <div class="pt-6">
+                    <button type="submit"
+                        class="gradient-primary w-full py-6 rounded-[32px] text-xs font-black uppercase tracking-widest shadow-2xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                        FINALISER L'ENREGISTREMENT
+                    </button>
+                    <p class="text-center mt-6 text-[9px] text-white/10 font-black uppercase tracking-[0.2em] italic">Un
+                        reçu sera automatiquement généré pour le membre.</p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleModal(id) {
+        document.getElementById(id).classList.toggle('hidden');
+    }
+</script>
+{% endblock %}

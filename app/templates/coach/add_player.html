@@ -2,90 +2,117 @@
 {% block title %}Ajouter un Joueur - FootLogic Elite{% endblock %}
 
 {% block content %}
-<div class="page-enter max-w-2xl mx-auto px-4 py-8">
-    <!-- Header -->
-    <div class="mb-10 text-center">
-        <div
-            class="w-24 h-24 gradient-primary rounded-[32px] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary-500/20">
-            <i class="fa-solid fa-user-plus text-white text-3xl"></i>
+<div class="page-enter max-w-3xl mx-auto px-4 py-8">
+    <!-- Header Hero -->
+    <div class="glass p-10 rounded-[40px] border-white/5 mb-10 relative overflow-hidden text-center">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-amber-500/10"></div>
+        <div class="relative z-10">
+            <div
+                class="w-20 h-20 gradient-primary rounded-[32px] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary-500/20">
+                <i class="fa-solid fa-user-plus text-white text-3xl"></i>
+            </div>
+            <h1 class="text-4xl font-black italic uppercase tracking-tight leading-none mb-2 light:text-slate-900">
+                Nouveau Talent</h1>
+            <p class="text-white/40 light:text-slate-500 text-sm font-medium italic">Enregistrez un nouvel athlète dans
+                votre effectif FootLogic Elite.</p>
         </div>
-        <h1 class="text-3xl font-black italic uppercase tracking-tight">Nouveau Joueur</h1>
-        <p class="text-white/40 mt-2 font-medium tracking-wide">Ajoutez un nouveau talent à votre effectif FootLogic</p>
     </div>
 
-    <form method="POST" class="space-y-6">
-        <div class="glass p-8 rounded-[40px] border-white/5 space-y-6">
-            <!-- Basic Info -->
-            <div class="grid grid-cols-2 gap-6">
-                <div class="space-y-2 col-span-2">
-                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 ml-2">Nom
-                        Complet</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                            <i
-                                class="fa-solid fa-user text-white/10 group-focus-within:text-primary-500 transition-colors"></i>
-                        </div>
-                        <input type="text" name="name" placeholder="Ex: Kylian Dubois" required
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all">
-                    </div>
-                </div>
+    <!-- Registration Form -->
+    <form method="POST" class="space-y-8">
+        <!-- Identity Section -->
+        <div class="glass p-10 rounded-[48px] border-white/5 space-y-8 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 rounded-full blur-[80px] -mr-32 -mt-32"></div>
 
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 ml-2">Numéro
-                        Maillot</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                            <i
-                                class="fa-solid fa-shirt text-white/10 group-focus-within:text-primary-500 transition-colors"></i>
-                        </div>
-                        <input type="number" name="jersey_number" placeholder="10" required
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all">
-                    </div>
-                </div>
+            <h3
+                class="text-xs font-black uppercase tracking-widest light:text-slate-900 mb-6 flex items-center gap-3 relative z-10">
+                <i class="fa-solid fa-id-card text-primary-400"></i>
+                Identité de l'athlète
+            </h3>
 
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 ml-2">Position</label>
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                            <i
-                                class="fa-solid fa-location-crosshairs text-white/10 group-focus-within:text-primary-500 transition-colors"></i>
-                        </div>
-                        <select name="position"
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all appearance-none cursor-pointer">
-                            <option value="GK">Gardien (GK)</option>
-                            <option value="DEF">Défenseur (DEF)</option>
-                            <option value="MID" selected>Milieu (MID)</option>
-                            <option value="ATT">Attaquant (ATT)</option>
-                        </select>
-                    </div>
+            <div class="space-y-3 relative z-10">
+                <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Nom
+                    Complet</label>
+                <div class="relative group">
+                    <i
+                        class="fa-solid fa-user absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-500 transition-colors"></i>
+                    <input type="text" name="name" placeholder="Ex: Lucas Mendy" required
+                        class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-sm font-bold placeholder:text-white/10 focus:outline-none focus:border-primary-500/50 transition-all">
                 </div>
             </div>
 
-            <!-- Physical -->
-            <div class="grid grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 ml-2">Taille
-                        (cm)</label>
-                    <input type="number" name="height" value="175"
-                        class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Numéro de
+                        Maillot</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-shirt absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-500 transition-colors"></i>
+                        <input type="number" name="jersey_number" placeholder="10" required
+                            class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-sm font-bold focus:outline-none focus:border-primary-500/50 transition-all">
+                    </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 ml-2">Poids
-                        (kg)</label>
-                    <input type="number" name="weight" value="70"
-                        class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all">
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Position
+                        Préférentielle</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-arrows-to-circle absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-500 transition-colors"></i>
+                        <select name="position" required
+                            class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-sm font-bold focus:outline-none focus:border-primary-500/50 transition-all appearance-none cursor-pointer">
+                            <option value="GK">Gardien de But (GK)</option>
+                            <option value="DEF">Défenseur (DEF)</option>
+                            <option value="MID" selected>Milieu de Terrain (MID)</option>
+                            <option value="ATT">Attaquant (ATT)</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-6 flex items-center pointer-events-none text-white/20">
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="flex gap-4 pt-4">
+        <!-- Physical Specs Section -->
+        <div class="glass p-10 rounded-[48px] border-white/5 space-y-8 relative overflow-hidden">
+            <h3 class="text-xs font-black uppercase tracking-widest light:text-slate-900 mb-6 flex items-center gap-3">
+                <i class="fa-solid fa-heart-pulse text-amber-500"></i>
+                Profil Physique
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Taille
+                        (cm)</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-ruler-vertical absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-amber-500 transition-colors"></i>
+                        <input type="number" name="height" value="175"
+                            class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-sm font-bold focus:outline-none focus:border-amber-500/50 transition-all">
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Poids
+                        (kg)</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-weight-hanging absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-amber-500 transition-colors"></i>
+                        <input type="number" name="weight" value="70"
+                            class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-sm font-bold focus:outline-none focus:border-amber-500/50 transition-all">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex gap-6 pt-4">
             <a href="{{ url_for('coach.roster') }}"
-                class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-5 rounded-2xl font-black text-xs text-center transition-all italic tracking-widest text-white/40">
+                class="flex-1 glass bg-white/5 border border-white/10 py-6 rounded-[32px] font-black text-[10px] uppercase tracking-[0.2em] text-center text-white/40 hover:text-white hover:bg-white/10 transition-all">
                 ANNULER
             </a>
             <button type="submit"
-                class="flex-1 gradient-primary py-5 rounded-2xl font-black text-xs shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all tracking-widest">
-                CRÉER LE JOUEUR
+                class="flex-1 gradient-primary py-6 rounded-[32px] font-black text-[10px] uppercase tracking-[0.2em] text-black shadow-2xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                CRÉER L'ATHLÈTE
             </button>
         </div>
     </form>

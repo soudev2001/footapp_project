@@ -1,0 +1,37 @@
+<!-- Mobile Header Component -->
+<header class="mobile-header">
+    <div class="mobile-header-content">
+        <!-- Logo -->
+        <a href="/" class="mobile-logo">
+            <div class="mobile-logo-icon">
+                <img src="{{ url_for('static', filename='img/logo_dark.png') }}" class="dark-logo" alt="FootLogic">
+                <img src="{{ url_for('static', filename='img/logo_light.png') }}" class="light-logo" alt="FootLogic">
+            </div>
+            <div class="mobile-logo-text">
+                <span class="mobile-logo-title">FOOT<span class="text-primary-500">LOGIC</span></span>
+            </div>
+        </a>
+
+        <!-- Right Actions -->
+        <div class="mobile-header-actions">
+            <!-- Theme Toggle -->
+            <button id="mobile-header-theme-toggle" class="mobile-action-btn" aria-label="Changer le thème">
+                <i class="fa-solid fa-moon icon-dark"></i>
+                <i class="fa-solid fa-sun icon-light"></i>
+            </button>
+
+            <!-- Notifications (if authenticated) -->
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.notifications') }}" class="mobile-action-btn mobile-notif-btn">
+                <i class="fa-solid fa-bell"></i>
+                <span class="mobile-notif-badge"></span>
+            </a>
+            {% endif %}
+
+            <!-- Menu Toggle -->
+            <button id="sidebar-toggle" class="mobile-action-btn mobile-menu-btn" aria-label="Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>

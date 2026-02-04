@@ -63,7 +63,8 @@
                 <div>
                     <h2 class="text-3xl font-black italic tracking-tight uppercase">MON <span
                             class="text-gradient">EFFECTIF</span></h2>
-                    <p class="text-white/40 text-sm mt-1">Gérez les coachs, joueurs et staff de votre club.</p>
+                    <p class="text-white/40 light:text-slate-500 text-sm mt-1">Gérez les coachs, joueurs et staff de
+                        votre club.</p>
                 </div>
                 <div class="flex gap-3">
                     <button onclick="toggleModal('inviteModal')"
@@ -84,7 +85,9 @@
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-3xl -mr-16 -mt-16">
                         </div>
-                        <h3 class="text-xs font-black uppercase tracking-widest text-white/20 mb-6">Répartition</h3>
+                        <h3
+                            class="text-xs font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-6">
+                            Répartition</h3>
                         <div class="space-y-4">
                             <div
                                 class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
@@ -128,7 +131,7 @@
                     <div class="glass rounded-[32px] border-white/5 overflow-hidden">
                         <table class="w-full text-left">
                             <thead
-                                class="bg-white/5 text-[10px] font-black uppercase tracking-widest text-white/20 border-b border-white/5">
+                                class="bg-white/5 text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 border-b border-white/5">
                                 <tr>
                                     <th class="p-6">Membre</th>
                                     <th class="p-6">Rôle</th>
@@ -149,7 +152,8 @@
                                             <div>
                                                 <p class="text-sm font-black">{{ member.profile.first_name }} {{
                                                     member.profile.last_name }}</p>
-                                                <p class="text-[10px] text-white/40">{{ member.email }}</p>
+                                                <p class="text-[10px] text-white/40 light:text-slate-500">{{
+                                                    member.email }}</p>
                                             </div>
                                         </div>
                                     </td>
@@ -160,16 +164,18 @@
                                         </span>
                                     </td>
                                     <td class="p-6">
-                                        <p class="text-xs text-white/60">Actif</p>
+                                        <p class="text-xs text-white/60 light:text-slate-600">Actif</p>
                                     </td>
                                     <td class="p-6 text-right">
-                                        <button class="text-white/20 hover:text-white transition-colors"><i
+                                        <button
+                                            class="text-white/20 light:text-slate-400 hover:text-white light:hover:text-slate-900 transition-colors"><i
                                                 class="fa-solid fa-ellipsis-vertical"></i></button>
                                     </td>
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="4" class="p-10 text-center text-white/20 italic">Aucun membre pour le
+                                    <td colspan="4" class="p-10 text-center text-white/20 light:text-slate-300 italic">
+                                        Aucun membre pour le
                                         moment.</td>
                                 </tr>
                                 {% endfor %}
@@ -204,7 +210,9 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-3xl font-black">49,90€</p>
-                                <p class="text-[10px] text-white/30 font-black uppercase tracking-widest">Par Mois</p>
+                                <p
+                                    class="text-[10px] text-white/30 light:text-slate-400 font-black uppercase tracking-widest">
+                                    Par Mois</p>
                             </div>
                         </div>
 
@@ -253,11 +261,12 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-black">Facture #FA-2026-02</p>
-                                    <p class="text-[10px] text-white/40 uppercase tracking-widest">Payée le 01 Fév 2026
+                                    <p class="text-[10px] text-white/40 light:text-slate-500 uppercase tracking-widest">
+                                        Payée le 01 Fév 2026
                                     </p>
                                 </div>
                             </div>
-                            <i class="fa-solid fa-chevron-right text-white/20"></i>
+                            <i class="fa-solid fa-chevron-right text-white/20 light:text-slate-300"></i>
                         </div>
                     </div>
 
@@ -266,7 +275,8 @@
                         <i class="fa-solid fa-bolt text-green-400 text-2xl mb-4"></i>
                         <h4 class="text-sm font-black uppercase tracking-widest mb-2">Prochain Paiement</h4>
                         <p class="text-2xl font-black mb-1">01 Mars 2026</p>
-                        <p class="text-xs text-white/40 italic">Le prélèvement automatique sera effectué via votre carte
+                        <p class="text-xs text-white/40 light:text-slate-500 italic">Le prélèvement automatique sera
+                            effectué via votre carte
                             finissant par **** 4242.</p>
                     </div>
                 </div>
@@ -278,7 +288,8 @@
             <div class="mb-10">
                 <h2 class="text-3xl font-black italic tracking-tight uppercase">ANALYSE <span
                         class="text-gradient">PERFORMANCE</span></h2>
-                <p class="text-white/40 text-sm mt-1">Surveillez l'activité et l'engagement de votre club.</p>
+                <p class="text-white/40 light:text-slate-500 text-sm mt-1">Surveillez l'activité et l'engagement de
+                    votre club.</p>
             </div>
 
             <div class="glass p-8 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all">
@@ -289,7 +300,8 @@
                     </div>
                 </div>
                 <div class="text-4xl font-black mb-1 italic">{{ stats.total_members }}</div>
-                <div class="text-[10px] text-white/20 font-black uppercase tracking-widest mt-2">Membres Totaux</div>
+                <div class="text-[10px] text-white/20 light:text-slate-400 font-black uppercase tracking-widest mt-2">
+                    Membres Totaux</div>
             </div>
             <div class="glass p-8 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all">
                 <div class="flex justify-between items-start mb-6">
@@ -319,7 +331,8 @@
                     </div>
                 </div>
                 <div class="text-4xl font-black mb-1 italic">{{ stats.mrr }}€</div>
-                <div class="text-[10px] text-white/20 font-black uppercase tracking-widest mt-2">Revenu Mensuel
+                <div class="text-[10px] text-white/20 light:text-slate-400 font-black uppercase tracking-widest mt-2">
+                    Revenu Mensuel
                     (Simulation)</div>
             </div>
 
@@ -329,7 +342,8 @@
                 </div>
                 <h3 class="text-lg font-black italic tracking-tight uppercase mb-2 relative z-10">Taux de Remplissage
                 </h3>
-                <p class="text-white/30 text-xs mb-10 relative z-10 font-medium">Réponses aux convocations (6 derniers
+                <p class="text-white/30 light:text-slate-400 text-xs mb-10 relative z-10 font-medium">Réponses aux
+                    convocations (6 derniers
                     mois)</p>
 
                 <div class="flex items-end gap-5 h-48 w-full relative z-10">
@@ -352,7 +366,8 @@
                         class="w-full gradient-primary rounded-2xl shadow-2xl shadow-primary-500/20 h-[95%] border border-primary-400/20">
                     </div>
                 </div>
-                <div class="flex justify-between mt-6 text-[10px] text-white/20 font-black uppercase tracking-widest">
+                <div
+                    class="flex justify-between mt-6 text-[10px] text-white/20 light:text-slate-400 font-black uppercase tracking-widest">
                     <span>Sept</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Fev</span>
                 </div>
             </div>
@@ -369,7 +384,7 @@
 
             <div class="max-w-3xl space-y-8">
                 <div class="glass p-10 rounded-[40px] border-white/5">
-                    <form class="space-y-6">
+                    <form class="space-y-6" action="{{ url_for('admin.update_club') }}" method="POST">
                         <div class="flex flex-col md:flex-row gap-8 items-center mb-10 pb-10 border-b border-white/5">
                             <div
                                 class="w-24 h-24 gradient-primary rounded-[32px] flex items-center justify-center text-3xl font-black shadow-2xl relative group cursor-pointer">
@@ -379,7 +394,8 @@
                             </div>
                             <div class="flex-1 text-center md:text-left">
                                 <h4 class="font-black text-xl mb-1">Logo du Club</h4>
-                                <p class="text-xs text-white/40 font-medium mb-4 italic">Format recommandé: SVG ou PNG
+                                <p class="text-xs text-white/40 light:text-slate-500 font-medium mb-4 italic">Format
+                                    recommandé: SVG ou PNG
                                     (512x512px)</p>
                                 <button type="button"
                                     class="btn-primary px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest">Choisir
@@ -390,7 +406,7 @@
                         <div class="grid grid-cols-2 gap-6">
                             <div class="col-span-2">
                                 <label
-                                    class="block text-[10px] font-black uppercase tracking-widest text-white/20 mb-2 ml-1">Nom
+                                    class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Nom
                                     Public du Club</label>
                                 <input type="text" name="name" value="{{ club.name if club else 'Club Elite' }}"
                                     required
@@ -398,19 +414,19 @@
                             </div>
                             <div class="col-span-2">
                                 <label
-                                    class="block text-[10px] font-black uppercase tracking-widest text-white/20 mb-2 ml-1">Description</label>
+                                    class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Description</label>
                                 <textarea name="description" rows="3"
                                     class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 italic font-medium">{{ club.description or '' }}</textarea>
                             </div>
                             <div>
                                 <label
-                                    class="block text-[10px] font-black uppercase tracking-widest text-white/20 mb-2 ml-1">Ville</label>
+                                    class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Ville</label>
                                 <input type="text" name="city" value="{{ club.city or 'Paris' }}"
                                     class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 italic font-medium">
                             </div>
                             <div>
                                 <label
-                                    class="block text-[10px] font-black uppercase tracking-widest text-white/20 mb-2 ml-1">Année
+                                    class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Année
                                     de Fondation</label>
                                 <input type="number" name="founded_year" value="{{ club.founded_year or 1992 }}"
                                     class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 italic font-medium">
@@ -446,26 +462,26 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label
-                            class="block text-[10px] font-black uppercase tracking-widest text-white/20 mb-2 ml-1">Prénom</label>
+                            class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Prénom</label>
                         <input type="text" name="first_name" required
                             class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium">
                     </div>
                     <div>
                         <label
-                            class="block text-[10px] font-black uppercase tracking-widest text-white/20 mb-2 ml-1">Nom</label>
+                            class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Nom</label>
                         <input type="text" name="last_name" required
                             class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium">
                     </div>
                 </div>
                 <div>
                     <label
-                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 mb-2 ml-1">Email</label>
+                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Email</label>
                     <input type="email" name="email" required
                         class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium">
                 </div>
                 <div>
                     <label
-                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 mb-2 ml-1">Rôle</label>
+                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Rôle</label>
                     <select name="role"
                         class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium appearance-none">
                         <option value="player" class="bg-slate-900">Joueur</option>
@@ -476,7 +492,8 @@
                     <button type="submit"
                         class="gradient-primary w-full py-5 rounded-3xl text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.01] active:scale-95 transition-all">CRÉER
                         LE COMPTE</button>
-                    <p class="text-center mt-6 text-[10px] text-white/20 font-black uppercase tracking-[0.2em] italic">
+                    <p
+                        class="text-center mt-6 text-[10px] text-white/20 light:text-slate-400 font-black uppercase tracking-[0.2em] italic">
                         Un mot de passe par défaut sera généré.</p>
                 </div>
             </form>
@@ -516,8 +533,14 @@
             if (tab) tab.classList.add('hidden');
             if (nav) {
                 nav.classList.remove('active');
-                nav.querySelector('span:first-of-type')?.classList.remove('text-white');
-                nav.querySelector('span:first-of-type')?.classList.add('text-gray-400');
+                // Remove white text from inactive
+                const span = nav.querySelector('span');
+                if (span) {
+                    span.classList.remove('text-white');
+                    span.classList.add('text-gray-400');
+                }
+                const icon = nav.querySelector('i');
+                if (icon) icon.classList.replace('opacity-100', 'opacity-50');
             }
         });
 
@@ -526,10 +549,27 @@
         if (activeTab) activeTab.classList.remove('hidden');
         if (activeNav) {
             activeNav.classList.add('active');
-            activeNav.querySelector('span:first-of-type')?.classList.remove('text-gray-400');
-            activeNav.querySelector('span:first-of-type')?.classList.add('text-white');
+            const span = activeNav.querySelector('span');
+            if (span) {
+                span.classList.remove('text-gray-400');
+                span.classList.add('text-white');
+            }
+            const icon = activeNav.querySelector('i');
+            if (icon) icon.classList.replace('opacity-50', 'opacity-100');
         }
+        // Update URL hash without jumping
+        history.replaceState(null, null, '#' + tabId);
     }
+
+    // Initialize from Hash
+    document.addEventListener('DOMContentLoaded', () => {
+        const hash = window.location.hash.replace('#', '');
+        if (['members', 'subscription', 'metrics', 'settings'].includes(hash)) {
+            switchTab(hash);
+        } else {
+            switchTab('members');
+        }
+    });
 </script>
 
 <style>
@@ -539,5 +579,3 @@
     }
 </style>
 {% endblock %}
-
-

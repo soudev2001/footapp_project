@@ -6,4 +6,5 @@ from .auth import auth_bp
 from .admin import admin_bp
 from .coach import coach_bp
 from .player import player_bp
+from .isy import isy_bp
 

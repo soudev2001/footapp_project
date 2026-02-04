@@ -1,170 +1,193 @@
 {% extends "base.html" %}
-{% block title %}Notifications - FootLogic{% endblock %}
+{% block title %}Centre de Notifications Elite - FootLogic{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-6">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Notifications</h1>
-        <button onclick="markAllRead()" class="text-sm text-primary-400 font-bold hover:text-primary-300 transition">
-            Tout marquer lu
+<div class="max-w-2xl mx-auto px-4 py-8 page-enter">
+    <!-- Elite Header -->
+    <div class="flex justify-between items-center mb-12">
+        <div>
+            <h1 class="text-4xl font-black italic uppercase tracking-tighter flex items-center gap-4">
+                <span
+                    class="w-12 h-12 gradient-accent rounded-2xl flex items-center justify-center shadow-2xl shadow-amber-500/20">
+                    <i class="fa-solid fa-bell text-black text-xl"></i>
+                </span>
+                Notifications
+            </h1>
+            <p class="text-white/40 mt-2 font-medium italic tracking-wide">Restez informé de votre progression et de la
+                vie du club.</p>
+        </div>
+        <button onclick="markAllRead()"
+            class="text-[10px] font-black uppercase tracking-widest text-primary-400 hover:text-white transition-colors flex items-center gap-2 group">
+            TOUT MARQUER LU
+            <i class="fa-solid fa-check-double transition-transform group-hover:scale-125"></i>
         </button>
     </div>
 
-    <!-- Today -->
-    <div class="mb-4">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-1">Aujourd'hui</p>
+    <!-- Timeline Sections -->
+    <div class="space-y-12">
+        <!-- Today Section -->
+        <div>
+            <h3
+                class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-6 flex items-center gap-3 px-2">
+                <span class="w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
+                AUJOURD'HUI
+            </h3>
 
-        <!-- Notification: Convocation -->
-        <div class="card p-4 mb-3 flex gap-4 cursor-pointer hover:border-green-500/30 notification unread" data-id="1">
-            <div
-                class="w-12 h-12 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-calendar-check text-lg"></i>
-            </div>
-            <div class="flex-1">
-                <p class="text-sm">Vous avez été <strong class="text-green-400">convoqué</strong> pour le match contre
-                    <span class="font-bold">Racing FC</span>.</p>
-                <a href="/calendar"
-                    class="text-xs text-primary-400 font-bold mt-1 inline-block hover:text-primary-300">Répondre
-                    maintenant →</a>
-            </div>
-            <div class="flex flex-col items-end gap-2">
-                <span class="text-[10px] text-gray-500">14:30</span>
-                <span class="unread-dot w-2 h-2 rounded-full bg-primary-500"></span>
+            <div class="space-y-4">
+                <!-- Notification: Convocation -->
+                <div class="glass p-6 rounded-[36px] border-white/5 flex gap-6 cursor-pointer hover:bg-white/5 transition-all duration-500 relative group overflow-hidden animate-slide-in unread"
+                    style="--idx: 1">
+                    <div
+                        class="absolute inset-0 bg-primary-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity">
+                    </div>
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-green-500/10 text-green-400 flex items-center justify-center flex-shrink-0 border border-green-500/10 group-hover:rotate-6 transition-transform">
+                        <i class="fa-solid fa-calendar-check text-xl"></i>
+                    </div>
+                    <div class="flex-1 pt-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4
+                                class="font-black italic text-lg tracking-tight uppercase group-hover:text-green-400 transition-colors">
+                                Convocations Match</h4>
+                            <span class="text-[10px] font-black text-white/20 uppercase tracking-widest">14:30</span>
+                        </div>
+                        <p class="text-sm text-white/60 italic font-medium leading-relaxed">
+                            Vous avez été sélectionné pour la rencontre Elite contre <span
+                                class="text-primary-400 font-bold">Racing FC</span>. Confirmez votre présence !
+                        </p>
+                        <div class="mt-4 flex gap-4">
+                            <a href="/calendar"
+                                class="text-[9px] font-black uppercase tracking-widest bg-primary-500 text-black px-4 py-2 rounded-xl shadow-lg shadow-primary-500/20 hover:scale-105 transition-all active:scale-95">RÉPONDRE</a>
+                            <button
+                                class="text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors">IGNORER</button>
+                        </div>
+                    </div>
+                    <div
+                        class="w-2.5 h-2.5 rounded-full bg-primary-500 shadow-[0_0_10px_rgba(132,204,22,0.8)] flex-shrink-0 mt-2 unread-dot">
+                    </div>
+                </div>
+
+                <!-- Notification: Dynamic Group Message -->
+                <div class="glass p-6 rounded-[36px] border-white/5 flex gap-6 cursor-pointer hover:bg-white/5 transition-all unread animate-slide-in"
+                    style="--idx: 2">
+                    <div
+                        class="w-16 h-16 rounded-[24px] overflow-hidden flex-shrink-0 border-2 border-primary-500/20 p-0.5">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                            class="w-full h-full object-cover rounded-[20px]">
+                    </div>
+                    <div class="flex-1 pt-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4
+                                class="font-black italic text-lg tracking-tight uppercase group-hover:text-primary-400 transition-colors">
+                                Coach Thomas</h4>
+                            <span class="text-[10px] font-black text-white/20 uppercase tracking-widest">10:45</span>
+                        </div>
+                        <p class="msg-preview text-sm text-white/40 italic font-medium truncate">
+                            "N'oubliez pas les protège-tibias pour samedi, contrôle technique obligatoire."
+                        </p>
+                        <p class="text-[9px] font-black text-primary-400/60 uppercase tracking-widest mt-2 italic">DANS
+                            GROUPE U15 - SENIORS</p>
+                    </div>
+                    <div
+                        class="w-2.5 h-2.5 rounded-full bg-primary-500 shadow-[0_0_10px_rgba(132,204,22,0.8)] flex-shrink-0 mt-2 unread-dot">
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Notification: Message -->
-        <div class="card p-4 mb-3 flex gap-4 cursor-pointer hover:border-primary-500/30 notification unread"
-            data-id="2">
-            <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-full h-full object-cover">
-            </div>
-            <div class="flex-1">
-                <p class="text-sm"><span class="font-bold">Coach Thomas</span> a envoyé un message dans <span
-                        class="font-bold text-primary-400">Groupe U15</span>.</p>
-                <p class="text-xs text-gray-500 mt-1 truncate">"N'oubliez pas les protège-tibias pour samedi..."</p>
-            </div>
-            <span class="text-[10px] text-gray-500">10:45</span>
-        </div>
-    </div>
+        <!-- Yesterday Section -->
+        <div>
+            <h3
+                class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-6 flex items-center gap-3 px-2">
+                HIER
+            </h3>
 
-    <!-- Yesterday -->
-    <div class="mb-4">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-1">Hier</p>
+            <div class="space-y-4">
+                <!-- Shopping Alert -->
+                <div class="glass p-6 rounded-[36px] border-white/5 flex gap-6 cursor-pointer hover:bg-white/5 transition-all animate-slide-in"
+                    style="--idx: 3">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center flex-shrink-0 border border-amber-500/10">
+                        <i class="fa-solid fa-bag-shopping text-xl"></i>
+                    </div>
+                    <div class="flex-1 pt-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4
+                                class="font-black italic text-lg tracking-tight uppercase group-hover:text-amber-400 transition-colors">
+                                Boutique Elite</h4>
+                            <span class="text-[10px] font-black text-white/20 uppercase tracking-widest">H-24</span>
+                        </div>
+                        <p class="text-sm text-white/60 italic font-medium leading-relaxed">
+                            Nouvel article disponible : <span class="text-amber-400 font-bold">Pack Entraînement 2026 -
+                                Performance Edition</span>.
+                        </p>
+                    </div>
+                </div>
 
-        <!-- Notification: Shop -->
-        <div class="card p-4 mb-3 flex gap-4 cursor-pointer notification" data-id="3">
-            <div
-                class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-tag text-lg"></i>
+                <!-- Interaction Check -->
+                <div class="glass p-6 rounded-[36px] border-white/5 flex gap-6 cursor-pointer hover:bg-white/5 transition-all animate-slide-in"
+                    style="--idx: 4">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-red-500/10 text-red-500 flex items-center justify-center flex-shrink-0 border border-red-500/10">
+                        <i class="fa-solid fa-heart text-xl"></i>
+                    </div>
+                    <div class="flex-1 pt-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4
+                                class="font-black italic text-lg tracking-tight uppercase group-hover:text-red-400 transition-colors">
+                                Social Engagement</h4>
+                            <span class="text-[10px] font-black text-white/20 uppercase tracking-widest">H-26</span>
+                        </div>
+                        <p class="text-sm text-white/60 italic font-medium">
+                            <span class="text-white font-black">Romain</span> et <span class="text-white font-black">12
+                                autres membres</span> ont apprécié votre dernier commentaire.
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="flex-1">
-                <p class="text-sm">Nouvel article disponible dans la boutique : <strong class="text-amber-400">Pack
-                        Entraînement 2026</strong>.</p>
-            </div>
-            <span class="text-[10px] text-gray-500">Hier</span>
-        </div>
-
-        <!-- Notification: Like -->
-        <div class="card p-4 mb-3 flex gap-4 cursor-pointer notification" data-id="4">
-            <div class="w-12 h-12 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-heart text-lg"></i>
-            </div>
-            <div class="flex-1">
-                <p class="text-sm"><span class="font-bold">Romain</span> et <span class="font-bold">12 autres</span> ont
-                    aimé votre commentaire.</p>
-            </div>
-            <span class="text-[10px] text-gray-500">Hier</span>
-        </div>
-
-        <!-- Notification: Event Reminder -->
-        <div class="card p-4 mb-3 flex gap-4 cursor-pointer notification" data-id="5">
-            <div
-                class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-bell text-lg"></i>
-            </div>
-            <div class="flex-1">
-                <p class="text-sm"><strong class="text-amber-400">Rappel:</strong> Entraînement demain à 18h30 au
-                    Terrain B.</p>
-            </div>
-            <span class="text-[10px] text-gray-500">Hier</span>
-        </div>
-    </div>
-
-    <!-- Earlier -->
-    <div>
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-1">Cette semaine</p>
-
-        <!-- Notification: Goal -->
-        <div class="card p-4 mb-3 flex gap-4 cursor-pointer notification" data-id="6">
-            <div
-                class="w-12 h-12 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-futbol text-lg"></i>
-            </div>
-            <div class="flex-1">
-                <p class="text-sm">Félicitations ! Votre <strong class="text-green-400">but</strong> a été enregistré
-                    (FC Elite 2-1 Lyon FC).</p>
-            </div>
-            <span class="text-[10px] text-gray-500">Lun</span>
-        </div>
-
-        <!-- Notification: Document -->
-        <div class="card p-4 flex gap-4 cursor-pointer notification" data-id="7">
-            <div
-                class="w-12 h-12 rounded-xl bg-primary-500/20 text-primary-400 flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-file-pdf text-lg"></i>
-            </div>
-            <div class="flex-1">
-                <p class="text-sm">Nouveau document disponible : <strong>Convocation Officielle - Match J16</strong>.
-                </p>
-            </div>
-            <span class="text-[10px] text-gray-500">Dim</span>
         </div>
     </div>
 </div>
 
 <style>
-    .notification.unread {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
-        border-color: rgba(99, 102, 241, 0.2);
+    .unread {
+        background: linear-gradient(135deg, rgba(132, 204, 22, 0.05), transparent);
+        border-color: rgba(132, 204, 22, 0.1);
     }
 
-    .notification:hover .unread-dot {
-        animation: pulse 1s infinite;
+    .animate-slide-in {
+        animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        animation-delay: calc(var(--idx) * 0.1s);
     }
 
-    @keyframes pulse {
-
-        0%,
-        100% {
-            opacity: 1;
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
         }
 
-        50% {
-            opacity: 0.5;
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
     }
 </style>
 
 <script>
     function markAllRead() {
-        document.querySelectorAll('.notification.unread').forEach(notif => {
-            notif.classList.remove('unread');
-            const dot = notif.querySelector('.unread-dot');
-            if (dot) dot.remove();
+        document.querySelectorAll('.unread').forEach(el => {
+            el.classList.remove('unread');
+            const dot = el.querySelector('.unread-dot');
+            if (dot) dot.style.display = 'none';
         });
     }
 
-    // Click to mark as read
-    document.querySelectorAll('.notification').forEach(notif => {
-        notif.addEventListener('click', function () {
+    document.querySelectorAll('.glass.cursor-pointer').forEach(el => {
+        el.addEventListener('click', function () {
             this.classList.remove('unread');
             const dot = this.querySelector('.unread-dot');
-            if (dot) dot.remove();
+            if (dot) dot.style.display = 'none';
         });
     });
 </script>
 {% endblock %}
-
-

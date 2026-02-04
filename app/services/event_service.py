@@ -138,3 +138,11 @@ class EventService:
         """Delete an event"""
         return self.collection.delete_one({'_id': ObjectId(event_id)})
 
+    def add_attendee(self, event_id, player_id):
+        """Alias for set_attendance with 'present' status"""
+        return self.set_attendance(event_id, player_id, 'present')
+
+    def remove_attendee(self, event_id, player_id):
+        """Alias for set_attendance with 'absent' status"""
+        return self.set_attendance(event_id, player_id, 'absent')
+

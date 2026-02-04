@@ -1,0 +1,104 @@
+{
+  "name": "FootLogic",
+  "short_name": "FootLogic",
+  "description": "La plateforme digitale du football amateur français - Gestion de clubs, équipes et joueurs",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#84cc16",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "fr-FR",
+  "categories": ["sports", "productivity", "social"],
+  "icons": [
+    {
+      "src": "/static/img/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/static/img/screenshots/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard FootLogic sur Desktop"
+    },
+    {
+      "src": "/static/img/screenshots/mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dashboard FootLogic sur Mobile"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tableau de Bord",
+      "short_name": "Dashboard",
+      "description": "Accéder au tableau de bord",
+      "url": "/app-home",
+      "icons": [{"src": "/static/img/icons/dashboard.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "Calendrier",
+      "short_name": "Agenda",
+      "description": "Voir le calendrier des événements",
+      "url": "/calendar",
+      "icons": [{"src": "/static/img/icons/calendar.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "Équipe",
+      "short_name": "Effectif",
+      "description": "Gérer l'effectif",
+      "url": "/roster",
+      "icons": [{"src": "/static/img/icons/team.png", "sizes": "96x96"}]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

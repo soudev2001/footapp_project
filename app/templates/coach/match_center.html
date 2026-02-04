@@ -2,7 +2,8 @@
 {% block title %}Match Center Elite - FootLogic{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto page-enter px-4 py-8">
+<div class="page-enter max-w-7xl mx-auto px-4 py-8" id="match-center-config"
+    data-match-id="{{ selected_match._id if selected_match else '' }}">
     <!-- Match Selector (Top Bar) -->
     <div class="flex gap-4 overflow-x-auto pb-6 custom-scrollbar mb-8">
         {% for match in upcoming_matches %}
@@ -137,6 +138,11 @@
             <div class="glass p-8 rounded-[40px] border-white/5">
                 <h3 class="text-[10px] font-black uppercase tracking-[0.2em] mb-8 text-white/20">Actions Match</h3>
 
+                <a href="{{ url_for('main.match_live', match_id=selected_match._id) }}" target="_blank"
+                    class="w-full flex items-center justify-center gap-2 glass px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider text-primary-400 hover:bg-white/5 transition mb-6 border border-primary-500/20">
+                    <i class="fa-solid fa-satellite-dish animate-pulse"></i> Voir le Direct Public
+                </a>
+
                 <div class="grid grid-cols-2 gap-4">
                     <button onclick="showEventModal('goal')"
                         class="glass p-5 rounded-3xl border-white/5 hover:border-primary-500/30 transition-all flex flex-col items-center gap-3">
@@ -217,7 +223,7 @@
 </div>
 
 <script>
-    const matchId = "{{ selected_match._id if selected_match else '' }}";
+    const matchId = document.getElementById('match-center-config').getAttribute('data-match-id');
     let currentEventType = '';
 
     function showEventModal(type) {

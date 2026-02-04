@@ -1,79 +1,158 @@
 {% extends "base.html" %}
-{% block title %}Créer un Post - FootLogic{% endblock %}
+{% block title %}Créer un Contenu Elite - FootLogic{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-8">
-    <!-- Header Actions -->
-    <div class="flex items-center justify-between mb-8">
-        <div class="flex items-center gap-4">
+<div class="max-w-3xl mx-auto px-4 py-8 page-enter overflow-hidden">
+    <!-- Header Hero -->
+    <div class="flex items-center justify-between mb-12">
+        <div class="flex items-center gap-6">
             <a href="{{ url_for('main.feed') }}"
-                class="w-10 h-10 rounded-xl glass-light flex items-center justify-center hover:bg-white/10 transition">
-                <i class="fa-solid fa-xmark"></i>
+                class="w-12 h-12 glass rounded-2xl flex items-center justify-center hover:bg-white/10 transition-all active:scale-90 border border-white/10 group">
+                <i class="fa-solid fa-xmark text-sm group-hover:rotate-90 transition-transform"></i>
             </a>
-            <h1 class="text-xl font-bold">Nouvelle publication</h1>
+            <div>
+                <h1 class="text-3xl font-black italic uppercase tracking-tighter">Elite Studio</h1>
+                <p class="text-white/40 font-medium italic tracking-wide">Exprimez-vous au sein du club.</p>
+            </div>
         </div>
         <button
-            class="btn-primary px-6 py-2 rounded-xl font-bold transition shadow-lg shadow-primary-500/20">Publier</button>
+            class="gradient-primary px-10 py-4 rounded-2xl font-black italic uppercase tracking-widest text-xs shadow-xl shadow-primary-500/20 hover:scale-[1.05] active:scale-95 transition-all">
+            PUBLIER
+        </button>
     </div>
 
-    <!-- Main Editor -->
-    <div class="card p-6 shadow-2xl">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="w-12 h-12 rounded-full gradient-primary flex items-center justify-center shadow-lg">
-                <i class="fa-solid fa-shield-cat text-white"></i>
-            </div>
-            <div>
-                <p class="font-bold text-white">FC Elite Officiel</p>
-                <div
-                    class="flex items-center gap-1.5 text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
-                    <i class="fa-solid fa-earth-americas text-primary-400"></i>
-                    <span>Public</span>
-                    <i class="fa-solid fa-chevron-down text-[8px]"></i>
+    <!-- Main Creative Matrix -->
+    <div class="grid lg:grid-cols-12 gap-8">
+        <!-- Text Editor & Content -->
+        <div class="lg:col-span-8 space-y-6">
+            <div class="glass p-10 rounded-[48px] border-white/5 relative overflow-hidden group">
+                <div class="absolute -right-20 -top-20 w-64 h-64 bg-primary-500/5 rounded-full blur-[100px]"></div>
+
+                <div class="flex items-center gap-6 mb-10 relative z-10">
+                    <div class="relative group/avatar cursor-pointer">
+                        <div
+                            class="w-16 h-16 rounded-[24px] p-0.5 bg-gradient-to-br from-primary-500 to-amber-500 group-hover/avatar:scale-105 transition-transform duration-500 shadow-xl">
+                            <div
+                                class="w-full h-full rounded-[22px] border-[3px] border-black overflow-hidden bg-surface-950">
+                                <img src="{{ user.profile.avatar or 'https://ui-avatars.com/api/?name=' + user.profile.first_name }}"
+                                    class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                        <div
+                            class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-[3px] border-black shadow-lg">
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-black italic text-lg tracking-tight uppercase">{{ user.profile.first_name }} {{
+                            user.profile.last_name }}</h4>
+                        <div class="flex items-center gap-3 mt-1 cursor-pointer hover:opacity-70 transition-opacity">
+                            <i class="fa-solid fa-earth-americas text-[10px] text-primary-400"></i>
+                            <span class="text-[9px] text-white/40 font-black uppercase tracking-[0.2em] italic">Visible
+                                par tout le Club</span>
+                            <i class="fa-solid fa-chevron-down text-[8px] text-white/20"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <textarea placeholder="Partagez un résultat, une annonce technique ou un moment fort..."
+                    class="w-full bg-transparent border-none p-0 text-2xl font-black italic tracking-tight text-white placeholder-white/10 focus:ring-0 resize-none h-64 mb-8 leading-[1.3] relative z-10"></textarea>
+
+                <!-- Premium Media Preview Area -->
+                <div id="previewArea"
+                    class="hidden relative aspect-video rounded-[36px] overflow-hidden mb-10 group/preview animate-slide-up shadow-2xl border-4 border-white/5">
+                    <img id="previewImage" src=""
+                        class="w-full h-full object-cover filter saturate-[1.1] scale-105 group-hover/preview:scale-110 transition-transform duration-[10s] linear">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <button onclick="removeMedia()"
+                        class="absolute top-6 right-6 w-12 h-12 glass bg-black/50 backdrop-blur-xl text-white rounded-2xl flex items-center justify-center hover:bg-red-500 transition-all border border-white/10 shadow-2xl">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </button>
+                    <div class="absolute bottom-6 left-6 flex items-center gap-3">
+                        <span
+                            class="px-3 py-1.5 rounded-xl bg-primary-500 text-black text-[9px] font-black uppercase tracking-widest italic">Aperçu
+                            Elite</span>
+                    </div>
+                </div>
+
+                <!-- Fast Actions Bar -->
+                <div class="border-t border-white/5 pt-8 grid grid-cols-4 gap-4 relative z-10">
+                    <button onclick="simulateUpload()"
+                        class="flex flex-col items-center gap-3 group/tool hover:bg-white/5 p-4 rounded-3xl transition-all">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-green-500/10 text-green-400 flex items-center justify-center border border-green-500/10 group-hover/tool:scale-110 group-hover/tool:bg-green-500 group-hover/tool:text-black transition-all">
+                            <i class="fa-solid fa-image-polaroid text-lg"></i>
+                        </div>
+                        <span
+                            class="text-[9px] font-black text-white/20 uppercase tracking-widest group-hover/tool:text-white transition-colors">Capture</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center gap-3 group/tool hover:bg-white/5 p-4 rounded-3xl transition-all">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-primary-500/10 text-primary-400 flex items-center justify-center border border-primary-500/10 group-hover/tool:scale-110 group-hover/tool:bg-primary-500 group-hover/tool:text-black transition-all">
+                            <i class="fa-solid fa-play-pause text-lg"></i>
+                        </div>
+                        <span
+                            class="text-[9px] font-black text-white/20 uppercase tracking-widest group-hover/tool:text-white transition-colors">Clip</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center gap-3 group/tool hover:bg-white/5 p-4 rounded-3xl transition-all">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/10 group-hover/tool:scale-110 group-hover/tool:bg-amber-500 group-hover/tool:text-black transition-all">
+                            <i class="fa-solid fa-ranking-star text-lg"></i>
+                        </div>
+                        <span
+                            class="text-[9px] font-black text-white/20 uppercase tracking-widest group-hover/tool:text-white transition-colors">Stats</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center gap-3 group/tool hover:bg-white/5 p-4 rounded-3xl transition-all">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-red-400/10 text-red-400 flex items-center justify-center border border-red-400/10 group-hover/tool:scale-110 group-hover/tool:bg-red-400 group-hover/tool:text-black transition-all">
+                            <i class="fa-solid fa-map-location-dot text-lg"></i>
+                        </div>
+                        <span
+                            class="text-[9px] font-black text-white/20 uppercase tracking-widest group-hover/tool:text-white transition-colors">Lieu</span>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <textarea placeholder="Partagez un résultat, une annonce ou une photo avec le club..."
-            class="w-full bg-transparent border-none p-0 text-xl text-white placeholder-gray-600 focus:ring-0 resize-none h-48 mb-6"></textarea>
+        <!-- Meta Side Matrix -->
+        <div class="lg:col-span-4 space-y-6">
+            <div class="glass p-8 rounded-[40px] border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent">
+                <h3 class="text-[10px] font-black uppercase tracking-[.3em] text-white/20 mb-6 px-2">CONFIGURATIONS</h3>
 
-        <!-- Media Preview Area (Hidden by default) -->
-        <div id="previewArea" class="hidden relative aspect-video rounded-2xl overflow-hidden mb-6 group">
-            <img id="previewImage" src="" class="w-full h-full object-cover">
-            <button onclick="removeMedia()"
-                class="absolute top-4 right-4 w-10 h-10 bg-black/50 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-black/70 transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
+                <div class="space-y-4">
+                    <div
+                        class="flex items-center justify-between p-5 bg-white/5 rounded-2xl cursor-pointer hover:bg-white/10 transition-all border border-white/5">
+                        <div class="flex items-center gap-4">
+                            <i class="fa-solid fa-user-plus text-primary-400"></i>
+                            <span class="text-[10px] font-black uppercase tracking-widest">Identifier Coéquipiers</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-white/20 text-[10px]"></i>
+                    </div>
 
-        <!-- Attachment Bar -->
-        <div class="border-t border-white/5 pt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
-            <button onclick="simulateUpload()"
-                class="p-3 rounded-xl hover:bg-white/5 transition flex flex-col items-center gap-2 group">
-                <i class="fa-solid fa-image text-xl text-green-400 group-hover:scale-110 transition"></i>
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Photo</span>
-            </button>
-            <button class="p-3 rounded-xl hover:bg-white/5 transition flex flex-col items-center gap-2 group">
-                <i class="fa-solid fa-play text-xl text-primary-400 group-hover:scale-110 transition"></i>
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Vidéo</span>
-            </button>
-            <button class="p-3 rounded-xl hover:bg-white/5 transition flex flex-col items-center gap-2 group">
-                <i class="fa-solid fa-trophy text-xl text-amber-400 group-hover:scale-110 transition"></i>
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Score</span>
-            </button>
-            <button class="p-3 rounded-xl hover:bg-white/5 transition flex flex-col items-center gap-2 group">
-                <i class="fa-solid fa-location-dot text-xl text-red-400 group-hover:scale-110 transition"></i>
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Lieu</span>
-            </button>
-        </div>
-    </div>
+                    <div
+                        class="flex items-center justify-between p-5 bg-white/5 rounded-2xl cursor-pointer hover:bg-white/10 transition-all border border-white/5">
+                        <div class="flex items-center gap-4">
+                            <i class="fa-solid fa-comments-dollar text-amber-400"></i>
+                            <span class="text-[10px] font-black uppercase tracking-widest">Désactiver Comms</span>
+                        </div>
+                        <div class="w-10 h-6 bg-white/10 rounded-full flex items-center px-1">
+                            <div class="w-4 h-4 bg-white/20 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Options Card -->
-    <div class="mt-6 card p-4 flex items-center justify-between cursor-pointer hover:bg-white/5 transition">
-        <div class="flex items-center gap-3 text-gray-400">
-            <i class="fa-solid fa-user-tag"></i>
-            <span class="text-sm font-medium">Identifier des joueurs</span>
+            <div class="glass p-8 rounded-[40px] border-white/5 bg-gradient-to-tr from-primary-500/10 to-transparent">
+                <h3 class="text-[10px] font-black uppercase tracking-[.3em] text-white/20 mb-4 px-2 italic">ELITE TIP
+                </h3>
+                <p class="text-xs text-white/40 leading-relaxed font-medium italic">
+                    "Les publications avec des photos de haute qualité génèrent <span
+                        class="text-primary-400">2.4x</span> plus d'engagements de la part du staff technique."
+                </p>
+            </div>
         </div>
-        <i class="fa-solid fa-chevron-right text-gray-600 text-xs"></i>
     </div>
 </div>
 
@@ -81,7 +160,7 @@
     function simulateUpload() {
         const preview = document.getElementById('previewArea');
         const img = document.getElementById('previewImage');
-        img.src = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80';
+        img.src = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80';
         preview.classList.remove('hidden');
     }
 
@@ -90,5 +169,3 @@
     }
 </script>
 {% endblock %}
-
-

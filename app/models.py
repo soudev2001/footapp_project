@@ -118,6 +118,20 @@ POST_SCHEMA = {
     'category': str  # 'news', 'announcement', 'match_report'
 }
 
+CONTRACT_SCHEMA = {
+    '_id': ObjectId,
+    'club_id': ObjectId,
+    'user_id': ObjectId,
+    'role': str,        # 'player', 'coach'
+    'status': str,      # 'pending', 'active', 'rejected', 'expired'
+    'start_date': datetime,
+    'end_date': datetime,
+    'salary': int,      # Optional
+    'conditions': str,  # Text description
+    'created_at': datetime,
+    'updated_at': datetime
+}
+
 # ============================================================
 # MODEL HELPER FUNCTIONS
 # ============================================================

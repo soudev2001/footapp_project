@@ -1,664 +1,414 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navigation Demo - FootLogic V2</title>
+    <title>Elite Navigator - FootLogic</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            400: '#a3e635',
+                            500: '#84cc16',
+                            600: '#65a30d',
+                        },
+                        surface: {
+                            900: '#050505',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
+        body {
+            background-color: #020617;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(132, 204, 22, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(234, 179, 8, 0.05) 0px, transparent 50%);
         }
 
-        .card-hover {
-            transition: all 0.3s ease;
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        .text-gradient {
+            background: linear-gradient(to right, #a3e635, #facc15);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .pulse-dot {
-            animation: pulse 2s infinite;
+        .card-route {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes pulse {
+        .card-route:hover {
+            transform: translateY(-8px) scale(1.02);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(132, 204, 22, 0.3);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+        }
 
-            0%,
+        @keyframes spotlight {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+
             100% {
                 opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
             }
+        }
 
-            50% {
-                opacity: 0.5;
-            }
+        .spotlight {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(132, 204, 22, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: spotlight 2s ease-out forwards;
         }
     </style>
 </head>
 
-<body class="bg-gray-900 text-white min-h-screen">
+<body class="text-white min-h-screen selection:bg-primary-500/30">
+    <div class="spotlight top-0 left-1/2 -translate-x-1/2"></div>
 
-    <!-- Header -->
-    <header class="gradient-bg py-8 px-6">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-shield-cat text-4xl text-yellow-400"></i>
-                    <div>
-                        <h1 class="text-3xl font-extrabold">FootLogic V2</h1>
-                        <p class="text-primary-200 text-sm">Navigation & Routes Demo</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span
-                        class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
-                        <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
-                        34 Routes Active
-                    </span>
-                    <a href="/" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition">
-                        <i class="fa-solid fa-home mr-2"></i>Accueil
-                    </a>
-                </div>
+    <header class="relative z-10 pt-16 pb-12 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 animate-bounce">
+                <span class="w-2 h-2 bg-primary-500 rounded-full"></span>
+                <span class="text-[10px] font-black uppercase tracking-widest text-primary-400">FootLogic Elite
+                    Explorer</span>
             </div>
+            <h1 class="text-7xl font-black italic uppercase tracking-tighter mb-4 leading-none">
+                Elite <span class="text-gradient underline decoration-primary-500/30">Navigator</span>
+            </h1>
+            <p class="text-white/40 text-lg font-medium italic max-w-2xl mx-auto mb-12">
+                Explorez l'ensemble de l'écosystème digital FootLogic Elite. Toutes les routes, tous les services, une
+                seule interface.
+            </p>
 
-            <!-- Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white/10 rounded-xl p-4 backdrop-blur">
-                    <div class="text-3xl font-bold text-yellow-400" id="stat-routes">34</div>
-                    <div class="text-primary-200 text-sm">Pages</div>
+            <div class="flex flex-wrap justify-center gap-6">
+                <div class="glass px-8 py-4 rounded-3xl">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Total Routes</p>
+                    <p class="text-3xl font-black italic text-primary-400">42</p>
                 </div>
-                <div class="bg-white/10 rounded-xl p-4 backdrop-blur">
-                    <div class="text-3xl font-bold text-green-400" id="stat-api">8</div>
-                    <div class="text-primary-200 text-sm">API Endpoints</div>
+                <div class="glass px-8 py-4 rounded-3xl">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Status</p>
+                    <p class="text-3xl font-black italic text-green-400">READY</p>
                 </div>
-                <div class="bg-white/10 rounded-xl p-4 backdrop-blur">
-                    <div class="text-3xl font-bold text-amber-400">5</div>
-                    <div class="text-primary-200 text-sm">Categories</div>
+                <div class="glass px-8 py-4 rounded-3xl">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Services</p>
+                    <p class="text-3xl font-black italic text-amber-400">PRO</p>
                 </div>
-                <div class="bg-white/10 rounded-xl p-4 backdrop-blur">
-                    <div class="text-3xl font-bold text-amber-400">MongoDB</div>
-                    <div class="text-primary-200 text-sm">Database</div>
-                </div>
+                <a href="/"
+                    class="px-10 py-5 bg-white text-black rounded-3xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform">
+                    RETOUR ACCUEIL
+                </a>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto py-8 px-6">
+    <main class="relative z-10 max-w-7xl mx-auto px-6 pb-24 space-y-20">
+        <!-- New: ISY MANAGEMENT SECTION -->
+        <section>
+            <div class="flex items-center gap-4 mb-8">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-primary-500/20 flex items-center justify-center text-primary-400 text-xl border border-primary-500/10">
+                    <i class="fa-solid fa-rocket"></i>
+                </div>
+                <h2 class="text-3xl font-black italic uppercase tracking-tight">Isy Management <span
+                        class="text-primary-500">Suite</span></h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="/isy/hub" class="card-route glass p-8 rounded-[40px] flex flex-col group">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-black text-2xl mb-8 group-hover:rotate-12 transition-transform">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <h3 class="font-black italic uppercase text-lg mb-2">ISY HUB</h3>
+                    <p class="text-white/40 text-xs italic font-medium">Tableau de bord de gestion globale du club.</p>
+                    <div class="mt-auto pt-6 text-[10px] font-bold tracking-widest text-primary-400">/isy/hub</div>
+                </a>
+                <a href="/isy/payments" class="card-route glass p-8 rounded-[40px] flex flex-col group">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white/60 text-2xl mb-8 border border-white/10 group-hover:bg-primary-500 group-hover:text-black transition-all">
+                        <i class="fa-solid fa-credit-card"></i>
+                    </div>
+                    <h3 class="font-black italic uppercase text-lg mb-2">COTISATIONS</h3>
+                    <p class="text-white/40 text-xs italic font-medium">Suivi des paiements et finances membres.</p>
+                    <div class="mt-auto pt-6 text-[10px] font-bold tracking-widest text-primary-400">/isy/payments</div>
+                </a>
+                <a href="/isy/sponsors" class="card-route glass p-8 rounded-[40px] flex flex-col group">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white/60 text-2xl mb-8 border border-white/10 group-hover:bg-amber-500 group-hover:text-black transition-all">
+                        <i class="fa-solid fa-handshake"></i>
+                    </div>
+                    <h3 class="font-black italic uppercase text-lg mb-2">SPONSORS</h3>
+                    <p class="text-white/40 text-xs italic font-medium">Gestion des partenaires et du sponsoring.</p>
+                    <div class="mt-auto pt-6 text-[10px] font-bold tracking-widest text-primary-400">/isy/sponsors</div>
+                </a>
+            </div>
+        </section>
 
-        <!-- Authentication Routes -->
-        <section class="mb-10">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-lock text-primary-400"></i>
-                Authentication
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <a href="/login"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-primary-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-right-to-bracket text-primary-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Connexion</div>
-                            <div class="text-gray-400 text-xs">/login</div>
-                        </div>
+        <!-- APP CORE SECTION -->
+        <section>
+            <div class="flex items-center gap-4 mb-8">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center text-amber-500 text-xl border border-amber-500/10">
+                    <i class="fa-solid fa-futbol"></i>
+                </div>
+                <h2 class="text-3xl font-black italic uppercase tracking-tight">Core Application</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="/app-home" class="card-route glass p-8 rounded-[40px] group">
+                    <i
+                        class="fa-solid fa-house text-white/20 text-3xl mb-6 group-hover:text-primary-400 block transition-colors"></i>
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Home Base</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-white/20">/app-home</div>
+                </a>
+                <a href="/feed" class="card-route glass p-8 rounded-[40px] group">
+                    <i
+                        class="fa-solid fa-rss text-white/20 text-3xl mb-6 group-hover:text-orange-400 block transition-colors"></i>
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Social Feed</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-white/20">/feed</div>
+                </a>
+                <a href="/calendar" class="card-route glass p-8 rounded-[40px] group">
+                    <i
+                        class="fa-solid fa-calendar-days text-white/20 text-3xl mb-6 group-hover:text-red-400 block transition-colors"></i>
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Calendar</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-white/20">/calendar</div>
+                </a>
+                <a href="/chat-inbox" class="card-route glass p-8 rounded-[40px] group">
+                    <i
+                        class="fa-solid fa-comments text-white/20 text-3xl mb-6 group-hover:text-blue-400 block transition-colors"></i>
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Messages</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-white/20">/chat-inbox</div>
+                </a>
+                <a href="/notifications" class="card-route glass p-8 rounded-[40px] group">
+                    <i
+                        class="fa-solid fa-bell text-white/20 text-3xl mb-6 group-hover:text-yellow-400 block transition-colors"></i>
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Notifications</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-white/20">/notifications</div>
+                </a>
+                <a href="/documents" class="card-route glass p-8 rounded-[40px] group">
+                    <i
+                        class="fa-solid fa-file-invoice text-white/20 text-3xl mb-6 group-hover:text-primary-400 block transition-colors"></i>
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Vault</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-white/20">/documents</div>
+                </a>
+                <a href="/gallery" class="card-route glass p-8 rounded-[40px] group">
+                    <i
+                        class="fa-solid fa-images text-white/20 text-3xl mb-6 group-hover:text-purple-400 block transition-colors"></i>
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Galerie</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-white/20">/gallery</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- COACHING STRATEGY -->
+        <section>
+            <div class="flex items-center gap-4 mb-8">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400 text-xl border border-blue-500/10">
+                    <i class="fa-solid fa-whistle"></i>
+                </div>
+                <h2 class="text-3xl font-black italic uppercase tracking-tight">Strategy Lab</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="/coach/dashboard" class="card-route glass p-8 rounded-[40px] group">
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Coach Dashboard</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-primary-400">/coach/dashboard</div>
+                </a>
+                <a href="/coach/roster" class="card-route glass p-8 rounded-[40px] group">
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Squad Management</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-primary-400">/coach/roster</div>
+                </a>
+                <a href="/coach/tactics" class="card-route glass p-8 rounded-[40px] group">
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Tactical Board</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-primary-400">/coach/tactics</div>
+                </a>
+                <a href="/coach/match-center" class="card-route glass p-8 rounded-[40px] group">
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Match Center</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-primary-400">/coach/match-center</div>
+                </a>
+                <a href="/coach/scouting" class="card-route glass p-8 rounded-[40px] group">
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Scouting Info</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-primary-400">/coach/scouting</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- PLAYER HUB -->
+        <section>
+            <div class="flex items-center gap-4 mb-8">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-primary-500/20 flex items-center justify-center text-primary-400 text-xl border border-primary-500/10">
+                    <i class="fa-solid fa-running"></i>
+                </div>
+                <h2 class="text-3xl font-black italic uppercase tracking-tight">Performance Hub</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="/player/home" class="card-route glass p-8 rounded-[40px] group">
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Player Home</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-primary-400">/player/home</div>
+                </a>
+                <a href="/player/evo-hub" class="card-route glass p-8 rounded-[40px] group">
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Evolution HUB</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-primary-400">/player/evo-hub</div>
+                </a>
+                <a href="/player/team" class="card-route glass p-8 rounded-[40px] group">
+                    <h3 class="font-black italic uppercase text-lg leading-tight">My Team</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-primary-400">/player/team</div>
+                </a>
+                <a href="/player/contracts" class="card-route glass p-8 rounded-[40px] group">
+                    <h3 class="font-black italic uppercase text-lg leading-tight">Contracts</h3>
+                    <div class="mt-4 text-[10px] font-bold tracking-widest text-primary-400">/player/contracts</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- AUTH & SETTINGS -->
+        <section>
+            <div class="flex items-center gap-4 mb-8">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 text-xl border border-white/10">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h2 class="text-3xl font-black italic uppercase tracking-tight">Gateway & Profile</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="/login" class="card-route glass p-6 rounded-3xl flex items-center gap-6 group">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/20 group-hover:text-primary-400 transition-colors">
+                        <i class="fa-solid fa-right-to-bracket text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black italic uppercase text-sm tracking-tight">Connexion</h3>
+                        <p class="text-[9px] font-bold tracking-widest text-white/20">/login</p>
                     </div>
                 </a>
-                <a href="/register"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-primary-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-user-plus text-green-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Inscription</div>
-                            <div class="text-gray-400 text-xs">/register</div>
-                        </div>
+                <a href="/register" class="card-route glass p-6 rounded-3xl flex items-center gap-6 group">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/20 group-hover:text-primary-400 transition-colors">
+                        <i class="fa-solid fa-user-plus text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black italic uppercase text-sm tracking-tight">Inscription</h3>
+                        <p class="text-[9px] font-bold tracking-widest text-white/20">/register</p>
                     </div>
                 </a>
-                <a href="/forgot-password"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-primary-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-key text-yellow-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Mot de passe</div>
-                            <div class="text-gray-400 text-xs">/forgot-password</div>
-                        </div>
+                <a href="/profile" class="card-route glass p-6 rounded-3xl flex items-center gap-6 group">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/20 group-hover:text-primary-400 transition-colors">
+                        <i class="fa-solid fa-id-card text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black italic uppercase text-sm tracking-tight">Mon Profil</h3>
+                        <p class="text-[9px] font-bold tracking-widest text-white/20">/profile</p>
+                    </div>
+                </a>
+                <a href="/settings" class="card-route glass p-6 rounded-3xl flex items-center gap-6 group">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/20 group-hover:text-primary-400 transition-colors">
+                        <i class="fa-solid fa-gear text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black italic uppercase text-sm tracking-tight">Parametres</h3>
+                        <p class="text-[9px] font-bold tracking-widest text-white/20">/settings</p>
                     </div>
                 </a>
             </div>
         </section>
 
-        <!-- App Core Routes -->
-        <section class="mb-10">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-mobile-screen text-amber-400"></i>
-                Application Mobile
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <a href="/app-home"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-house text-amber-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Accueil App</div>
-                            <div class="text-gray-400 text-xs">/app-home</div>
-                        </div>
+        <!-- API DIRECTORY -->
+        <section class="glass p-12 rounded-[64px] border-white/5 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-transparent"></div>
+            <div class="relative z-10">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-10 mb-12">
+                    <div class="text-center md:text-left">
+                        <h2 class="text-4xl font-black italic uppercase tracking-tighter mb-2">API <span
+                                class="text-primary-500">Service Directory</span></h2>
+                        <p class="text-white/40 text-sm font-medium italic">Accès direct aux points de terminaison de
+                            données.</p>
                     </div>
-                </a>
-                <a href="/feed"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-newspaper text-orange-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Actualites</div>
-                            <div class="text-gray-400 text-xs">/feed</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/calendar"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-calendar-days text-red-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Calendrier</div>
-                            <div class="text-gray-400 text-xs">/calendar</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/roster"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-users text-primary-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Effectif</div>
-                            <div class="text-gray-400 text-xs">/roster</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/match-center"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-futbol text-green-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Match Center</div>
-                            <div class="text-gray-400 text-xs">/match-center</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/chat-inbox"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-comments text-primary-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Messagerie</div>
-                            <div class="text-gray-400 text-xs">/chat-inbox</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/notifications"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-bell text-amber-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Notifications</div>
-                            <div class="text-gray-400 text-xs">/notifications</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/gallery"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-images text-amber-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Galerie</div>
-                            <div class="text-gray-400 text-xs">/gallery</div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </section>
+                    <button onclick="seedDatabase()"
+                        class="px-10 py-5 bg-amber-500 text-black rounded-3xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform shadow-xl shadow-amber-500/20">
+                        RE-SEED DATABASE
+                    </button>
+                </div>
 
-        <!-- Profile & User Routes -->
-        <section class="mb-10">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-user text-green-400"></i>
-                Profil & Utilisateur
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <a href="/profile"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-green-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-id-card text-green-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Mon Profil</div>
-                            <div class="text-gray-400 text-xs">/profile</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/edit-profile"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-green-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-pen-to-square text-yellow-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Modifier Profil</div>
-                            <div class="text-gray-400 text-xs">/edit-profile</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/settings"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-green-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gray-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-gear text-gray-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Parametres</div>
-                            <div class="text-gray-400 text-xs">/settings</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/documents"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-green-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-file-lines text-primary-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Documents</div>
-                            <div class="text-gray-400 text-xs">/documents</div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </section>
-
-        <!-- Club Management -->
-        <section class="mb-10">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-clipboard text-yellow-400"></i>
-                Gestion Club
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <a href="/dashboard"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-yellow-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-gauge text-yellow-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Dashboard</div>
-                            <div class="text-gray-400 text-xs">/dashboard</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/attendance"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-yellow-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-clipboard-check text-green-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Presences</div>
-                            <div class="text-gray-400 text-xs">/attendance</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/tactics"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-yellow-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-chess-board text-amber-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Tactiques</div>
-                            <div class="text-gray-400 text-xs">/tactics</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/create-event"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-yellow-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-calendar-plus text-primary-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Creer Evenement</div>
-                            <div class="text-gray-400 text-xs">/create-event</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/create-post"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-yellow-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-pen text-orange-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Creer Post</div>
-                            <div class="text-gray-400 text-xs">/create-post</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/event-training"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-yellow-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-dumbbell text-primary-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Entrainement</div>
-                            <div class="text-gray-400 text-xs">/event-training</div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </section>
-
-        <!-- Commerce & Public -->
-        <section class="mb-10">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-store text-amber-400"></i>
-                Commerce & Public
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <a href="/shop-product"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-shirt text-amber-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Boutique</div>
-                            <div class="text-gray-400 text-xs">/shop-product</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/checkout"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-credit-card text-green-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Paiement</div>
-                            <div class="text-gray-400 text-xs">/checkout</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/invoice"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-file-invoice text-yellow-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Facture</div>
-                            <div class="text-gray-400 text-xs">/invoice</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/reservations"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-ticket text-primary-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Reservations</div>
-                            <div class="text-gray-400 text-xs">/reservations</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/public-club"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-globe text-amber-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Page Club</div>
-                            <div class="text-gray-400 text-xs">/public-club</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/ranking"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-amber-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-ranking-star text-amber-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Classement</div>
-                            <div class="text-gray-400 text-xs">/ranking</div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </section>
-
-        <!-- Admin Routes -->
-        <section class="mb-10">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-shield-halved text-red-400"></i>
-                Administration
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <a href="/admin-panel"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-red-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-user-shield text-red-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Admin Panel</div>
-                            <div class="text-gray-400 text-xs">/admin-panel</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/architecture"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-red-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-sitemap text-amber-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Architecture</div>
-                            <div class="text-gray-400 text-xs">/architecture</div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </section>
-
-        <!-- Other Pages -->
-        <section class="mb-10">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-ellipsis text-gray-400"></i>
-                Autres
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <a href="/help"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-gray-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-circle-question text-primary-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Aide</div>
-                            <div class="text-gray-400 text-xs">/help</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/terms"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-gray-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gray-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-scale-balanced text-gray-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Mentions Legales</div>
-                            <div class="text-gray-400 text-xs">/terms</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/chat-conversation"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-gray-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-message text-amber-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Conversation</div>
-                            <div class="text-gray-400 text-xs">/chat-conversation</div>
-                        </div>
-                    </div>
-                </a>
-                <a href="/404"
-                    class="card-hover bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-gray-500">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-triangle-exclamation text-red-400"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Page 404</div>
-                            <div class="text-gray-400 text-xs">/404</div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </section>
-
-        <!-- API Endpoints -->
-        <section class="mb-10">
-            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-code text-primary-400"></i>
-                API Endpoints
-            </h2>
-            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="flex items-center gap-3 p-3 bg-gray-900 rounded-lg">
-                        <span class="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-1 rounded">GET</span>
-                        <code class="text-gray-300">/api/players</code>
-                        <a href="/api/players" target="_blank"
-                            class="ml-auto text-primary-400 hover:text-primary-300"><i
-                                class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    </div>
-                    <div class="flex items-center gap-3 p-3 bg-gray-900 rounded-lg">
-                        <span class="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-1 rounded">GET</span>
-                        <code class="text-gray-300">/api/clubs</code>
-                        <a href="/api/clubs" target="_blank" class="ml-auto text-primary-400 hover:text-primary-300"><i
-                                class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    </div>
-                    <div class="flex items-center gap-3 p-3 bg-gray-900 rounded-lg">
-                        <span class="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-1 rounded">GET</span>
-                        <code class="text-gray-300">/api/events</code>
-                        <a href="/api/events" target="_blank" class="ml-auto text-primary-400 hover:text-primary-300"><i
-                                class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    </div>
-                    <div class="flex items-center gap-3 p-3 bg-gray-900 rounded-lg">
-                        <span class="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-1 rounded">GET</span>
-                        <code class="text-gray-300">/api/matches</code>
-                        <a href="/api/matches" target="_blank"
-                            class="ml-auto text-primary-400 hover:text-primary-300"><i
-                                class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    </div>
-                    <div class="flex items-center gap-3 p-3 bg-gray-900 rounded-lg">
-                        <span class="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-1 rounded">GET</span>
-                        <code class="text-gray-300">/api/posts</code>
-                        <a href="/api/posts" target="_blank" class="ml-auto text-primary-400 hover:text-primary-300"><i
-                                class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    </div>
-                    <div class="flex items-center gap-3 p-3 bg-gray-900 rounded-lg">
-                        <span class="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-1 rounded">GET</span>
-                        <code class="text-gray-300">/api/stats</code>
-                        <a href="/api/stats" target="_blank" class="ml-auto text-primary-400 hover:text-primary-300"><i
-                                class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    </div>
-                    <div class="flex items-center gap-3 p-3 bg-gray-900 rounded-lg">
-                        <span class="bg-yellow-500/20 text-yellow-400 text-xs font-bold px-2 py-1 rounded">POST</span>
-                        <code class="text-gray-300">/api/seed</code>
-                        <button onclick="seedDatabase()"
-                            class="ml-auto bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded text-sm hover:bg-yellow-500/30 transition">Seed
-                            DB</button>
-                    </div>
-                    <div class="flex items-center gap-3 p-3 bg-gray-900 rounded-lg">
-                        <span class="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-1 rounded">GET</span>
-                        <code class="text-gray-300">/api/health</code>
-                        <a href="/api/health" target="_blank" class="ml-auto text-primary-400 hover:text-primary-300"><i
-                                class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {% for ep in [
+                    {'m': 'GET', 'u': '/api/players', 'c': 'green'},
+                    {'m': 'GET', 'u': '/api/clubs', 'c': 'green'},
+                    {'m': 'GET', 'u': '/api/events', 'c': 'green'},
+                    {'m': 'GET', 'u': '/api/matches', 'c': 'green'},
+                    {'m': 'GET', 'u': '/api/posts', 'c': 'green'},
+                    {'m': 'GET', 'u': '/api/stats', 'c': 'green'},
+                    {'m': 'GET', 'u': '/api/health', 'c': 'blue'}
+                    ] %}
+                    <a href="{{ ep.u }}" target="_blank"
+                        class="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-colors group">
+                        <span
+                            class="text-[8px] font-black uppercase px-2 py-1 rounded bg-{{ ep.c }}-500/20 text-{{ ep.c }}-400 border border-{{ ep.c }}-500/20">{{
+                            ep.m }}</span>
+                        <code class="text-xs font-bold text-white/60 group-hover:text-primary-400">{{ ep.u }}</code>
+                    </a>
+                    {% endfor %}
                 </div>
             </div>
         </section>
-
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 border-t border-gray-700 py-8 px-6">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
-            <div class="flex items-center gap-2 mb-4 md:mb-0">
-                <i class="fa-solid fa-shield-cat text-2xl text-gray-500"></i>
-                <span class="font-bold text-gray-400">FootLogic V2</span>
+    <footer class="relative z-10 py-12 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="flex items-center justify-center gap-3 mb-6">
+                <i class="fa-solid fa-shield-cat text-2xl text-primary-500"></i>
+                <span class="font-black italic uppercase tracking-widest text-sm">FootLogic Elite Platform</span>
             </div>
-            <div class="text-gray-500 text-sm">
-                Built with Flask + MongoDB + Tailwind CSS
-            </div>
+            <p class="text-white/10 text-[9px] font-black uppercase tracking-[0.4em]">Designed for Club Excellence •
+                SaaS Architecture v2.0</p>
         </div>
     </footer>
 
     <script>
         async function seedDatabase() {
-            if (!confirm('Seed the database with demo data? This will clear existing data.')) return;
-
+            if (!confirm('Re-peupler la base de données ? Les changements actuels seront perdus.')) return;
             try {
                 const res = await fetch('/api/seed', { method: 'POST' });
                 const data = await res.json();
                 if (data.success) {
-                    alert('Database seeded successfully!');
+                    alert('Base de données initialisée !');
                     location.reload();
                 } else {
-                    alert('Error: ' + data.error);
+                    alert('Erreur: ' + data.error);
                 }
             } catch (e) {
-                alert('Failed to seed database: ' + e.message);
+                alert('Échec: ' + e.message);
             }
         }
-
-        // Load stats
-        fetch('/api/stats')
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('stat-api').textContent = Object.values(data.data).reduce((a, b) => a + b, 0);
-                }
-            })
-            .catch(() => { });
     </script>
 </body>
 

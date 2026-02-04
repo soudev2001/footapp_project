@@ -3,8 +3,33 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{% block title %}FootLogic Elite{% endblock %}</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="description"
+        content="FootLogic - La plateforme digitale du football amateur français. Gestion de clubs, équipes et joueurs.">
+    <meta name="theme-color" content="#84cc16" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#65a30d" media="(prefers-color-scheme: light)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FootLogic">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="FootLogic">
+    <meta name="msapplication-TileColor" content="#020617">
+    <meta name="msapplication-config" content="/static/browserconfig.xml">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="32x32"
+        href="{{ url_for('static', filename='img/icons/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16"
+        href="{{ url_for('static', filename='img/icons/favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='img/icons/apple-touch-icon.png') }}">
+    <link rel="mask-icon" href="{{ url_for('static', filename='img/icons/safari-pinned-tab.svg') }}" color="#84cc16">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -73,119 +98,30 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
     <style>
-        body {
-            background-color: #020617;
-            /* surface-950 */
-            color: #ffffff;
-            transition: background-color 0.3s, color 0.3s;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
         }
 
-        .light body {
-            background-color: #f8fafc;
-            /* slate-50 */
-            color: #020617;
-            /* slate-950 */
+        ::-webkit-scrollbar-track {
+            background: transparent;
         }
 
-        /* Glass Effect */
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.5);
+            border-radius: 10px;
         }
 
-        .light .glass {
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid #e2e8f0;
-            /* slate-200 */
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.8);
         }
 
-        /* Light mode specific overrides */
-        .light .text-white\/40 {
-            color: #64748b;
-        }
-
-        .light .text-white\/20 {
-            color: #94a3b8;
-        }
-
-        .light .text-white\/10 {
-            color: #cbd5e1;
-        }
-
-        .light .border-white\/5 {
-            border-color: #e2e8f0;
-        }
-
-        .light .border-white\/10 {
-            border-color: #cbd5e1;
-        }
-
-        .light .bg-surface-950\/40 {
-            background-color: rgba(255, 255, 255, 0.4);
-        }
-
-        .light .text-gray-300 {
-            color: #475569;
-        }
-
-        .light .text-gray-400 {
-            color: #64748b;
-        }
-
-        .light .bg-white\/5 {
-            background-color: rgba(226, 232, 240, 0.5);
-        }
-
-        .light .hover\:bg-white\/5:hover {
-            background-color: #e2e8f0;
-        }
-
-        /* Responsive Safe Area */
+        /* Mobile nav safe area */
         .safe-area-inset-bottom {
             padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* Shimmer loading */
-        .shimmer {
-            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-
-        .light .shimmer {
-            background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.05) 50%, transparent 100%);
-        }
-
-        @keyframes shimmer {
-            0% {
-                background-position: -200% 0;
-            }
-
-            100% {
-                background-position: 200% 0;
-            }
-        }
-
-        /* Active nav item */
-        .nav-active {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .light .nav-active {
-            background-color: rgba(132, 204, 22, 0.1);
-            /* primary-500/10 */
-            color: #4d7c0f;
-            /* primary-700 */
-            border: 1px solid rgba(132, 204, 22, 0.2);
-        }
-
-        /* Logo visibility */
+        /* Logo visibility helpers */
         .light .light-logo {
             display: block !important;
         }
@@ -202,163 +138,159 @@
             display: none;
         }
 
-        /* Mobile nav glass effect */
-        .mobile-nav {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* Page transitions */
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .page-enter {
-            animation: slideUp 0.4s ease-out forwards;
+        /* Background Mesh for dynamic feel */
+        .gradient-mesh {
+            background-color: var(--bg-body);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(132, 204, 22, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(250, 204, 21, 0.15) 0px, transparent 50%);
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {% block head %}{% endblock %}
 </head>
 
-<body class="bg-surface-950 text-white min-h-screen flex flex-col overflow-x-hidden">
+<body class="bg-surface-950 text-white min-h-screen flex flex-col overflow-x-hidden"
+    data-authenticated="{{ 'true' if current_user.is_authenticated else 'false' }}">
     <!-- Background mesh -->
     <div class="fixed inset-0 gradient-mesh pointer-events-none"></div>
 
+    <!-- Mobile Header (visible on mobile only) -->
+    {% include 'components/_mobile_header.html' %}
+
+    <!-- Sidebar (mobile menu) -->
+    {% include 'components/_sidebar.html' %}
+
     <!-- Desktop Navbar -->
-    <nav class="hidden md:block glass fixed top-0 left-0 right-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-3">
-            <div class="flex justify-between items-center">
-                <!-- Logo -->
-                <a href="/" class="flex items-center gap-3 group">
-                    <div class="relative">
-                        <div
-                            class="absolute -inset-1 bg-gradient-to-r from-primary-600 to-accent-400 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-300">
-                        </div>
-                        <div
-                            class="relative w-12 h-12 rounded-xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300 overflow-hidden">
-                            <img src="{{ url_for('static', filename='img/logo_dark.png') }}"
-                                class="w-full h-full object-cover dark-logo">
-                            <img src="{{ url_for('static', filename='img/logo_light.png') }}"
-                                class="w-full h-full object-cover light-logo">
-                        </div>
-                    </div>
-                    <div class="flex flex-col">
-                        <span class="font-black text-xl tracking-tight leading-none italic uppercase">FOOT<span
-                                class="text-primary-500">LOGIC</span></span>
-                        <span class="text-[8px] font-bold text-gray-500 uppercase tracking-[0.2em] mt-0.5">SaaS
-                            Management</span>
-                    </div>
-                </a>
+    <!-- Top Glass Navbar -->
+    <nav class="hidden md:block fixed top-0 left-0 right-0 z-[100] h-20">
+        <div class="absolute inset-0 glass border-b border-white/5 shadow-2xl shadow-black/50"></div>
 
-                <!-- Navigation -->
-                <div class="flex items-center gap-1">
-                    {% for item in nav_items %}
-                    <a href="{{ item.url }}"
-                        class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200 group">
-                        <i
-                            class="fa-solid {{ item.icon }} text-primary-400 group-hover:scale-110 transition-transform"></i>
-                        <span>{{ item.name }}</span>
-                    </a>
-                    {% endfor %}
+        <div class="relative h-full max-w-7xl mx-auto px-6 flex items-center justify-between gap-12">
+            <!-- Brand Logo -->
+            <a href="/" class="flex items-center gap-4 group shrink-0">
+                <div class="relative w-12 h-12">
+                    <div
+                        class="absolute -inset-1 bg-gradient-to-r from-primary-500 to-amber-500 rounded-xl blur-[8px] opacity-20 group-hover:opacity-40 transition-all duration-700">
+                    </div>
+                    <div
+                        class="relative h-full w-full bg-surface-950 rounded-xl border border-white/10 flex items-center justify-center p-2.5 shadow-2xl overflow-hidden group-hover:scale-110 transition-transform duration-500">
+                        <img src="{{ url_for('static', filename='img/logo_dark.png') }}"
+                            class="w-full h-full object-contain dark-logo">
+                        <img src="{{ url_for('static', filename='img/logo_light.png') }}"
+                            class="w-full h-full object-contain light-logo">
+                    </div>
                 </div>
+                <div class="flex flex-col">
+                    <span class="text-xl font-black italic uppercase tracking-tighter leading-none">FOOT<span
+                            class="text-primary-500">LOGIC</span></span>
+                    <span class="text-[8px] font-black uppercase tracking-[0.3em] text-white/20 mt-1">ELITE
+                        PLATFORM</span>
+                </div>
+            </a>
 
-                <!-- Right Actions -->
-                <div class="flex items-center gap-3">
-                    <!-- Theme Toggle -->
+            <!-- Navigation Links -->
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
+                {% for item in nav_items %}
+                <a href="{{ item.url }}"
+                    class="flex items-center gap-3 px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all duration-300 group whitespace-nowrap">
+                    <i
+                        class="fa-solid {{ item.icon }} text-primary-500 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all"></i>
+                    {{ item.name }}
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- Global Actions -->
+            <div class="flex items-center gap-4 shrink-0">
+                <!-- Theme & Tools -->
+                <div class="flex items-center glass rounded-2xl p-1.5 border-white/5">
                     <button id="theme-toggle"
-                        class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all group overflow-hidden relative">
-                        <i id="theme-toggle-dark-icon"
-                            class="fa-solid fa-moon text-primary-400 group-hover:scale-110 transition-transform absolute dark:static dark:opacity-100 opacity-0 transform translate-y-10 dark:translate-y-0"></i>
-                        <i id="theme-toggle-light-icon"
-                            class="fa-solid fa-sun text-yellow-400 group-hover:scale-110 transition-transform absolute light:static light:opacity-100 opacity-0 transform translate-y-10 light:translate-y-0"></i>
+                        class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors text-white/40 hover:text-white">
+                        <i class="fa-solid fa-moon dark:block hidden text-sm"></i>
+                        <i class="fa-solid fa-sun dark:hidden block text-sm"></i>
                     </button>
 
                     <a href="{{ url_for('main.nav_demo') }}"
-                        class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
-                        title="Toutes les pages">
-                        <i class="fa-solid fa-compass text-gray-400 hover:text-white"></i>
+                        class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors text-white/40 hover:text-white"
+                        title="Navigateur Système">
+                        <i class="fa-solid fa-compass text-sm"></i>
                     </a>
+                </div>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.notifications') }}"
+                    class="w-10 h-10 flex items-center justify-center rounded-2xl hover:bg-white/5 transition-colors relative group">
+                    <i class="fa-solid fa-bell text-white/40 group-hover:text-primary-500 transition-colors"></i>
+                    <span
+                        class="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-primary-500 rounded-full border-2 border-surface-950 shadow-[0_0_10px_rgba(132,204,22,0.5)]"></span>
+                </a>
 
-                    {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('main.notifications') }}"
-                        class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors relative">
-                        <i class="fa-solid fa-bell text-gray-400 hover:text-white"></i>
-                        <span
-                            class="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full border-2 border-black badge-pulse"></span>
-                    </a>
-
-                    <div class="relative group">
-                        <button
-                            class="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-white/5 transition-colors">
-                            <div
-                                class="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center font-bold text-sm shadow-md">
-                                {{ current_user.profile.first_name[:1] if current_user.profile.first_name else 'U' }}
-                            </div>
-                            <span class="text-sm font-medium hidden lg:inline">{{ current_user.profile.first_name or
-                                'User' }}</span>
-                            <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
-                        </button>
-
-                        <!-- Dropdown -->
+                <div class="relative group">
+                    <button
+                        class="flex items-center gap-3 p-1.5 pr-4 rounded-2xl hover:bg-white/5 transition-all duration-300 border border-transparent hover:border-white/10 group">
                         <div
-                            class="absolute right-0 top-full mt-2 w-56 glass rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">
-                            <div class="p-4 border-b border-white/10">
-                                <div class="font-semibold">{{ current_user.profile.first_name }} {{
-                                    current_user.profile.last_name }}</div>
-                                <div class="text-xs text-gray-400 truncate">{{ current_user.email }}</div>
+                            class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center font-black text-black text-xs shadow-lg transform group-hover:rotate-6 transition-transform">
+                            {{ current_user.profile.first_name[:1] if current_user.profile.first_name else 'U' }}
+                        </div>
+                        <div class="flex flex-col items-start">
+                            <span class="text-[10px] font-black uppercase tracking-widest leading-none">
+                                {{ current_user.profile.first_name or 'Elite' }}
+                            </span>
+                            <span class="text-[8px] font-bold text-white/20 uppercase tracking-tighter mt-0.5">Membre
+                                Pro</span>
+                        </div>
+                    </button>
+
+                    <!-- Dropdown -->
+                    <div
+                        class="absolute right-0 top-full mt-2 w-64 glass rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 overflow-hidden z-[110]">
+                        <div class="p-6 border-b border-white/5 bg-white/[0.02]">
+                            <div class="font-black italic uppercase text-sm tracking-tight">
+                                {{ current_user.profile.first_name }} {{ current_user.profile.last_name }}
                             </div>
-                            <div class="p-2">
-                                <a href="{{ url_for('main.profile') }}"
-                                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-white/5 transition-colors">
-                                    <i class="fa-solid fa-user text-primary-400 w-4"></i>
-                                    Mon Profil
-                                </a>
-                                <a href="{{ url_for('main.settings') }}"
-                                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-white/5 transition-colors">
-                                    <i class="fa-solid fa-gear text-gray-400 w-4"></i>
-                                    Parametres
-                                </a>
-                                <hr class="my-2 border-white/10">
-                                <a href="{{ url_for('auth.logout') }}"
-                                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-colors">
-                                    <i class="fa-solid fa-right-from-bracket w-4"></i>
-                                    Deconnexion
-                                </a>
+                            <div class="text-[10px] text-white/20 font-bold uppercase tracking-widest mt-1 truncate">
+                                {{ current_user.email }}
                             </div>
                         </div>
+                        <div class="p-2">
+                            <a href="{{ url_for('main.profile') }}"
+                                class="flex items-center gap-4 px-4 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white/40 hover:text-white hover:bg-primary-500 hover:text-black transition-all group">
+                                <i class="fa-solid fa-user w-4 text-center"></i>Profil
+                            </a>
+                            <a href="{{ url_for('main.settings') }}"
+                                class="flex items-center gap-4 px-4 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all">
+                                <i class="fa-solid fa-gear w-4 text-center"></i>Settings
+                            </a>
+                            <div class="h-px bg-white/5 my-2 mx-4"></div>
+                            <a href="{{ url_for('auth.logout') }}"
+                                class="flex items-center gap-4 px-4 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest text-red-400 hover:bg-red-500/10 transition-all">
+                                <i class="fa-solid fa-power-off w-4 text-center"></i>Logout
+                            </a>
+                        </div>
                     </div>
-                    {% else %}
-                    <a href="{{ url_for('auth.login') }}"
-                        class="btn-primary px-5 py-2.5 rounded-xl text-sm font-semibold">
-                        Connexion
-                    </a>
-                    {% endif %}
                 </div>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}"
+                    class="px-8 py-3 bg-primary-500 text-black rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 hover:shadow-[0_0_20px_rgba(132,204,22,0.3)] transition-all">
+                    CONNEXION
+                </a>
+                {% endif %}
             </div>
         </div>
     </nav>
 
+
     <!-- Main Content -->
-    <main class="flex-1 pt-20 pb-24 md:pb-8 relative z-10">
+    <main class="flex-1 pt-16 md:pt-20 pb-20 md:pb-8 relative z-10">
         <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% with messages=get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div class="max-w-7xl mx-auto px-4 pt-4 space-y-2">
             {% for category, message in messages %}
             <div class="flex items-center gap-3 p-4 rounded-xl animate-slide-up
-                    {% if category == 'error' %}bg-red-500/20 border border-red-500/30 text-red-300
-                    {% elif category == 'success' %}bg-green-500/20 border border-green-500/30 text-green-300
-                    {% else %}bg-primary-500/20 border border-primary-500/30 text-primary-300{% endif %}">
+                        {% if category=='error' %} bg-red-500/20 border border-red-500/30 text-red-300
+                        {% elif category=='success' %} bg-green-500/20 border border-green-500/30 text-green-300
+                        {% else %} bg-primary-500/20 border border-primary-500/30 text-primary-300 {% endif %}">
                 <i
                     class="fa-solid {% if category == 'error' %}fa-circle-exclamation{% elif category == 'success' %}fa-circle-check{% else %}fa-circle-info{% endif %}"></i>
                 <span class="text-sm font-medium">{{ message }}</span>
@@ -368,80 +300,304 @@
         {% endif %}
         {% endwith %}
 
-        <div class="page-enter">
-            {% block content %}{% endblock %}
+        <div class="fixed inset-0 pointer-events-none z-0">
+            <div class="absolute top-[20%] left-[10%] w-96 h-96 bg-primary-500/10 rounded-full blur-[128px]">
+            </div>
+            <div class="absolute bottom-[20%] right-[10%] w-96 h-96 bg-amber-500/5 rounded-full blur-[128px]">
+            </div>
         </div>
+
+        {% block content %}{% endblock %}
     </main>
 
     <!-- Mobile Bottom Navigation -->
-    <nav class="md:hidden mobile-nav fixed bottom-0 left-0 right-0 z-50 px-2 py-3 safe-area-inset-bottom">
-        <div class="flex justify-around items-center max-w-md mx-auto">
+    <nav class="bottom-nav md:hidden">
+        <div class="bottom-nav-content">
             {% if current_user.is_authenticated %}
-            {% for item in nav_items[:5] %}
-            <a href="{{ item.url }}"
-                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
-                <i class="fa-solid {{ item.icon }} text-lg"></i>
-                <span class="text-[10px] font-medium">{{ item.name }}</span>
+            {% for item in nav_items[:4] %}
+            <a href="{{ item.url }}" class="bottom-nav-item">
+                <i class="fa-solid {{ item.icon }}"></i>
+                <span>{{ item.name }}</span>
             </a>
             {% endfor %}
             {% else %}
-            <a href="{{ url_for('main.index') }}"
-                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
-                <i class="fa-solid fa-house text-lg"></i>
-                <span class="text-[10px] font-medium">Accueil</span>
+            <a href="{{ url_for('main.index') }}" class="bottom-nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Accueil</span>
             </a>
-            <a href="{{ url_for('main.feed') }}"
-                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
-                <i class="fa-solid fa-newspaper text-lg"></i>
-                <span class="text-[10px] font-medium">News</span>
+            <a href="{{ url_for('main.feed') }}" class="bottom-nav-item">
+                <i class="fa-solid fa-newspaper"></i>
+                <span>News</span>
             </a>
-            <a href="{{ url_for('auth.login') }}"
-                class="flex items-center justify-center w-14 h-14 -mt-6 gradient-primary rounded-2xl shadow-lg shadow-primary-500/30">
-                <i class="fa-solid fa-right-to-bracket text-xl"></i>
+            <!-- Center Login Button -->
+            <a href="{{ url_for('auth.login') }}" class="bottom-nav-item bottom-nav-action gradient-primary">
+                <i class="fa-solid fa-right-to-bracket text-black"></i>
             </a>
-            <a href="{{ url_for('main.public_club') }}"
-                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
-                <i class="fa-solid fa-futbol text-lg"></i>
-                <span class="text-[10px] font-medium">Clubs</span>
+            <a href="{{ url_for('main.public_club') }}" class="bottom-nav-item">
+                <i class="fa-solid fa-futbol"></i>
+                <span>Clubs</span>
             </a>
-            <a href="{{ url_for('main.help') }}"
-                class="flex flex-col items-center gap-1 py-2 px-4 rounded-2xl text-gray-400 hover:text-white transition-all">
-                <i class="fa-solid fa-circle-question text-lg"></i>
-                <span class="text-[10px] font-medium">Aide</span>
+            <a href="{{ url_for('main.help') }}" class="bottom-nav-item">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>Aide</span>
             </a>
             {% endif %}
         </div>
     </nav>
-
     <script>
-        const themeToggleBtn = document.getElementById('theme-toggle');
+        // ========================================
+        // Theme Toggle Logic - Enhanced
+        // ========================================
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isLight = html.classList.contains('light');
 
-        themeToggleBtn.addEventListener('click', function () {
-            // toggle icons inside botton (optional since we use light: prefix)
-
-            // if set via local storage previously
-            if (localStorage.getItem('color-theme')) {
-                if (localStorage.getItem('color-theme') === 'light') {
-                    document.documentElement.classList.remove('light');
-                    localStorage.setItem('color-theme', 'dark');
-                } else {
-                    document.documentElement.classList.add('light');
-                    localStorage.setItem('color-theme', 'light');
-                }
+            if (isLight) {
+                html.classList.remove('light');
+                localStorage.setItem('color-theme', 'dark');
+                updateThemeColor('#020617');
             } else {
-                if (document.documentElement.classList.contains('light')) {
-                    document.documentElement.classList.remove('light');
-                    localStorage.setItem('color-theme', 'dark');
-                } else {
-                    document.documentElement.classList.add('light');
-                    localStorage.setItem('color-theme', 'light');
+                html.classList.add('light');
+                localStorage.setItem('color-theme', 'light');
+                updateThemeColor('#f1f5f9');
+            }
+
+            // Haptic feedback on mobile if available
+            if (navigator.vibrate) {
+                navigator.vibrate(10);
+            }
+        }
+
+        function updateThemeColor(color) {
+            const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+            if (metaThemeColor) {
+                metaThemeColor.setAttribute('content', color);
+            }
+        }
+
+        // Desktop theme toggle
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', toggleTheme);
+        }
+
+        // Mobile theme toggles
+        const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+        const mobileThemeTogglePublic = document.getElementById('mobile-theme-toggle-public');
+
+        if (mobileThemeToggle) {
+            mobileThemeToggle.addEventListener('click', toggleTheme);
+        }
+        if (mobileThemeTogglePublic) {
+            mobileThemeTogglePublic.addEventListener('click', toggleTheme);
+        }
+
+        // ========================================
+        // PWA Service Worker Registration
+        // ========================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/static/sw.js', {
+                        scope: '/'
+                    });
+                    console.log('[PWA] Service Worker registered:', registration.scope);
+
+                    // Check for updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        console.log('[PWA] New Service Worker installing...');
+
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // New version available - show update prompt
+                                showUpdatePrompt();
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.error('[PWA] Service Worker registration failed:', error);
                 }
+            });
+        }
+
+        // Show update prompt when new version is available
+        function showUpdatePrompt() {
+            const prompt = document.createElement('div');
+            prompt.className = 'fixed bottom-24 md:bottom-8 left-4 right-4 md:left-auto md:right-8 md:max-w-sm glass p-4 rounded-2xl shadow-2xl z-[100] animate-slide-up';
+            prompt.innerHTML = `
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center">
+                                <i class="fa-solid fa-arrow-rotate-right text-primary-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-sm">Mise à jour disponible</p>
+                                <p class="text-xs text-gray-400">Rafraîchir pour la nouvelle version</p>
+                            </div>
+                            <button onclick="window.location.reload()" class="px-4 py-2 gradient-primary rounded-xl text-xs font-bold">
+                                Rafraîchir
+                            </button>
+                        </div>
+                    `;
+            document.body.appendChild(prompt);
+
+            // Auto-dismiss after 10 seconds
+            setTimeout(() => prompt.remove(), 10000);
+        }
+
+        // ========================================
+        // Install Prompt (Add to Home Screen)
+        // Only show for authenticated users
+        // ========================================
+        let deferredPrompt;
+        const isAuthenticated = document.body.dataset.authenticated === 'true';
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Only show install prompt for authenticated users
+            if (isAuthenticated) {
+                setTimeout(() => {
+                    showInstallPrompt();
+                }, 30000); // Show after 30 seconds
+            }
+        });
+
+        function showInstallPrompt() {
+            if (!deferredPrompt) return;
+
+            const prompt = document.createElement('div');
+            prompt.id = 'install-prompt';
+            prompt.className = 'fixed bottom-24 md:bottom-8 left-4 right-4 md:left-auto md:right-8 md:max-w-sm glass p-4 rounded-2xl shadow-2xl z-[100] animate-slide-up';
+            prompt.innerHTML = `
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shadow-lg">
+                                <i class="fa-solid fa-download text-white text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-bold text-sm">Installer FootLogic</p>
+                                <p class="text-xs text-gray-400 mt-1">Accès rapide depuis votre écran d'accueil</p>
+                                <div class="flex gap-2 mt-3">
+                                    <button id="install-btn" class="px-4 py-2 gradient-primary rounded-xl text-xs font-bold">
+                                        Installer
+                                    </button>
+                                    <button id="dismiss-install" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-medium transition-colors">
+                                        Plus tard
+                                    </button>
+                                </div>
+                            </div>
+                            <button id="close-install" class="text-gray-400 hover:text-white transition-colors">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    `;
+            document.body.appendChild(prompt);
+
+            document.getElementById('install-btn').addEventListener('click', async () => {
+                prompt.remove();
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log('[PWA] Install prompt outcome:', outcome);
+                deferredPrompt = null;
+            });
+
+            document.getElementById('dismiss-install').addEventListener('click', () => {
+                prompt.remove();
+            });
+
+            document.getElementById('close-install').addEventListener('click', () => {
+                prompt.remove();
+            });
+        }
+
+        // ========================================
+        // Online/Offline Status
+        // ========================================
+        function updateOnlineStatus() {
+            const isOnline = navigator.onLine;
+
+            if (!isOnline) {
+                showOfflineNotification();
+            }
+        }
+
+        function showOfflineNotification() {
+            const existing = document.getElementById('offline-notification');
+            if (existing) return;
+
+            const notification = document.createElement('div');
+            notification.id = 'offline-notification';
+            notification.className = 'fixed top-20 left-4 right-4 md:left-auto md:right-8 md:max-w-sm bg-orange-500/90 backdrop-blur-sm p-3 rounded-xl shadow-lg z-[100] flex items-center gap-3';
+            notification.innerHTML = `
+                        <i class="fa-solid fa-wifi-slash text-white"></i>
+                        <span class="text-sm font-medium text-white">Mode hors ligne activé</span>
+                    `;
+            document.body.appendChild(notification);
+        }
+
+        window.addEventListener('online', () => {
+            const notification = document.getElementById('offline-notification');
+            if (notification) notification.remove();
+        });
+
+        window.addEventListener('offline', updateOnlineStatus);
+
+        // Check initial status
+        updateOnlineStatus();
+
+        // ========================================
+        // Sidebar Toggle
+        // ========================================
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarClose = document.getElementById('sidebar-close');
+
+        function openSidebar() {
+            sidebar?.classList.add('open');
+            sidebarOverlay?.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            sidebar?.classList.remove('open');
+            sidebarOverlay?.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        sidebarToggle?.addEventListener('click', openSidebar);
+        sidebarClose?.addEventListener('click', closeSidebar);
+        sidebarOverlay?.addEventListener('click', closeSidebar);
+
+        // Close sidebar on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeSidebar();
+        });
+
+        // ========================================
+        // All Theme Toggle Buttons
+        // ========================================
+        const allThemeToggles = [
+            'theme-toggle',
+            'mobile-theme-toggle',
+            'mobile-theme-toggle-public',
+            'mobile-header-theme-toggle',
+            'sidebar-theme-toggle'
+        ];
+
+        allThemeToggles.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.addEventListener('click', toggleTheme);
             }
         });
     </script>
-    {% block scripts %}{% endblock %}
+
+
+    {% block scripts %}
+    {% endblock %}
+
 </body>
 
 </html>
-
-

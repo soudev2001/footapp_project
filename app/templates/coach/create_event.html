@@ -1,151 +1,204 @@
 {% extends "base.html" %}
-{% block title %}Créer un Événement - FootLogic{% endblock %}
+{% block title %}Nouvel Événement - FootLogic Elite{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto px-4 py-6">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-        <a href="{{ url_for('main.calendar') }}" class="text-gray-400 hover:text-white transition font-medium">
-            <i class="fa-solid fa-arrow-left mr-2"></i>Retour
-        </a>
-        <h1 class="text-xl font-bold">Nouvel Événement</h1>
-        <div class="w-20"></div>
+<div class="page-enter max-w-3xl mx-auto px-4 py-8">
+    <!-- Header Hero -->
+    <div class="glass p-10 rounded-[40px] border-white/5 mb-10 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-amber-500/10"></div>
+        <div class="relative z-10">
+            <a href="{{ url_for('main.calendar') }}"
+                class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-primary-400 mb-6 transition-colors">
+                <i class="fa-solid fa-arrow-left text-[8px]"></i> RETOUR AU CALENDRIER
+            </a>
+            <div class="flex items-center gap-6">
+                <div
+                    class="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary-500/20">
+                    <i class="fa-solid fa-calendar-plus text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1
+                        class="text-4xl font-black italic uppercase tracking-tight leading-none mb-2 light:text-slate-900">
+                        Nouvel Événement</h1>
+                    <p class="text-white/40 light:text-slate-500 text-sm font-medium italic">Planifiez les prochaines
+                        étapes de votre saison.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Form -->
-    <form action="{{ url_for('coach.create_event') }}" method="POST" class="space-y-6" onsubmit="handleSubmit(event)">
+    <!-- Main Creation Form -->
+    <form action="{{ url_for('coach.create_event') }}" method="POST" class="space-y-8" onsubmit="handleSubmit(event)">
         <!-- Event Type Selection -->
-        <div>
-            <label class="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Type d'événement</label>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <input type="radio" name="event_type" id="match" value="match" class="hidden peer" checked>
-                    <label for="match"
-                        class="card p-5 flex flex-col items-center justify-center cursor-pointer transition peer-checked:border-primary-500 peer-checked:bg-primary-500/10 hover:border-gray-600">
-                        <div
-                            class="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center mb-3 shadow-lg">
-                            <i class="fa-solid fa-trophy text-xl"></i>
-                        </div>
-                        <span class="font-bold">Match</span>
-                    </label>
-                </div>
-                <div>
-                    <input type="radio" name="event_type" id="training" value="training" class="hidden peer">
-                    <label for="training"
-                        class="card p-5 flex flex-col items-center justify-center cursor-pointer transition peer-checked:border-green-500 peer-checked:bg-green-500/10 hover:border-gray-600">
-                        <div
-                            class="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-3 shadow-lg">
-                            <i class="fa-solid fa-stopwatch text-xl"></i>
-                        </div>
-                        <span class="font-bold">Entraînement</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- Event Details -->
-        <div class="card p-6 space-y-5">
-            <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Titre / Adversaire</label>
-                <input type="text" name="title" placeholder="Ex: vs Racing FC" required
-                    class="w-full input-premium rounded-xl py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Date</label>
-                    <input type="date" name="date" required
-                        class="w-full input-premium rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Heure</label>
-                    <input type="time" name="time" required
-                        class="w-full input-premium rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Lieu</label>
+        <div class="space-y-4">
+            <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-6">Nature de la
+                session</label>
+            <div class="grid grid-cols-2 gap-6">
                 <div class="relative">
-                    <i class="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                    <input type="text" name="location" placeholder="Stade Municipal, Paris"
-                        class="w-full input-premium rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <input type="radio" name="type" id="match" value="match" class="hidden peer" checked>
+                    <label for="match"
+                        class="glass p-8 flex flex-col items-center justify-center cursor-pointer transition-all border-white/5 rounded-[40px] hover:bg-white/5 peer-checked:bg-primary-500/10 peer-checked:border-primary-500/50 group">
+                        <div
+                            class="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-4 shadow-xl group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-trophy text-white text-2xl"></i>
+                        </div>
+                        <span class="font-black italic uppercase text-sm tracking-widest light:text-slate-900">MATCH
+                            OFFICIEL</span>
+                    </label>
                 </div>
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Description (optionnel)</label>
-                <textarea name="description" rows="3" placeholder="Informations supplémentaires..."
-                    class="w-full input-premium rounded-xl py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
+                <div class="relative">
+                    <input type="radio" name="type" id="training" value="training" class="hidden peer">
+                    <label for="training"
+                        class="glass p-8 flex flex-col items-center justify-center cursor-pointer transition-all border-white/5 rounded-[40px] hover:bg-white/5 peer-checked:bg-amber-500/10 peer-checked:border-amber-500/50 group">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mb-4 shadow-xl group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-stopwatch text-white text-2xl"></i>
+                        </div>
+                        <span
+                            class="font-black italic uppercase text-sm tracking-widest light:text-slate-900">ENTRAÎNEMENT</span>
+                    </label>
+                </div>
             </div>
         </div>
 
-        <!-- Convocation Settings -->
-        <div class="card p-6">
-            <div class="flex justify-between items-center mb-4">
-                <span class="font-bold">Convocations</span>
-                <button type="button" onclick="toggleAllPlayers()"
-                    class="text-xs text-primary-400 font-bold hover:text-primary-300 transition">
-                    Tout cocher
-                </button>
+        <!-- Core Details -->
+        <div class="glass p-10 rounded-[48px] border-white/5 space-y-8 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+
+            <div class="space-y-3 relative z-10">
+                <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Titre ou
+                    Adversaire</label>
+                <div class="relative group">
+                    <i
+                        class="fa-solid fa-pen-nib absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-500 transition-colors"></i>
+                    <input type="text" name="title" placeholder="Ex: vs Racing Club FC" required
+                        class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-sm font-bold placeholder:text-white/10 focus:outline-none focus:border-primary-500/50 transition-all">
+                </div>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Date du
+                        rendez-vous</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-calendar absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-500 transition-colors"></i>
+                        <input type="date" name="date" required
+                            class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-sm font-bold focus:outline-none focus:border-primary-500/50 transition-all">
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Heure de
+                        début</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-clock absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-500 transition-colors"></i>
+                        <input type="time" name="time" required
+                            class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-sm font-bold focus:outline-none focus:border-primary-500/50 transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3 relative z-10">
+                <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Lieu
+                    physique</label>
+                <div class="relative group">
+                    <i
+                        class="fa-solid fa-location-dot absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-500 transition-colors"></i>
+                    <input type="text" name="location" placeholder="Ex: Stade Municipal, Paris"
+                        class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-sm font-bold placeholder:text-white/10 focus:outline-none focus:border-primary-500/50 transition-all">
+                </div>
+            </div>
+
+            <div class="space-y-3 relative z-10">
+                <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Instructions
+                    supplémentaires (optionnel)</label>
+                <textarea name="description" rows="3" placeholder="Ex: Rendez-vous 45min avant le coup d'envoi..."
+                    class="w-full glass bg-white/5 border border-white/10 rounded-3xl py-5 px-6 text-sm font-bold placeholder:text-white/10 focus:outline-none focus:border-primary-500/50 transition-all resize-none"></textarea>
+            </div>
+        </div>
+
+        <!-- Automation & Convocations -->
+        <div class="glass p-10 rounded-[48px] border-white/5 space-y-6">
+            <h3 class="text-xs font-black uppercase tracking-widest light:text-slate-900 mb-6 flex items-center gap-3">
+                <i class="fa-solid fa-robot text-primary-400"></i>
+                Paramètres de Convocation
+            </h3>
 
             <div class="space-y-4">
-                <label class="flex items-center justify-between cursor-pointer group">
-                    <span class="text-sm group-hover:text-white transition">Convoquer tout l'effectif</span>
+                <label
+                    class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 cursor-pointer group hover:bg-white/10 transition-all">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-400">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-white light:text-slate-900">
+                                Tout l'effectif</p>
+                            <p class="text-[8px] font-medium text-white/20 uppercase tracking-widest mt-0.5">Automatique
+                            </p>
+                        </div>
+                    </div>
                     <input type="checkbox" name="convoke_all" checked
-                        class="w-5 h-5 rounded bg-surface-800 border-gray-600 text-primary-500 focus:ring-primary-500 focus:ring-offset-0">
+                        class="w-6 h-6 rounded-lg bg-surface-950 border-white/10 text-primary-500 focus:ring-primary-500 focus:ring-offset-0 transition-all">
                 </label>
-                <div class="border-t border-white/10 pt-4">
-                    <label class="flex items-center justify-between cursor-pointer group">
-                        <span class="text-sm group-hover:text-white transition">Envoyer rappel (J-1)</span>
-                        <input type="checkbox" name="send_reminder" checked
-                            class="w-5 h-5 rounded bg-surface-800 border-gray-600 text-primary-500 focus:ring-primary-500 focus:ring-offset-0">
-                    </label>
-                </div>
-                <div class="border-t border-white/10 pt-4">
-                    <label class="flex items-center justify-between cursor-pointer group">
-                        <span class="text-sm group-hover:text-white transition">Demander confirmation présence</span>
-                        <input type="checkbox" name="require_confirmation" checked
-                            class="w-5 h-5 rounded bg-surface-800 border-gray-600 text-primary-500 focus:ring-primary-500 focus:ring-offset-0">
-                    </label>
-                </div>
+
+                <label
+                    class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 cursor-pointer group hover:bg-white/10 transition-all">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                            <i class="fa-solid fa-bell"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-white light:text-slate-900">
+                                Rappel Smart</p>
+                            <p class="text-[8px] font-medium text-white/20 uppercase tracking-widest mt-0.5">Envoi à J-1
+                            </p>
+                        </div>
+                    </div>
+                    <input type="checkbox" name="send_reminder" checked
+                        class="w-6 h-6 rounded-lg bg-surface-950 border-white/10 text-primary-500 focus:ring-primary-500 focus:ring-offset-0 transition-all">
+                </label>
+
+                <label
+                    class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 cursor-pointer group hover:bg-white/10 transition-all">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
+                            <i class="fa-solid fa-check-double"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-white light:text-slate-900">
+                                Confirmation de présence</p>
+                            <p class="text-[8px] font-medium text-white/20 uppercase tracking-widest mt-0.5">Action
+                                Joueur</p>
+                        </div>
+                    </div>
+                    <input type="checkbox" name="require_confirmation" checked
+                        class="w-6 h-6 rounded-lg bg-surface-950 border-white/10 text-primary-500 focus:ring-primary-500 focus:ring-offset-0 transition-all">
+                </label>
             </div>
         </div>
 
         <!-- Submit Button -->
         <button type="submit" id="submitBtn"
-            class="w-full btn-primary py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2">
-            <i class="fa-solid fa-calendar-plus"></i>
-            Publier l'événement
+            class="w-full gradient-primary py-6 rounded-[32px] font-black text-xs text-black uppercase tracking-[0.3em] shadow-2xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4">
+            <i class="fa-solid fa-paper-plane text-lg"></i>
+            PUBLIER L'ÉVÉNEMENT ELITE
         </button>
     </form>
 </div>
 
 <script>
     function handleSubmit(e) {
-        e.preventDefault();
+        // Simple visual feedback only, real submission happens
         const btn = document.getElementById('submitBtn');
-        const originalHTML = btn.innerHTML;
+        const icon = btn.querySelector('i');
 
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Création...';
-        btn.disabled = true;
-
-        setTimeout(() => {
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> Événement créé !';
-            btn.classList.add('bg-green-500');
-
-            setTimeout(() => {
-                window.location.href = '{{ url_for("main.calendar") }}';
-            }, 1000);
-        }, 800);
-    }
-
-    function toggleAllPlayers() {
-        const checkbox = document.querySelector('input[name="convoke_all"]');
-        checkbox.checked = !checkbox.checked;
+        btn.classList.add('pointer-events-none');
+        icon.className = 'fa-solid fa-spinner fa-spin text-lg';
+        btn.innerHTML = icon.outerHTML + ' PUBLICATION EN COURS...';
     }
 </script>
 {% endblock %}
-
-

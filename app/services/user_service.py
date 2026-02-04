@@ -29,13 +29,22 @@ class UserService:
         """Get user by email"""
         return self.collection.find_one({'email': email})
     
-    def create(self, email, password, role='player', club_id=None, profile=None):
+    def create(self, email, password, role='fan', roles=None, club_id=None, profile=None):
         """Create a new user"""
         from datetime import datetime
+        
+        # Determine primary role and roles list
+        if roles is None:
+            roles = [role]
+        else:
+            # If roles provided, primary role is the first one (or 'fan' if empty)
+            role = roles[0] if roles else 'fan'
+            
         user = {
             'email': email,
             'password_hash': generate_password_hash(password),
-            'role': role,
+            'role': role,        # Primary role for backward compatibility
+            'roles': roles,      # List of all roles
             'club_id': ObjectId(club_id) if club_id else None,
             'created_at': datetime.utcnow(),
             'profile': profile or {
@@ -98,20 +107,25 @@ def get_nav_for_role(role):
     all_nav = {
         'admin': [
             {'name': 'Accueil', 'url': '/', 'icon': 'fa-house'},
+            {'name': 'Isy HUB', 'url': '/isy/hub', 'icon': 'fa-rocket'},
             {'name': 'Console Gestion', 'url': '/admin/panel', 'icon': 'fa-shield-halved'},
             {'name': 'Site Public', 'url': '/public-club', 'icon': 'fa-globe'},
         ],
         'coach': [
             {'name': 'Dashboard', 'url': '/coach/dashboard', 'icon': 'fa-gauge'},
+            {'name': 'Isy HUB', 'url': '/isy/hub', 'icon': 'fa-rocket'},
             {'name': 'Effectif', 'url': '/coach/roster', 'icon': 'fa-users'},
             {'name': 'Tactiques', 'url': '/coach/tactics', 'icon': 'fa-chess-board'},
             {'name': 'Match Center', 'url': '/coach/match-center', 'icon': 'fa-gamepad'},
+            {'name': 'Scouting', 'url': '/coach/scouting', 'icon': 'fa-binoculars'},
             {'name': 'Social', 'url': '/feed', 'icon': 'fa-rss'},
         ],
         'player': [
             {'name': 'Accueil', 'url': '/player/home', 'icon': 'fa-house'},
+            {'name': 'Evo HUB', 'url': '/player/evo-hub', 'icon': 'fa-chart-radar'},
             {'name': 'Mon Équipe', 'url': '/player/team', 'icon': 'fa-people-group'},
             {'name': 'Planning', 'url': '/player/calendar', 'icon': 'fa-calendar-days'},
+            {'name': 'Contrats', 'url': '/player/contracts', 'icon': 'fa-file-signature'},
             {'name': 'Documents', 'url': '/player/documents', 'icon': 'fa-file-invoice'},
             {'name': 'Social', 'url': '/feed', 'icon': 'fa-rss'},
         ],

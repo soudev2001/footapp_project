@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}Vision Isy Club - FootLogic Elite{% endblock %}
+
+{% block content %}
+<div class="relative min-h-screen pt-12">
+    <!-- Hero Background Elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div
+            class="absolute top-[10%] left-[15%] w-[500px] h-[500px] bg-primary-500/10 rounded-full blur-[120px] animate-pulse-slow">
+        </div>
+        <div class="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-amber-500/5 rounded-full blur-[100px]">
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 relative z-10 pb-24">
+        <!-- Floating Navigation Breadcrumb -->
+        <div class="flex items-center gap-2 mb-12 animate-slide-in">
+            <a href="{{ url_for('isy.hub') }}"
+                class="glass px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-widest text-white/40 hover:text-primary-400 transition-colors">
+                <i class="fa-solid fa-arrow-left mr-2"></i>Retour au HUB
+            </a>
+            <span class="text-white/10">/</span>
+            <span class="text-xs font-black uppercase tracking-widest text-primary-500">Vision & Innovation</span>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="text-center mb-24 animate-slide-up">
+            <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full glass border-primary-500/20 mb-8">
+                <i class="fa-solid fa-rocket text-primary-400"></i>
+                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-primary-400">The Future of Sports
+                    Management</span>
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black italic uppercase tracking-tighter mb-8 leading-[0.9]">
+                ISY <span class="text-primary-500">CLUB</span><br />
+                <span class="text-white/20">ELITE VISION</span>
+            </h1>
+            <p class="max-w-3xl mx-auto text-xl text-white/40 italic font-medium leading-relaxed">
+                "Plus qu'un outil de gestion, une révolution numérique pour le football amateur."
+            </p>
+        </div>
+
+        <!-- Innovative Solution Matrix -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-32">
+            <div class="glass p-12 rounded-[64px] border-white/5 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-8">
+                    <i
+                        class="fa-solid fa-shield-halved text-8xl text-primary-500/5 group-hover:text-primary-500/10 transition-colors"></i>
+                </div>
+                <h2 class="text-3xl font-black italic uppercase tracking-tight mb-8">L'Innovation au <span
+                        class="text-primary-500">Cœur</span></h2>
+                <div class="space-y-6 text-white/60 leading-relaxed font-medium">
+                    <p>
+                        Isy Club est une solution de gestion sportive innovante conçue pour donner du pouvoir aux clubs
+                        de sport amateurs en fournissant un système centralisé et convivial pour gérer les équipes, les
+                        événements, les paiements, la communication et les données des joueurs.
+                    </p>
+                    <p>
+                        Sa conception se concentre sur le gain de temps, la clarté et l'accessibilité, ce qui en fait un
+                        outil efficace pour les administrateurs de club, les entraîneurs, les joueurs et les parents.
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass p-8 rounded-[40px] border-white/5 hover:border-primary-500/20 transition-colors">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center text-primary-400 mb-6">
+                        <i class="fa-solid fa-clock-rotate-left text-xl"></i>
+                    </div>
+                    <h3 class="font-black italic uppercase text-lg mb-3 tracking-tight">Efficacité</h3>
+                    <p class="text-white/30 text-xs font-medium leading-relaxed">Optimisation radicale du temps
+                        administratif pour se concentrer sur le terrain.</p>
+                </div>
+                <div class="glass p-8 rounded-[40px] border-white/5 hover:border-amber-500/20 transition-colors">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 mb-6">
+                        <i class="fa-solid fa-eye text-xl"></i>
+                    </div>
+                    <h3 class="font-black italic uppercase text-lg mb-3 tracking-tight">Clarté</h3>
+                    <p class="text-white/30 text-xs font-medium leading-relaxed">Une visibilité totale sur les finances,
+                        les effectifs et les événements.</p>
+                </div>
+                <div class="glass p-8 rounded-[40px] border-white/5 hover:border-blue-500/20 transition-colors">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400 mb-6">
+                        <i class="fa-solid fa-mobile-screen text-xl"></i>
+                    </div>
+                    <h3 class="font-black italic uppercase text-lg mb-3 tracking-tight">Accessibilité</h3>
+                    <p class="text-white/30 text-xs font-medium leading-relaxed">Une interface pensée pour tous les
+                        acteurs, du bureau au vestiaire.</p>
+                </div>
+                <div class="glass p-8 rounded-[40px] border-white/5 hover:border-primary-500/20 transition-colors">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center text-primary-400 mb-6">
+                        <i class="fa-solid fa-users-viewfinder text-xl"></i>
+                    </div>
+                    <h3 class="font-black italic uppercase text-lg mb-3 tracking-tight">Engagement</h3>
+                    <p class="text-white/30 text-xs font-medium leading-relaxed">Renforcer le lien social et la vie
+                        communautaire du club.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visionary Pillars -->
+        <div class="space-y-12">
+            <!-- DNA Section -->
+            <div class="glass p-1 px-8 md:px-16 rounded-[80px] border-white/5 overflow-hidden">
+                <div class="flex flex-col lg:flex-row items-center gap-16 py-16">
+                    <div class="lg:w-1/2">
+                        <h3 class="text-4xl font-black italic uppercase tracking-tighter mb-8 leading-none">
+                            Renforcer <span class="text-primary-500">l'ADN</span><br />du Club
+                        </h3>
+                        <p class="text-white/50 text-lg font-medium leading-relaxed mb-8">
+                            Au-delà de la logistique, Isy Club agit comme le cœur numérique de l'organisation. En
+                            centralisant les événements — galas annuels, soirées partenaires, programmes de
+                            sensibilisation — la plateforme veille à ce que la culture du club s'étende bien au-delà du
+                            coup de sifflet final.
+                        </p>
+                        <ul class="space-y-4">
+                            <li
+                                class="flex items-center gap-3 text-white/80 font-bold italic uppercase text-xs tracking-widest">
+                                <i class="fa-solid fa-check text-primary-500"></i> Culture Unifiée
+                            </li>
+                            <li
+                                class="flex items-center gap-3 text-white/80 font-bold italic uppercase text-xs tracking-widest">
+                                <i class="fa-solid fa-check text-primary-500"></i> Sentiment d'Appartenance
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="lg:w-1/2 relative">
+                        <div class="absolute -inset-4 bg-primary-500/20 rounded-3xl blur-3xl opacity-30"></div>
+                        <div
+                            class="relative glass bg-white/5 rounded-[40px] p-8 mt-12 lg:mt-0 aspect-video flex items-center justify-center border-white/10 shadow-2xl">
+                            <i class="fa-solid fa-dna text-9xl text-white/5 animate-pulse"></i>
+                            <div class="absolute bottom-10 left-10 space-y-2">
+                                <div class="w-32 h-2 bg-white/10 rounded-full"></div>
+                                <div class="w-24 h-2 bg-white/10 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partners Section -->
+            <div class="glass p-1 px-8 md:px-16 rounded-[80px] border-white/5 overflow-hidden">
+                <div class="flex flex-col lg:flex-row-reverse items-center gap-16 py-16">
+                    <div class="lg:w-1/2">
+                        <h3 class="text-4xl font-black italic uppercase tracking-tighter mb-8 leading-none">
+                            Elite <span class="text-amber-500">Partner</span><br />Circle
+                        </h3>
+                        <p class="text-white/50 text-lg font-medium leading-relaxed mb-8">
+                            Les sponsors recherchent une visibilité professionnelle et un impact mesurable. Le cercle de
+                            partenaires d'Isy Club offre une vitrine haut de gamme, classant les partenariats en niveaux
+                            prestigieux (Platinum, Gold, Silver).
+                        </p>
+                        <p class="text-white/30 text-sm italic font-medium">
+                            Une présentation professionnelle qui honore les soutiens existants et sert de puissant outil
+                            de recrutement pour nouveaux partenaires.
+                        </p>
+                    </div>
+                    <div class="lg:w-1/2 relative">
+                        <div class="absolute -inset-4 bg-amber-500/20 rounded-3xl blur-3xl opacity-30"></div>
+                        <div class="relative glass bg-white/5 rounded-[40px] p-8 border-white/10 shadow-2xl">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="h-24 glass rounded-2xl flex items-center justify-center"><i
+                                        class="fa-solid fa-crown text-amber-500 opacity-50"></i></div>
+                                <div class="h-24 glass rounded-2xl flex items-center justify-center"><i
+                                        class="fa-solid fa-medal text-gray-400 opacity-50"></i></div>
+                                <div class="h-24 glass rounded-2xl flex items-center justify-center col-span-2"><i
+                                        class="fa-solid fa-handshake text-white/10 text-4xl"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financials Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="glass p-12 rounded-[64px] border-white/5">
+                    <i class="fa-solid fa-vault text-4xl text-primary-500 mb-8"></i>
+                    <h3 class="text-3xl font-black italic uppercase tracking-tight mb-6">Excellence <span
+                            class="text-primary-500">Financière</span></h3>
+                    <p class="text-white/50 font-medium leading-relaxed">
+                        La "Matrice des paiements" supprime les frictions. Un registre clair et en temps réel pour les
+                        cotisations, l'équipement et les contributions, éliminant l'incertitude du suivi manuel.
+                    </p>
+                </div>
+                <div class="glass p-12 rounded-[64px] border-white/5">
+                    <i class="fa-solid fa-chart-line text-4xl text-primary-500 mb-8"></i>
+                    <h3 class="text-3xl font-black italic uppercase tracking-tight mb-6">Innovation <span
+                            class="text-primary-500">Scalable</span></h3>
+                    <p class="text-white/50 font-medium leading-relaxed">
+                        Conçue pour l'avenir, notre architecture évolue avec vos ambitions. Qu'il s'agisse d'une équipe
+                        de quartier ou d'une académie régionale, nous fournissons l'infrastructure pour
+                        professionnaliser vos opérations.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="mt-32 text-center">
+            <h4 class="text-xs font-black uppercase tracking-[0.5em] text-white/20 mb-8">Ready to evolve?</h4>
+            <a href="{{ url_for('isy.hub') }}"
+                class="inline-flex items-center gap-4 px-12 py-6 bg-primary-500 text-black rounded-[32px] font-black text-xs uppercase tracking-[0.2em] transform hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/30 transition-all group">
+                REJOINDRE LE HUB <i class="fa-solid fa-arrow-right group-hover:translate-x-2 transition-transform"></i>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

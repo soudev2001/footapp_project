@@ -1,174 +1,203 @@
 {% extends "base.html" %}
-{% block title %}Messages - FootLogic{% endblock %}
+{% block title %}Messages Elite - FootLogic{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-6">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
+<div class="max-w-2xl mx-auto px-4 py-8 page-enter">
+    <!-- Header Hero -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
         <div>
-            <h1 class="text-2xl font-bold">Messages</h1>
-            <p class="text-gray-400 text-sm">Vos conversations</p>
+            <h1 class="text-4xl font-black italic uppercase tracking-tighter flex items-center gap-4">
+                <span
+                    class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary-500/20">
+                    <i class="fa-solid fa-comment-dots text-white text-xl"></i>
+                </span>
+                Messages
+            </h1>
+            <p class="text-white/40 mt-2 font-medium italic tracking-wide">Connectez-vous avec votre équipe et votre
+                staff.</p>
         </div>
         <button
-            class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-lg hover:scale-105 transition-transform">
-            <i class="fa-solid fa-pen-to-square"></i>
+            class="w-14 h-14 glass rounded-2xl flex items-center justify-center text-primary-400 hover:bg-primary-500 hover:text-black hover:scale-105 active:scale-95 transition-all shadow-xl border border-white/10 group">
+            <i class="fa-solid fa-pen-nib text-lg transition-transform group-hover:rotate-12"></i>
         </button>
     </div>
 
-    <!-- Search -->
-    <div class="relative mb-6">
-        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+    <!-- Smart Search Bar -->
+    <div class="relative mb-12 group">
+        <div class="absolute inset-0 bg-primary-500/5 blur-xl group-focus-within:bg-primary-500/10 transition-all">
+        </div>
+        <i
+            class="fa-solid fa-magnifying-glass absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition-colors"></i>
         <input type="text" placeholder="Rechercher une conversation..."
-            class="w-full input-premium rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none">
+            class="w-full glass bg-white/5 border-white/10 rounded-[28px] py-5 pl-16 pr-6 text-sm font-bold placeholder:text-white/20 focus:outline-none focus:border-primary-500/50 transition-all relative z-10">
     </div>
 
-    <!-- Online Users -->
-    <div class="flex gap-4 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-        <div class="flex flex-col items-center gap-2 cursor-pointer group flex-shrink-0">
-            <div
-                class="w-14 h-14 rounded-full glass-light border-2 border-dashed border-gray-600 flex items-center justify-center text-gray-500 group-hover:border-primary-400 group-hover:text-primary-400 transition">
-                <i class="fa-solid fa-plus text-lg"></i>
+    <!-- Active Staff & Players (Horizontal Scroll) -->
+    <div class="mb-12">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-6 flex items-center gap-3">
+            <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+            DISPONIBLES MAINTENANT
+        </h3>
+        <div class="flex gap-6 overflow-x-auto pb-6 scrollbar-hide px-2">
+            <!-- New Chat Toggle -->
+            <div class="flex flex-col items-center gap-3 cursor-pointer group flex-shrink-0">
+                <div
+                    class="w-16 h-16 rounded-[24px] glass border-2 border-dashed border-white/10 flex items-center justify-center text-white/10 group-hover:border-primary-500/50 group-hover:text-primary-400 transition-all duration-500 bg-white/5 group-hover:bg-primary-500/5">
+                    <i class="fa-solid fa-plus text-xl"></i>
+                </div>
+                <span class="text-[9px] text-white/20 font-black uppercase tracking-widest italic">Nouveau</span>
             </div>
-            <span class="text-[10px] text-gray-500 font-medium">Nouveau</span>
+
+            {% for user in online_users %}
+            <a href="/chat/{{ user.id }}"
+                class="flex flex-col items-center gap-3 cursor-pointer group flex-shrink-0 animate-slide-in"
+                style="--idx: {{ loop.index }}">
+                <div class="relative">
+                    <div
+                        class="w-16 h-16 rounded-[24px] p-0.5 bg-gradient-to-br from-primary-500 to-amber-500 group-hover:scale-110 transition-transform duration-500 shadow-xl shadow-primary-500/10">
+                        <div
+                            class="w-full h-full rounded-[22px] border-[3px] border-black overflow-hidden bg-surface-950">
+                            <img src="https://randomuser.me/api/portraits/men/{{ loop.index + 10 }}.jpg"
+                                class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div
+                        class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-[3px] border-black shadow-lg">
+                    </div>
+                </div>
+                <span
+                    class="text-[9px] text-white/40 font-black uppercase tracking-widest group-hover:text-white transition-colors">{{
+                    user.name or 'Membre' }}</span>
+            </a>
+            {% else %}
+            <!-- Elite Demo Avatars -->
+            {% set demo_users = [('Coach Thomas', '32', 'amber'), ('Pierre M.', '19', 'primary'), ('Marc L.', '45',
+            'primary')] %}
+            {% for name, img, color in demo_users %}
+            <a href="/chat/demo"
+                class="flex flex-col items-center gap-3 cursor-pointer group flex-shrink-0 animate-slide-in"
+                style="--idx: {{ loop.index }}">
+                <div class="relative">
+                    <div
+                        class="w-16 h-16 rounded-[24px] p-0.5 bg-gradient-to-br from-{{ color }}-500 to-transparent group-hover:scale-110 transition-transform duration-500 shadow-xl">
+                        <div class="w-full h-full rounded-[22px] border-[3px] border-black overflow-hidden">
+                            <img src="https://randomuser.me/api/portraits/men/{{ img }}.jpg"
+                                class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div
+                        class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-[3px] border-black shadow-lg">
+                    </div>
+                </div>
+                <span
+                    class="text-[9px] text-white/40 font-black uppercase tracking-widest group-hover:text-white transition-colors">{{
+                    name }}</span>
+            </a>
+            {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Conversations Matrix -->
+    <div class="space-y-10">
+        <!-- Pinned / Important Section -->
+        <div>
+            <h3
+                class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-6 flex items-center gap-3 px-4">
+                <i class="fa-solid fa-thumbtack text-[8px]"></i>
+                ÉPINGLÉ
+            </h3>
+
+            <div class="space-y-4">
+                <!-- Group Elite -->
+                <a href="/chat/group-u15"
+                    class="glass p-6 flex items-center gap-6 group hover:bg-white/5 transition-all duration-500 rounded-[36px] border border-white/5 hover:border-primary-500/30">
+                    <div class="relative flex-shrink-0">
+                        <div
+                            class="w-16 h-16 gradient-primary rounded-3xl flex items-center justify-center text-white font-black italic shadow-2xl group-hover:scale-105 transition-transform duration-500 text-sm">
+                            U15
+                        </div>
+                        <div
+                            class="absolute -bottom-2 -right-2 w-7 h-7 bg-surface-950 rounded-xl flex items-center justify-center border border-white/10 shadow-xl">
+                            <i class="fa-solid fa-users text-[10px] text-primary-400"></i>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3
+                                class="font-black italic text-lg truncate tracking-tight group-hover:text-primary-400 transition-colors">
+                                Groupe U15 - Équipe Première</h3>
+                            <span
+                                class="text-[10px] text-primary-400 font-black uppercase tracking-widest italic">Maintenant</span>
+                        </div>
+                        <p class="text-sm text-white/40 italic font-medium truncate">Coach: "Rendez-vous à 18h au Stade
+                            de France..."</p>
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                        <span
+                            class="bg-primary-500 text-black text-[9px] font-black px-2.5 py-1.5 rounded-xl shadow-lg shadow-primary-500/20">4</span>
+                    </div>
+                </a>
+
+                <!-- Coach Private -->
+                <a href="/chat/coach"
+                    class="glass p-6 flex items-center gap-6 group hover:bg-white/5 transition-all duration-500 rounded-[36px] border border-white/5 hover:border-amber-500/30">
+                    <div class="relative flex-shrink-0">
+                        <div
+                            class="w-16 h-16 rounded-[28px] overflow-hidden border-2 border-white/5 p-0.5 group-hover:scale-105 transition-transform duration-500">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                                class="w-full h-full object-cover rounded-[24px]">
+                        </div>
+                        <div
+                            class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-[3px] border-black">
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3
+                                class="font-black italic text-lg truncate tracking-tight group-hover:text-amber-400 transition-colors">
+                                Coach Thomas</h3>
+                            <span class="text-[10px] text-white/20 font-black uppercase tracking-widest italic">Il y a
+                                2h</span>
+                        </div>
+                        <p class="text-sm text-white/40 italic font-medium truncate">"Ton analyse de match est
+                            impressionnante."</p>
+                    </div>
+                </a>
+            </div>
         </div>
 
-        {% for user in online_users %}
-        <a href="/chat/{{ user.id }}" class="flex flex-col items-center gap-2 cursor-pointer group flex-shrink-0">
-            <div class="relative">
-                <div class="w-14 h-14 rounded-full overflow-hidden border-2 border-primary-500 p-0.5">
-                    <img src="https://randomuser.me/api/portraits/men/{{ loop.index }}.jpg"
-                        class="w-full h-full rounded-full object-cover">
-                </div>
-                <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-surface-900">
-                </div>
-            </div>
-            <span class="text-[10px] text-gray-400 font-medium group-hover:text-white transition">{{ user.name or
-                'Coach' }}</span>
-        </a>
-        {% else %}
-        <!-- Demo online users -->
-        <a href="/chat/1" class="flex flex-col items-center gap-2 cursor-pointer group flex-shrink-0">
-            <div class="relative">
-                <div class="w-14 h-14 rounded-full overflow-hidden border-2 border-amber-500 p-0.5">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg"
-                        class="w-full h-full rounded-full object-cover">
-                </div>
-                <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-surface-900">
-                </div>
-            </div>
-            <span class="text-[10px] text-gray-400 font-medium group-hover:text-white transition">Coach</span>
-        </a>
-        <a href="/chat/2" class="flex flex-col items-center gap-2 cursor-pointer group flex-shrink-0">
-            <div class="relative">
-                <div class="w-14 h-14 rounded-full overflow-hidden border-2 border-primary-500 p-0.5">
-                    <img src="https://randomuser.me/api/portraits/men/19.jpg"
-                        class="w-full h-full rounded-full object-cover">
-                </div>
-                <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-surface-900">
-                </div>
-            </div>
-            <span class="text-[10px] text-gray-400 font-medium group-hover:text-white transition">Pierre</span>
-        </a>
-        <a href="/chat/3" class="flex flex-col items-center gap-2 cursor-pointer group flex-shrink-0">
-            <div class="relative">
-                <div class="w-14 h-14 rounded-full overflow-hidden border-2 border-primary-500 p-0.5">
-                    <img src="https://randomuser.me/api/portraits/men/45.jpg"
-                        class="w-full h-full rounded-full object-cover">
-                </div>
-            </div>
-            <span class="text-[10px] text-gray-400 font-medium group-hover:text-white transition">Marc</span>
-        </a>
-        {% endfor %}
-    </div>
+        <!-- Recent Feed -->
+        <div>
+            <h3
+                class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-6 flex items-center gap-3 px-4">
+                DÉFAUT
+            </h3>
 
-    <!-- Pinned Chats -->
-    <div class="mb-4">
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Épinglés</p>
-
-        <!-- Group Chat -->
-        <a href="/chat/group-u15"
-            class="card p-4 flex items-center gap-4 mb-3 group cursor-pointer hover:border-primary-500/30">
-            <div class="relative flex-shrink-0">
-                <div
-                    class="w-14 h-14 gradient-primary rounded-full flex items-center justify-center text-white font-bold shadow-lg">
-                    U15
-                </div>
-                <div class="absolute -bottom-1 -right-1 bg-surface-900 rounded-full p-0.5">
-                    <div class="w-5 h-5 bg-gray-700 rounded-full flex items-center justify-center text-[8px]">
-                        <i class="fa-solid fa-users"></i>
+            <div class="space-y-4">
+                {% set recents = [('Maxime R.', '22', 'Covoiturage pour samedi ?', 'LUN'), ('Olivier L.', '41', 'Bravo
+                pour ton but! 👑', 'DIM')] %}
+                {% for name, img, msg, time in recents %}
+                <a href="/chat/demo"
+                    class="glass p-6 flex items-center gap-6 group hover:bg-white/5 transition-all duration-500 rounded-[36px] border border-white/5">
+                    <div
+                        class="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5 group-hover:scale-105 transition-transform duration-500">
+                        <img src="https://randomuser.me/api/portraits/men/{{ img }}.jpg"
+                            class="w-full h-full object-cover">
                     </div>
-                </div>
-            </div>
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline mb-1">
-                    <h3 class="font-bold truncate">Groupe U15 - Seniors</h3>
-                    <span class="text-[10px] text-primary-400 font-bold">10:42</span>
-                </div>
-                <p class="text-sm text-gray-400 truncate">Coach: N'oubliez pas vos équipements...</p>
-            </div>
-            <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">2</span>
-        </a>
-
-        <!-- Private Chat -->
-        <a href="/chat/coach" class="card p-4 flex items-center gap-4 group cursor-pointer hover:border-amber-500/30">
-            <div class="relative flex-shrink-0">
-                <div class="w-14 h-14 rounded-full overflow-hidden">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-full h-full object-cover">
-                </div>
-            </div>
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline mb-1">
-                    <h3 class="font-bold truncate">Coach Thomas</h3>
-                    <span class="text-[10px] text-gray-500">Hier</span>
-                </div>
-                <p class="text-sm text-gray-400 truncate">Tu seras dispo pour le match de coupe ?</p>
-            </div>
-        </a>
-    </div>
-
-    <!-- Other Chats -->
-    <div>
-        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Autres conversations</p>
-
-        <div class="space-y-2">
-            <a href="/chat/maxime" class="card p-4 flex items-center gap-4 group cursor-pointer">
-                <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                    <img src="https://randomuser.me/api/portraits/men/22.jpg" class="w-full h-full object-cover">
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-baseline mb-1">
-                        <h3 class="font-bold text-sm truncate">Maxime R.</h3>
-                        <span class="text-[10px] text-gray-500">Lun</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3
+                                class="font-bold text-base truncate tracking-tight group-hover:text-white transition-colors">
+                                {{ name }}</h3>
+                            <span class="text-[9px] text-white/20 font-black uppercase tracking-widest">{{ time
+                                }}</span>
+                        </div>
+                        <p class="text-sm text-white/20 font-medium truncate italic">{{ msg }}</p>
                     </div>
-                    <p class="text-sm text-gray-400 truncate">On covoiture samedi ?</p>
-                </div>
-            </a>
-
-            <a href="/chat/olivier" class="card p-4 flex items-center gap-4 group cursor-pointer">
-                <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                    <img src="https://randomuser.me/api/portraits/men/41.jpg" class="w-full h-full object-cover">
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-baseline mb-1">
-                        <h3 class="font-bold text-sm truncate">Olivier L.</h3>
-                        <span class="text-[10px] text-gray-500">Dim</span>
-                    </div>
-                    <p class="text-sm text-gray-400 truncate">Bravo pour ton but! 🎉</p>
-                </div>
-            </a>
-
-            <a href="/chat/captain" class="card p-4 flex items-center gap-4 group cursor-pointer">
-                <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                    <img src="https://randomuser.me/api/portraits/men/35.jpg" class="w-full h-full object-cover">
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-baseline mb-1">
-                        <h3 class="font-bold text-sm truncate">Romain (Capitaine)</h3>
-                        <span class="text-[10px] text-gray-500">Sam</span>
-                    </div>
-                    <p class="text-sm text-gray-400 truncate">Réunion d'équipe à 18h demain</p>
-                </div>
-            </a>
+                </a>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
@@ -182,7 +211,22 @@
         -ms-overflow-style: none;
         scrollbar-width: none;
     }
+
+    .animate-slide-in {
+        animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        animation-delay: calc(var(--idx) * 0.1s);
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
 </style>
 {% endblock %}
-
-

@@ -2,7 +2,9 @@
 {% block title %}Tactique Elite - FootLogic{% endblock %}
 
 {% block content %}
-<div class="h-[calc(100vh-100px)] flex flex-col lg:flex-row gap-6 p-6 page-enter">
+<div class="lg:h-[calc(100vh-100px)] h-auto flex flex-col lg:flex-row gap-6 p-6 page-enter overflow-y-auto lg:overflow-hidden"
+    id="tactics-config" data-starters='{{ (lineup.starters or {}) | tojson | safe }}'
+    data-formation="{{ lineup.formation or '4-3-3' }}">
     <!-- Sidebar / Players List -->
     <div class="w-full lg:w-96 flex flex-col gap-6">
         <div class="glass p-6 rounded-[40px] border-white/5 flex-1 flex flex-col overflow-hidden">
@@ -16,9 +18,10 @@
 
             <div class="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar" id="availablePlayers">
                 {% for player in players %}
-                <div onclick="selectPlayer('{{ player._id }}', '{{ player.name }}', '{{ player.jersey_number or '?' }}', '{{ player.position }}')"
+                <div onclick="selectPlayerCard(this)"
                     class="p-4 rounded-[24px] bg-white/5 border border-white/5 flex items-center justify-between group hover:border-primary-500/30 transition cursor-pointer player-card"
-                    data-player-id="{{ player._id }}">
+                    data-player-id="{{ player._id }}" data-player-name="{{ player.name }}"
+                    data-player-number="{{ player.jersey_number or '?' }}" data-player-pos="{{ player.position }}">
                     <div class="flex items-center gap-4">
                         <div
                             class="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center font-black text-xs shadow-lg group-hover:scale-110 transition-transform">
@@ -139,8 +142,9 @@
 <script>
     const pitchArea = document.getElementById('pitchArea');
     const slotTemplate = document.getElementById('playerSlotTemplate');
-    const starters = {{ lineup.starters| tojson | safe }};
-    const initialFormation = "{{ lineup.formation }}";
+    const configEl = document.getElementById('tactics-config');
+    const starters = JSON.parse(configEl.getAttribute('data-starters'));
+    const initialFormation = configEl.getAttribute('data-formation');
 
     let activeSlot = null;
     let assignment = { ...starters };
@@ -208,6 +212,14 @@
         if (activeSlot) activeSlot.querySelector('.slot-circle').classList.remove('border-primary-500', 'border-solid');
         activeSlot = el;
         activeSlot.querySelector('.slot-circle').classList.add('border-primary-500', 'border-solid', 'border-2');
+    }
+
+    function selectPlayerCard(el) {
+        const id = el.getAttribute('data-player-id');
+        const name = el.getAttribute('data-player-name');
+        const number = el.getAttribute('data-player-number');
+        const pos = el.getAttribute('data-player-pos');
+        selectPlayer(id, name, number, pos);
     }
 
     function selectPlayer(id, name, number, pos) {

@@ -1,6 +1,8 @@
 # FootLogic V2 - Main Routes (Public Pages)
 
-from flask import Blueprint, render_template, session, redirect, url_for
+from flask import Blueprint, render_template, session, redirect, url_for, request, flash
+from app.routes.auth import login_required
+
 
 main_bp = Blueprint('main', __name__)
 
@@ -73,6 +75,11 @@ def page_404():
     """404 error page"""
     return render_template('errors/404.html')
 
+@main_bp.route('/offline')
+def offline():
+    """Offline fallback page for PWA"""
+    return render_template('public/offline.html')
+
 # ============================================================
 # APP PAGES (require login but accessible to all roles)
 # ============================================================
@@ -102,9 +109,18 @@ def feed():
     return render_template('app/feed.html')
 
 @main_bp.route('/calendar')
+@login_required
 def calendar():
     """Calendar view"""
-    return render_template('app/calendar.html')
+    club_id = session.get('club_id')
+    if not club_id:
+        return redirect(url_for('main.app_home')) or redirect(url_for('main.index'))
+    
+    from app.services import get_event_service
+    event_service = get_event_service()
+    events = event_service.get_upcoming(club_id, limit=30)
+    
+    return render_template('app/calendar.html', events=events)
 
 @main_bp.route('/roster')
 def roster():
@@ -200,6 +216,19 @@ def architecture():
     """System architecture"""
     return render_template('admin/architecture.html')
 
+@main_bp.route('/match/<match_id>/live')
+def match_live(match_id):
+    """Public live match view"""
+    from app.services import get_match_service
+    match_service = get_match_service()
+    
+    match = match_service.get_by_id(match_id)
+    if not match:
+        return redirect(url_for('main.index'))
+        
+    from datetime import datetime
+    return render_template('match/live.html', match=match, now=datetime.now().strftime("%d/%m/%Y %H:%M"))
+
 # ============================================================
 # COMMERCE
 # ============================================================
@@ -223,4 +252,3 @@ def invoice():
 def reservations():
     """Reservations page"""
     return render_template('shop/reservations.html')
-

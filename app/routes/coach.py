@@ -392,3 +392,50 @@ def add_match_event():
     match_service.add_event(match_id, event_type, player_id, minute)
     return {"status": "success"}
 
+# ============================================================
+# CONTRACTS / SCOUTING
+# ============================================================
+
+@coach_bp.route('/scouting')
+@login_required
+@role_required('coach', 'admin')
+def scouting():
+    """Search for players to recruit"""
+    from app.services import get_user_service, get_contract_service
+    user_service = get_user_service()
+    
+    # Get all users who are NOT already in a club (or any filter you prefer)
+    # Ideally filter by role='player' and club_id=None
+    all_users = user_service.get_all()
+    free_agents = [
+        u for u in all_users 
+        if (not u.get('club_id') and 'player' in (u.get('roles') or [u.get('role')]))
+    ]
+    
+    return render_template('coach/scouting.html', free_agents=free_agents)
+
+@coach_bp.route('/offer-contract', methods=['POST'])
+@login_required
+@role_required('coach', 'admin')
+def offer_contract():
+    """Send a contract offer to a user"""
+    user_id = request.form.get('user_id')
+    salary = request.form.get('salary', 0)
+    conditions = request.form.get('conditions', '')
+    club_id = session.get('club_id')
+    
+    from app.services import get_contract_service
+    contract_service = get_contract_service()
+    
+    contract_service.create_offer(
+        club_id=club_id,
+        user_id=user_id,
+        role='player',
+        salary=salary,
+        conditions=conditions
+    )
+    
+    flash('Offre de contrat envoyee !', 'success')
+    return redirect(url_for('coach.scouting'))
+
+

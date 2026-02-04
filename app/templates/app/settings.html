@@ -1,217 +1,201 @@
 {% extends "base.html" %}
-{% block title %}Paramètres - FootLogic{% endblock %}
+{% block title %}Paramètres Elite - FootLogic{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto px-4 py-6">
-    <!-- Header -->
-    <div class="flex items-center gap-4 mb-8">
-        <a href="/profile"
-            class="w-10 h-10 glass-light rounded-xl flex items-center justify-center hover:bg-white/10 transition">
-            <i class="fa-solid fa-arrow-left"></i>
+<div class="max-w-2xl mx-auto px-4 py-8 page-enter">
+    <!-- Header with Back Button -->
+    <div class="flex items-center gap-6 mb-12">
+        <a href="{{ url_for('main.profile') }}"
+            class="w-12 h-12 glass rounded-2xl flex items-center justify-center hover:bg-white/10 transition-all active:scale-90 border border-white/10 group">
+            <i class="fa-solid fa-arrow-left text-sm group-hover:-translate-x-1 transition-transform"></i>
         </a>
-        <h1 class="text-2xl font-bold">Paramètres</h1>
+        <div>
+            <h1 class="text-4xl font-black italic uppercase tracking-tighter">Configuration</h1>
+            <p class="text-white/40 font-medium italic tracking-wide">Personnalisez votre expérience Elite.</p>
+        </div>
     </div>
 
-    <!-- Profile Section -->
-    <section class="card p-6 mb-6">
-        <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Profil</h2>
+    <!-- Sections Matrix -->
+    <div class="space-y-10">
 
-        <a href="/edit-profile"
-            class="flex items-center justify-between py-3 hover:bg-white/5 -mx-2 px-2 rounded-lg transition group">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-full overflow-hidden">
-                    <img src="https://randomuser.me/api/portraits/men/{{ range(1,50) | random }}.jpg"
-                        class="w-full h-full object-cover">
-                </div>
-                <div>
-                    <p class="font-bold">{{ current_user.profile.first_name or 'Joueur' }} {{
-                        current_user.profile.last_name or '' }}</p>
-                    <p class="text-sm text-gray-400">Modifier mon profil</p>
-                </div>
+        <!-- Profile Identity Card -->
+        <section class="glass p-8 rounded-[40px] border-white/5 relative overflow-hidden group">
+            <div
+                class="absolute -right-20 -top-20 w-64 h-64 bg-primary-500/5 rounded-full blur-[100px] group-hover:bg-primary-500/10 transition-all duration-1000">
             </div>
-            <i class="fa-solid fa-chevron-right text-gray-600 group-hover:text-primary-400 transition"></i>
-        </a>
-    </section>
+            <h2
+                class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-8 px-2 flex items-center gap-3">
+                <i class="fa-solid fa-id-card text-[8px]"></i>
+                IDENTITÉ NUMÉRIQUE
+            </h2>
 
-    <!-- Notifications Section -->
-    <section class="card p-6 mb-6">
-        <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Notifications</h2>
-
-        <div class="space-y-4">
-            <label class="flex items-center justify-between cursor-pointer group">
-                <div>
-                    <p class="font-medium group-hover:text-white transition">Notifications push</p>
-                    <p class="text-xs text-gray-500">Recevoir les alertes sur votre appareil</p>
-                </div>
-                <input type="checkbox" checked class="toggle-switch">
-            </label>
-
-            <div class="border-t border-white/10 pt-4">
-                <label class="flex items-center justify-between cursor-pointer group">
-                    <div>
-                        <p class="font-medium group-hover:text-white transition">Rappels de match</p>
-                        <p class="text-xs text-gray-500">24h et 1h avant le match</p>
+            <a href="{{ url_for('main.edit_profile') }}"
+                class="flex items-center justify-between p-6 bg-white/5 rounded-[32px] border border-white/5 hover:border-primary-500/30 transition-all duration-500 group/link relative z-10">
+                <div class="flex items-center gap-6">
+                    <div
+                        class="w-16 h-16 rounded-[22px] overflow-hidden border-2 border-primary-500/30 p-0.5 group-hover/link:scale-105 transition-transform duration-500">
+                        <img src="https://randomuser.me/api/portraits/men/{{ range(1,50) | random }}.jpg"
+                            class="w-full h-full object-cover rounded-[18px]">
                     </div>
-                    <input type="checkbox" checked class="toggle-switch">
-                </label>
-            </div>
-
-            <div class="border-t border-white/10 pt-4">
-                <label class="flex items-center justify-between cursor-pointer group">
                     <div>
-                        <p class="font-medium group-hover:text-white transition">Messages de groupe</p>
-                        <p class="text-xs text-gray-500">Notifications des discussions</p>
+                        <p
+                            class="text-lg font-black italic tracking-tight uppercase group-hover/link:text-primary-400 transition-colors">
+                            {{ current_user.profile.first_name }} {{ current_user.profile.last_name }}</p>
+                        <p class="text-[10px] text-white/20 font-black uppercase tracking-widest mt-1 italic">Modifier
+                            les informations de base</p>
                     </div>
-                    <input type="checkbox" checked class="toggle-switch">
-                </label>
-            </div>
-
-            <div class="border-t border-white/10 pt-4">
-                <label class="flex items-center justify-between cursor-pointer group">
-                    <div>
-                        <p class="font-medium group-hover:text-white transition">Nouvelles publications</p>
-                        <p class="text-xs text-gray-500">Actualités du club</p>
-                    </div>
-                    <input type="checkbox" class="toggle-switch">
-                </label>
-            </div>
-        </div>
-    </section>
-
-    <!-- Appearance Section -->
-    <section class="card p-6 mb-6">
-        <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Apparence</h2>
-
-        <div class="space-y-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="font-medium">Thème sombre</p>
-                    <p class="text-xs text-gray-500">Activé par défaut</p>
                 </div>
-                <input type="checkbox" checked class="toggle-switch">
-            </div>
-
-            <div class="border-t border-white/10 pt-4">
-                <p class="font-medium mb-3">Couleur d'accent</p>
-                <div class="flex gap-3">
-                    <button
-                        class="w-8 h-8 rounded-full bg-primary-500 ring-2 ring-white ring-offset-2 ring-offset-surface-900"></button>
-                    <button
-                        class="w-8 h-8 rounded-full bg-green-500 hover:ring-2 hover:ring-white hover:ring-offset-2 hover:ring-offset-surface-900 transition"></button>
-                    <button
-                        class="w-8 h-8 rounded-full bg-amber-500 hover:ring-2 hover:ring-white hover:ring-offset-2 hover:ring-offset-surface-900 transition"></button>
-                    <button
-                        class="w-8 h-8 rounded-full bg-red-500 hover:ring-2 hover:ring-white hover:ring-offset-2 hover:ring-offset-surface-900 transition"></button>
-                    <button
-                        class="w-8 h-8 rounded-full bg-amber-500 hover:ring-2 hover:ring-white hover:ring-offset-2 hover:ring-offset-surface-900 transition"></button>
+                <div
+                    class="w-10 h-10 rounded-xl glass flex items-center justify-center text-white/20 group-hover/link:text-primary-400 transition-all">
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Privacy Section -->
-    <section class="card p-6 mb-6">
-        <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Confidentialité</h2>
-
-        <div class="space-y-4">
-            <label class="flex items-center justify-between cursor-pointer group">
-                <div>
-                    <p class="font-medium group-hover:text-white transition">Profil public</p>
-                    <p class="text-xs text-gray-500">Les fans peuvent voir votre profil</p>
-                </div>
-                <input type="checkbox" checked class="toggle-switch">
-            </label>
-
-            <div class="border-t border-white/10 pt-4">
-                <label class="flex items-center justify-between cursor-pointer group">
-                    <div>
-                        <p class="font-medium group-hover:text-white transition">Afficher statistiques</p>
-                        <p class="text-xs text-gray-500">Vos stats sont visibles</p>
-                    </div>
-                    <input type="checkbox" checked class="toggle-switch">
-                </label>
-            </div>
-        </div>
-    </section>
-
-    <!-- Other Section -->
-    <section class="card p-6 mb-6">
-        <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Autres</h2>
-
-        <div class="space-y-1">
-            <a href="/help"
-                class="flex items-center justify-between py-3 hover:bg-white/5 -mx-2 px-2 rounded-lg transition group">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-circle-question text-gray-500 w-5"></i>
-                    <span class="font-medium group-hover:text-white transition">Aide et support</span>
-                </div>
-                <i class="fa-solid fa-chevron-right text-gray-600"></i>
             </a>
+        </section>
 
-            <a href="/terms"
-                class="flex items-center justify-between py-3 hover:bg-white/5 -mx-2 px-2 rounded-lg transition group">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-file-contract text-gray-500 w-5"></i>
-                    <span class="font-medium group-hover:text-white transition">Conditions d'utilisation</span>
+        <!-- Preferences & Alerts -->
+        <section class="glass p-10 rounded-[48px] border-white/5">
+            <h2
+                class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-10 px-2 flex items-center gap-3">
+                <i class="fa-solid fa-sliders text-[8px]"></i>
+                PRÉFÉRENCES & ALERTES
+            </h2>
+
+            <div class="space-y-8">
+                <!-- Toggle Row -->
+                <div class="flex items-center justify-between group cursor-pointer">
+                    <div>
+                        <p
+                            class="font-black italic text-base uppercase tracking-tight group-hover:text-primary-400 transition-colors">
+                            Notifications Push</p>
+                        <p class="text-xs text-white/40 italic font-medium">Alertes instantanées sur mobile</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" checked class="sr-only peer">
+                        <div
+                            class="w-14 h-7 bg-white/5 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white/20 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500 peer-checked:after:bg-black peer-checked:after:border-black shadow-inner">
+                        </div>
+                    </label>
                 </div>
-                <i class="fa-solid fa-chevron-right text-gray-600"></i>
+
+                <div class="w-full h-px bg-white/5"></div>
+
+                <div class="flex items-center justify-between group cursor-pointer">
+                    <div>
+                        <p
+                            class="font-black italic text-base uppercase tracking-tight group-hover:text-amber-400 transition-colors">
+                            Rappels de Match</p>
+                        <p class="text-xs text-white/40 italic font-medium">Alertes 24h et 1h avant le coup d'envoi</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" checked class="sr-only peer">
+                        <div
+                            class="w-14 h-7 bg-white/5 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white/20 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500 peer-checked:after:bg-black peer-checked:after:border-black shadow-inner">
+                        </div>
+                    </label>
+                </div>
+
+                <div class="w-full h-px bg-white/5"></div>
+
+                <div class="flex items-center justify-between group cursor-pointer">
+                    <div>
+                        <p
+                            class="font-black italic text-base uppercase tracking-tight group-hover:text-primary-400 transition-colors">
+                            Confidentialité Profil</p>
+                        <p class="text-xs text-white/40 italic font-medium">Rendre vos statistiques visibles aux clubs
+                        </p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" checked class="sr-only peer">
+                        <div
+                            class="w-14 h-7 bg-white/5 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white/20 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500 peer-checked:after:bg-black peer-checked:after:border-black shadow-inner">
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Customization Matrix -->
+        <section class="glass p-10 rounded-[48px] border-white/5">
+            <h2
+                class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-8 px-2 flex items-center gap-3">
+                <i class="fa-solid fa-paint-brush text-[8px]"></i>
+                INTERFACE & DESIGN
+            </h2>
+
+            <div class="space-y-8">
+                <div>
+                    <p class="font-black italic text-base uppercase tracking-tight mb-4">Couleur d'accentuation</p>
+                    <div class="flex gap-4">
+                        {% set colors = [('primary', '#84cc16'), ('amber', '#f59e0b'), ('blue', '#3b82f6'), ('red',
+                        '#ef4444')] %}
+                        {% for name, hex in colors %}
+                        <button
+                            class="w-12 h-12 rounded-[18px] border-4 border-black shadow-xl hover:scale-110 transition-transform relative group {% if loop.first %}ring-2 ring-primary-500 ring-offset-4 ring-offset-surface-950{% endif %}"
+                            style="background-color: {{ hex }};">
+                            <i
+                                class="fa-solid fa-check text-black text-[10px] opacity-0 group-hover:opacity-100 {% if loop.first %}opacity-100{% endif %} transition-opacity"></i>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Extra Links -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% set extra_links = [('Aide & Support', 'fa-circle-question', '/help'), ('Confidentialité',
+            'fa-shield-halved', '/privacy'), ('CGU / Licences', 'fa-file-signature', '/terms')] %}
+            {% for label, icon, url in extra_links %}
+            <a href="{{ url }}"
+                class="glass p-6 rounded-[28px] border-white/5 flex items-center justify-between group hover:bg-white/5 transition-all">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/20 group-hover:text-white transition-colors">
+                        <i class="fa-solid {{ icon }} text-sm"></i>
+                    </div>
+                    <span class="text-sm font-black italic uppercase tracking-tight">{{ label }}</span>
+                </div>
+                <i
+                    class="fa-solid fa-arrow-right-long text-[10px] text-white/10 group-hover:text-white group-hover:translate-x-1 transition-all"></i>
             </a>
+            {% endfor %}
+        </div>
 
-            <a href="/privacy"
-                class="flex items-center justify-between py-3 hover:bg-white/5 -mx-2 px-2 rounded-lg transition group">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-shield text-gray-500 w-5"></i>
-                    <span class="font-medium group-hover:text-white transition">Politique de confidentialité</span>
+        <!-- Logout Action -->
+        <div class="pt-10">
+            <a href="{{ url_for('auth.logout') }}"
+                class="w-full glass p-8 rounded-[40px] border-red-500/20 flex flex-col items-center gap-4 group hover:bg-red-500/5 transition-all duration-700">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-red-500/10 text-red-500 flex items-center justify-center text-xl group-hover:scale-110 transition-all duration-500 shadow-xl shadow-red-500/10">
+                    <i class="fa-solid fa-power-off"></i>
                 </div>
-                <i class="fa-solid fa-chevron-right text-gray-600"></i>
+                <div class="text-center">
+                    <p
+                        class="font-black italic text-lg uppercase tracking-tight text-white group-hover:text-red-400 transition-colors">
+                        Déconnexion Sécurisée</p>
+                    <p class="text-[10px] text-white/20 font-black uppercase tracking-widest mt-1">Session FootLogic
+                        Elite Academy</p>
+                </div>
             </a>
         </div>
-    </section>
+    </div>
 
-    <!-- Danger Zone -->
-    <section class="card p-6 border-red-500/30">
-        <a href="/logout" class="flex items-center gap-3 text-red-400 hover:text-red-300 transition font-bold">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            Déconnexion
-        </a>
-    </section>
-
-    <!-- App Version -->
-    <p class="text-center text-xs text-gray-600 mt-8">FootLogic v2.0.0 • Fait avec ❤️</p>
+    <!-- App Info Badge -->
+    <div class="mt-16 text-center space-y-2">
+        <p class="text-[10px] font-black uppercase tracking-[0.4em] text-white/10 italic">FootLogic Elite Platform
+            v2.0.4</p>
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/5">Développé pour les athlètes de haut
+            niveau</p>
+    </div>
 </div>
 
 <style>
-    .toggle-switch {
-        appearance: none;
-        width: 44px;
-        height: 24px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        position: relative;
-        cursor: pointer;
-        transition: background 0.3s;
+    .peer:checked~.peer-checked\:bg-primary-500 {
+        background-color: #84cc16;
     }
 
-    .toggle-switch::before {
-        content: '';
-        position: absolute;
-        top: 2px;
-        left: 2px;
-        width: 20px;
-        height: 20px;
-        background: white;
-        border-radius: 50%;
-        transition: transform 0.3s;
-    }
-
-    .toggle-switch:checked {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    }
-
-    .toggle-switch:checked::before {
-        transform: translateX(20px);
+    .peer:checked~.peer-checked\:bg-amber-500 {
+        background-color: #f59e0b;
     }
 </style>
 {% endblock %}
-
-

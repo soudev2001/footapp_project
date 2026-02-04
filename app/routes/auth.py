@@ -140,7 +140,12 @@ def register():
             'avatar': '',
             'phone': ''
         }
-        user = user_service.create(email, password, role='fan', profile=profile)
+        # Get roles from form
+        roles = request.form.getlist('roles')
+        if not roles:
+            roles = ['fan'] # Default if nothing selected
+            
+        user = user_service.create(email, password, roles=roles, profile=profile)
         
         flash('Inscription reussie! Connectez-vous.', 'success')
         return redirect(url_for('auth.login'))

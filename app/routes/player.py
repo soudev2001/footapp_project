@@ -136,7 +136,7 @@ def event_detail(event_id):
         flash('Evenement non trouve.', 'error')
         return redirect(url_for('player.calendar'))
     
-    attendees = event_service.get_attendance(event_id)
+    attendees = event_service.get_attendance_list(event_id)
     
     return render_template('player/event_detail.html', event=event, attendees=attendees)
 
@@ -180,4 +180,76 @@ def settings():
 def notifications():
     """Player notifications"""
     return render_template('player/notifications.html')
+
+# ============================================================
+# CONTRACTS
+# ============================================================
+
+@player_bp.route('/contracts')
+@login_required
+def contracts():
+    """View my contracts"""
+    user_id = session.get('user_id')
+    
+    from app.services import get_contract_service, get_club_service
+    contract_service = get_contract_service()
+    club_service = get_club_service()
+    
+    contracts = contract_service.get_by_user(user_id)
+    
+    # Enrich with club details
+    for c in contracts:
+        c['club'] = club_service.get_by_id(c['club_id'])
+    
+    return render_template('player/contracts.html', contracts=contracts)
+
+
+@player_bp.route('/contracts/<contract_id>/respond', methods=['POST'])
+@login_required
+def respond_contract(contract_id):
+    """Accept or Reject a contract"""
+    action = request.form.get('action') # 'active' or 'rejected'
+    user_id = session.get('user_id')
+    
+    from app.services import get_contract_service, get_user_service, get_player_service
+    contract_service = get_contract_service()
+    user_service = get_user_service()
+    player_service = get_player_service()
+    
+    contract = contract_service.get_by_id(contract_id)
+    
+    if not contract or str(contract['user_id']) != user_id:
+        flash('Contrat invalide.', 'error')
+        return redirect(url_for('player.contracts'))
+        
+    contract_service.respond_to_offer(contract_id, action)
+    
+    if action == 'active':
+        # 1. Update User's club_id
+        from bson import ObjectId
+        # Direct DB update needed or userService method
+        # Using raw collection for now or assume userService has update method
+        # Let's use the one we have access to via services
+        from app.services.db import get_db
+        db = get_db()
+        db.users.update_one({'_id': ObjectId(user_id)}, {'$set': {'club_id': contract['club_id']}})
+        
+        # 2. Create Player Profile if it doesn't exist
+        existing_player = player_service.get_by_user(user_id)
+        if not existing_player:
+            player_service.create(
+                user_id=user_id,
+                club_id=str(contract['club_id']), # expects string usually
+                name=session.get('user_profile', {}).get('first_name', 'Player'),
+                jersey_number=0,
+                position='MID'
+            )
+        
+        # Update session
+        session['club_id'] = str(contract['club_id'])
+        flash('Contrat accepté ! Bienvenue dans votre nouveau club.', 'success')
+        return redirect(url_for('player.home'))
+        
+    flash('Offre rejetée.', 'info')
+    return redirect(url_for('player.contracts'))
 

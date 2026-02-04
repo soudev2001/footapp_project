@@ -27,6 +27,14 @@ def get_post_service():
     from .post_service import PostService
     return PostService(mongo.db)
 
+def get_contract_service():
+    from .contract_service import ContractService
+    return ContractService(mongo.db)
+
+def get_isy_service():
+    from .isy_service import IsyService
+    return IsyService()
+
 # Role helpers
 from .user_service import has_permission, get_nav_for_role, ROLE_PERMISSIONS
 

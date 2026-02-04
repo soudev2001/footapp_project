@@ -7,7 +7,9 @@
     <div class="glass p-8 rounded-[40px] border-white/5 mb-10 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-amber-500/10"></div>
 
-        <div class="relative z-10 flex flex-col md:flex-row justify-between gap-8">
+        <div class="relative z-10 flex flex-col md:flex-row justify-between gap-8" id="attendance-config"
+            data-total-players="{{ players|length }}"
+            data-event-id="{{ selected_event._id if selected_event else '' }}">
             <div class="flex-1">
                 <div class="flex items-center gap-4 mb-4">
                     <span
@@ -82,8 +84,7 @@
         {% for player in players %}
         {% set status = attendance_data.get(player._id|string, '') %}
         <div class="player-row glass p-6 rounded-[32px] border-white/5 flex items-center justify-between group hover:bg-white/5 transition-all duration-500 animate-slide-in"
-            style="animation-delay: {{ loop.index0 * 0.05 }}s" data-player-id="{{ player._id }}"
-            data-name="{{ player.name|lower }}">
+            style="--idx: {{ loop.index0 }}" data-player-id="{{ player._id }}" data-name="{{ player.name|lower }}">
             <div class="flex items-center gap-5">
                 <div class="relative">
                     <div
@@ -191,6 +192,7 @@
 
     .animate-slide-in {
         animation: slideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
+        animation-delay: calc(var(--idx) * 0.05s);
     }
 
     @keyframes slideIn {
@@ -207,8 +209,9 @@
 </style>
 
 <script>
-    const totalPlayers = {{ players| length }};
-    const eventId = "{{ selected_event._id if selected_event else '' }}";
+    const configEl = document.getElementById('attendance-config');
+    const totalPlayers = parseInt(configEl.getAttribute('data-total-players'));
+    const eventId = configEl.getAttribute('data-event-id');
 
     function setStatus(btn, status) {
         const parent = btn.parentElement;

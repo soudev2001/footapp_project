@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Partenaires & Sponsors - Isy Hub{% endblock %}
+
+{% block content %}
+<div class="page-enter max-w-7xl mx-auto px-4 py-8">
+    <!-- Header Hero -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-10 mb-16">
+        <div>
+            <a href="{{ url_for('isy.hub') }}"
+                class="inline-flex items-center gap-2 text-white/40 hover:text-primary-400 font-black text-[10px] uppercase tracking-widest mb-6 transition-colors">
+                <i class="fa-solid fa-arrow-left text-[8px]"></i> RETOUR AU HUB
+            </a>
+            <h1 class="text-6xl font-black italic uppercase tracking-tighter leading-none">Cercle des <span
+                    class="text-gradient">Partenaires</span></h1>
+        </div>
+        <button onclick="toggleModal('addSponsorModal')"
+            class="gradient-accent px-10 py-6 rounded-[32px] font-black text-[11px] uppercase tracking-widest text-black shadow-2xl shadow-yellow-500/10 hover:scale-[1.05] transition-all flex items-center gap-4">
+            <i class="fa-solid fa-plus"></i> NOUVEAU SPONSOR
+        </button>
+    </div>
+
+    <!-- Sponsors Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        {% for sponsor in sponsors %}
+        <div
+            class="glass p-1 rounded-[56px] border-white/5 group hover:border-primary-500/30 transition-all duration-700 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-50">
+            </div>
+
+            <div class="relative bg-surface-950/40 rounded-[55px] p-10 flex flex-col items-center text-center">
+                <!-- Sponsor Status Badge -->
+                <div class="absolute top-8 right-10">
+                    <span
+                        class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[8px] font-black uppercase tracking-widest text-primary-400">
+                        {{ sponsor.level }}
+                    </span>
+                </div>
+
+                <!-- Logo Circle -->
+                <div
+                    class="w-32 h-32 bg-white rounded-[44px] p-4 flex items-center justify-center shadow-2xl mb-8 group-hover:scale-110 transition-transform duration-700">
+                    {% if sponsor.logo_url %}
+                    <img src="{{ sponsor.logo_url }}" class="w-full h-full object-contain">
+                    {% else %}
+                    <i class="fa-solid fa-shield-halved text-5xl text-black/10"></i>
+                    {% endif %}
+                </div>
+
+                <h3 class="text-3xl font-black italic uppercase tracking-tighter mb-4">{{ sponsor.name }}</h3>
+                <div class="w-12 h-1 bg-primary-500/20 rounded-full mb-6"></div>
+
+                <p class="text-white/40 text-sm font-medium italic mb-8 h-12 line-clamp-2">Propulse l'excellence
+                    sportive au sein du club depuis {{ sponsor.created_at.strftime('%Y') if sponsor.created_at else
+                    '2026' }}.</p>
+
+                <div class="grid grid-cols-2 gap-4 w-full mb-10">
+                    <div class="bg-white/5 rounded-3xl p-4 border border-white/5">
+                        <p class="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1 italic">
+                            Contribution</p>
+                        <p class="font-black text-lg italic tracking-tight">{{ sponsor.contribution }}€</p>
+                    </div>
+                    <div class="bg-white/5 rounded-3xl p-4 border border-white/5">
+                        <p class="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1 italic">Visibilité
+                        </p>
+                        <p class="font-black text-lg italic tracking-tight">Maximale</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 w-full">
+                    <a href="{{ sponsor.website }}" target="_blank"
+                        class="flex-1 py-5 bg-white/5 hover:bg-white/10 rounded-[24px] text-[10px] font-black uppercase tracking-widest transition-all">VISITER</a>
+                    <button
+                        class="w-16 h-14 bg-red-500/5 hover:bg-red-500/10 rounded-[24px] flex items-center justify-center text-red-500/50 hover:text-red-500 border border-red-500/10 transition-all">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="lg:col-span-3 glass p-32 rounded-[64px] border-white/5 border-dashed text-center">
+            <div class="w-24 h-24 bg-white/5 rounded-[40px] flex items-center justify-center mx-auto mb-8">
+                <i class="fa-solid fa-handshake-angle text-4xl text-white/10"></i>
+            </div>
+            <h3 class="text-2xl font-black italic uppercase tracking-widest text-white/20 mb-4">Aucun Partenaire</h3>
+            <p class="text-white/10 text-sm font-medium italic">Commencez à bâtir votre réseau de sponsors pour financer
+                vos ambitions.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal: Add Sponsor -->
+<div id="addSponsorModal"
+    class="fixed inset-0 z-[100] hidden bg-black/90 backdrop-blur-xl flex items-center justify-center p-6">
+    <div
+        class="glass max-w-xl w-full rounded-[64px] border-white/10 overflow-hidden animate-slide-up shadow-[0_32px_80px_-16px_rgba(0,0,0,0.8)]">
+        <div class="p-12 lg:p-16 relative">
+            <div class="flex justify-between items-center mb-12">
+                <h3 class="text-4xl font-black italic uppercase tracking-tighter leading-none">Nouveau <span
+                        class="text-gradient">Partenaire</span></h3>
+                <button onclick="toggleModal('addSponsorModal')"
+                    class="w-14 h-14 rounded-3xl glass hover:bg-white/10 flex items-center justify-center transition-all text-white/20 hover:text-white border border-white/10">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <form action="{{ url_for('isy.sponsors') }}" method="POST" class="space-y-8">
+                <div>
+                    <label
+                        class="block text-[11px] font-black uppercase tracking-[0.4em] text-white/10 mb-4 ml-2">Identité
+                        du Sponsor</label>
+                    <input type="text" name="name" required placeholder="Ex: Nike, RedBull, Entreprise Locale..."
+                        class="w-full bg-white/[0.03] border border-white/10 rounded-[32px] py-6 px-10 text-white focus:outline-none focus:border-primary-500 transition-all font-black placeholder:text-white/10">
+                </div>
+
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <label
+                            class="block text-[11px] font-black uppercase tracking-[0.4em] text-white/10 mb-4 ml-2">Niveau</label>
+                        <select name="level"
+                            class="w-full bg-white/[0.03] border border-white/10 rounded-[32px] py-6 px-10 text-white focus:outline-none focus:border-primary-500 transition-all font-black appearance-none uppercase text-xs">
+                            <option value="Platinum">Platinum</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Silver">Silver</option>
+                            <option value="Bronze">Bronze</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-[11px] font-black uppercase tracking-[0.4em] text-white/10 mb-4 ml-2">Contribution
+                            (€)</label>
+                        <input type="number" name="contribution" required placeholder="5000"
+                            class="w-full bg-white/[0.03] border border-white/10 rounded-[32px] py-6 px-10 text-white focus:outline-none focus:border-primary-500 transition-all font-black placeholder:text-white/10">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-black uppercase tracking-[0.4em] text-white/10 mb-4 ml-2">Site
+                        Web (pour le logo)</label>
+                    <input type="text" name="website" placeholder="nike.com"
+                        class="w-full bg-white/[0.03] border border-white/10 rounded-[32px] py-6 px-10 text-white focus:outline-none focus:border-primary-500 transition-all font-black placeholder:text-white/10">
+                </div>
+
+                <div class="pt-8">
+                    <button type="submit"
+                        class="gradient-accent w-full py-7 rounded-[36px] text-[13px] font-black uppercase tracking-[0.2em] text-black shadow-2xl shadow-yellow-500/10 hover:scale-[1.02] active:scale-95 transition-all">
+                        INTÉGRER AU CERCLE ÉLITE
+                    </button>
+                    <p class="text-center mt-8 text-[10px] text-white/20 font-black uppercase tracking-[0.3em] italic">
+                        L'excellence commence par un partenariat solide.</p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleModal(id) {
+        document.getElementById(id).classList.toggle('hidden');
+    }
+</script>
+{% endblock %}

@@ -94,6 +94,43 @@
                     </div>
                 </div>
 
+                <div>
+                    <label
+                        class="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Confirmer
+                        Mot de passe</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition"></i>
+                        <input type="password" name="password_confirm" required placeholder="••••••••"
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500/50 transition-all font-medium">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Rôles
+                        (Sélectionnez au moins un)</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label
+                            class="flex items-center space-x-3 bg-white/5 border border-white/10 rounded-2xl p-3 cursor-pointer hover:bg-white/10 transition">
+                            <input type="checkbox" name="roles" value="player"
+                                class="form-checkbox h-5 w-5 text-primary-500 rounded border-gray-600 focus:ring-primary-500">
+                            <span class="text-sm font-bold">Joueur</span>
+                        </label>
+                        <label
+                            class="flex items-center space-x-3 bg-white/5 border border-white/10 rounded-2xl p-3 cursor-pointer hover:bg-white/10 transition">
+                            <input type="checkbox" name="roles" value="coach"
+                                class="form-checkbox h-5 w-5 text-primary-500 rounded border-gray-600 focus:ring-primary-500">
+                            <span class="text-sm font-bold">Coach</span>
+                        </label>
+                        <label
+                            class="flex items-center space-x-3 bg-white/5 border border-white/10 rounded-2xl p-3 cursor-pointer hover:bg-white/10 transition">
+                            <input type="checkbox" name="roles" value="fan"
+                                class="form-checkbox h-5 w-5 text-primary-500 rounded border-gray-600 focus:ring-primary-500">
+                            <span class="text-sm font-bold">Fan</span>
+                        </label>
+                    </div>
+                </div>
+
                 <button type="submit"
                     class="w-full gradient-primary py-4 rounded-2xl text-white font-black text-lg shadow-xl hover:scale-[1.02] active:scale-95 transition-all">
                     S'inscrire
@@ -109,6 +146,3 @@
     </div>
 </div>
 {% endblock %}
-{% endblock %}
-
-

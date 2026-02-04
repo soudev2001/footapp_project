@@ -65,7 +65,20 @@ def add_member():
             'phone': ''
         }
         # In this demo, we use a simple password
-        user_service.create(email, 'Member123!', role=role, club_id=club_id, profile=profile)
+        new_user = user_service.create(email, 'Member123!', role=role, club_id=club_id, profile=profile)
+        
+        # If the member is a player, create their player profile too
+        if role == 'player':
+            from app.services import get_player_service
+            player_service = get_player_service()
+            player_service.create(
+                club_id=club_id,
+                user_id=new_user['_id'],
+                name=f"{first_name} {last_name}",
+                position="À définir",
+                jersey_number=None
+            )
+            
         flash(f'Membre {first_name} ajoute avec succes au club!', 'success')
         
     return redirect(url_for('admin.admin_panel'))
@@ -134,12 +147,13 @@ def users():
 @role_required('admin')
 def change_role(user_id):
     """Change user role"""
+    from bson import ObjectId
     new_role = request.form.get('role')
     if new_role in ['admin', 'coach', 'player', 'fan']:
         from app.services import get_user_service
         user_service = get_user_service()
         user_service.collection.update_one(
-            {'_id': user_id},
+            {'_id': ObjectId(user_id)},
             {'$set': {'role': new_role}}
         )
         flash(f'Role modifie en {new_role}.', 'success')
