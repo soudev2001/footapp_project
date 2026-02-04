@@ -24,8 +24,20 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - MONGO_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-secret}@mongodb_prod:27017/${MONGO_DATABASE:-FootClubApp_Prod}?authSource=admin
       - FLASK_ENV=production
-    ports:
-      - "5000:5000"
+    networks:
+      - default
+      - traefik_public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.footapp-prod.rule=Host(`takurte.fr`) || Host(`www.takurte.fr`)"
+      - "traefik.http.routers.footapp-prod.entrypoints=websecure"
+      - "traefik.http.routers.footapp-prod.tls=true"
+      - "traefik.http.routers.footapp-prod.tls.certresolver=letsencrypt"
 
 volumes:
   mongodb_data_prod:
+
+
+networks:
+  traefik_public:
+    external: true

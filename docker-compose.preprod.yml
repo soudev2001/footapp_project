@@ -24,8 +24,20 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - MONGO_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-secret}@mongodb_preprod:27017/${MONGO_DATABASE:-FootClubApp_PreProd}?authSource=admin
       - FLASK_ENV=development
-    ports:
-      - "5001:5000" # Mapped to port 5001 for pre-prod
+    networks:
+      - default
+      - traefik_public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.footapp-preprod.rule=Host(`preprod.takurte.fr`)"
+      - "traefik.http.routers.footapp-preprod.entrypoints=websecure"
+      - "traefik.http.routers.footapp-preprod.tls=true"
+      - "traefik.http.routers.footapp-preprod.tls.certresolver=letsencrypt"
 
 volumes:
   mongodb_data_preprod:
+
+
+networks:
+  traefik_public:
+    external: true
