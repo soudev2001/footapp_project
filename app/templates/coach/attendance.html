@@ -19,18 +19,40 @@
                     <h1 class="text-3xl font-black italic uppercase tracking-tight">Pointage Elite</h1>
                 </div>
 
-                <div class="relative group max-w-md">
-                    <select onchange="window.location.href='/coach/attendance/' + this.value"
-                        class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-12 text-sm font-black text-primary-400 cursor-pointer appearance-none focus:outline-none focus:border-primary-500/50 transition-all">
-                        {% for event in events %}
-                        <option value="{{ event._id }}" class="bg-surface-950 text-white" {% if selected_event and
-                            selected_event._id==event._id %}selected{% endif %}>
-                            {{ event.title }} • {{ event.date.strftime('%d %b %H:%M') }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <div class="absolute inset-y-0 right-6 flex items-center pointer-events-none">
-                        <i class="fa-solid fa-chevron-down text-primary-400 text-xs"></i>
+                <div class="flex items-center gap-4">
+                    {% if teams %}
+                    <div class="relative min-w-[200px]">
+                        <form id="teamFilterForm" method="GET" action="{{ url_for('coach.attendance') }}">
+                            <select name="team_id" onchange="this.form.submit()"
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-xs font-black uppercase tracking-widest focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
+                                {% for team in teams %}
+                                <option value="{{ team._id|string }}" {% if selected_team_id==team._id|string
+                                    %}selected{% endif %} class="bg-slate-900">
+                                    {{ team.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none text-white/20">
+                                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
+
+                    <div class="relative group flex-1">
+                        <select
+                            onchange="window.location.href='/coach/attendance/' + this.value + '?team_id={{ selected_team_id }}'"
+                            class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-12 text-sm font-black text-primary-400 cursor-pointer appearance-none focus:outline-none focus:border-primary-500/50 transition-all">
+                            {% for event in events %}
+                            <option value="{{ event._id }}" class="bg-surface-950 text-white" {% if selected_event and
+                                selected_event._id==event._id %}selected{% endif %}>
+                                {{ event.title }} • {{ event.date.strftime('%d %b %H:%M') }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="absolute inset-y-0 right-6 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-chevron-down text-primary-400 text-xs"></i>
+                        </div>
                     </div>
                 </div>
             </div>

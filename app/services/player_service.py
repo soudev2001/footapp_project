@@ -18,9 +18,12 @@ class PlayerService:
         """Get player by ID"""
         return self.collection.find_one({'_id': ObjectId(player_id)})
     
-    def get_by_club(self, club_id):
-        """Get all players for a club"""
-        return list(self.collection.find({'club_id': ObjectId(club_id)}))
+    def get_by_club(self, club_id, team_id=None):
+        """Get all players for a club, optionally filtered by team"""
+        query = {'club_id': ObjectId(club_id)}
+        if team_id:
+            query['team_id'] = ObjectId(team_id)
+        return list(self.collection.find(query))
     
     def get_by_position(self, club_id, position):
         """Get players by position"""
@@ -142,6 +145,16 @@ class PlayerService:
             {'$set': {f'parents.{parent_type}': data}}
         )
     
+    def get_upcoming(self, club_id, team_id=None, limit=10):
+        """Get upcoming events, optionally filtered by team"""
+        query = {
+            'club_id': ObjectId(club_id),
+            'date': {'$gte': datetime.utcnow()}
+        }
+        if team_id:
+            query['team_id'] = ObjectId(team_id)
+        return list(self.collection.find(query).sort('date', 1).limit(limit))
+    
     def get_top_scorers(self, club_id, limit=5):
         """Get top scorers for a club"""
         return list(self.collection.find(
@@ -164,23 +177,32 @@ class PlayerService:
         
         return lineup
 
-    def save_lineup(self, club_id, formation, starters):
-        """Save a custom lineup for a club"""
+    def save_lineup(self, club_id, formation, starters, team_id=None):
+        """Save a custom lineup for a club/team"""
+        query = {'club_id': ObjectId(club_id)}
+        if team_id:
+            query['team_id'] = ObjectId(team_id)
+            
         return self.db.lineups.update_one(
-            {'club_id': ObjectId(club_id)},
+            query,
             {
                 '$set': {
                     'formation': formation,
                     'starters': starters, # { "GK": "player_id", "LB": "player_id", ... }
+                    'team_id': ObjectId(team_id) if team_id else None,
                     'updated_at': datetime.utcnow()
                 }
             },
             upsert=True
         )
 
-    def get_active_lineup(self, club_id):
-        """Get the current active lineup for a club"""
-        lineup = self.db.lineups.find_one({'club_id': ObjectId(club_id)})
+    def get_active_lineup(self, club_id, team_id=None):
+        """Get the current active lineup for a club/team"""
+        query = {'club_id': ObjectId(club_id)}
+        if team_id:
+            query['team_id'] = ObjectId(team_id)
+            
+        lineup = self.db.lineups.find_one(query)
         if not lineup:
             return {'formation': '4-3-3', 'starters': {}}
         return lineup

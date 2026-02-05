@@ -22,19 +22,25 @@ class MatchService:
         """Get all matches for a club"""
         return list(self.collection.find({'club_id': ObjectId(club_id)}).sort('date', -1))
     
-    def get_upcoming(self, club_id, limit=5):
-        """Get upcoming scheduled matches"""
-        return list(self.collection.find({
+    def get_upcoming(self, club_id, team_id=None, limit=5):
+        """Get upcoming scheduled matches, optionally filtered by team"""
+        query = {
             'club_id': ObjectId(club_id),
             'status': 'scheduled'
-        }).sort('date', 1).limit(limit))
+        }
+        if team_id:
+            query['team_id'] = ObjectId(team_id)
+        return list(self.collection.find(query).sort('date', 1).limit(limit))
     
-    def get_completed(self, club_id, limit=10):
-        """Get completed matches"""
-        return list(self.collection.find({
+    def get_completed(self, club_id, team_id=None, limit=10):
+        """Get completed matches, optionally filtered by team"""
+        query = {
             'club_id': ObjectId(club_id),
             'status': 'completed'
-        }).sort('date', -1).limit(limit))
+        }
+        if team_id:
+            query['team_id'] = ObjectId(team_id)
+        return list(self.collection.find(query).sort('date', -1).limit(limit))
     
     def create(self, club_id, opponent, date, is_home=True, **kwargs):
         """Create a new match"""
@@ -101,12 +107,16 @@ class MatchService:
         lineup_ids = match.get('lineup', [])
         return list(self.db.players.find({'_id': {'$in': lineup_ids}}))
     
-    def get_season_stats(self, club_id):
-        """Get season statistics for a club"""
-        matches = list(self.collection.find({
+    def get_season_stats(self, club_id, team_id=None):
+        """Get season statistics for a club, optionally filtered by team"""
+        query = {
             'club_id': ObjectId(club_id),
             'status': 'completed'
-        }))
+        }
+        if team_id:
+            query['team_id'] = ObjectId(team_id)
+            
+        matches = list(self.collection.find(query))
         
         wins = draws = losses = goals_for = goals_against = 0
         

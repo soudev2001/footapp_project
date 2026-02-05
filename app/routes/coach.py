@@ -19,21 +19,34 @@ def dashboard():
         flash('Aucun club associe.', 'warning')
         return redirect(url_for('main.index'))
     
-    from app.services import get_player_service, get_event_service, get_match_service
+    from app.services import get_player_service, get_event_service, get_match_service, get_team_service
     
     player_service = get_player_service()
     event_service = get_event_service()
     match_service = get_match_service()
+    team_service = get_team_service()
     
-    players = player_service.get_by_club(club_id)
-    upcoming_events = event_service.get_upcoming(club_id, limit=5)
-    upcoming_matches = match_service.get_upcoming(club_id, limit=3)
-    season_stats = match_service.get_season_stats(club_id)
+    # Get all teams for the club to allow selection
+    teams = team_service.get_by_club(club_id)
+    
+    # Determine the selected team (default to the first one or a specific one from session/query)
+    selected_team_id = request.args.get('team_id')
+    if not selected_team_id and teams:
+        selected_team_id = str(teams[0]['_id'])
+    
+    players = player_service.get_by_club(club_id, team_id=selected_team_id)
+    upcoming_events = event_service.get_upcoming(club_id, team_id=selected_team_id, limit=5)
+    upcoming_matches = match_service.get_upcoming(club_id, team_id=selected_team_id, limit=3)
+    recent_matches = match_service.get_completed(club_id, team_id=selected_team_id, limit=5)
+    season_stats = match_service.get_season_stats(club_id, team_id=selected_team_id)
     
     return render_template('coach/dashboard.html',
         players=players,
+        teams=teams,
+        selected_team_id=selected_team_id,
         upcoming_events=upcoming_events,
         upcoming_matches=upcoming_matches,
+        recent_matches=recent_matches,
         season_stats=season_stats
     )
 
@@ -41,24 +54,36 @@ def dashboard():
 @login_required
 @role_required('coach', 'admin')
 def roster():
-    """Team roster management"""
+    """Roster management"""
     club_id = session.get('club_id')
     if not club_id:
         return redirect(url_for('main.index'))
     
-    from app.services import get_player_service
+    from app.services import get_player_service, get_team_service
     player_service = get_player_service()
+    team_service = get_team_service()
     
-    players = player_service.get_by_club(club_id)
+    teams = team_service.get_by_club(club_id)
+    selected_team_id = request.args.get('team_id')
+    if not selected_team_id and teams:
+        selected_team_id = str(teams[0]['_id'])
+        
+    players = player_service.get_by_club(club_id, team_id=selected_team_id)
     
-    # Group by position
-    by_position = {'GK': [], 'DEF': [], 'MID': [], 'ATT': []}
-    for player in players:
-        pos = player.get('position', 'MID')
-        if pos in by_position:
-            by_position[pos].append(player)
+    # Simple grouping for the roster view by position
+    by_position = {
+        'GK': [p for p in players if p.get('position') == 'GK'],
+        'DEF': [p for p in players if p.get('position') == 'DEF'],
+        'MID': [p for p in players if p.get('position') == 'MID'],
+        'ATT': [p for p in players if p.get('position') == 'ATT'],
+    }
     
-    return render_template('coach/roster.html', players=players, by_position=by_position)
+    return render_template('coach/roster.html', 
+        players=players, 
+        by_position=by_position, 
+        teams=teams, 
+        selected_team_id=selected_team_id
+    )
 
 @coach_bp.route('/player/<player_id>')
 @login_required
@@ -111,25 +136,30 @@ def add_player():
     club_id = session.get('club_id')
     if not club_id:
         return redirect(url_for('main.index'))
-        
+    
+    from app.services import get_player_service, get_team_service
+    player_service = get_player_service()
+    team_service = get_team_service()
+    
     if request.method == 'POST':
-        from app.services import get_player_service
-        player_service = get_player_service()
-        
         data = {
             'name': request.form.get('name'),
             'jersey_number': int(request.form.get('jersey_number', 0)),
             'position': request.form.get('position'),
             'status': 'active',
             'height': int(request.form.get('height', 175)),
-            'weight': int(request.form.get('weight', 70))
+            'weight': int(request.form.get('weight', 70)),
+            'team_id': request.form.get('team_id')
         }
         
         player_service.create(club_id=club_id, **data)
         flash('Nouveau joueur ajoute a l\'effectif.', 'success')
-        return redirect(url_for('coach.roster'))
-        
-    return render_template('coach/add_player.html')
+        return redirect(url_for('coach.roster', team_id=data['team_id']))
+    
+    teams = team_service.get_by_club(club_id)
+    selected_team_id = request.args.get('team_id')
+    
+    return render_template('coach/add_player.html', teams=teams, selected_team_id=selected_team_id)
 
 @coach_bp.route('/player/<player_id>/delete', methods=['POST'])
 @login_required
@@ -210,17 +240,27 @@ def attendance(event_id=None):
     if not club_id:
         return redirect(url_for('main.index'))
     
-    from app.services import get_event_service, get_player_service
+    from app.services import get_event_service, get_player_service, get_team_service
     event_service = get_event_service()
     player_service = get_player_service()
+    team_service = get_team_service()
     
-    players = player_service.get_by_club(club_id)
-    upcoming_events = event_service.get_upcoming(club_id, limit=20)
+    teams = team_service.get_by_club(club_id)
+    selected_team_id = request.args.get('team_id')
     
     selected_event = None
     if event_id:
         selected_event = event_service.get_by_id(event_id)
-    elif upcoming_events:
+        if selected_event and selected_event.get('team_id') and not selected_team_id:
+            selected_team_id = str(selected_event['team_id'])
+    
+    if not selected_team_id and teams:
+        selected_team_id = str(teams[0]['_id'])
+        
+    players = player_service.get_by_club(club_id, team_id=selected_team_id)
+    upcoming_events = event_service.get_upcoming(club_id, team_id=selected_team_id, limit=20)
+    
+    if not selected_event and upcoming_events:
         selected_event = upcoming_events[0]
         
     attendance_data = {}
@@ -231,7 +271,9 @@ def attendance(event_id=None):
         events=upcoming_events, 
         players=players,
         selected_event=selected_event,
-        attendance_data=attendance_data
+        attendance_data=attendance_data,
+        teams=teams,
+        selected_team_id=selected_team_id
     )
 
 @coach_bp.route('/attendance/update', methods=['POST'])
@@ -262,15 +304,23 @@ def tactics():
     if not club_id:
         return redirect(url_for('main.index'))
     
-    from app.services import get_player_service
+    from app.services import get_player_service, get_team_service
     player_service = get_player_service()
+    team_service = get_team_service()
     
-    active_lineup = player_service.get_active_lineup(club_id)
-    players = player_service.get_by_club(club_id)
+    teams = team_service.get_by_club(club_id)
+    selected_team_id = request.args.get('team_id')
+    if not selected_team_id and teams:
+        selected_team_id = str(teams[0]['_id'])
+        
+    active_lineup = player_service.get_active_lineup(club_id, team_id=selected_team_id)
+    players = player_service.get_by_club(club_id, team_id=selected_team_id)
     
     return render_template('coach/tactics.html', 
         lineup=active_lineup,
-        players=players
+        players=players,
+        teams=teams,
+        selected_team_id=selected_team_id
     )
 
 @coach_bp.route('/tactics/save', methods=['POST'])
@@ -280,6 +330,7 @@ def save_tactics():
     """Save club tactical lineup"""
     data = request.json
     club_id = session.get('club_id')
+    team_id = data.get('team_id')
     
     from app.services import get_player_service
     player_service = get_player_service()
@@ -287,7 +338,8 @@ def save_tactics():
     player_service.save_lineup(
         club_id=club_id,
         formation=data.get('formation'),
-        starters=data.get('starters')
+        starters=data.get('starters'),
+        team_id=team_id
     )
     
     return {"status": "success"}
@@ -297,21 +349,24 @@ def save_tactics():
 @role_required('coach', 'admin')
 def create_event():
     """Create new event"""
+    club_id = session.get('club_id')
+    user_id = session.get('user_id')
+    
+    from app.services import get_event_service, get_team_service
+    event_service = get_event_service()
+    team_service = get_team_service()
+    
     if request.method == 'POST':
-        club_id = session.get('club_id')
-        user_id = session.get('user_id')
-        
-        from app.services import get_event_service
         from datetime import datetime
-        
-        event_service = get_event_service()
         
         date_str = request.form.get('date')
         time_str = request.form.get('time', '18:00')
         event_date = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+        team_id = request.form.get('team_id')
         
         event_service.create(
             club_id=club_id,
+            team_id=team_id if team_id else None,
             title=request.form.get('title'),
             event_type=request.form.get('type'),
             date=event_date,
@@ -323,7 +378,10 @@ def create_event():
         flash('Evenement cree.', 'success')
         return redirect(url_for('main.calendar'))
     
-    return render_template('coach/create_event.html')
+    teams = team_service.get_by_club(club_id)
+    selected_team_id = request.args.get('team_id')
+    
+    return render_template('coach/create_event.html', teams=teams, selected_team_id=selected_team_id)
 
 @coach_bp.route('/match-center')
 @coach_bp.route('/match-center/<match_id>')
@@ -335,28 +393,41 @@ def match_center(match_id=None):
     if not club_id:
         return redirect(url_for('main.index'))
     
-    from app.services import get_match_service, get_player_service
+    from app.services import get_match_service, get_player_service, get_team_service
     match_service = get_match_service()
     player_service = get_player_service()
+    team_service = get_team_service()
     
-    upcoming = match_service.get_upcoming(club_id)
-    completed = match_service.get_completed(club_id)
+    teams = team_service.get_by_club(club_id)
+    selected_team_id = request.args.get('team_id')
     
     selected_match = None
     if match_id:
         selected_match = match_service.get_by_id(match_id)
-    elif upcoming:
-        selected_match = upcoming[0]
-    elif completed:
-        selected_match = completed[0]
+        if selected_match and selected_match.get('team_id') and not selected_team_id:
+            selected_team_id = str(selected_match['team_id'])
+    
+    if not selected_team_id and teams:
+        selected_team_id = str(teams[0]['_id'])
         
-    players = player_service.get_by_club(club_id)
+    upcoming = match_service.get_upcoming(club_id, team_id=selected_team_id)
+    completed = match_service.get_completed(club_id, team_id=selected_team_id)
+    
+    if not selected_match:
+        if upcoming:
+            selected_match = upcoming[0]
+        elif completed:
+            selected_match = completed[0]
+            
+    players = player_service.get_by_club(club_id, team_id=selected_team_id)
     
     return render_template('coach/match_center.html',
         upcoming_matches=upcoming,
         completed_matches=completed,
         selected_match=selected_match,
-        players=players
+        players=players,
+        teams=teams,
+        selected_team_id=selected_team_id
     )
 
 @coach_bp.route('/match-center/update-score', methods=['POST'])
@@ -401,18 +472,28 @@ def add_match_event():
 @role_required('coach', 'admin')
 def scouting():
     """Search for players to recruit"""
-    from app.services import get_user_service, get_contract_service
+    from app.services import get_user_service, get_contract_service, get_team_service
     user_service = get_user_service()
+    team_service = get_team_service()
+    club_id = session.get('club_id')
     
-    # Get all users who are NOT already in a club (or any filter you prefer)
-    # Ideally filter by role='player' and club_id=None
+    # Get all users who are NOT already in a club
     all_users = user_service.get_all()
     free_agents = [
         u for u in all_users 
         if (not u.get('club_id') and 'player' in (u.get('roles') or [u.get('role')]))
     ]
     
-    return render_template('coach/scouting.html', free_agents=free_agents)
+    teams = team_service.get_by_club(club_id)
+    selected_team_id = request.args.get('team_id')
+    if not selected_team_id and teams:
+        selected_team_id = str(teams[0]['_id'])
+    
+    return render_template('coach/scouting.html', 
+        free_agents=free_agents, 
+        teams=teams, 
+        selected_team_id=selected_team_id
+    )
 
 @coach_bp.route('/offer-contract', methods=['POST'])
 @login_required
@@ -422,6 +503,7 @@ def offer_contract():
     user_id = request.form.get('user_id')
     salary = request.form.get('salary', 0)
     conditions = request.form.get('conditions', '')
+    team_id = request.form.get('team_id')
     club_id = session.get('club_id')
     
     from app.services import get_contract_service
@@ -432,10 +514,11 @@ def offer_contract():
         user_id=user_id,
         role='player',
         salary=salary,
-        conditions=conditions
+        conditions=conditions,
+        team_id=team_id
     )
     
     flash('Offre de contrat envoyee !', 'success')
-    return redirect(url_for('coach.scouting'))
+    return redirect(url_for('coach.scouting', team_id=team_id))
 
 

@@ -76,6 +76,28 @@
                 </div>
             </div>
 
+            <div class="space-y-3 relative z-10">
+                <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Équipe
+                    concernée</label>
+                <div class="relative group">
+                    <i
+                        class="fa-solid fa-users absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-500 transition-colors"></i>
+                    <select name="team_id" required
+                        class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-6 text-sm font-bold focus:outline-none focus:border-primary-500/50 transition-all appearance-none cursor-pointer">
+                        <option value="" disabled selected>Sélectionner une équipe</option>
+                        {% for team in teams %}
+                        <option value="{{ team._id|string }}" {% if selected_team_id==team._id|string %}selected{% endif
+                            %} class="bg-slate-900">
+                            {{ team.name }} ({{ team.category }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="absolute inset-y-0 right-6 flex items-center pointer-events-none text-white/20">
+                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
                 <div class="space-y-3">
                     <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Date du

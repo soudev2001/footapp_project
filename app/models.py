@@ -49,10 +49,21 @@ CLUB_SCHEMA = {
     'created_at': datetime
 }
 
+TEAM_SCHEMA = {
+    '_id': ObjectId,
+    'club_id': ObjectId,
+    'name': str,              # e.g., 'Senior A', 'U15', 'Reserve'
+    'category': str,          # e.g., 'Senior', 'Youth', 'Academy'
+    'coach_ids': [ObjectId],  # List of coach user_ids
+    'created_at': datetime,
+    'description': str
+}
+
 PLAYER_SCHEMA = {
     '_id': ObjectId,
     'user_id': ObjectId,
     'club_id': ObjectId,
+    'team_id': ObjectId,      # Linked to Team
     'jersey_number': int,
     'position': str,  # 'GK', 'DEF', 'MID', 'ATT'
     'stats': {
@@ -72,6 +83,7 @@ PLAYER_SCHEMA = {
 EVENT_SCHEMA = {
     '_id': ObjectId,
     'club_id': ObjectId,
+    'team_id': ObjectId,      # Optional: filter by team
     'title': str,
     'type': str,  # 'training', 'match', 'meeting', 'other'
     'date': datetime,
@@ -165,11 +177,23 @@ def create_club(name, city, colors, logo='', stadium='', founded_year=2000, desc
         'created_at': datetime.utcnow()
     }
 
-def create_player(user_id, club_id, jersey_number, position, stats=None, **kwargs):
+def create_team(club_id, name, category, coach_ids=None, description=''):
+    """Create a new team document"""
+    return {
+        'club_id': ObjectId(club_id),
+        'name': name,
+        'category': category,
+        'coach_ids': [ObjectId(cid) for cid in coach_ids] if coach_ids else [],
+        'description': description,
+        'created_at': datetime.utcnow()
+    }
+
+def create_player(user_id, club_id, jersey_number, position, team_id=None, stats=None, **kwargs):
     """Create a new player document"""
     return {
         'user_id': ObjectId(user_id) if user_id else None,
         'club_id': ObjectId(club_id),
+        'team_id': ObjectId(team_id) if team_id else None,
         'jersey_number': jersey_number,
         'position': position,
         'stats': stats or {
@@ -187,10 +211,11 @@ def create_player(user_id, club_id, jersey_number, position, stats=None, **kwarg
         'name': kwargs.get('name', '')  # Helper field for display
     }
 
-def create_event(club_id, title, event_type, date, location='', description='', created_by=None):
+def create_event(club_id, title, event_type, date, team_id=None, location='', description='', created_by=None):
     """Create a new event document"""
     return {
         'club_id': ObjectId(club_id),
+        'team_id': ObjectId(team_id) if team_id else None,
         'title': title,
         'type': event_type,
         'date': date,

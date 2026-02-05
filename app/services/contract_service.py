@@ -10,11 +10,12 @@ class ContractService:
         self.db = db
         self.collection = db.contracts
         
-    def create_offer(self, club_id, user_id, role, conditions='', salary=0):
+    def create_offer(self, club_id, user_id, role, conditions='', salary=0, team_id=None):
         """Create a new contract offer"""
         contract = {
             'club_id': ObjectId(club_id),
             'user_id': ObjectId(user_id),
+            'team_id': ObjectId(team_id) if team_id else None,
             'role': role,
             'status': 'pending',
             'start_date': datetime.utcnow(),

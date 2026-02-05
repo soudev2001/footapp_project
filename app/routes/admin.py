@@ -31,19 +31,24 @@ def admin_panel():
     
     club = None
     members = []
+    teams = []
     if club_id:
+        from app.services import get_team_service
         club = club_service.get_by_id(club_id)
         members = user_service.get_members_by_club(club_id)
+        team_service = get_team_service()
+        teams = team_service.get_by_club(club_id)
     
     # Mock specific stats
     stats = {
         'total_members': len(members),
+        'total_teams': len(teams),
         'coaches': len([m for m in members if m.get('role') == 'coach']),
         'players': len([m for m in members if m.get('role') == 'player']),
         'mrr': "29.90" if club_id else "0.00"
     }
     
-    return render_template('admin/panel.html', club=club, members=members, stats=stats)
+    return render_template('admin/panel.html', club=club, members=members, teams=teams, stats=stats)
 
 @admin_bp.route('/add-member', methods=['POST'])
 @login_required
@@ -57,6 +62,7 @@ def add_member():
     role = request.form.get('role', 'player')
     first_name = request.form.get('first_name')
     last_name = request.form.get('last_name')
+    team_id = request.form.get('team_id')
     
     # Use current admin's club_id
     admin_user = user_service.get_by_id(session.get('user_id'))
@@ -81,6 +87,7 @@ def add_member():
             player_service.create(
                 club_id=club_id,
                 user_id=new_user['_id'],
+                team_id=team_id if team_id else None,
                 name=f"{first_name} {last_name}",
                 position="À définir",
                 jersey_number=None
@@ -227,4 +234,37 @@ def seed_demo():
 def architecture():
     """System architecture view"""
     return render_template('admin/architecture.html')
+
+# --- TEAMS MANAGEMENT ---
+
+@admin_bp.route('/teams/add', methods=['POST'])
+@login_required
+@role_required('admin')
+def add_team():
+    """Add a new team to the club"""
+    from app.services import get_team_service, get_user_service
+    user_service = get_user_service()
+    team_service = get_team_service()
+    
+    admin_user = user_service.get_by_id(session.get('user_id'))
+    club_id = admin_user.get('club_id')
+    
+    name = request.form.get('name')
+    category = request.form.get('category', 'Senior')
+    description = request.form.get('description', '')
+    
+    team_service.create(club_id, name, category, description=description)
+    flash(f'Équipe {name} créée avec succès !', 'success')
+    return redirect(url_for('admin.admin_panel'))
+
+@admin_bp.route('/teams/<team_id>/delete', methods=['POST'])
+@login_required
+@role_required('admin')
+def delete_team(team_id):
+    """Delete a team"""
+    from app.services import get_team_service
+    team_service = get_team_service()
+    team_service.delete(team_id)
+    flash('Équipe supprimée avec succès.', 'success')
+    return redirect(url_for('admin.admin_panel'))
 

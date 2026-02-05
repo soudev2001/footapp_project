@@ -24,9 +24,10 @@ def home():
     
     # Get player profile
     player = player_service.get_by_user(user_id) if user_id else None
+    team_id = player.get('team_id') if player else None
     
-    # Get upcoming events
-    upcoming = event_service.get_upcoming(club_id, limit=5) if club_id else []
+    # Get upcoming events (filtered by team)
+    upcoming = event_service.get_upcoming(club_id, team_id=team_id, limit=5) if club_id else []
     
     # Get recent posts
     posts = post_service.get_by_club(club_id, limit=5) if club_id else []
@@ -99,30 +100,47 @@ def edit_profile():
 @player_bp.route('/calendar')
 @login_required
 def calendar():
-    """Player calendar view"""
+    user_id = session.get('user_id')
     club_id = session.get('club_id')
     
-    from app.services import get_event_service
+    from app.services import get_event_service, get_player_service
     event_service = get_event_service()
+    player_service = get_player_service()
+    
+    # Filter by team if player
+    player = player_service.get_by_user(user_id) if user_id else None
+    team_id = player.get('team_id') if player else None
     
     events = event_service.get_by_club(club_id) if club_id else []
+    # If it's a player, we might want to highlight or filter? 
+    # For now, let's keep all club events but maybe filter in the service?
+    # Actually, the user asked for filtering.
+    if team_id:
+        events = [e for e in events if not e.get('team_id') or e.get('team_id') == team_id]
     
     return render_template('player/calendar.html', events=events)
 
 @player_bp.route('/team')
 @login_required
 def team():
-    """View team roster"""
+    user_id = session.get('user_id')
     club_id = session.get('club_id')
     
-    from app.services import get_player_service, get_club_service
+    from app.services import get_player_service, get_club_service, get_team_service
     player_service = get_player_service()
     club_service = get_club_service()
+    team_service = get_team_service()
+    
+    player = player_service.get_by_user(user_id) if user_id else None
+    team_id = player.get('team_id') if player else None
     
     club = club_service.get_by_id(club_id) if club_id else None
-    players = player_service.get_by_club(club_id) if club_id else []
+    # Show my team by default
+    players = player_service.get_by_club(club_id, team_id=team_id) if club_id else []
     
-    return render_template('player/team.html', club=club, players=players)
+    selected_team = team_service.get_by_id(team_id) if team_id else None
+    
+    return render_template('player/team.html', club=club, players=players, team=selected_team)
 
 @player_bp.route('/event/<event_id>')
 @login_required
@@ -225,25 +243,34 @@ def respond_contract(contract_id):
     contract_service.respond_to_offer(contract_id, action)
     
     if action == 'active':
-        # 1. Update User's club_id
+        # 1. Update User's club_id and team_id
         from bson import ObjectId
-        # Direct DB update needed or userService method
-        # Using raw collection for now or assume userService has update method
-        # Let's use the one we have access to via services
         from app.services.db import get_db
         db = get_db()
-        db.users.update_one({'_id': ObjectId(user_id)}, {'$set': {'club_id': contract['club_id']}})
         
-        # 2. Create Player Profile if it doesn't exist
+        update_fields = {'club_id': contract['club_id']}
+        if contract.get('team_id'):
+            update_fields['team_id'] = contract['team_id']
+            
+        db.users.update_one({'_id': ObjectId(user_id)}, {'$set': update_fields})
+        
+        # 2. Create/Update Player Profile
         existing_player = player_service.get_by_user(user_id)
         if not existing_player:
             player_service.create(
                 user_id=user_id,
-                club_id=str(contract['club_id']), # expects string usually
+                club_id=str(contract['club_id']),
                 name=session.get('user_profile', {}).get('first_name', 'Player'),
                 jersey_number=0,
-                position='MID'
+                position='MID',
+                team_id=str(contract['team_id']) if contract.get('team_id') else None
             )
+        else:
+            # Update existing player profile with new club/team
+            player_service.update(str(existing_player['_id']), {
+                'club_id': contract['club_id'],
+                'team_id': contract.get('team_id')
+            })
         
         # Update session
         session['club_id'] = str(contract['club_id'])

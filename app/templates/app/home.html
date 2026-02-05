@@ -25,15 +25,24 @@
                     match ? Ton équipe compte sur ton talent pour décrocher la victoire.</p>
 
                 <div class="flex flex-wrap gap-4 mt-10 justify-center md:justify-start">
-                    <div class="px-6 py-4 glass bg-white/5 border-white/10 rounded-3xl flex items-center gap-4">
-                        <div
-                            class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center text-black font-black italic shadow-lg">
-                            10</div>
-                        <div>
-                            <p class="text-[9px] font-black uppercase tracking-widest text-white/20">Numéro</p>
-                            <p class="font-black italic text-sm">MENEUR</p>
-                        </div>
+                    {% if teams %}
+                    <div class="relative min-w-[220px]">
+                        <form id="teamFilterForm" method="GET" action="{{ url_for('main.app_home') }}">
+                            <select name="team_id" onchange="this.form.submit()"
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
+                                {% for team in teams %}
+                                <option value="{{ team._id|string }}" {% if selected_team_id==team._id|string
+                                    %}selected{% endif %} class="bg-slate-900">
+                                    SUIVRE : {{ team.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none text-white/20">
+                                <i class="fa-solid fa-chevron-down text-[8px]"></i>
+                            </div>
+                        </form>
                     </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -81,6 +90,37 @@
                         DÉMONSTRATION DE FORCE À DOMICILE</h2>
                     <p class="text-white/60 text-sm font-medium italic max-w-xl">Le FC Elite s'impose 4-1 avec un triplé
                         du capitaine. Retrouvez l'analyse tactique complète du match.</p>
+                </div>
+            </div>
+
+            <!-- Upcoming for selected team -->
+            <div class="space-y-6">
+                <h3 class="text-xl font-black italic uppercase tracking-tight light:text-slate-900 px-6">Calendrier
+                    Équipe</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    {% for event in upcoming_events %}
+                    <div class="glass p-6 rounded-[32px] border-white/5 hover:bg-white/5 transition-all">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div
+                                class="w-12 h-12 rounded-2xl gradient-primary flex flex-col items-center justify-center text-white">
+                                <span class="text-lg font-black leading-none">{{ event.date.strftime('%d') if event.date
+                                    else '--' }}</span>
+                                <span class="text-[8px] font-black uppercase">{{ event.date.strftime('%b') if event.date
+                                    else '' }}</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm leading-tight">{{ event.title }}</h4>
+                                <p class="text-[10px] text-white/40 uppercase tracking-widest mt-1">{{ event.time or
+                                    '18:00' }} • {{ event.location or 'Terrain A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-span-full py-10 text-center glass rounded-[32px] border-dashed border-white/10">
+                        <p class="text-white/20 text-xs italic tracking-widest uppercase">Aucun événement à venir pour
+                            cette équipe</p>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>

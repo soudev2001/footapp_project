@@ -41,6 +41,20 @@ def seed_all():
     club1_id = mongo.db.clubs.insert_one(club1).inserted_id
     club2_id = mongo.db.clubs.insert_one(club2).inserted_id
     print(f"[Seed] Created 2 clubs")
+
+    # ========================================
+    # 1b. CREATE TEAMS
+    # ========================================
+    team1 = {
+        'club_id': club1_id,
+        'name': 'Sénior A',
+        'category': 'Senior',
+        'coach_ids': [],
+        'description': 'L\'équipe première du club.',
+        'created_at': datetime.utcnow()
+    }
+    team1_id = mongo.db.teams.insert_one(team1).inserted_id
+    print(f"[Seed] Created 1 team")
     
     # ========================================
     # 2. CREATE USERS
@@ -61,6 +75,9 @@ def seed_all():
         result = mongo.db.users.insert_one(user)
         user_ids.append(result.inserted_id)
     print(f"[Seed] Created {len(users)} users")
+    
+    # Link coach to team
+    mongo.db.teams.update_one({'_id': team1_id}, {'$set': {'coach_ids': [user_ids[1]]}})
     
     # ========================================
     # 3. CREATE PLAYERS (FC Elite)
@@ -83,6 +100,7 @@ def seed_all():
         player = create_player(
             user_id=user_ids[2] if i == 0 else None,  # Link first player to user
             club_id=club1_id,
+            team_id=team1_id,
             jersey_number=p['jersey'],
             position=p['pos'],
             stats={
@@ -107,11 +125,11 @@ def seed_all():
     # ========================================
     now = datetime.utcnow()
     events = [
-        create_event(club1_id, 'Entrainement Technique', 'training', now + timedelta(days=1, hours=18), 'Terrain A', 'Focus sur les passes courtes'),
-        create_event(club1_id, 'Entrainement Physique', 'training', now + timedelta(days=3, hours=10), 'Salle de Musculation', 'Renforcement musculaire'),
-        create_event(club1_id, 'Reunion Tactique', 'meeting', now + timedelta(days=5, hours=19), 'Salle de Conference', 'Preparation match de coupe'),
-        create_event(club1_id, 'Match Amical', 'match', now + timedelta(days=7, hours=15), 'Stade Municipal', 'Contre AS Montagne'),
-        create_event(club1_id, 'Entrainement Gardiens', 'training', now + timedelta(days=2, hours=17), 'Terrain B', 'Seance specifique gardiens'),
+        create_event(club1_id, 'Entrainement Technique', 'training', now + timedelta(days=1, hours=18), team_id=team1_id, location='Terrain A', description='Focus sur les passes courtes'),
+        create_event(club1_id, 'Entrainement Physique', 'training', now + timedelta(days=3, hours=10), team_id=team1_id, location='Salle de Musculation', description='Renforcement musculaire'),
+        create_event(club1_id, 'Reunion Tactique', 'meeting', now + timedelta(days=5, hours=19), team_id=team1_id, location='Salle de Conference', description='Preparation match de coupe'),
+        create_event(club1_id, 'Match Amical', 'match', now + timedelta(days=7, hours=15), team_id=team1_id, location='Stade Municipal', description='Contre AS Montagne'),
+        create_event(club1_id, 'Entrainement Gardiens', 'training', now + timedelta(days=2, hours=17), team_id=team1_id, location='Terrain B', description='Seance specifique gardiens'),
     ]
     
     for event in events:

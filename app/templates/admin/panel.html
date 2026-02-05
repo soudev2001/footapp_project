@@ -27,6 +27,12 @@
                 <i class="fa-solid fa-users w-5 text-center text-primary-400"></i>
                 <span class="font-medium text-white light:text-slate-900 text-sm">Effectif</span>
             </button>
+            <button onclick="switchTab('teams')" id="nav-teams"
+                class="nav-item w-full flex items-center gap-4 px-4 py-4 hover:bg-white/5 light:hover:bg-slate-200 rounded-xl transition-all duration-200 group text-left">
+                <i class="fa-solid fa-layer-group w-5 text-center text-primary-400"></i>
+                <span
+                    class="font-medium text-gray-400 group-hover:text-white light:group-hover:text-slate-900 text-sm">Équipes</span>
+            </button>
             <button onclick="switchTab('subscription')" id="nav-subscription"
                 class="nav-item w-full flex items-center gap-4 px-4 py-4 hover:bg-white/5 light:hover:bg-slate-200 rounded-xl transition-all duration-200 group text-left">
                 <i class="fa-solid fa-credit-card w-5 text-center text-green-400"></i>
@@ -115,12 +121,12 @@
                                 class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
                                 <div class="flex items-center gap-3">
                                     <div
-                                        class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
-                                        <i class="fa-solid fa-briefcase"></i>
+                                        class="w-8 h-8 rounded-lg bg-primary-500/20 flex items-center justify-center text-primary-400">
+                                        <i class="fa-solid fa-layer-group"></i>
                                     </div>
-                                    <span class="text-sm font-bold">Staff Administratif</span>
+                                    <span class="text-sm font-bold">Équipes</span>
                                 </div>
-                                <span class="font-black">1</span>
+                                <span class="font-black">{{ stats.total_teams }}</span>
                             </div>
                         </div>
                     </div>
@@ -183,6 +189,61 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- TAB: TEAMS (Équipes) -->
+        <div id="tab-teams" class="hidden animate-slide-up">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+                <div>
+                    <h2 class="text-3xl font-black italic tracking-tight uppercase">MES <span
+                            class="text-gradient">ÉQUIPES</span></h2>
+                    <p class="text-white/40 light:text-slate-500 text-sm mt-1">Gérez les différentes catégories et
+                        équipes de votre club.</p>
+                </div>
+                <button onclick="toggleModal('addTeamModal')"
+                    class="gradient-primary px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    <i class="fa-solid fa-plus mr-2"></i> Créer une Équipe
+                </button>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for team in teams %}
+                <div class="glass p-8 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all relative">
+                    <div class="flex justify-between items-start mb-6">
+                        <div
+                            class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-lg text-xl">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <form action="{{ url_for('admin.delete_team', team_id=team._id|string) }}" method="POST"
+                            onsubmit="return confirm('Supprimer cette équipe ?')">
+                            <button type="submit" class="text-white/10 hover:text-red-500 transition-colors">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <h3 class="text-xl font-black italic uppercase mb-1">{{ team.name }}</h3>
+                    <p class="text-primary-400 text-[10px] font-black uppercase tracking-widest mb-4">{{ team.category
+                        }}</p>
+                    <p class="text-white/40 text-xs mb-6 h-12 overflow-hidden">{{ team.description or 'Aucune
+                        description.' }}</p>
+
+                    <div class="flex items-center justify-between pt-6 border-t border-white/5">
+                        <div class="flex -space-x-3">
+                            <div
+                                class="w-8 h-8 rounded-full border-2 border-surface-900 bg-gray-700 flex items-center justify-center text-[10px] font-bold">
+                                +{{ (team.coach_ids|length) if team.coach_ids else 0 }}
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-white/20">Coachs</span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-span-full py-20 text-center glass rounded-[40px] border-dashed border-white/10">
+                    <i class="fa-solid fa-layer-group text-4xl text-white/10 mb-4"></i>
+                    <p class="text-white/40 italic">Aucune équipe configurée pour le moment.</p>
+                </div>
+                {% endfor %}
             </div>
         </div>
 
@@ -481,6 +542,19 @@
                 </div>
                 <div>
                     <label
+                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Équipe
+                        (pour les joueurs)</label>
+                    <select name="team_id"
+                        class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium appearance-none">
+                        <option value="">Aucune / À définir</option>
+                        {% for team in teams %}
+                        <option value="{{ team._id|string }}" class="bg-slate-900">{{ team.name }} ({{ team.category }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label
                         class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Rôle</label>
                     <select name="role"
                         class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium appearance-none">
@@ -495,6 +569,57 @@
                     <p
                         class="text-center mt-6 text-[10px] text-white/20 light:text-slate-400 font-black uppercase tracking-[0.2em] italic">
                         Un mot de passe par défaut sera généré.</p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add Team -->
+<div id="addTeamModal"
+    class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass max-w-lg w-full rounded-[40px] border-white/10 overflow-hidden animate-slide-up">
+        <div class="p-8 lg:p-10">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-black italic uppercase">Nouvelle <span class="text-gradient">Équipe</span></h3>
+                <button onclick="toggleModal('addTeamModal')"
+                    class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all text-white/40">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form action="{{ url_for('admin.add_team') }}" method="POST" class="space-y-6">
+                <div>
+                    <label
+                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Nom
+                        de l'équipe</label>
+                    <input type="text" name="name" placeholder="ex: Seniors A, U17 G" required
+                        class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium">
+                </div>
+                <div>
+                    <label
+                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Catégorie</label>
+                    <select name="category"
+                        class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium appearance-none">
+                        <option value="Senior" class="bg-slate-900">Sénior</option>
+                        <option value="U19" class="bg-slate-900">U19 / U18</option>
+                        <option value="U17" class="bg-slate-900">U17 / U16</option>
+                        <option value="U15" class="bg-slate-900">U15 / U14</option>
+                        <option value="Academy" class="bg-slate-900">École de Foot</option>
+                        <option value="Feminine" class="bg-slate-900">Féminine</option>
+                    </select>
+                </div>
+                <div>
+                    <label
+                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Description
+                        (Optionnel)</label>
+                    <textarea name="description" rows="2"
+                        class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium"></textarea>
+                </div>
+                <div class="pt-4">
+                    <button type="submit"
+                        class="gradient-primary w-full py-5 rounded-3xl text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.01] active:scale-95 transition-all">CRÉER
+                        L'ÉQUIPE</button>
                 </div>
             </form>
         </div>
@@ -527,7 +652,7 @@
         modal.classList.toggle('hidden');
     }
     function switchTab(tabId) {
-        ['members', 'subscription', 'metrics', 'settings'].forEach(t => {
+        ['members', 'teams', 'subscription', 'metrics', 'settings'].forEach(t => {
             const tab = document.getElementById('tab-' + t);
             const nav = document.getElementById('nav-' + t);
             if (tab) tab.classList.add('hidden');
@@ -564,7 +689,7 @@
     // Initialize from Hash
     document.addEventListener('DOMContentLoaded', () => {
         const hash = window.location.hash.replace('#', '');
-        if (['members', 'subscription', 'metrics', 'settings'].includes(hash)) {
+        if (['members', 'teams', 'subscription', 'metrics', 'settings'].includes(hash)) {
             switchTab(hash);
         } else {
             switchTab('members');

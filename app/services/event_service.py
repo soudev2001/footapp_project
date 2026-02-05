@@ -22,12 +22,15 @@ class EventService:
         """Get all events for a club"""
         return list(self.collection.find({'club_id': ObjectId(club_id)}).sort('date', -1))
     
-    def get_upcoming(self, club_id, limit=10):
-        """Get upcoming events"""
-        return list(self.collection.find({
+    def get_upcoming(self, club_id, team_id=None, limit=10):
+        """Get upcoming events, optionally filtered by team"""
+        query = {
             'club_id': ObjectId(club_id),
             'date': {'$gte': datetime.utcnow()}
-        }).sort('date', 1).limit(limit))
+        }
+        if team_id:
+            query['team_id'] = ObjectId(team_id)
+        return list(self.collection.find(query).sort('date', 1).limit(limit))
     
     def get_past(self, club_id, limit=10):
         """Get past events"""

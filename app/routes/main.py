@@ -94,7 +94,31 @@ def app_home():
         return redirect(url_for('player.home'))
     else:
         # Fan or other stays on the main app home
-        return render_template('app/home.html')
+        from app.services import get_team_service, get_event_service, get_post_service, get_player_service
+        team_service = get_team_service()
+        event_service = get_event_service()
+        post_service = get_post_service()
+        club_id = session.get('club_id')
+        
+        teams = []
+        upcoming_events = []
+        if club_id:
+            teams = team_service.get_by_club(club_id)
+            
+        # Selected team for fan (could be stored in session or query)
+        selected_team_id = request.args.get('team_id')
+        if not selected_team_id and teams:
+            # Default to first team for now or none
+            selected_team_id = str(teams[0]['_id'])
+            
+        if club_id:
+            upcoming_events = event_service.get_upcoming(club_id, team_id=selected_team_id, limit=3)
+        
+        return render_template('app/home.html', 
+            teams=teams, 
+            selected_team_id=selected_team_id,
+            upcoming_events=upcoming_events
+        )
 
 @main_bp.route('/dashboard')
 def dashboard():

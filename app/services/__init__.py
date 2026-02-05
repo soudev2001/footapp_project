@@ -35,6 +35,10 @@ def get_isy_service():
     from .isy_service import IsyService
     return IsyService()
 
+def get_team_service():
+    from .team_service import TeamService
+    return TeamService()
+
 # Role helpers
 from .user_service import has_permission, get_nav_for_role, ROLE_PERMISSIONS
 

@@ -20,14 +20,19 @@
 
             <div class="text-center md:text-left flex-1">
                 <h1 class="text-5xl font-black mb-3 italic tracking-tight light:text-slate-900 leading-none">
-                    {{ club.name|upper if club else 'MON CLUB' }}
+                    {{ team.name|upper if team else (club.name|upper if club else 'MON CLUB') }}
                 </h1>
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-4">
                     <span
                         class="px-4 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/40">Saison
                         2025/26</span>
-                    <span class="text-primary-400 text-xs font-bold italic">"Unis dans l'effort, grands dans la
-                        victoire"</span>
+                    <span class="text-primary-400 text-xs font-bold italic">
+                        {% if team %}
+                        {{ team.category }} • "Unis dans l'effort, grands dans la victoire"
+                        {% else %}
+                        "Unis dans l'effort, grands dans la victoire"
+                        {% endif %}
+                    </span>
                 </div>
             </div>
 
