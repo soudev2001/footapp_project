@@ -22,7 +22,7 @@ const CACHE_STRATEGIES = {
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   console.log('[ServiceWorker] Installing...');
-  
+
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -42,7 +42,7 @@ self.addEventListener('install', (event) => {
 // Activate event - clean old caches
 self.addEventListener('activate', (event) => {
   console.log('[ServiceWorker] Activating...');
-  
+
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
@@ -71,14 +71,14 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   // Skip cross-origin requests except for allowed CDNs
-  if (url.origin !== location.origin && 
-      !CACHE_STRATEGIES.cacheFirst.some(domain => url.hostname.includes(domain))) {
+  if (url.origin !== location.origin &&
+    !CACHE_STRATEGIES.cacheFirst.some(domain => url.hostname.includes(domain))) {
     return;
   }
 
   // Determine cache strategy
   let strategy = 'networkFirst';
-  
+
   if (CACHE_STRATEGIES.cacheFirst.some(domain => url.hostname.includes(domain))) {
     strategy = 'cacheFirst';
   } else if (CACHE_STRATEGIES.staleWhileRevalidate.some(path => url.pathname.startsWith(path))) {
@@ -109,7 +109,7 @@ async function cacheFirst(request) {
   if (cachedResponse) {
     return cachedResponse;
   }
-  
+
   try {
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
@@ -136,12 +136,12 @@ async function networkFirst(request) {
     if (cachedResponse) {
       return cachedResponse;
     }
-    
+
     // Return offline page for navigation requests
     if (request.mode === 'navigate') {
       return caches.match(OFFLINE_URL);
     }
-    
+
     return new Response('Offline', { status: 503 });
   }
 }
@@ -150,7 +150,7 @@ async function networkFirst(request) {
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(CACHE_NAME);
   const cachedResponse = await cache.match(request);
-  
+
   const networkResponsePromise = fetch(request)
     .then((networkResponse) => {
       if (networkResponse.ok) {
@@ -166,19 +166,19 @@ async function staleWhileRevalidate(request) {
 // Push notification handling
 self.addEventListener('push', (event) => {
   console.log('[ServiceWorker] Push received');
-  
+
   const options = {
     body: event.data ? event.data.text() : 'Nouvelle notification FootLogic',
-    icon: '/static/img/icons/icon-192x192.png',
-    badge: '/static/img/icons/badge-72x72.png',
+    icon: '/static/img/icons/icon.svg',
+    badge: '/static/img/icons/icon.svg',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
       primaryKey: 1
     },
     actions: [
-      { action: 'explore', title: 'Voir', icon: '/static/img/icons/checkmark.png' },
-      { action: 'close', title: 'Fermer', icon: '/static/img/icons/xmark.png' }
+      { action: 'explore', title: 'Voir', icon: '/static/img/icons/icon.svg' },
+      { action: 'close', title: 'Fermer', icon: '/static/img/icons/icon.svg' }
     ]
   };
 
@@ -190,7 +190,7 @@ self.addEventListener('push', (event) => {
 // Notification click handling
 self.addEventListener('notificationclick', (event) => {
   console.log('[ServiceWorker] Notification clicked');
-  
+
   event.notification.close();
 
   if (event.action === 'explore') {
@@ -203,7 +203,7 @@ self.addEventListener('notificationclick', (event) => {
 // Background sync for offline actions
 self.addEventListener('sync', (event) => {
   console.log('[ServiceWorker] Sync event:', event.tag);
-  
+
   if (event.tag === 'sync-attendance') {
     event.waitUntil(syncAttendance());
   } else if (event.tag === 'sync-events') {
@@ -216,7 +216,7 @@ async function syncAttendance() {
   try {
     const db = await openDB();
     const pendingAttendance = await db.getAll('pending-attendance');
-    
+
     for (const data of pendingAttendance) {
       await fetch('/api/attendance', {
         method: 'POST',
@@ -235,7 +235,7 @@ async function syncEvents() {
   try {
     const db = await openDB();
     const pendingEvents = await db.getAll('pending-events');
-    
+
     for (const data of pendingEvents) {
       await fetch('/api/events', {
         method: 'POST',
