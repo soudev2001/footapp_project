@@ -172,12 +172,15 @@ CONTRACT_SCHEMA = {
 # MODEL HELPER FUNCTIONS
 # ============================================================
 
-def create_user(email, password_hash, role='player', club_id=None, profile=None):
+def create_user(email, password_hash, role='player', club_id=None, profile=None, roles=None):
     """Create a new user document"""
+    if roles is None:
+        roles = [role]
     return {
         'email': email,
         'password_hash': password_hash,
         'role': role,
+        'roles': roles,
         'club_id': ObjectId(club_id) if club_id else None,
         'created_at': datetime.utcnow(),
         'profile': profile or {
