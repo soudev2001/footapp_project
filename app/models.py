@@ -113,6 +113,30 @@ MATCH_SCHEMA = {
     }]
 }
 
+PROJECT_SCHEMA = {
+    '_id': ObjectId,
+    'name': str,
+    'description': str,
+    'status': str,  # 'planning', 'in_progress', 'completed', 'on_hold'
+    'created_at': datetime,
+    'updated_at': datetime,
+    'owner_id': ObjectId
+}
+
+TICKET_SCHEMA = {
+    '_id': ObjectId,
+    'project_id': ObjectId,
+    'title': str,
+    'description': str,
+    'type': str,  # 'bug', 'feature', 'task', 'improvement'
+    'status': str,  # 'todo', 'in_progress', 'review', 'done'
+    'priority': str,  # 'low', 'medium', 'high', 'critical'
+    'reporter_id': ObjectId,
+    'assignee_id': ObjectId,
+    'created_at': datetime,
+    'updated_at': datetime
+}
+
 POST_SCHEMA = {
     '_id': ObjectId,
     'club_id': ObjectId,
@@ -239,6 +263,34 @@ def create_match(club_id, opponent, date, is_home=True, location='', status='sch
         'events': []
     }
 
+def create_project(name, description, owner_id, status='planning'):
+    """Create a new project document"""
+    now = datetime.utcnow()
+    return {
+        'name': name,
+        'description': description,
+        'status': status,
+        'owner_id': ObjectId(owner_id) if owner_id else None,
+        'created_at': now,
+        'updated_at': now
+    }
+
+def create_ticket(project_id, title, description, reporter_id, ticket_type='task', priority='medium', status='todo', assignee_id=None):
+    """Create a new ticket document"""
+    now = datetime.utcnow()
+    return {
+        'project_id': ObjectId(project_id),
+        'title': title,
+        'description': description,
+        'type': ticket_type,
+        'status': status,
+        'priority': priority,
+        'reporter_id': ObjectId(reporter_id) if reporter_id else None,
+        'assignee_id': ObjectId(assignee_id) if assignee_id else None,
+        'created_at': now,
+        'updated_at': now
+    }
+
 def create_post(club_id, author_id, title, content, category='news', image=''):
     """Create a new post document"""
     return {
@@ -252,4 +304,3 @@ def create_post(club_id, author_id, title, content, category='news', image=''):
         'created_at': datetime.utcnow(),
         'category': category
     }
-

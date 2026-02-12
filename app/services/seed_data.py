@@ -67,6 +67,12 @@ def seed_all():
     users = [
         create_user('admin@footlogic.fr', generate_password_hash('admin123'), 'admin', club1_id, 
                    {'first_name': 'Admin', 'last_name': 'System', 'avatar': '', 'phone': '0600000000'}),
+        create_user('superadmin1@footlogic.com', generate_password_hash('super123'), 'admin', None, 
+                   {'first_name': 'Super', 'last_name': 'User 1', 'avatar': '', 'phone': '0600000001'}),
+        create_user('superadmin2@footlogic.com', generate_password_hash('super123'), 'admin', None, 
+                   {'first_name': 'Super', 'last_name': 'User 2', 'avatar': '', 'phone': '0600000002'}),
+        create_user('superadmin3@footlogic.com', generate_password_hash('super123'), 'admin', None, 
+                   {'first_name': 'Super', 'last_name': 'User 3', 'avatar': '', 'phone': '0600000003'}),
         create_user('coach@fcelite.fr', generate_password_hash('coach123'), 'coach', club1_id,
                    {'first_name': 'Michel', 'last_name': 'Dupont', 'avatar': 'https://randomuser.me/api/portraits/men/1.jpg', 'phone': '0612345678'}),
         create_user('player1@fcelite.fr', generate_password_hash('player123'), 'player', club1_id,
@@ -79,14 +85,32 @@ def seed_all():
     for user in users:
         result = mongo.db.users.insert_one(user)
         user_ids.append(result.inserted_id)
-    print(f"[Seed] Created {len(users)} users")
+    print(f"[Seed] Created {len(users)} users (including 3 new superadmins)")
+
+    # ========================================
+    # 2b. CREATE PROJECTS & TICKETS
+    # ========================================
+    from app.models import create_project, create_ticket
+    project1 = create_project('FootLogic V2 Core', 'Main application development and infrastructure', user_ids[0], 'in_progress')
+    project2 = create_project('Marketing & Launch', 'Launch campaign and club onboarding', user_ids[1], 'planning')
+    
+    p1_id = mongo.db.projects.insert_one(project1).inserted_id
+    p2_id = mongo.db.projects.insert_one(project2).inserted_id
+    
+    tickets = [
+        create_ticket(p1_id, 'Finaliser le module superadmin', 'Ajouter les vues et services de gestion de projet', user_ids[0], 'feature', 'high', 'in_progress'),
+        create_ticket(p1_id, 'Correction bug auth session', 'Le token ne se rafraichit pas correctement sur mobile', user_ids[0], 'bug', 'critical', 'todo'),
+        create_ticket(p1_id, 'Optimisation MongoDB indexes', 'Ameliorer les performances des recherches complexes', user_ids[0], 'improvement', 'medium', 'done'),
+        create_ticket(p2_id, 'Design landing page', 'Creer une page d accueil attrayante pour les clubs', user_ids[1], 'task', 'high', 'todo'),
+    ]
+    mongo.db.tickets.insert_many(tickets)
+    print(f"[Seed] Created 2 projects and {len(tickets)} tickets")
     
     # Link coach to team
-    mongo.db.teams.update_one({'_id': team1_id}, {'$set': {'coach_ids': [user_ids[1]]}})
+    mongo.db.teams.update_one({'_id': team1_id}, {'$set': {'coach_ids': [user_ids[4]]}})
     
-    # ========================================
-    # 3. CREATE PLAYERS (FC Elite)
-    # ========================================
+    # ... lines 87-261 remain mostly same, adjusting user index if needed ...
+    # (Checking user_ids[2] in line 106, it was player1, now user_ids[5] is player1)
     player_data = [
         {'name': 'Lucas Martin', 'jersey': 1, 'pos': 'GK', 'goals': 0, 'assists': 0, 'matches': 18, 'status': 'active'},
         {'name': 'Thomas Bernard', 'jersey': 2, 'pos': 'DEF', 'goals': 1, 'assists': 3, 'matches': 20, 'status': 'active'},

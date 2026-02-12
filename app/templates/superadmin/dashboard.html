@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Superadmin Dashboard - FootLogic{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Superadmin Dashboard</h1>
+        <button onclick="document.getElementById('newProjectModal').classList.remove('hidden')"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+            + Nouveau Projet
+        </button>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Projets</div>
+            <div class="text-2xl font-bold text-gray-800 dark:text-white">{{ total_projects }}</div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Tickets Actifs</div>
+            <div class="text-2xl font-bold text-blue-600">4</div> <!-- Mock for now -->
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Comptes Superadmin</div>
+            <div class="text-2xl font-bold text-green-600">3</div>
+        </div>
+    </div>
+
+    <!-- Project List -->
+    <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
+        <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Projets en cours</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-gray-50 dark:bg-gray-900/50">
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Créé le</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                    {% for project in projects %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition duration-150">
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-gray-900 dark:text-white">{{ project.name }}</div>
+                            <div class="text-sm text-gray-500">{{ project.description[:60] }}...</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-medium
+                                {% if project.status == 'in_progress' %} bg-blue-100 text-blue-700
+                                {% elif project.status == 'completed' %} bg-green-100 text-green-700
+                                {% else %} bg-gray-100 text-gray-700 {% endif %}">
+                                {{ project.status }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            {{ project.created_at.strftime('%d/%m/%Y') if project.created_at else 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <a href="{{ url_for('superadmin.project_detail', project_id=project._id) }}"
+                                class="text-blue-600 hover:text-blue-800 font-medium">Gérer</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-10 text-center text-gray-500">Aucun projet trouvé.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- New Project Modal -->
+<div id="newProjectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
+        <h3 class="text-xl font-bold mb-4 dark:text-white">Nouveau Projet</h3>
+        <form action="{{ url_for('superadmin.create_project') }}" method="POST">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom du projet</label>
+                <input type="text" name="name" required
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                <textarea name="description" rows="3"
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"></textarea>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button type="button" onclick="document.getElementById('newProjectModal').classList.add('hidden')"
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800">Annuler</button>
+                <button type="submit"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Créer</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

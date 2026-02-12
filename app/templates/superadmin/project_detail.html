@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - Superadmin{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+        <a href="{{ url_for('superadmin.dashboard') }}" class="text-blue-600 hover:underline mb-4 inline-block">&larr;
+            Retour au Dashboard</a>
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800 dark:text-white">{{ project.name }}</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">{{ project.description }}</p>
+            </div>
+            <button onclick="document.getElementById('newTicketModal').classList.remove('hidden')"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                + Nouveau Ticket (Jira style)
+            </button>
+        </div>
+    </div>
+
+    <!-- Tickets Kanban-ish View -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- To Do -->
+        <div class="bg-gray-100 dark:bg-gray-900/40 p-4 rounded-xl">
+            <h3 class="font-bold text-gray-700 dark:text-gray-300 mb-4 flex justify-between">
+                À FAIRE <span class="bg-gray-200 dark:bg-gray-700 px-2 rounded">{{ tickets|selectattr('status',
+                    'equalto', 'todo')|list|length }}</span>
+            </h3>
+            <div class="space-y-4">
+                {% for ticket in tickets if ticket.status == 'todo' %}
+                {{ render_ticket_card(ticket) }}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="bg-gray-100 dark:bg-gray-900/40 p-4 rounded-xl">
+            <h3 class="font-bold text-blue-700 dark:text-blue-400 mb-4 flex justify-between">
+                EN COURS <span class="bg-blue-100 dark:bg-blue-900/40 px-2 rounded">{{ tickets|selectattr('status',
+                    'equalto', 'in_progress')|list|length }}</span>
+            </h3>
+            <div class="space-y-4">
+                {% for ticket in tickets if ticket.status == 'in_progress' %}
+                {{ render_ticket_card(ticket) }}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Review -->
+        <div class="bg-gray-100 dark:bg-gray-900/40 p-4 rounded-xl">
+            <h3 class="font-bold text-yellow-700 dark:text-yellow-400 mb-4 flex justify-between">
+                REVUE <span class="bg-yellow-100 dark:bg-yellow-900/40 px-2 rounded">{{ tickets|selectattr('status',
+                    'equalto', 'review')|list|length }}</span>
+            </h3>
+            <div class="space-y-4">
+                {% for ticket in tickets if ticket.status == 'review' %}
+                {{ render_ticket_card(ticket) }}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Done -->
+        <div class="bg-gray-100 dark:bg-gray-900/40 p-4 rounded-xl">
+            <h3 class="font-bold text-green-700 dark:text-green-400 mb-4 flex justify-between">
+                TERMINÉ <span class="bg-green-100 dark:bg-green-900/40 px-2 rounded">{{ tickets|selectattr('status',
+                    'equalto', 'done')|list|length }}</span>
+            </h3>
+            <div class="space-y-4">
+                {% for ticket in tickets if ticket.status == 'done' %}
+                {{ render_ticket_card(ticket) }}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% macro render_ticket_card(ticket) %}
+<div
+    class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition">
+    <div class="flex justify-between items-start mb-2">
+        <span class="text-xs font-bold uppercase tracking-wider 
+            {% if ticket.type == 'bug' %} text-red-600 
+            {% elif ticket.type == 'feature' %} text-green-600 
+            {% else %} text-blue-600 {% endif %}">
+            {{ ticket.type }}
+        </span>
+        <span class="text-xs text-gray-400">#{{ ticket._id[-4:] }}</span>
+    </div>
+    <h4 class="font-semibold text-gray-900 dark:text-white mb-1">{{ ticket.title }}</h4>
+    <p class="text-xs text-gray-500 mb-3">{{ ticket.description[:80] }}</p>
+    <div class="flex justify-between items-center">
+        <span class="text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+            {{ ticket.priority }}
+        </span>
+        <form action="{{ url_for('superadmin.update_ticket_status', ticket_id=ticket._id) }}" method="POST"
+            class="inline">
+            <input type="hidden" name="project_id" value="{{ project._id }}">
+            <select name="status" onchange="this.form.submit()"
+                class="text-xs bg-transparent border-none focus:ring-0 cursor-pointer text-blue-600">
+                <option value="todo" {% if ticket.status=='todo' %}selected{% endif %}>À faire</option>
+                <option value="in_progress" {% if ticket.status=='in_progress' %}selected{% endif %}>En cours</option>
+                <option value="review" {% if ticket.status=='review' %}selected{% endif %}>Revue</option>
+                <option value="done" {% if ticket.status=='done' %}selected{% endif %}>Terminé</option>
+            </select>
+        </form>
+    </div>
+</div>
+{% endmacro %}
+
+<!-- New Ticket Modal -->
+<div id="newTicketModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
+        <h3 class="text-xl font-bold mb-4 dark:text-white">Créer un Ticket</h3>
+        <form action="{{ url_for('superadmin.create_ticket', project_id=project._id) }}" method="POST">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Titre</label>
+                <input type="text" name="title" required
+                    class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                <textarea name="description" rows="3"
+                    class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                    <select name="type" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                        <option value="task">Tache</option>
+                        <option value="feature">Fonctionnalité</option>
+                        <option value="bug">Bug</option>
+                        <option value="improvement">Amélioration</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priorité</label>
+                    <select name="priority" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+                        <option value="low">Basse</option>
+                        <option value="medium" selected>Moyenne</option>
+                        <option value="high">Haute</option>
+                        <option value="critical">Critique</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button type="button" onclick="document.getElementById('newTicketModal').classList.add('hidden')"
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800">Annuler</button>
+                <button type="submit"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Créer</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

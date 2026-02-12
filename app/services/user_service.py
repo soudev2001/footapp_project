@@ -110,6 +110,7 @@ def get_nav_for_role(role):
             {'name': 'Isy HUB', 'url': '/isy/hub', 'icon': 'fa-rocket'},
             {'name': 'Partenaires', 'url': '/isy/partners', 'icon': 'fa-crown'},
             {'name': 'Console Gestion', 'url': '/admin/panel', 'icon': 'fa-shield-halved'},
+            {'name': 'Avancement App', 'url': '/superadmin/dashboard', 'icon': 'fa-list-check'},
             {'name': 'Site Public', 'url': '/public-club', 'icon': 'fa-globe'},
         ],
         'coach': [
