@@ -55,28 +55,29 @@
                     },
                     colors: {
                         'primary': {
-                            50: '#f7fee7',
-                            100: '#ecfccb',
-                            200: '#d9f99d',
-                            300: '#bef264',
-                            400: '#a3e635',
-                            500: '#84cc16',
-                            600: '#65a30d',
-                            700: '#4d7c0f',
-                            800: '#3f6212',
-                            900: '#365314',
-                            950: '#1a2e05',
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            300: '#6ee7b7',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            950: '#022c22',
                         },
                         'accent': {
-                            400: '#facc15',
-                            500: '#eab308',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
                         },
                         'surface': {
                             50: '#f8fafc',
                             100: '#f1f5f9',
-                            800: '#1e293b',
-                            900: '#050505',
-                            950: '#020617',
+                            800: '#1f2937',
+                            900: '#111827',
+                            950: '#0a0f1a',
                         }
                     },
                     animation: {
@@ -85,6 +86,7 @@
                         'slide-up': 'slideUp 0.5s ease-out',
                         'slide-in': 'slideIn 0.3s ease-out',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in': 'fadeIn 0.4s ease forwards',
                     },
                 }
             }
@@ -139,8 +141,8 @@
         .gradient-mesh {
             background-color: var(--bg-body);
             background-image:
-                radial-gradient(at 0% 0%, rgba(132, 204, 22, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(250, 204, 21, 0.15) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.06) 0px, transparent 50%);
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -160,18 +162,18 @@
 
     <!-- Desktop Navbar -->
     <!-- Top Glass Navbar -->
-    <nav class="hidden md:block fixed top-0 left-0 right-0 z-[100] h-20">
-        <div class="absolute inset-0 glass border-b border-white/5 shadow-2xl shadow-black/50"></div>
+    <nav class="hidden md:block fixed top-0 left-0 right-0 z-[100] h-16">
+        <div class="absolute inset-0 glass border-b border-white/5"></div>
 
-        <div class="relative h-full max-w-7xl mx-auto px-6 flex items-center justify-between gap-12">
+        <div class="relative h-full max-w-7xl mx-auto px-6 flex items-center justify-between gap-10">
             <!-- Brand Logo -->
-            <a href="/" class="flex items-center gap-4 group shrink-0">
-                <div class="relative w-12 h-12">
+            <a href="/" class="flex items-center gap-3 group shrink-0">
+                <div class="relative w-10 h-10">
                     <div
-                        class="absolute -inset-1 bg-gradient-to-r from-primary-500 to-amber-500 rounded-xl blur-[8px] opacity-20 group-hover:opacity-40 transition-all duration-700">
+                        class="absolute -inset-1 bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl blur-[6px] opacity-20 group-hover:opacity-40 transition-all duration-500">
                     </div>
                     <div
-                        class="relative h-full w-full bg-surface-950 rounded-xl border border-white/10 flex items-center justify-center p-2.5 shadow-2xl overflow-hidden group-hover:scale-110 transition-transform duration-500">
+                        class="relative h-full w-full bg-surface-950 rounded-xl border border-white/10 flex items-center justify-center p-2 shadow-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
                         <img src="{{ url_for('static', filename='img/logo_dark.png') }}"
                             class="w-full h-full object-contain dark-logo">
                         <img src="{{ url_for('static', filename='img/logo_light.png') }}"
@@ -179,20 +181,20 @@
                     </div>
                 </div>
                 <div class="flex flex-col">
-                    <span class="text-xl font-black italic uppercase tracking-tighter leading-none">FOOT<span
-                            class="text-primary-500">LOGIC</span></span>
-                    <span class="text-[8px] font-black uppercase tracking-[0.3em] text-white/20 mt-1">ELITE
-                        PLATFORM</span>
+                    <span class="text-lg font-extrabold uppercase tracking-tight leading-none">Foot<span
+                            class="text-primary-500">Logic</span></span>
+                    <span class="text-[7px] font-semibold uppercase tracking-[0.25em] text-white/25 mt-0.5">Sports
+                        Platform</span>
                 </div>
             </a>
 
             <!-- Navigation Links -->
-            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
+            <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-2">
                 {% for item in nav_items %}
                 <a href="{{ item.url }}"
-                    class="flex items-center gap-3 px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all duration-300 group whitespace-nowrap">
+                    class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-[11px] font-semibold uppercase tracking-wider text-white/45 hover:text-white hover:bg-white/5 transition-all duration-200 group whitespace-nowrap">
                     <i
-                        class="fa-solid {{ item.icon }} text-primary-500 opacity-40 group-hover:opacity-100 group-hover:scale-110 transition-all"></i>
+                        class="fa-solid {{ item.icon }} text-primary-500 opacity-50 group-hover:opacity-100 transition-all"></i>
                     {{ item.name }}
                 </a>
                 {% endfor %}
@@ -201,75 +203,74 @@
             <!-- Global Actions -->
             <div class="flex items-center gap-4 shrink-0">
                 <!-- Theme & Tools -->
-                <div class="flex items-center glass rounded-2xl p-1.5 border-white/5">
+                <div class="flex items-center gap-1 bg-white/[0.03] rounded-xl p-1 border border-white/5">
                     <button id="theme-toggle"
-                        class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors text-white/40 hover:text-white">
+                        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/8 transition-colors text-white/40 hover:text-white">
                         <i class="fa-solid fa-moon dark:block hidden text-sm"></i>
                         <i class="fa-solid fa-sun dark:hidden block text-sm"></i>
                     </button>
-
                     <a href="{{ url_for('main.nav_demo') }}"
-                        class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors text-white/40 hover:text-white"
-                        title="Navigateur Système">
+                        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/8 transition-colors text-white/40 hover:text-white"
+                        title="Navigation">
                         <i class="fa-solid fa-compass text-sm"></i>
                     </a>
                 </div>
                 {% if current_user.is_authenticated %}
                 <a href="{{ url_for('main.notifications') }}"
-                    class="w-10 h-10 flex items-center justify-center rounded-2xl hover:bg-white/5 transition-colors relative group">
-                    <i class="fa-solid fa-bell text-white/40 group-hover:text-primary-500 transition-colors"></i>
+                    class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/5 transition-colors relative group">
+                    <i
+                        class="fa-solid fa-bell text-white/40 group-hover:text-primary-500 transition-colors text-sm"></i>
                     <span
-                        class="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-primary-500 rounded-full border-2 border-surface-950 shadow-[0_0_10px_rgba(132,204,22,0.5)]"></span>
+                        class="absolute top-2 right-2 w-2 h-2 bg-primary-500 rounded-full border-2 border-surface-950 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
                 </a>
 
                 <div class="relative group">
                     <button
-                        class="flex items-center gap-3 p-1.5 pr-4 rounded-2xl hover:bg-white/5 transition-all duration-300 border border-transparent hover:border-white/10 group">
+                        class="flex items-center gap-2.5 p-1.5 pr-3.5 rounded-xl hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/8 group">
                         <div
-                            class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center font-black text-black text-xs shadow-lg transform group-hover:rotate-6 transition-transform">
+                            class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center font-bold text-white text-xs shadow-md">
                             {{ current_user.profile.first_name[:1] if current_user.profile.first_name else 'U' }}
                         </div>
                         <div class="flex flex-col items-start">
-                            <span class="text-[10px] font-black uppercase tracking-widest leading-none">
-                                {{ current_user.profile.first_name or 'Elite' }}
+                            <span class="text-xs font-semibold leading-none">
+                                {{ current_user.profile.first_name or 'User' }}
                             </span>
-                            <span class="text-[8px] font-bold text-white/20 uppercase tracking-tighter mt-0.5">Membre
-                                Pro</span>
+                            <span class="text-[9px] text-white/25 mt-0.5">{{ current_user.role | capitalize }}</span>
                         </div>
                     </button>
 
                     <!-- Dropdown -->
                     <div
-                        class="absolute right-0 top-full mt-2 w-64 glass rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 overflow-hidden z-[110]">
-                        <div class="p-6 border-b border-white/5 bg-white/[0.02]">
-                            <div class="font-black italic uppercase text-sm tracking-tight">
+                        class="absolute right-0 top-full mt-2 w-56 glass rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.4)] border border-white/6 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-1 group-hover:translate-y-0 overflow-hidden z-[110]">
+                        <div class="p-4 border-b border-white/5 bg-white/[0.02]">
+                            <div class="font-semibold text-sm">
                                 {{ current_user.profile.first_name }} {{ current_user.profile.last_name }}
                             </div>
-                            <div class="text-[10px] text-white/20 font-bold uppercase tracking-widest mt-1 truncate">
+                            <div class="text-xs text-white/30 mt-0.5 truncate">
                                 {{ current_user.email }}
                             </div>
                         </div>
-                        <div class="p-2">
+                        <div class="p-1.5">
                             <a href="{{ url_for('main.profile') }}"
-                                class="flex items-center gap-4 px-4 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white/40 hover:text-white hover:bg-primary-500 hover:text-black transition-all group">
-                                <i class="fa-solid fa-user w-4 text-center"></i>Profil
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/50 hover:text-white hover:bg-primary-500/15 transition-all">
+                                <i class="fa-solid fa-user w-4 text-center text-xs"></i>Profil
                             </a>
                             <a href="{{ url_for('main.settings') }}"
-                                class="flex items-center gap-4 px-4 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all">
-                                <i class="fa-solid fa-gear w-4 text-center"></i>Settings
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/50 hover:text-white hover:bg-white/5 transition-all">
+                                <i class="fa-solid fa-gear w-4 text-center text-xs"></i>Paramètres
                             </a>
-                            <div class="h-px bg-white/5 my-2 mx-4"></div>
+                            <div class="h-px bg-white/5 my-1.5 mx-2"></div>
                             <a href="{{ url_for('auth.logout') }}"
-                                class="flex items-center gap-4 px-4 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest text-red-400 hover:bg-red-500/10 transition-all">
-                                <i class="fa-solid fa-power-off w-4 text-center"></i>Logout
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-all">
+                                <i class="fa-solid fa-power-off w-4 text-center text-xs"></i>Déconnexion
                             </a>
                         </div>
                     </div>
                 </div>
                 {% else %}
                 <a href="{{ url_for('auth.login') }}"
-                    class="px-8 py-3 bg-primary-500 text-black rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 hover:shadow-[0_0_20px_rgba(132,204,22,0.3)] transition-all">
-                    CONNEXION
+                    class="px-6 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-xs hover:bg-primary-600 hover:shadow-[0_0_16px_rgba(16,185,129,0.25)] transition-all">
+                    Connexion
                 </a>
                 {% endif %}
             </div>
@@ -278,7 +279,7 @@
 
 
     <!-- Main Content -->
-    <main class="flex-1 pt-16 md:pt-20 pb-20 md:pb-8 relative z-10">
+    <main class="flex-1 pt-16 md:pt-16 pb-20 md:pb-8 relative z-10">
         <!-- Flash Messages -->
         {% with messages=get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -298,9 +299,9 @@
         {% endwith %}
 
         <div class="fixed inset-0 pointer-events-none z-0">
-            <div class="absolute top-[20%] left-[10%] w-96 h-96 bg-primary-500/10 rounded-full blur-[128px]">
+            <div class="absolute top-[20%] left-[10%] w-80 h-80 bg-primary-500/[0.06] rounded-full blur-[120px]">
             </div>
-            <div class="absolute bottom-[20%] right-[10%] w-96 h-96 bg-amber-500/5 rounded-full blur-[128px]">
+            <div class="absolute bottom-[20%] right-[10%] w-80 h-80 bg-accent-500/[0.04] rounded-full blur-[120px]">
             </div>
         </div>
 

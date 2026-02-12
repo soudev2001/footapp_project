@@ -1,43 +1,42 @@
 {% extends "base.html" %}
-{% block title %}FootLogic Elite - Accueil{% endblock %}
+{% block title %}FootLogic — Accueil{% endblock %}
 
 {% block content %}
 <div class="page-enter max-w-6xl mx-auto px-4 py-8">
-    <!-- Premium Welcome Hero -->
-    <div class="glass p-12 rounded-[48px] border-white/5 mb-12 relative overflow-hidden group">
-        <div class="absolute inset-0 bg-gradient-to-br from-primary-600/20 via-transparent to-amber-600/10"></div>
+    <!-- Welcome Hero -->
+    <div class="glass p-10 rounded-3xl border-white/5 mb-10 relative overflow-hidden group">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-600/15 via-transparent to-accent-500/8"></div>
         <div
-            class="absolute -top-24 -right-24 w-96 h-96 bg-primary-500/10 rounded-full blur-[120px] group-hover:bg-primary-500/20 transition-all duration-1000">
+            class="absolute -top-24 -right-24 w-80 h-80 bg-primary-500/8 rounded-full blur-[100px] group-hover:bg-primary-500/12 transition-all duration-1000">
         </div>
 
-        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
             <div class="flex-1 text-center md:text-left">
                 <div
-                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-primary-400 mb-6 animate-pulse">
-                    <span class="w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
+                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/8 text-[10px] font-semibold uppercase tracking-wider text-primary-400 mb-5">
+                    <span class="w-1.5 h-1.5 bg-primary-500 rounded-full animate-pulse"></span>
                     Saison 2025/2026 en cours
                 </div>
-                <h1
-                    class="text-6xl font-black italic uppercase tracking-tighter light:text-slate-900 leading-[0.9] mb-4">
+                <h1 class="text-5xl font-extrabold uppercase tracking-tighter light:text-slate-900 leading-[0.9] mb-3">
                     Salut, <span class="text-gradient">{{ current_user.profile.first_name }}</span> !
                 </h1>
-                <p class="text-white/40 light:text-slate-500 text-lg font-medium italic max-w-lg">Prêt pour le prochain
+                <p class="text-white/35 light:text-slate-500 text-base font-medium max-w-lg">Prêt pour le prochain
                     match ? Ton équipe compte sur ton talent pour décrocher la victoire.</p>
 
-                <div class="flex flex-wrap gap-4 mt-10 justify-center md:justify-start">
+                <div class="flex flex-wrap gap-3 mt-8 justify-center md:justify-start">
                     {% if teams %}
-                    <div class="relative min-w-[220px]">
+                    <div class="relative min-w-[200px]">
                         <form id="teamFilterForm" method="GET" action="{{ url_for('main.app_home') }}">
                             <select name="team_id" onchange="this.form.submit()"
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
+                                class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-5 text-white text-[10px] font-semibold uppercase tracking-wider focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
                                 {% for team in teams %}
                                 <option value="{{ team._id|string }}" {% if selected_team_id==team._id|string
                                     %}selected{% endif %} class="bg-slate-900">
-                                    SUIVRE : {{ team.name }}
+                                    Suivre : {{ team.name }}
                                 </option>
                                 {% endfor %}
                             </select>
-                            <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none text-white/20">
+                            <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-white/20">
                                 <i class="fa-solid fa-chevron-down text-[8px]"></i>
                             </div>
                         </form>
@@ -48,76 +47,78 @@
 
             <div class="relative">
                 <div
-                    class="w-64 h-64 rounded-[56px] overflow-hidden border-8 border-white/5 shadow-2xl rotate-3 group-hover:rotate-0 transition-all duration-700">
+                    class="w-56 h-56 rounded-3xl overflow-hidden border-4 border-white/5 shadow-xl rotate-2 group-hover:rotate-0 transition-all duration-700">
                     <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=800"
-                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000">
                 </div>
                 <div
-                    class="absolute -bottom-6 -right-6 w-32 h-32 glass border-white/10 rounded-[40px] flex flex-col items-center justify-center shadow-2xl -rotate-6 group-hover:rotate-0 transition-all duration-700">
-                    <p class="text-4xl font-black italic text-primary-400">84</p>
-                    <p class="text-[9px] font-black uppercase tracking-widest text-white/20">FORME</p>
+                    class="absolute -bottom-5 -right-5 w-28 h-28 glass border-white/8 rounded-2xl flex flex-col items-center justify-center shadow-xl -rotate-3 group-hover:rotate-0 transition-all duration-700">
+                    <p class="text-3xl font-extrabold text-primary-400">84</p>
+                    <p class="text-[9px] font-semibold uppercase tracking-wider text-white/20">Forme</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Main Grid -->
-    <div class="grid lg:grid-cols-12 gap-10">
+    <div class="grid lg:grid-cols-12 gap-8">
         <!-- News & Updates -->
-        <div class="lg:col-span-8 space-y-10">
-            <div class="flex items-center justify-between px-6">
-                <h3 class="text-2xl font-black italic uppercase tracking-tight light:text-slate-900 leading-none">
+        <div class="lg:col-span-8 space-y-8">
+            <div class="flex items-center justify-between px-4">
+                <h3 class="text-xl font-bold uppercase tracking-tight light:text-slate-900 leading-none">
                     Actualités Club</h3>
                 <a href="{{ url_for('main.feed') }}"
-                    class="text-[10px] font-black uppercase tracking-widest text-primary-400 hover:text-primary-300 transition-colors">Tout
+                    class="text-[10px] font-semibold uppercase tracking-wider text-primary-400 hover:text-primary-300 transition-colors">Tout
                     Voir</a>
             </div>
 
-            <div class="glass rounded-[48px] border-white/5 overflow-hidden group cursor-pointer relative h-96">
+            <div class="glass rounded-3xl border-white/5 overflow-hidden group cursor-pointer relative h-80">
                 <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80"
-                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000">
+                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-1000">
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-                <div class="absolute bottom-10 left-10 right-10">
-                    <div class="flex items-center gap-3 mb-4">
+                <div class="absolute bottom-8 left-8 right-8">
+                    <div class="flex items-center gap-3 mb-3">
                         <span
-                            class="px-3 py-1 rounded-full bg-primary-500 text-black text-[9px] font-black uppercase tracking-widest shadow-xl">MATCH
-                            REPORT</span>
-                        <span class="text-[10px] font-black text-white/60 uppercase tracking-widest italic">Il y a 2
+                            class="px-3 py-1 rounded-full bg-primary-500 text-white text-[9px] font-bold uppercase tracking-wider shadow-lg">Match
+                            Report</span>
+                        <span class="text-[10px] font-semibold text-white/55 uppercase tracking-wider">Il y a 2
                             heures</span>
                     </div>
                     <h2
-                        class="text-4xl font-black text-white italic uppercase tracking-tight mb-4 group-hover:text-primary-400 transition-colors">
-                        DÉMONSTRATION DE FORCE À DOMICILE</h2>
-                    <p class="text-white/60 text-sm font-medium italic max-w-xl">Le FC Elite s'impose 4-1 avec un triplé
+                        class="text-3xl font-extrabold text-white uppercase tracking-tight mb-3 group-hover:text-primary-400 transition-colors">
+                        Démonstration de force à domicile</h2>
+                    <p class="text-white/55 text-sm font-medium max-w-xl">Le FC Elite s'impose 4-1 avec un triplé
                         du capitaine. Retrouvez l'analyse tactique complète du match.</p>
                 </div>
             </div>
 
             <!-- Upcoming for selected team -->
-            <div class="space-y-6">
-                <h3 class="text-xl font-black italic uppercase tracking-tight light:text-slate-900 px-6">Calendrier
+            <div class="space-y-4">
+                <h3 class="text-lg font-bold uppercase tracking-tight light:text-slate-900 px-4">Calendrier
                     Équipe</h3>
-                <div class="grid md:grid-cols-2 gap-4">
+                <div class="grid md:grid-cols-2 gap-3">
                     {% for event in upcoming_events %}
-                    <div class="glass p-6 rounded-[32px] border-white/5 hover:bg-white/5 transition-all">
-                        <div class="flex items-center gap-4 mb-4">
+                    <div class="glass p-5 rounded-2xl border-white/5 hover:bg-white/[0.04] transition-all">
+                        <div class="flex items-center gap-3 mb-3">
                             <div
-                                class="w-12 h-12 rounded-2xl gradient-primary flex flex-col items-center justify-center text-white">
-                                <span class="text-lg font-black leading-none">{{ event.date.strftime('%d') if event.date
+                                class="w-10 h-10 rounded-xl gradient-primary flex flex-col items-center justify-center text-white">
+                                <span class="text-base font-extrabold leading-none">{{ event.date.strftime('%d') if
+                                    event.date
                                     else '--' }}</span>
-                                <span class="text-[8px] font-black uppercase">{{ event.date.strftime('%b') if event.date
+                                <span class="text-[7px] font-semibold uppercase">{{ event.date.strftime('%b') if
+                                    event.date
                                     else '' }}</span>
                             </div>
                             <div>
                                 <h4 class="font-bold text-sm leading-tight">{{ event.title }}</h4>
-                                <p class="text-[10px] text-white/40 uppercase tracking-widest mt-1">{{ event.time or
+                                <p class="text-[10px] text-white/35 uppercase tracking-wider mt-0.5">{{ event.time or
                                     '18:00' }} • {{ event.location or 'Terrain A' }}</p>
                             </div>
                         </div>
                     </div>
                     {% else %}
-                    <div class="col-span-full py-10 text-center glass rounded-[32px] border-dashed border-white/10">
-                        <p class="text-white/20 text-xs italic tracking-widest uppercase">Aucun événement à venir pour
+                    <div class="col-span-full py-8 text-center glass rounded-2xl border-dashed border-white/8">
+                        <p class="text-white/20 text-xs tracking-wider uppercase">Aucun événement à venir pour
                             cette équipe</p>
                     </div>
                     {% endfor %}
@@ -126,100 +127,100 @@
         </div>
 
         <!-- Community & Side Widgets -->
-        <div class="lg:col-span-4 space-y-10">
-            <h3 class="text-xs font-black text-white/20 uppercase tracking-[0.3em] px-6">Activités</h3>
+        <div class="lg:col-span-4 space-y-8">
+            <h3 class="text-xs font-semibold text-white/20 uppercase tracking-wider px-4">Activités</h3>
 
-            <div class="glass p-8 rounded-[40px] border-white/5 bg-gradient-to-br from-amber-500/10 to-transparent">
-                <div class="flex items-center gap-4 mb-8">
+            <div class="glass p-6 rounded-2xl border-white/5 bg-gradient-to-br from-accent-500/8 to-transparent">
+                <div class="flex items-center gap-3 mb-6">
                     <div
-                        class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+                        class="w-10 h-10 rounded-xl bg-accent-500/15 text-accent-400 flex items-center justify-center text-lg">
                         <i class="fa-solid fa-trophy"></i>
                     </div>
                     <div>
-                        <h4 class="font-black italic uppercase text-sm">Championnat J15</h4>
-                        <p class="text-[9px] font-black text-white/20 uppercase tracking-widest">PRONOSTICS</p>
+                        <h4 class="font-bold uppercase text-sm">Championnat J15</h4>
+                        <p class="text-[9px] font-semibold text-white/20 uppercase tracking-wider">Pronostics</p>
                     </div>
                 </div>
-                <p class="text-white/40 text-[10px] font-medium italic leading-relaxed mb-8">Pronostiquez le résultat du
+                <p class="text-white/35 text-[10px] font-medium leading-relaxed mb-6">Pronostiquez le résultat du
                     match contre Racing FC pour gagner des points Elite.</p>
-                <div class="grid grid-cols-3 gap-3">
+                <div class="grid grid-cols-3 gap-2">
                     <button
-                        class="glass-light py-3 rounded-2xl text-[9px] font-black uppercase hover:bg-primary-500 hover:text-black transition-all">ELITE</button>
+                        class="glass-light py-2.5 rounded-xl text-[9px] font-bold uppercase hover:bg-primary-500 hover:text-white transition-all">Elite</button>
                     <button
-                        class="glass-light py-3 rounded-2xl text-[9px] font-black uppercase hover:bg-white/10 transition-all">NUL</button>
+                        class="glass-light py-2.5 rounded-xl text-[9px] font-bold uppercase hover:bg-white/8 transition-all">Nul</button>
                     <button
-                        class="glass-light py-3 rounded-2xl text-[9px] font-black uppercase hover:bg-red-500/20 transition-all">RACING</button>
+                        class="glass-light py-2.5 rounded-xl text-[9px] font-bold uppercase hover:bg-red-500/15 transition-all">Racing</button>
                 </div>
             </div>
 
-            <div class="glass p-10 rounded-[48px] border-white/5 relative overflow-hidden group">
-                <div class="flex justify-between items-start mb-10">
-                    <h4 class="font-black italic uppercase text-lg leading-none">Boutique Pro</h4>
+            <div class="glass p-8 rounded-3xl border-white/5 relative overflow-hidden group">
+                <div class="flex justify-between items-start mb-8">
+                    <h4 class="font-bold uppercase text-base leading-none">Boutique Pro</h4>
                     <i
-                        class="fa-solid fa-shirt text-primary-400 group-hover:scale-125 transition-transform duration-500"></i>
+                        class="fa-solid fa-shirt text-primary-400 group-hover:scale-110 transition-transform duration-500"></i>
                 </div>
                 <div class="text-center">
-                    <div class="relative mb-8 inline-block">
+                    <div class="relative mb-6 inline-block">
                         <div
-                            class="absolute inset-0 bg-primary-500/20 rounded-full blur-2xl group-hover:blur-3xl transition-all">
+                            class="absolute inset-0 bg-primary-500/15 rounded-full blur-2xl group-hover:blur-3xl transition-all">
                         </div>
                         <img src="https://images.unsplash.com/photo-1521485950395-bcfb8fc9bd06?auto=format&fit=crop&w=300&q=80"
-                            class="w-32 h-32 mx-auto rounded-3xl object-cover relative z-10 shadow-2xl group-hover:-rotate-3 transition-transform duration-700">
+                            class="w-28 h-28 mx-auto rounded-2xl object-cover relative z-10 shadow-xl group-hover:-rotate-2 transition-transform duration-700">
                     </div>
-                    <p class="font-black italic text-lg uppercase mb-1">Kit Training 2026</p>
-                    <p class="text-[9px] text-white/20 font-black uppercase tracking-widest mb-10">Édition Spéciale
+                    <p class="font-bold text-base uppercase mb-1">Kit Training 2026</p>
+                    <p class="text-[9px] text-white/20 font-semibold uppercase tracking-wider mb-8">Édition Spéciale
                         Joueurs</p>
                     <a href="{{ url_for('main.shop_product') }}"
-                        class="w-full py-4 gradient-primary rounded-2xl block text-[10px] font-black uppercase tracking-[0.2em] text-black shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">VOIR
-                        L'ARTICLE</a>
+                        class="w-full py-3.5 gradient-primary rounded-xl block text-[10px] font-bold uppercase tracking-wider text-white shadow-lg shadow-primary-500/15 hover:scale-[1.01] active:scale-[0.99] transition-all">Voir
+                        l'article</a>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Quick Guide / Pro Tips -->
-    <div class="mt-20 glass p-10 rounded-[48px] border-white/5 relative overflow-hidden">
-        <div class="absolute top-0 right-0 p-8 opacity-10">
-            <i class="fa-solid fa-lightbulb text-8xl text-primary-400"></i>
+    <div class="mt-16 glass p-8 rounded-3xl border-white/5 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-6 opacity-8">
+            <i class="fa-solid fa-lightbulb text-6xl text-primary-400"></i>
         </div>
         <div class="relative z-10">
-            <h3 class="text-2xl font-black italic uppercase italic tracking-tighter mb-8 text-primary-400">Guide Rapide
-                Elite</h3>
-            <div class="grid md:grid-cols-4 gap-8">
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3 text-white font-bold text-sm">
+            <h3 class="text-xl font-bold uppercase tracking-tight mb-6 text-primary-400">Guide Rapide</h3>
+            <div class="grid md:grid-cols-4 gap-6">
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 text-white font-semibold text-sm">
                         <i class="fa-solid fa-circle-check text-primary-500"></i>
                         <span>Équipe</span>
                     </div>
-                    <p class="text-[10px] text-white/40 leading-relaxed italic">Sélectionnez votre équipe favorite dans
+                    <p class="text-[10px] text-white/35 leading-relaxed">Sélectionnez votre équipe favorite dans
                         le menu en haut pour voir ses prochains matchs et événements.</p>
                 </div>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3 text-white font-bold text-sm">
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 text-white font-semibold text-sm">
                         <i class="fa-solid fa-circle-check text-primary-500"></i>
                         <span>Stats</span>
                     </div>
-                    <p class="text-[10px] text-white/40 leading-relaxed italic">Consultez l'Evo Hub pour suivre votre
+                    <p class="text-[10px] text-white/35 leading-relaxed">Consultez l'Evo Hub pour suivre votre
                         progression technique et physique au fil de la saison.</p>
                 </div>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3 text-white font-bold text-sm">
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 text-white font-semibold text-sm">
                         <i class="fa-solid fa-circle-check text-primary-500"></i>
                         <span>Shop</span>
                     </div>
-                    <p class="text-[10px] text-white/40 leading-relaxed italic">N'oubliez pas de commander votre kit
+                    <p class="text-[10px] text-white/35 leading-relaxed">N'oubliez pas de commander votre kit
                         Elite dans la boutique pour être prêt pour le prochain match.</p>
                 </div>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3 text-white font-bold text-sm">
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 text-white font-semibold text-sm">
                         <i class="fa-solid fa-circle-check text-primary-500"></i>
                         <span>PWA</span>
                     </div>
-                    <p class="text-[10px] text-white/40 leading-relaxed italic">Installez l'application sur votre écran
+                    <p class="text-[10px] text-white/35 leading-relaxed">Installez l'application sur votre écran
                         d'accueil (via le menu navigateur) pour un accès ultra-rapide.</p>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}

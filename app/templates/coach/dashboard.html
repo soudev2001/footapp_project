@@ -6,22 +6,22 @@
         data-wins="{{ season_stats.wins | default(0, true) }}" data-draws="{{ season_stats.draws | default(0, true) }}"
         data-losses="{{ season_stats.losses | default(0, true) }}">
         <div>
-            <h1 class="text-4xl font-black flex items-center gap-4 light:text-slate-900">
+            <h1 class="text-3xl font-extrabold flex items-center gap-3 light:text-slate-900">
                 <span
-                    class="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary-500/20">
-                    <i class="fa-solid fa-whistle text-white text-2xl"></i>
+                    class="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/15">
+                    <i class="fa-solid fa-whistle text-white text-xl"></i>
                 </span>
                 Tableau de Bord
             </h1>
-            <p class="text-white/40 light:text-slate-500 mt-2 font-medium italic tracking-wide">Bonjour Coach {{
-                current_user.profile.last_name or '' }}, prêt pour l'entraînement d'aujourd'hui ?</p>
+            <p class="text-white/35 light:text-slate-500 mt-2 font-medium tracking-wide text-sm">Bonjour Coach {{
+                current_user.profile.last_name or '' }}, prêt pour l'entraînement ?</p>
         </div>
-        <div class="flex flex-col md:flex-row gap-4 items-center">
+        <div class="flex flex-col md:flex-row gap-3 items-center">
             {% if teams %}
             <div class="relative min-w-[200px]">
                 <form id="teamFilterForm" method="GET" action="{{ url_for('coach.dashboard') }}">
                     <select name="team_id" onchange="this.form.submit()"
-                        class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-xs font-black uppercase tracking-widest focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
+                        class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-5 text-white text-xs font-semibold uppercase tracking-wider focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
                         {% for team in teams %}
                         <option value="{{ team._id|string }}" {% if selected_team_id==team._id|string %}selected{% endif
                             %} class="bg-slate-900">
@@ -29,118 +29,121 @@
                         </option>
                         {% endfor %}
                     </select>
-                    <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none text-white/20">
+                    <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-white/20">
                         <i class="fa-solid fa-chevron-down text-[10px]"></i>
                     </div>
                 </form>
             </div>
             {% endif %}
             <a href="{{ url_for('coach.create_event', team_id=selected_team_id) }}"
-                class="gradient-primary px-8 py-4 rounded-2xl font-black text-sm flex items-center gap-3 shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                class="gradient-primary px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2 shadow-lg shadow-primary-500/15 hover:scale-[1.02] active:scale-95 transition-all text-white">
                 <i class="fa-solid fa-plus"></i>
-                CRÉER UN ÉVÉNEMENT
+                Créer un événement
             </a>
         </div>
     </div>
 
     <!-- Quick Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-10">
-        <div class="glass p-6 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all">
-            <div class="flex items-start justify-between mb-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-8 md:mb-10">
+        <div class="glass p-5 rounded-2xl border-white/5 group hover:bg-white/[0.04] transition-all stat-card">
+            <div class="flex items-start justify-between mb-3">
                 <div
-                    class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-users text-white text-xl"></i>
+                    class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-users text-white text-lg"></i>
                 </div>
                 <div class="text-right">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 light:text-slate-400">
+                    <p class="text-[10px] font-semibold uppercase tracking-wider text-white/20 light:text-slate-400">
                         Effectif</p>
-                    <p class="text-3xl font-black light:text-slate-900">{{ players|length }}</p>
+                    <p class="text-2xl font-extrabold light:text-slate-900">{{ players|length }}</p>
                 </div>
             </div>
             <div
-                class="pt-4 border-t border-white/5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-green-400">
+                class="pt-3 border-t border-white/5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-green-400">
                 <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                 16 Joueurs Aptes
             </div>
         </div>
 
-        <div class="glass p-6 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all">
-            <div class="flex items-start justify-between mb-4">
+        <div class="glass p-5 rounded-2xl border-white/5 group hover:bg-white/[0.04] transition-all stat-card">
+            <div class="flex items-start justify-between mb-3">
                 <div
-                    class="w-12 h-12 gradient-success rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-futbol text-white text-xl"></i>
+                    class="w-10 h-10 gradient-success rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-futbol text-white text-lg"></i>
                 </div>
                 <div class="text-right">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 light:text-slate-400">
+                    <p class="text-[10px] font-semibold uppercase tracking-wider text-white/20 light:text-slate-400">
                         Matchs</p>
-                    <p class="text-3xl font-black light:text-slate-900">{{ season_stats.total_matches or 0 }}</p>
+                    <p class="text-2xl font-extrabold light:text-slate-900">{{ season_stats.total_matches or 0 }}</p>
                 </div>
             </div>
-            <div class="pt-4 border-t border-white/5 flex gap-3 text-[10px] font-black uppercase tracking-widest">
+            <div class="pt-3 border-t border-white/5 flex gap-3 text-[10px] font-semibold uppercase tracking-wider">
                 <span class="text-green-400">{{ season_stats.wins or 0 }}V</span>
                 <span class="text-white/20">{{ season_stats.draws or 0 }}N</span>
                 <span class="text-red-400">{{ season_stats.losses or 0 }}D</span>
             </div>
         </div>
 
-        <div class="glass p-6 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all">
-            <div class="flex items-start justify-between mb-4">
+        <div class="glass p-5 rounded-2xl border-white/5 group hover:bg-white/[0.04] transition-all stat-card">
+            <div class="flex items-start justify-between mb-3">
                 <div
-                    class="w-12 h-12 gradient-accent rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-ranking-star text-black text-xl"></i>
+                    class="w-10 h-10 gradient-accent rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-ranking-star text-white text-lg"></i>
                 </div>
                 <div class="text-right">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 light:text-slate-400">Buts
+                    <p class="text-[10px] font-semibold uppercase tracking-wider text-white/20 light:text-slate-400">
+                        Buts
                     </p>
-                    <p class="text-3xl font-black light:text-slate-900">{{ season_stats.goals_scored or 0 }}</p>
+                    <p class="text-2xl font-extrabold light:text-slate-900">{{ season_stats.goals_scored or 0 }}</p>
                 </div>
             </div>
             <div
-                class="pt-4 border-t border-white/5 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/20">
-                <span>{{ season_stats.goals_conceded or 0 }} ENCAISSÉS</span>
+                class="pt-3 border-t border-white/5 flex justify-between items-center text-[10px] font-semibold uppercase tracking-wider text-white/20">
+                <span>{{ season_stats.goals_conceded or 0 }} encaissés</span>
                 <span class="text-green-400">+{{ (season_stats.goals_scored or 0) - (season_stats.goals_conceded or 0)
                     }}</span>
             </div>
         </div>
 
         <div
-            class="glass p-6 rounded-[32px] border-white/5 bg-gradient-to-br from-amber-500/10 to-transparent group hover:bg-white/5 transition-all relative overflow-hidden">
+            class="glass p-5 rounded-2xl border-white/5 bg-gradient-to-br from-accent-500/8 to-transparent group hover:bg-white/[0.04] transition-all relative overflow-hidden">
             <div class="relative z-10 flex flex-col h-full justify-between">
                 <div class="flex items-start justify-between mb-2">
                     <div
-                        class="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
-                        <i class="fa-solid fa-chart-pie text-white text-xl"></i>
+                        class="w-10 h-10 bg-gradient-to-br from-accent-400 to-accent-600 rounded-xl flex items-center justify-center shadow-md">
+                        <i class="fa-solid fa-chart-pie text-white text-lg"></i>
                     </div>
                     <div class="text-right">
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 light:text-slate-400">
+                        <p
+                            class="text-[10px] font-semibold uppercase tracking-wider text-white/20 light:text-slate-400">
                             Performance</p>
                     </div>
                 </div>
 
-                <div class="h-24 w-full flex items-center justify-center relative">
+                <div class="h-20 w-full flex items-center justify-center relative">
                     <canvas id="performanceChart"></canvas>
                     <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <span class="text-xs font-black text-white/40">{{ season_stats.played or 0 }}M</span>
+                        <span class="text-xs font-bold text-white/30">{{ season_stats.played or 0 }}M</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <div
-            class="glass p-6 rounded-[32px] border-white/5 bg-gradient-to-br from-primary-500/10 to-transparent group hover:bg-white/5 transition-all relative overflow-hidden">
+            class="glass p-5 rounded-2xl border-white/5 bg-gradient-to-br from-primary-500/8 to-transparent group hover:bg-white/[0.04] transition-all relative overflow-hidden">
             <div class="relative z-10 flex flex-col h-full justify-between">
                 <div class="flex items-start justify-between mb-2">
                     <div
-                        class="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center shadow-lg">
-                        <i class="fa-solid fa-arrow-trend-up text-white text-xl"></i>
+                        class="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
+                        <i class="fa-solid fa-arrow-trend-up text-white text-lg"></i>
                     </div>
                     <div class="text-right">
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 light:text-slate-400">
-                            Évolution Forme</p>
+                        <p
+                            class="text-[10px] font-semibold uppercase tracking-wider text-white/20 light:text-slate-400">
+                            Évolution</p>
                     </div>
                 </div>
 
-                <div class="h-24 w-full">
+                <div class="h-20 w-full">
                     <canvas id="trendChart"></canvas>
                 </div>
             </div>
@@ -163,7 +166,7 @@
 
             const hasData = (seasonStats.wins + seasonStats.draws + seasonStats.losses > 0);
             const dataPerf = (!hasData) ? [1] : [seasonStats.wins, seasonStats.draws, seasonStats.losses];
-            const colorsPerf = (!hasData) ? ['rgba(255, 255, 255, 0.1)'] : ['#22c55e', '#facc15', '#ef4444'];
+            const colorsPerf = (!hasData) ? ['rgba(255, 255, 255, 0.06)'] : ['#10b981', '#f59e0b', '#ef4444'];
 
             new Chart(ctxPerf, {
                 type: 'doughnut',
@@ -173,7 +176,7 @@
                         data: dataPerf,
                         backgroundColor: colorsPerf,
                         borderWidth: 0,
-                        hoverOffset: 10
+                        hoverOffset: 8
                     }]
                 },
                 options: {
@@ -189,7 +192,6 @@
             const resultsRaw = trendDataEl.getAttribute('data-results');
             const results = JSON.parse(resultsRaw || '[]');
 
-            // Labels like M1, M2...
             const labels = results.map((_, i) => `M${i + 1}`);
 
             new Chart(ctxTrend, {
@@ -199,15 +201,15 @@
                     datasets: [{
                         label: 'Points',
                         data: results,
-                        borderColor: '#1e40af',
-                        backgroundColor: 'rgba(30, 64, 175, 0.2)',
-                        borderWidth: 3,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                        borderWidth: 2.5,
                         tension: 0.4,
                         fill: true,
-                        pointBackgroundColor: '#1e40af',
-                        pointBorderColor: 'rgba(255,255,255,0.1)',
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: 'rgba(255,255,255,0.08)',
                         pointBorderWidth: 2,
-                        pointRadius: 4
+                        pointRadius: 3
                     }]
                 },
                 options: {
@@ -230,65 +232,66 @@
         });
     </script>
 
-    <div class="grid lg:grid-cols-3 gap-10">
+    <div class="grid lg:grid-cols-3 gap-8">
         <!-- Main Content -->
-        <div class="lg:col-span-2 space-y-10">
+        <div class="lg:col-span-2 space-y-8">
             <!-- Next Match Highlight -->
             {% if upcoming_matches %}
             {% set next_match = upcoming_matches[0] %}
-            <div class="glass rounded-[40px] border-white/5 overflow-hidden group">
-                <div class="p-6 border-b border-white/5 flex items-center justify-between">
-                    <h2
-                        class="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3 light:text-slate-900">
+            <div class="glass rounded-3xl border-white/5 overflow-hidden group">
+                <div class="p-5 border-b border-white/5 flex items-center justify-between">
+                    <h2 class="text-sm font-bold uppercase tracking-wider flex items-center gap-2 light:text-slate-900">
                         <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                        PROCHAIN MATCH
+                        Prochain match
                     </h2>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-white/20 italic">{{
+                    <span class="text-[10px] font-semibold uppercase tracking-wider text-white/20">{{
                         next_match.date }}</span>
                 </div>
-                <div class="p-10 bg-gradient-to-br from-primary-500/5 via-transparent to-amber-500/5">
+                <div class="p-8 bg-gradient-to-br from-primary-500/5 via-transparent to-accent-500/3">
                     <div class="flex items-center justify-around gap-4">
                         <div class="text-center group/team">
                             <div
-                                class="w-24 h-24 gradient-primary rounded-[32px] flex items-center justify-center text-3xl font-black mb-4 shadow-2xl shadow-primary-500/20 group-hover/team:scale-105 transition-transform duration-500 text-white">
+                                class="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center text-2xl font-extrabold mb-3 shadow-lg shadow-primary-500/15 group-hover/team:scale-105 transition-transform duration-500 text-white">
                                 FL
                             </div>
-                            <p class="font-black uppercase tracking-widest text-sm light:text-slate-900">{{
+                            <p class="font-bold uppercase tracking-wider text-sm light:text-slate-900">{{
                                 session.get('club_name', 'FOOTLOGIC') }}</p>
-                            <p class="text-[8px] font-black text-green-400 mt-1 uppercase tracking-widest">DOMICILE</p>
+                            <p class="text-[8px] font-semibold text-green-400 mt-1 uppercase tracking-wider">Domicile
+                            </p>
                         </div>
                         <div class="text-center px-6">
-                            <div class="text-5xl font-black text-white/5 light:text-slate-200 italic">VS</div>
-                            <div class="mt-4">
-                                <p class="text-2xl font-black leading-none mb-1 light:text-slate-900">{{ next_match.time
+                            <div class="text-4xl font-extrabold text-white/5 light:text-slate-200">VS</div>
+                            <div class="mt-3">
+                                <p class="text-xl font-extrabold leading-none mb-1 light:text-slate-900">{{
+                                    next_match.time
                                     }}</p>
                                 <p
-                                    class="text-[10px] font-black text-white/20 light:text-slate-400 uppercase tracking-widest">
+                                    class="text-[10px] font-semibold text-white/20 light:text-slate-400 uppercase tracking-wider">
                                     {{
                                     next_match.location }}</p>
                             </div>
                         </div>
                         <div class="text-center group/away">
                             <div
-                                class="w-24 h-24 bg-white/5 light:bg-slate-100 border border-white/10 light:border-slate-200 rounded-[32px] flex items-center justify-center text-3xl font-black mb-4 shadow-2xl group-hover/away:scale-105 transition-transform duration-500 light:text-slate-900">
+                                class="w-20 h-20 bg-white/[0.04] light:bg-slate-100 border border-white/8 light:border-slate-200 rounded-2xl flex items-center justify-center text-2xl font-extrabold mb-3 shadow-lg group-hover/away:scale-105 transition-transform duration-500 light:text-slate-900">
                                 RC
                             </div>
-                            <p class="font-black uppercase tracking-widest text-sm light:text-slate-900">{{
+                            <p class="font-bold uppercase tracking-wider text-sm light:text-slate-900">{{
                                 next_match.opponent or
                                 'ADVERSAIRE' }}</p>
                             <p
-                                class="text-[8px] font-black text-white/20 light:text-slate-400 mt-1 uppercase tracking-widest">
-                                EXTÉRIEUR</p>
+                                class="text-[8px] font-semibold text-white/20 light:text-slate-400 mt-1 uppercase tracking-wider">
+                                Extérieur</p>
                         </div>
                     </div>
-                    <div class="flex gap-4 mt-12">
+                    <div class="flex gap-3 mt-10">
                         <a href="{{ url_for('coach.match_center', match_id=next_match._id|string) }}"
-                            class="flex-1 gradient-primary py-4 rounded-2xl font-black text-xs text-center shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
-                            CONVOQUER L'ÉQUIPE
+                            class="flex-1 gradient-primary py-3.5 rounded-xl font-bold text-xs text-center shadow-lg shadow-primary-500/15 hover:scale-[1.01] active:scale-95 transition-all text-white">
+                            Convoquer l'équipe
                         </a>
                         <a href="{{ url_for('coach.tactics', team_id=selected_team_id) }}"
-                            class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-4 rounded-2xl font-black text-xs text-center transition-all">
-                            PRÉPARER LA TACTIQUE
+                            class="flex-1 bg-white/[0.04] hover:bg-white/8 border border-white/8 py-3.5 rounded-xl font-bold text-xs text-center transition-all">
+                            Préparer la tactique
                         </a>
                     </div>
                 </div>
@@ -296,44 +299,44 @@
             {% endif %}
 
             <!-- Upcoming Events List -->
-            <div class="space-y-6">
-                <div class="flex items-center justify-between px-4">
-                    <h2 class="text-xl font-black uppercase tracking-widest light:text-slate-900">Agenda Semaine</h2>
+            <div class="space-y-5">
+                <div class="flex items-center justify-between px-3">
+                    <h2 class="text-lg font-bold uppercase tracking-wider light:text-slate-900">Agenda Semaine</h2>
                     <a href="{{ url_for('main.calendar') }}"
-                        class="text-primary-400 light:text-primary-600 text-[10px] font-black uppercase tracking-widest hover:text-primary-300 light:hover:text-primary-700 transition">Calendrier
+                        class="text-primary-400 light:text-primary-600 text-[10px] font-semibold uppercase tracking-wider hover:text-primary-300 light:hover:text-primary-700 transition">Calendrier
                         Complet</a>
                 </div>
-                <div class="space-y-4">
+                <div class="space-y-3">
                     {% for event in upcoming_events %}
                     <div
-                        class="glass p-5 rounded-[32px] border-white/5 flex items-center gap-6 hover:bg-white/5 transition-all group cursor-pointer">
-                        <div class="w-16 h-16 rounded-[22px] flex flex-col items-center justify-center 
+                        class="glass p-4 rounded-2xl border-white/5 flex items-center gap-5 hover:bg-white/[0.04] transition-all group cursor-pointer">
+                        <div class="w-14 h-14 rounded-xl flex flex-col items-center justify-center 
                             {% if event.event_type == 'training' %}bg-green-500/10 text-green-400{% elif event.event_type == 'match' %}bg-red-500/10 text-red-400{% else %}bg-primary-500/10 text-primary-400{% endif %} 
                             border border-current/10">
-                            <span class="text-2xl font-black leading-none">{{ event.date.strftime('%d') if event.date
+                            <span class="text-xl font-extrabold leading-none">{{ event.date.strftime('%d') if event.date
                                 else '--' }}</span>
-                            <span class="text-[8px] font-black uppercase tracking-widest mt-1">{{
+                            <span class="text-[8px] font-semibold uppercase tracking-wider mt-0.5">{{
                                 event.date.strftime('%b') if event.date else '' }}</span>
                         </div>
                         <div class="flex-1">
-                            <h3 class="font-black text-lg mb-1">{{ event.title }}</h3>
-                            <p class="text-white/40 text-xs font-medium italic flex items-center gap-2">
+                            <h3 class="font-bold text-base mb-0.5">{{ event.title }}</h3>
+                            <p class="text-white/35 text-xs font-medium flex items-center gap-2">
                                 <i class="fa-solid fa-clock text-[10px]"></i> {{ event.time or '18:00' }}
-                                <span class="mx-2 opacity-20">|</span>
+                                <span class="mx-1 opacity-20">|</span>
                                 <i class="fa-solid fa-location-dot text-[10px]"></i> {{ event.location or 'Terrain A' }}
                             </p>
                         </div>
-                        <div class="flex -space-x-3 group-hover:mr-2 transition-all">
+                        <div class="flex -space-x-2 group-hover:mr-1 transition-all">
                             <img src="https://randomuser.me/api/portraits/men/1.jpg"
-                                class="w-8 h-8 rounded-full border-2 border-black shadow-xl">
+                                class="w-7 h-7 rounded-full border-2 border-black shadow-md">
                             <img src="https://randomuser.me/api/portraits/men/2.jpg"
-                                class="w-8 h-8 rounded-full border-2 border-black shadow-xl">
+                                class="w-7 h-7 rounded-full border-2 border-black shadow-md">
                             <div
-                                class="w-8 h-8 rounded-full bg-white/5 border-2 border-black flex items-center justify-center text-[8px] font-black">
+                                class="w-7 h-7 rounded-full bg-white/5 border-2 border-black flex items-center justify-center text-[8px] font-bold">
                                 12+</div>
                         </div>
                         <i
-                            class="fa-solid fa-chevron-right text-white/10 group-hover:text-primary-400 transition-colors"></i>
+                            class="fa-solid fa-chevron-right text-white/10 group-hover:text-primary-400 transition-colors text-sm"></i>
                     </div>
                     {% endfor %}
                 </div>
@@ -341,84 +344,84 @@
         </div>
 
         <!-- Sidebar Actions & Stats -->
-        <div class="space-y-8">
+        <div class="space-y-6">
             <!-- Secondary Actions -->
-            <div class="glass p-8 rounded-[40px] border-white/5">
-                <h3 class="text-sm font-black uppercase tracking-widest mb-6">Gestion Club</h3>
-                <div class="grid grid-cols-2 gap-4">
+            <div class="glass p-6 rounded-2xl border-white/5">
+                <h3 class="text-sm font-bold uppercase tracking-wider mb-5">Gestion Club</h3>
+                <div class="grid grid-cols-2 gap-3">
                     <a href="{{ url_for('coach.roster') }}"
-                        class="glass p-4 rounded-2xl border-white/5 text-center group hover:bg-primary-500/10 transition-all">
+                        class="glass p-4 rounded-xl border-white/5 text-center group hover:bg-primary-500/8 transition-all">
                         <i
-                            class="fa-solid fa-id-card text-xl text-primary-400 mb-3 group-hover:scale-110 transition-transform"></i>
-                        <p class="text-[9px] font-black uppercase tracking-widest">Effectif</p>
+                            class="fa-solid fa-id-card text-lg text-primary-400 mb-2 group-hover:scale-110 transition-transform"></i>
+                        <p class="text-[9px] font-semibold uppercase tracking-wider">Effectif</p>
                     </a>
                     <a href="{{ url_for('coach.attendance') }}"
-                        class="glass p-4 rounded-2xl border-white/5 text-center group hover:bg-green-500/10 transition-all">
+                        class="glass p-4 rounded-xl border-white/5 text-center group hover:bg-green-500/8 transition-all">
                         <i
-                            class="fa-solid fa-check-double text-xl text-green-400 mb-3 group-hover:scale-110 transition-transform"></i>
-                        <p class="text-[9px] font-black uppercase tracking-widest">Présences</p>
+                            class="fa-solid fa-check-double text-lg text-green-400 mb-2 group-hover:scale-110 transition-transform"></i>
+                        <p class="text-[9px] font-semibold uppercase tracking-wider">Présences</p>
                     </a>
                     <a href="{{ url_for('coach.tactics') }}"
-                        class="glass p-4 rounded-2xl border-white/5 text-center group hover:bg-amber-500/10 transition-all">
+                        class="glass p-4 rounded-xl border-white/5 text-center group hover:bg-accent-500/8 transition-all">
                         <i
-                            class="fa-solid fa-layer-group text-xl text-amber-400 mb-3 group-hover:scale-110 transition-transform"></i>
-                        <p class="text-[9px] font-black uppercase tracking-widest">Tactiques</p>
+                            class="fa-solid fa-layer-group text-lg text-accent-400 mb-2 group-hover:scale-110 transition-transform"></i>
+                        <p class="text-[9px] font-semibold uppercase tracking-wider">Tactiques</p>
                     </a>
                     <a href="#"
-                        class="glass p-4 rounded-2xl border-white/5 text-center group hover:bg-amber-500/10 transition-all">
+                        class="glass p-4 rounded-xl border-white/5 text-center group hover:bg-accent-500/8 transition-all">
                         <i
-                            class="fa-solid fa-bullhorn text-xl text-amber-400 mb-3 group-hover:scale-110 transition-transform"></i>
-                        <p class="text-[9px] font-black uppercase tracking-widest">Annonces</p>
+                            class="fa-solid fa-bullhorn text-lg text-accent-400 mb-2 group-hover:scale-110 transition-transform"></i>
+                        <p class="text-[9px] font-semibold uppercase tracking-wider">Annonces</p>
                     </a>
                 </div>
             </div>
 
             <!-- Top Scorers Mini -->
-            <div class="glass p-8 rounded-[40px] border-white/5">
-                <h3 class="text-sm font-black uppercase tracking-widest mb-6">Top Buteurs</h3>
-                <div class="space-y-5">
+            <div class="glass p-6 rounded-2xl border-white/5">
+                <h3 class="text-sm font-bold uppercase tracking-wider mb-5">Top Buteurs</h3>
+                <div class="space-y-4">
                     {% for player in players|sort(attribute='stats.goals', reverse=True) %}
-                    {% if loop.index <= 3 %} <div class="flex items-center gap-4 group">
+                    {% if loop.index <= 3 %} <div class="flex items-center gap-3 group">
                         <div class="relative">
-                            <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-xl">
+                            <div class="w-10 h-10 rounded-xl overflow-hidden shadow-md">
                                 <img src="{{ player.photo or 'https://ui-avatars.com/api/?name=' + player.name }}"
                                     class="w-full h-full object-cover">
                             </div>
                             <span
-                                class="absolute -top-2 -right-2 w-5 h-5 {% if loop.index == 1 %}bg-amber-500{% elif loop.index == 2 %}bg-slate-400{% else %}bg-orange-600{% endif %} rounded-lg text-[8px] flex items-center justify-center font-black shadow-lg shadow-black/50">{{
+                                class="absolute -top-1.5 -right-1.5 w-5 h-5 {% if loop.index == 1 %}bg-accent-500{% elif loop.index == 2 %}bg-slate-400{% else %}bg-orange-600{% endif %} rounded-md text-[8px] flex items-center justify-center font-bold shadow-md shadow-black/50 text-white">{{
                                 loop.index }}</span>
                         </div>
                         <div class="flex-1">
-                            <p class="text-xs font-black uppercase tracking-wider mb-1">{{ player.name }}</p>
-                            <p class="text-[9px] text-white/20 font-black uppercase tracking-widest">#{{
+                            <p class="text-xs font-bold uppercase tracking-wider mb-0.5">{{ player.name }}</p>
+                            <p class="text-[9px] text-white/20 font-semibold uppercase tracking-wider">#{{
                                 player.jersey_number }} • {{ player.position }}</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-lg font-black leading-none">{{ player.stats.goals }}</p>
-                            <p class="text-[7px] font-black text-white/20 uppercase tracking-[0.2em]">BUTS</p>
+                            <p class="text-lg font-extrabold leading-none">{{ player.stats.goals }}</p>
+                            <p class="text-[7px] font-semibold text-white/20 uppercase tracking-wider">buts</p>
                         </div>
                 </div>
                 {% endif %}
                 {% endfor %}
             </div>
             <button
-                class="w-full mt-8 bg-white/5 hover:bg-white/10 border border-white/10 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all">
-                CLASSEMENT COMPLET
+                class="w-full mt-6 bg-white/[0.04] hover:bg-white/8 border border-white/8 py-3.5 rounded-xl text-[9px] font-bold uppercase tracking-wider transition-all">
+                Classement complet
             </button>
         </div>
 
         <!-- Health Status -->
-        <div class="glass p-8 rounded-[40px] border-white/5">
-            <h3 class="text-sm font-black uppercase tracking-widest mb-6 flex items-center justify-between">
+        <div class="glass p-6 rounded-2xl border-white/5">
+            <h3 class="text-sm font-bold uppercase tracking-wider mb-5 flex items-center justify-between">
                 Infirmerie
-                <span class="text-[10px] bg-red-500/20 text-red-500 px-2 py-0.5 rounded-lg">2</span>
+                <span class="text-[10px] bg-red-500/15 text-red-500 px-2 py-0.5 rounded-md">2</span>
             </h3>
-            <div class="space-y-4 text-white/40">
-                <div class="flex items-center gap-4 p-3 rounded-2xl hover:bg-red-500/5 transition-all text-left">
+            <div class="space-y-3 text-white/35">
+                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-red-500/5 transition-all text-left">
                     <i class="fa-solid fa-kit-medical text-red-500/40 text-lg"></i>
                     <div>
-                        <p class="text-xs font-black uppercase">Nicolas Petit</p>
-                        <p class="text-[9px] italic">Cheville • 15 fév.</p>
+                        <p class="text-xs font-bold uppercase">Nicolas Petit</p>
+                        <p class="text-[9px]">Cheville • 15 fév.</p>
                     </div>
                 </div>
             </div>
