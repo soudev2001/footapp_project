@@ -177,26 +177,49 @@
         </div>
     </div>
 
-    <!-- Smart Links Grid -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-20">
-        {% set nav_links = [
-        ('/feed', 'fa-rss', 'Social', 'text-orange-400'),
-        ('/calendar', 'fa-calendar-days', 'Planning', 'text-red-400'),
-        ('/player/team', 'fa-people-group', 'Équipe', 'text-amber-400'),
-        ('/player/evo-hub', 'fa-chart-line', 'Evo Hub', 'text-primary-400')
-        ] %}
-        {% for url, icon, label, color in nav_links %}
-        <a href="{{ url }}"
-            class="glass p-8 rounded-[40px] border-white/5 flex flex-col items-center gap-4 group hover:bg-white/5 hover:border-white/20 transition-all duration-500 text-center translate-y-0 hover:-translate-y-2">
-            <div
-                class="w-16 h-16 rounded-[24px] bg-white/5 flex items-center justify-center text-2xl {{ color }} border border-white/5 group-hover:scale-110 transition-all duration-500">
-                <i class="fa-solid {{ icon }}"></i>
+    <!-- Quick Guide / Pro Tips -->
+    <div class="mt-20 glass p-10 rounded-[48px] border-white/5 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-8 opacity-10">
+            <i class="fa-solid fa-lightbulb text-8xl text-primary-400"></i>
+        </div>
+        <div class="relative z-10">
+            <h3 class="text-2xl font-black italic uppercase italic tracking-tighter mb-8 text-primary-400">Guide Rapide
+                Elite</h3>
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-white font-bold text-sm">
+                        <i class="fa-solid fa-circle-check text-primary-500"></i>
+                        <span>Équipe</span>
+                    </div>
+                    <p class="text-[10px] text-white/40 leading-relaxed italic">Sélectionnez votre équipe favorite dans
+                        le menu en haut pour voir ses prochains matchs et événements.</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-white font-bold text-sm">
+                        <i class="fa-solid fa-circle-check text-primary-500"></i>
+                        <span>Stats</span>
+                    </div>
+                    <p class="text-[10px] text-white/40 leading-relaxed italic">Consultez l'Evo Hub pour suivre votre
+                        progression technique et physique au fil de la saison.</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-white font-bold text-sm">
+                        <i class="fa-solid fa-circle-check text-primary-500"></i>
+                        <span>Shop</span>
+                    </div>
+                    <p class="text-[10px] text-white/40 leading-relaxed italic">N'oubliez pas de commander votre kit
+                        Elite dans la boutique pour être prêt pour le prochain match.</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-white font-bold text-sm">
+                        <i class="fa-solid fa-circle-check text-primary-500"></i>
+                        <span>PWA</span>
+                    </div>
+                    <p class="text-[10px] text-white/40 leading-relaxed italic">Installez l'application sur votre écran
+                        d'accueil (via le menu navigateur) pour un accès ultra-rapide.</p>
+                </div>
             </div>
-            <span
-                class="text-[10px] font-black uppercase tracking-[.3em] text-white/20 group-hover:text-white transition-colors">{{
-                label }}</span>
-        </a>
-        {% endfor %}
+        </div>
     </div>
 </div>
 {% endblock %}

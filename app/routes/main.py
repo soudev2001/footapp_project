@@ -14,8 +14,12 @@ from flask import send_from_directory, current_app
 import os
 
 @main_bp.route('/sw.js')
+@main_bp.route('/static/sw.js')
 def service_worker():
-    return send_from_directory(os.path.join(current_app.root_path, 'static'), 'sw.js')
+    from flask import make_response
+    response = make_response(send_from_directory(os.path.join(current_app.root_path, 'static'), 'sw.js'))
+    response.headers['Service-Worker-Allowed'] = '/'
+    return response
 
 @main_bp.route('/manifest.json')
 def manifest():

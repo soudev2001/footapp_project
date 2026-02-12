@@ -87,6 +87,9 @@ if __name__ == "__main__":
             ("app/templates/errors/500.html", "/root/footapp_project/app/templates/errors/500.html"),
             ("app/templates/base.html", "/root/footapp_project/app/templates/base.html"),
             ("app/services/seed_data.py", "/root/footapp_project/app/services/seed_data.py"),
+            ("app/static/css/style.css", "/root/footapp_project/app/static/css/style.css"),
+            ("app/templates/public/index.html", "/root/footapp_project/app/templates/public/index.html"),
+            ("app/templates/app/home.html", "/root/footapp_project/app/templates/app/home.html"),
         ]
         sys.exit(execute_remote(host, user, password, uploads=uploads))
     else:
