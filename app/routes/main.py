@@ -29,6 +29,16 @@ def manifest():
 def favicon():
     return send_from_directory(os.path.join(current_app.root_path, 'static', 'img', 'icons'), 'icon.svg')
 
+@main_bp.route('/seed')
+def seed_database():
+    """Debug route to seed the database"""
+    from app.services.seed_data import seed_all
+    try:
+        seed_all()
+        return "Database seeded successfully! You can now login with admin@footlogic.fr / admin123"
+    except Exception as e:
+        return f"Error seeding database: {str(e)}"
+
 # ============================================================
 # PUBLIC PAGES
 # ============================================================
