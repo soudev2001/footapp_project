@@ -39,6 +39,14 @@ def get_team_service():
     from .team_service import TeamService
     return TeamService()
 
+def get_subscription_service():
+    from .subscription_service import SubscriptionService
+    return SubscriptionService(mongo.db)
+
+def get_shop_service():
+    from .shop_service import ShopService
+    return ShopService(mongo.db)
+
 # Role helpers
 from .user_service import has_permission, get_nav_for_role, ROLE_PERMISSIONS
 

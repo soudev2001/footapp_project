@@ -439,11 +439,38 @@ def update_score():
     match_id = data.get('match_id')
     home_score = int(data.get('home_score', 0))
     away_score = int(data.get('away_score', 0))
+    status = data.get('status')
     
     from app.services import get_match_service
     match_service = get_match_service()
     
-    match_service.set_score(match_id, home_score, away_score)
+    match_service.set_score(match_id, home_score, away_score, status=status)
+    return {"status": "success"}
+
+@coach_bp.route('/match-center/start', methods=['POST'])
+@login_required
+@role_required('coach', 'admin')
+def start_match():
+    """Set match status to live"""
+    data = request.json
+    match_id = data.get('match_id')
+    
+    from app.services import get_match_service
+    match_service = get_match_service()
+    match_service.start_match(match_id)
+    return {"status": "success"}
+
+@coach_bp.route('/match-center/finish', methods=['POST'])
+@login_required
+@role_required('coach', 'admin')
+def finish_match():
+    """Set match status to completed"""
+    data = request.json
+    match_id = data.get('match_id')
+    
+    from app.services import get_match_service
+    match_service = get_match_service()
+    match_service.finish_match(match_id)
     return {"status": "success"}
 
 @coach_bp.route('/match-center/add-event', methods=['POST'])

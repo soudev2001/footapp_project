@@ -67,15 +67,32 @@ class MatchService:
             {'$set': data}
         )
     
-    def set_score(self, match_id, home_score, away_score):
-        """Update match score"""
+    def set_score(self, match_id, home_score, away_score, status=None):
+        """Update match score and optionally status"""
+        update_data = {
+            'score.home': home_score,
+            'score.away': away_score
+        }
+        if status:
+            update_data['status'] = status
+            
         return self.collection.update_one(
             {'_id': ObjectId(match_id)},
-            {'$set': {
-                'score.home': home_score,
-                'score.away': away_score,
-                'status': 'completed'
-            }}
+            {'$set': update_data}
+        )
+
+    def start_match(self, match_id):
+        """Set match status to live"""
+        return self.collection.update_one(
+            {'_id': ObjectId(match_id)},
+            {'$set': {'status': 'live'}}
+        )
+
+    def finish_match(self, match_id):
+        """Set match status to completed"""
+        return self.collection.update_one(
+            {'_id': ObjectId(match_id)},
+            {'$set': {'status': 'completed'}}
         )
     
     def set_lineup(self, match_id, player_ids):

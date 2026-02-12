@@ -57,8 +57,10 @@
                     selected_match.competition or 'CHAMPIONNAT' }}</span>
                 <div class="flex gap-2">
                     <span
-                        class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-widest">{{
-                        selected_match.status }}</span>
+                        class="px-4 py-1.5 rounded-full {% if selected_match.status == 'live' %}bg-red-500 animate-pulse text-white{% elif selected_match.status == 'completed' %}bg-white/5 text-white/40{% else %}bg-primary-500/20 text-primary-400{% endif %} border border-white/10 text-[9px] font-black uppercase tracking-widest flex items-center gap-2">
+                        {% if selected_match.status == 'live' %}<i class="fa-solid fa-satellite-dish"></i>{% endif %}
+                        {{ selected_match.status }}
+                    </span>
                 </div>
             </div>
 
@@ -186,7 +188,7 @@
 
                 <div class="mt-8 pt-8 border-t border-white/5 space-y-4">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-[10px] font-black text-white/20 uppercase">Score Manuel</span>
+                        <span class="text-[10px] font-black text-white/20 uppercase">Score & État</span>
                     </div>
                     <div class="flex items-center gap-4">
                         <input type="number" id="homeScore" value="{{ selected_match.score.home }}"
@@ -195,9 +197,30 @@
                         <input type="number" id="awayScore" value="{{ selected_match.score.away }}"
                             class="w-full bg-white/5 border border-white/10 rounded-xl py-3 text-center font-black">
                     </div>
-                    <button onclick="saveScore()"
-                        class="w-full gradient-primary py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary-500/20">Mettre
-                        à jour score</button>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="saveScore()"
+                            class="gradient-primary py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary-500/20">
+                            UPDATE SCORE
+                        </button>
+
+                        {% if selected_match.status == 'scheduled' %}
+                        <button onclick="changeMatchStatus('start')"
+                            class="bg-green-500 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest text-black shadow-xl shadow-green-500/20">
+                            COMMENCER
+                        </button>
+                        {% elif selected_match.status == 'live' %}
+                        <button onclick="changeMatchStatus('finish')"
+                            class="bg-red-500 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest text-white shadow-xl shadow-red-500/20">
+                            TERMINER
+                        </button>
+                        {% else %}
+                        <button disabled
+                            class="bg-white/5 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest text-white/20 cursor-not-allowed">
+                            MATCH FINI
+                        </button>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -273,13 +296,26 @@
         const payload = {
             match_id: matchId,
             home_score: document.getElementById('homeScore').value,
-            away_score: document.getElementById('awayScore').value
+            away_score: document.getElementById('awayScore').value,
+            status: '{{ selected_match.status }}'
         };
 
         fetch('/coach/match-center/update-score', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
+        }).then(() => window.location.reload());
+    }
+
+    function changeMatchStatus(action) {
+        if (!confirm(`Voulez-vous vraiment ${action === 'start' ? 'commencer' : 'terminer'} le match ?`)) return;
+
+        const endpoint = action === 'start' ? '/coach/match-center/start' : '/coach/match-center/finish';
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ match_id: matchId })
         }).then(() => window.location.reload());
     }
 </script>

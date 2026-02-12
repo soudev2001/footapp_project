@@ -255,22 +255,55 @@ def match_live(match_id):
 # COMMERCE
 # ============================================================
 
-@main_bp.route('/shop-product')
-def shop_product():
-    """Product page"""
-    return render_template('shop/product.html')
+@main_bp.route('/shop')
+def shop_catalog():
+    """Shop catalog page"""
+    from app.services import get_shop_service
+    shop_service = get_shop_service()
+    
+    category = request.args.get('category')
+    products = shop_service.get_all_products(category=category)
+    categories = shop_service.get_categories()
+    
+    return render_template('shop/catalog.html', products=products, categories=categories, selected_category=category)
 
-@main_bp.route('/checkout')
+@main_bp.route('/shop/product/<product_id>')
+def shop_product(product_id):
+    """Product detail page"""
+    from app.services import get_shop_service
+    shop_service = get_shop_service()
+    
+    product = shop_service.get_product_by_id(product_id)
+    if not product:
+        return redirect(url_for('main.shop_catalog'))
+        
+    related_products = shop_service.get_all_products(category=product.get('category'))[:4]
+    
+    return render_template('shop/product.html', product=product, related_products=related_products)
+
+@main_bp.route('/shop/cart')
+def cart():
+    """View cart"""
+    return render_template('shop/cart.html')
+
+@main_bp.route('/checkout', methods=['GET', 'POST'])
+@login_required
 def checkout():
     """Checkout page"""
+    if request.method == 'POST':
+        # Simulated order processing
+        flash('Commande validée ! Merci pour votre achat.', 'success')
+        return redirect(url_for('main.app_home'))
+        
     return render_template('shop/checkout.html')
 
-@main_bp.route('/invoice')
-def invoice():
-    """Invoice page"""
-    return render_template('shop/invoice.html')
-
-@main_bp.route('/reservations')
-def reservations():
-    """Reservations page"""
-    return render_template('shop/reservations.html')
+@main_bp.route('/orders')
+@login_required
+def orders():
+    """User orders history"""
+    from app.services import get_shop_service
+    shop_service = get_shop_service()
+    user_id = session.get('user_id')
+    
+    orders = shop_service.get_user_orders(user_id)
+    return render_template('shop/orders.html', orders=orders)

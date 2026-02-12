@@ -1,139 +1,139 @@
 {% extends "base.html" %}
-{% block title %}Paiement - FootLogic{% endblock %}
+{% block title %}Réservation Finale - FootLogic Elite{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-12">
-    <div class="grid md:grid-cols-3 gap-8 items-start">
-        <!-- Main Checkout Flow -->
-        <div class="md:col-span-2 space-y-6">
-            <h1 class="text-3xl font-extrabold text-white mb-8">Finaliser la commande</h1>
+<div class="page-enter max-w-4xl mx-auto px-4 py-8">
+    <div class="mb-12">
+        <h1 class="text-4xl font-black italic uppercase tracking-tighter">PHASE <span
+                class="text-gradient">FINALE</span></h1>
+        <p class="text-white/40 text-sm mt-1 italic">Validez votre réservation et récupérez vos articles au club.</p>
+    </div>
 
-            <!-- Delivery Step -->
-            <div class="card p-6 border-primary-500/30">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="font-bold flex items-center gap-3">
-                        <span
-                            class="w-6 h-6 rounded-full bg-primary-500 text-white flex items-center justify-center text-[10px]">1</span>
-                        Livraison
-                    </h2>
-                    <span class="text-xs font-bold text-green-400">Inclus</span>
-                </div>
-                <div class="p-4 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center gap-4">
-                    <div
-                        class="w-12 h-12 rounded-xl bg-primary-500/20 text-primary-400 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-house-chimney-window"></i>
+    <form action="{{ url_for('main.checkout') }}" method="POST" onsubmit="return handleCheckout(event)"
+        class="grid md:grid-cols-5 gap-12">
+
+        <!-- Form -->
+        <div class="md:col-span-3 space-y-8">
+            <div class="glass p-10 rounded-[40px] border-white/5 space-y-8">
+                <h3 class="text-xs font-black uppercase tracking-widest text-primary-400 mb-4 italic">Informations de
+                    retrait</h3>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label
+                            class="text-[10px] font-black uppercase tracking-widest text-white/20 mb-3 ml-1 block">Prénom</label>
+                        <input type="text" name="first_name"
+                            value="{{ current_user.profile.first_name if current_user }}" required
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black italic">
                     </div>
                     <div>
-                        <p class="font-bold text-white">Retrait au Club House</p>
-                        <p class="text-xs text-gray-400">Disponible sous 48h • Gratuit</p>
+                        <label
+                            class="text-[10px] font-black uppercase tracking-widest text-white/20 mb-3 ml-1 block">Nom</label>
+                        <input type="text" name="last_name" value="{{ current_user.profile.last_name if current_user }}"
+                            required
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black italic">
                     </div>
+                </div>
+
+                <div>
+                    <label
+                        class="text-[10px] font-black uppercase tracking-widest text-white/20 mb-3 ml-1 block">Email</label>
+                    <input type="email" name="email" value="{{ current_user.email if current_user }}" required
+                        class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black italic">
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black uppercase tracking-widest text-white/20 mb-3 ml-1 block">Date
+                        de retrait souhaitée</label>
+                    <select name="pickup_date" required
+                        class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black italic appearance-none cursor-pointer">
+                        <option value="next_training" class="bg-surface-950">Prochain Entraînement (Mardi)</option>
+                        <option value="next_match" class="bg-surface-950">Jour de Match (Samedi)</option>
+                        <option value="admin_office" class="bg-surface-950">Bureaux du Club (Lundi-Vendredi)</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- Payment Step -->
-            <div class="card p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="font-bold flex items-center gap-3">
-                        <span
-                            class="w-6 h-6 rounded-full bg-primary-500 text-white flex items-center justify-center text-[10px]">2</span>
-                        Paiement
-                    </h2>
-                </div>
-
-                <div class="space-y-3">
-                    <button
-                        class="w-full p-4 rounded-xl bg-white/5 border border-primary-500 flex items-center justify-between group transition">
-                        <div class="flex items-center gap-4">
-                            <i class="fa-brands fa-apple-pay text-3xl"></i>
-                            <span class="font-bold text-white">Apple Pay</span>
-                        </div>
-                        <div class="w-5 h-5 rounded-full border-2 border-primary-500 flex items-center justify-center">
-                            <div class="w-2 h-2 bg-primary-500 rounded-full"></div>
-                        </div>
-                    </button>
-                    <button
-                        class="w-full p-4 rounded-xl glass-light border border-white/5 hover:border-white/10 flex items-center justify-between group transition">
-                        <div class="flex items-center gap-4">
-                            <i class="fa-solid fa-credit-card text-xl text-gray-400"></i>
-                            <span class="font-bold text-gray-400">Carte Bancaire</span>
-                        </div>
-                    </button>
-                    <button
-                        class="w-full p-4 rounded-xl glass-light border border-white/5 hover:border-white/10 flex items-center justify-between group transition">
-                        <div class="flex items-center gap-4">
-                            <i class="fa-brands fa-paypal text-xl text-gray-400"></i>
-                            <span class="font-bold text-gray-400">PayPal</span>
-                        </div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Confirm Button (Mobile Only visible at bottom) -->
-            <button onclick="processPayment()"
-                class="w-full btn-primary py-5 rounded-2xl font-extrabold text-xl shadow-2xl transition transform active:scale-95">
-                Confirmer & Payer 45.00€
-            </button>
-        </div>
-
-        <!-- Order Summary -->
-        <div class="space-y-6">
-            <div class="card p-6 sticky top-24">
-                <h2 class="font-bold mb-6">Résumé de la commande</h2>
-
-                <div class="flex gap-4 mb-6">
-                    <div class="w-16 h-16 rounded-xl overflow-hidden shadow-lg border border-white/10">
-                        <img src="https://images.unsplash.com/photo-1517466787929-bc90951d64b8?auto=format&fit=crop&q=80&w=200"
-                            class="w-full h-full object-cover">
-                    </div>
-                    <div class="flex-1">
-                        <h4 class="font-bold text-sm text-white">Pack Entraînement</h4>
-                        <p class="text-xs text-gray-500">Taille M • Nike Pro</p>
-                        <p class="font-bold text-primary-400 mt-1">45.00€</p>
-                    </div>
-                </div>
-
-                <div class="space-y-3 border-t border-white/5 pt-6">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">Sous-total</span>
-                        <span class="text-gray-300">45.00€</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">Livraison</span>
-                        <span class="text-green-400">Offert</span>
-                    </div>
-                    <div class="flex justify-between text-xl font-black pt-4 border-t border-white/10">
-                        <span class="text-white">Total</span>
-                        <span class="text-primary-400">45.00€</span>
-                    </div>
-                </div>
-
+            <div class="bg-primary-500/5 border border-primary-500/20 p-8 rounded-[40px] flex items-start gap-6">
                 <div
-                    class="mt-8 flex items-center gap-3 text-[10px] text-gray-500 font-bold uppercase tracking-widest justify-center">
-                    <i class="fa-solid fa-lock text-green-500"></i>
-                    Paiement 100% Sécurisé
+                    class="w-12 h-12 rounded-2xl bg-primary-500 flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-primary-500/20">
+                    <i class="fa-solid fa-hand-holding-dollar text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="font-black italic uppercase text-sm mb-1">Paiement au Retrait</h4>
+                    <p class="text-xs text-white/40 italic font-medium">Pour faciliter la gestion du club, le paiement
+                        s'effectue directement au stade par CB ou Espèces lors de la remise des articles.</p>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Summary -->
+        <div class="md:col-span-2 space-y-6">
+            <div class="glass p-8 rounded-[40px] border-white/5">
+                <h3 class="text-xs font-black uppercase tracking-widest text-white/20 mb-8 italic text-center">Votre
+                    Commande</h3>
+
+                <div id="checkoutItems" class="space-y-4 mb-10">
+                    <!-- Dynamic items here -->
+                </div>
+
+                <div class="pt-8 border-t border-white/5 space-y-4">
+                    <div class="flex justify-between items-center text-xs font-black uppercase">
+                        <span class="text-white/40">Total à régler</span>
+                        <span id="checkoutTotal" class="text-2xl text-gradient italic">0.00€</span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit"
+                class="w-full gradient-primary py-6 rounded-[32px] text-xs font-black uppercase tracking-[0.2em] shadow-2xl shadow-primary-500/30 hover:scale-[1.02] active:scale-95 transition-all outline-none">
+                RÉSERVER MAINTENANT
+            </button>
+            <p class="text-[9px] text-center text-white/20 font-black uppercase tracking-widest px-4 leading-relaxed">
+                En cliquant sur "Réserver", vous vous engagez à venir retirer et régler vos articles au club.
+            </p>
+        </div>
+    </form>
 </div>
 
 <script>
-    function processPayment() {
-        const btn = event.currentTarget;
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Traitement...';
-        btn.disabled = true;
+    function renderCheckout() {
+        const cart = JSON.parse(localStorage.getItem('footlogic_cart') || '[]');
+        const container = document.getElementById('checkoutItems');
+        let total = 0;
 
-        setTimeout(() => {
-            btn.innerHTML = '<i class="fa-solid fa-check-circle mr-2"></i> Succès ! Redirection...';
-            btn.classList.remove('btn-primary');
-            btn.classList.add('bg-green-500');
+        if (cart.length === 0) {
+            window.location.href = "{{ url_for('main.shop_catalog') }}";
+            return;
+        }
 
-            setTimeout(() => {
-                window.location.href = "{{ url_for('main.invoice') }}";
-            }, 1200);
-        }, 2000);
+        container.innerHTML = '';
+        cart.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5';
+            div.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-[10px] font-black">${item.quantity}</span>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black italic uppercase">${item.name}</span>
+                        <span class="text-[8px] text-white/20 font-black uppercase italic">${item.size || 'Unique'}</span>
+                    </div>
+                </div>
+                <span class="text-xs font-black italic">${(item.price * item.quantity).toFixed(2)}€</span>
+            `;
+            container.appendChild(div);
+            total += item.price * item.quantity;
+        });
+
+        document.getElementById('checkoutTotal').innerText = total.toFixed(2) + '€';
     }
+
+    function handleCheckout(e) {
+        // Clear cart local storage on success simulation
+        localStorage.removeItem('footlogic_cart');
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', renderCheckout);
 </script>
 {% endblock %}
-
-

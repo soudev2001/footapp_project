@@ -24,6 +24,11 @@ def seed_all():
         'colors': {'primary': '#84cc16', 'secondary': '#facc15'},
         'stadium': 'Elite Arena',
         'description': 'L\'excellence du management sportif au service du jeu.',
+        'subscription': {
+            'plan_id': 'pack_pro',
+            'status': 'active',
+            'start_date': datetime.utcnow()
+        },
         'created_at': datetime.utcnow()
     }
     

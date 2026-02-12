@@ -39,16 +39,27 @@ def admin_panel():
         team_service = get_team_service()
         teams = team_service.get_by_club(club_id)
     
+    from app.services import get_subscription_service
+    subscription_service = get_subscription_service()
+    subscription = subscription_service.get_subscription_status(club_id) if club_id else None
+    
     # Mock specific stats
     stats = {
         'total_members': len(members),
         'total_teams': len(teams),
         'coaches': len([m for m in members if m.get('role') == 'coach']),
         'players': len([m for m in members if m.get('role') == 'player']),
-        'mrr': "29.90" if club_id else "0.00"
+        'mrr': subscription['billing']['total_monthly'] if subscription and subscription.get('billing') else "0.00"
     }
     
-    return render_template('admin/panel.html', club=club, members=members, teams=teams, stats=stats)
+    return render_template('admin/panel.html', 
+        club=club, 
+        members=members, 
+        teams=teams, 
+        stats=stats,
+        subscription=subscription,
+        plans=subscription_service.get_plans()
+    )
 
 @admin_bp.route('/add-member', methods=['POST'])
 @login_required
@@ -110,8 +121,23 @@ def invite_member():
 @login_required
 @role_required('admin')
 def update_subscription():
-    """Simulate subscription update"""
-    flash('Plan mis a jour avec succes!', 'success')
+    """Update club subscription plan"""
+    from app.services import get_subscription_service, get_user_service
+    subscription_service = get_subscription_service()
+    user_service = get_user_service()
+    
+    admin_user = user_service.get_by_id(session.get('user_id'))
+    club_id = admin_user.get('club_id')
+    
+    plan_id = request.form.get('plan_id')
+    
+    if not club_id:
+        flash('Erreur: Aucun club associe.', 'error')
+        return redirect(url_for('admin.admin_panel'))
+        
+    subscription_service.update_subscription(club_id, plan_id)
+    
+    flash(f'Plan mis a jour vers {plan_id.replace("_", " ").title()}!', 'success')
     return redirect(url_for('admin.admin_panel'))
 
 @admin_bp.route('/update-club', methods=['POST'])

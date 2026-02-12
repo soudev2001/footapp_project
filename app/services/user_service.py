@@ -119,6 +119,7 @@ def get_nav_for_role(role):
             {'name': 'Effectif', 'url': '/coach/roster', 'icon': 'fa-users'},
             {'name': 'Tactiques', 'url': '/coach/tactics', 'icon': 'fa-chess-board'},
             {'name': 'Match Center', 'url': '/coach/match-center', 'icon': 'fa-gamepad'},
+            {'name': 'Boutique', 'url': '/shop', 'icon': 'fa-bag-shopping'},
             {'name': 'Scouting', 'url': '/coach/scouting', 'icon': 'fa-binoculars'},
             {'name': 'Social', 'url': '/feed', 'icon': 'fa-rss'},
         ],
@@ -127,6 +128,7 @@ def get_nav_for_role(role):
             {'name': 'Evo HUB', 'url': '/player/evo-hub', 'icon': 'fa-chart-radar'},
             {'name': 'Mon Équipe', 'url': '/player/team', 'icon': 'fa-people-group'},
             {'name': 'Planning', 'url': '/player/calendar', 'icon': 'fa-calendar-days'},
+            {'name': 'Boutique', 'url': '/shop', 'icon': 'fa-bag-shopping'},
             {'name': 'Contrats', 'url': '/player/contracts', 'icon': 'fa-file-signature'},
             {'name': 'Documents', 'url': '/player/documents', 'icon': 'fa-file-invoice'},
             {'name': 'Offres Privées', 'url': '/isy/partners', 'icon': 'fa-crown'},
@@ -136,7 +138,7 @@ def get_nav_for_role(role):
             {'name': 'Accueil', 'url': '/', 'icon': 'fa-house'},
             {'name': 'Actualités', 'url': '/feed', 'icon': 'fa-newspaper'},
             {'name': 'Clubs', 'url': '/public-club', 'icon': 'fa-futbol'},
-            {'name': 'Boutique', 'url': '/shop-product', 'icon': 'fa-bag-shopping'},
+            {'name': 'Boutique', 'url': '/shop', 'icon': 'fa-bag-shopping'},
             {'name': 'Offres Privées', 'url': '/isy/partners', 'icon': 'fa-crown'},
         ]
     }

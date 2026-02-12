@@ -264,81 +264,111 @@
                         <div class="flex justify-between items-start mb-10">
                             <div>
                                 <span
-                                    class="px-3 py-1 rounded-lg bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest animate-pulse">PLAN
-                                    ACTIF</span>
-                                <h3 class="text-4xl font-black mt-4 italic uppercase tracking-tighter">ÉLITE <span
-                                        class="text-primary-400">SAAS</span></h3>
+                                    class="px-3 py-1 rounded-lg bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest animate-pulse">
+                                    {{ subscription.status|default('INACTIF')|upper }}
+                                </span>
+                                <h3 class="text-4xl font-black mt-4 italic uppercase tracking-tighter">
+                                    {{ subscription.details.name|default('SANS PLAN')|upper }}
+                                </h3>
                             </div>
                             <div class="text-right">
-                                <p class="text-3xl font-black">49,90€</p>
+                                <p class="text-3xl font-black">{{ subscription.billing.total_monthly|default('0.00') }}€
+                                </p>
                                 <p
                                     class="text-[10px] text-white/30 light:text-slate-400 font-black uppercase tracking-widest">
-                                    Par Mois</p>
+                                    Facturé / Mois</p>
                             </div>
                         </div>
 
                         <div class="space-y-6 mb-10">
+                            <h4 class="text-[10px] font-black uppercase tracking-widest text-primary-400">Services
+                                Inclus :</h4>
+                            {% if subscription.details %}
+                            {% for feat in subscription.details.features %}
                             <div class="flex items-center gap-4">
-                                <i class="fa-solid fa-check text-green-400"></i>
-                                <span class="text-sm font-medium text-white/70">Membres illimités (Managers, Coachs,
-                                    Joueurs)</span>
+                                <i class="fa-solid fa-square-check text-primary-500"></i>
+                                <span class="text-sm font-medium text-white/70">{{ feat.replace('_', ' ').title()
+                                    }}</span>
                             </div>
-                            <div class="flex items-center gap-4">
-                                <i class="fa-solid fa-check text-green-400"></i>
-                                <span class="text-sm font-medium text-white/70">Gestion des cotisations via
-                                    Stripe</span>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <i class="fa-solid fa-check text-green-400"></i>
-                                <span class="text-sm font-medium text-white/70">Analyses tactiques & statistiques
-                                    avancées</span>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <i class="fa-solid fa-check text-green-400"></i>
-                                <span class="text-sm font-medium text-white/70">Support prioritaire 24/7</span>
-                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <p class="text-xs italic text-white/20">Veuillez choisir un pack pour débloquer les
+                                fonctionnalités.</p>
+                            {% endif %}
                         </div>
                     </div>
 
                     <form action="{{ url_for('admin.update_subscription') }}" method="POST"
-                        class="pt-10 border-t border-white/5 flex gap-4">
+                        class="pt-10 border-t border-white/5 space-y-6">
+                        <div>
+                            <label
+                                class="block text-[10px] font-black uppercase tracking-widest text-white/20 mb-3 ml-1">Changer
+                                de Pack</label>
+                            <select name="plan_id"
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black appearance-none cursor-pointer">
+                                {% for pid, pinfo in plans.items() %}
+                                <option value="{{ pid }}" {% if subscription.plan_id==pid %}selected{% endif %}
+                                    class="bg-slate-900">
+                                    {{ pinfo.name }} - {{ pinfo.base_price }}€ + options
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
                         <button type="submit"
-                            class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-5 rounded-3xl text-xs font-black uppercase tracking-widest transition-all italic">MODIFIER
-                            PLAN</button>
-                        <button type="submit"
-                            class="flex-1 gradient-primary py-5 rounded-3xl text-xs font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">GÉRER
-                            LE PAIEMENT</button>
+                            class="w-full gradient-primary py-5 rounded-3xl text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all text-center">
+                            METTRE À JOUR MON ACCÈS
+                        </button>
                     </form>
                 </div>
 
                 <div class="space-y-6">
                     <div class="glass p-8 rounded-[32px] border-white/5">
-                        <h4 class="text-sm font-black uppercase tracking-widest mb-6">Dernière Facture</h4>
-                        <div class="flex items-center justify-between p-5 bg-white/5 rounded-2xl border border-white/5">
-                            <div class="flex items-center gap-4">
-                                <div
-                                    class="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-400 text-xl">
-                                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-black">Facture #FA-2026-02</p>
-                                    <p class="text-[10px] text-white/40 light:text-slate-500 uppercase tracking-widest">
-                                        Payée le 01 Fév 2026
-                                    </p>
-                                </div>
+                        <h4 class="text-sm font-black uppercase tracking-widest mb-6">Détail des Licences</h4>
+                        <div class="space-y-4">
+                            <div
+                                class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                                <span class="text-xs font-bold text-white/40">Base Package</span>
+                                <span class="text-sm font-black">{{ subscription.billing.base_price|default('0')
+                                    }}€</span>
                             </div>
-                            <i class="fa-solid fa-chevron-right text-white/20 light:text-slate-300"></i>
+                            <div
+                                class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-black uppercase text-primary-400">Coachs (x{{
+                                        subscription.billing.coach_count|default(0) }})</span>
+                                    <span class="text-[9px] text-white/20 italic">Tarif: {{
+                                        subscription.details.coach_license|default(0) }}€ / unité</span>
+                                </div>
+                                <span class="text-sm font-black text-green-400">+{{
+                                    subscription.billing.coach_cost_total|default('0.00') }}€</span>
+                            </div>
+                            <div
+                                class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-black uppercase text-primary-400">Joueurs (x{{
+                                        subscription.billing.player_count|default(0) }})</span>
+                                    <span class="text-[9px] text-white/20 italic">Tarif: {{
+                                        subscription.details.player_license|default(0) }}€ / unité</span>
+                                </div>
+                                <span class="text-sm font-black text-green-400">+{{
+                                    subscription.billing.player_cost_total|default('0.00') }}€</span>
+                            </div>
+                            <div class="pt-4 border-t border-white/5 flex items-center justify-between px-2">
+                                <span class="text-lg font-black italic uppercase">TOTAL ESTIMÉ</span>
+                                <span class="text-2xl font-black text-white italic">{{
+                                    subscription.billing.total_monthly|default('0.00') }}€<small
+                                        class="text-[10px] ml-1">HT/mois</small></span>
+                            </div>
                         </div>
                     </div>
 
                     <div
                         class="glass p-8 rounded-[32px] border-white/5 bg-gradient-to-br from-green-600/10 to-transparent">
-                        <i class="fa-solid fa-bolt text-green-400 text-2xl mb-4"></i>
-                        <h4 class="text-sm font-black uppercase tracking-widest mb-2">Prochain Paiement</h4>
-                        <p class="text-2xl font-black mb-1">01 Mars 2026</p>
-                        <p class="text-xs text-white/40 light:text-slate-500 italic">Le prélèvement automatique sera
-                            effectué via votre carte
-                            finissant par **** 4242.</p>
+                        <i class="fa-solid fa-credit-card text-green-400 text-2xl mb-4"></i>
+                        <h4 class="text-sm font-black uppercase tracking-widest mb-2">Cycle de Facturation</h4>
+                        <p class="text-2xl font-black mb-1">01 {{ now_month|default('Mars') }} 2026</p>
+                        <p class="text-xs text-white/40 light:text-slate-500 italic">Evolution continue : Les frais
+                            s'adaptent automatiquement à la taille de votre effectif.</p>
                     </div>
                 </div>
             </div>
