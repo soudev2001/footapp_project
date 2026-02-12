@@ -1,145 +1,141 @@
 {% extends "base.html" %}
-{% block title %}S'inscrire - FootLogic Elite{% endblock %}
+{% block title %}S'inscrire — FootLogic{% endblock %}
 
 {% block content %}
 <div class="page-enter min-h-[85vh] flex items-center justify-center px-4 py-12">
     <div class="max-w-5xl w-full grid lg:grid-cols-2 gap-12 items-center">
         <!-- Benefits -->
         <div class="hidden lg:block text-white">
-            <a href="{{ url_for('main.index') }}" class="inline-flex items-center gap-3 mb-10 group">
+            <a href="{{ url_for('main.index') }}" class="inline-flex items-center gap-3 mb-8 group">
                 <div
-                    class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-futbol text-white text-xl"></i>
+                    class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-futbol text-white text-lg"></i>
                 </div>
-                <span class="text-2xl font-black">FootLogic</span>
+                <span class="text-xl font-extrabold">FootLogic</span>
             </a>
-            <h1 class="text-5xl font-black leading-tight mb-8">Vivez le <span class="text-gradient">football</span>
+            <h1 class="text-4xl font-extrabold leading-tight mb-6">Vivez le <span class="text-gradient">football</span>
                 autrement</h1>
 
-            <div class="space-y-6">
+            <div class="space-y-5">
                 <div class="flex gap-4">
                     <div
-                        class="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 mt-1">
+                        class="w-8 h-8 rounded-full bg-primary-500/15 flex items-center justify-center text-primary-400 mt-1 shrink-0">
                         <i class="fa-solid fa-check text-sm"></i>
                     </div>
                     <div>
-                        <p class="font-bold text-lg">Suivez votre Club</p>
-                        <p class="text-white/50">Restez informé des derniers résultats et actualités.</p>
+                        <p class="font-bold text-base">Suivez votre Club</p>
+                        <p class="text-white/40 text-sm">Restez informé des derniers résultats et actualités.</p>
                     </div>
                 </div>
                 <div class="flex gap-4">
                     <div
-                        class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 mt-1">
+                        class="w-8 h-8 rounded-full bg-green-500/15 flex items-center justify-center text-green-400 mt-1 shrink-0">
                         <i class="fa-solid fa-check text-sm"></i>
                     </div>
                     <div>
-                        <p class="font-bold text-lg">Boutique & Galerie</p>
-                        <p class="text-white/50">Accédez aux produits officiels et aux photos de matchs.</p>
+                        <p class="font-bold text-base">Boutique & Galerie</p>
+                        <p class="text-white/40 text-sm">Accédez aux produits officiels et aux photos de matchs.</p>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-12 p-8 border border-white/10 rounded-[32px] bg-white/5">
-                <p class="text-xs font-black uppercase tracking-[0.2em] text-white/30 mb-4">Vous êtes un club ?</p>
-                <p class="text-sm italic text-white/60 mb-6 leading-relaxed">"Rejoignez plus de 1,200 académies et
-                    digitalisez votre structure dès aujourd'hui."</p>
+            <div class="mt-10 p-6 border border-white/8 rounded-2xl bg-white/[0.03]">
+                <p class="text-xs font-semibold uppercase tracking-wider text-white/25 mb-3">Vous êtes un club ?</p>
+                <p class="text-sm text-white/50 mb-5 leading-relaxed">Rejoignez plus de 1,200 académies et
+                    digitalisez votre structure dès aujourd'hui.</p>
                 <a href="{{ url_for('auth.register_club') }}"
-                    class="btn-primary inline-block px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest">Enregistrer
+                    class="btn-primary inline-block px-5 py-2.5 rounded-xl text-xs font-bold">Enregistrer
                     mon Club</a>
             </div>
         </div>
 
         <!-- Register Form -->
-        <div class="glass p-10 lg:p-12 rounded-[40px] shadow-2xl relative overflow-hidden border-white/5">
-            <div class="text-center lg:text-left mb-8">
-                <h2 class="text-3xl font-black">Compte Fan</h2>
-                <p class="text-white/40 mt-2 text-sm italic">Rejoignez la communauté FootLogic.</p>
+        <div class="glass p-8 lg:p-10 rounded-3xl shadow-2xl relative overflow-hidden border-white/5">
+            <div class="text-center lg:text-left mb-6">
+                <h2 class="text-2xl font-extrabold light:text-slate-900">Compte Fan</h2>
+                <p class="text-white/40 mt-1.5 text-sm">Rejoignez la communauté FootLogic.</p>
             </div>
 
-            <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-5">
-                <div class="grid grid-cols-2 gap-4">
+            <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label
-                            class="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Prénom</label>
+                        <label class="block text-xs font-semibold text-white/35 mb-1.5 ml-1">Prénom</label>
                         <input type="text" name="first_name" required placeholder="Jean"
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-white focus:outline-none focus:border-primary-500/50 transition-all font-medium">
+                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium">
                     </div>
                     <div>
-                        <label
-                            class="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Nom</label>
+                        <label class="block text-xs font-semibold text-white/35 mb-1.5 ml-1">Nom</label>
                         <input type="text" name="last_name" required placeholder="Dupont"
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-white focus:outline-none focus:border-primary-500/50 transition-all font-medium">
+                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium">
                     </div>
                 </div>
 
                 <div>
-                    <label
-                        class="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Email</label>
+                    <label class="block text-xs font-semibold text-white/35 mb-1.5 ml-1">Email</label>
                     <div class="relative group">
                         <i
-                            class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition"></i>
+                            class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition text-sm"></i>
                         <input type="email" name="email" required placeholder="jean@club.com"
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500/50 transition-all font-medium">
+                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Mot de
+                    <label class="block text-xs font-semibold text-white/35 mb-1.5 ml-1">Mot de passe</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition text-sm"></i>
+                        <input type="password" name="password" required placeholder="••••••••"
+                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-white/35 mb-1.5 ml-1">Confirmer le mot de
                         passe</label>
                     <div class="relative group">
                         <i
-                            class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition"></i>
-                        <input type="password" name="password" required placeholder="••••••••"
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500/50 transition-all font-medium">
-                    </div>
-                </div>
-
-                <div>
-                    <label
-                        class="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Confirmer
-                        Mot de passe</label>
-                    <div class="relative group">
-                        <i
-                            class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition"></i>
+                            class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition text-sm"></i>
                         <input type="password" name="password_confirm" required placeholder="••••••••"
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500/50 transition-all font-medium">
+                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Rôles
+                    <label class="block text-xs font-semibold text-white/35 mb-2 ml-1">Rôles
                         (Sélectionnez au moins un)</label>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-3">
                         <label
-                            class="flex items-center space-x-3 bg-white/5 border border-white/10 rounded-2xl p-3 cursor-pointer hover:bg-white/10 transition">
+                            class="flex items-center space-x-3 bg-white/[0.04] border border-white/8 rounded-xl p-3 cursor-pointer hover:bg-white/8 transition">
                             <input type="checkbox" name="roles" value="player"
-                                class="form-checkbox h-5 w-5 text-primary-500 rounded border-gray-600 focus:ring-primary-500">
-                            <span class="text-sm font-bold">Joueur</span>
+                                class="form-checkbox h-4 w-4 text-primary-500 rounded border-gray-600 focus:ring-primary-500">
+                            <span class="text-sm font-semibold">Joueur</span>
                         </label>
                         <label
-                            class="flex items-center space-x-3 bg-white/5 border border-white/10 rounded-2xl p-3 cursor-pointer hover:bg-white/10 transition">
+                            class="flex items-center space-x-3 bg-white/[0.04] border border-white/8 rounded-xl p-3 cursor-pointer hover:bg-white/8 transition">
                             <input type="checkbox" name="roles" value="coach"
-                                class="form-checkbox h-5 w-5 text-primary-500 rounded border-gray-600 focus:ring-primary-500">
-                            <span class="text-sm font-bold">Coach</span>
+                                class="form-checkbox h-4 w-4 text-primary-500 rounded border-gray-600 focus:ring-primary-500">
+                            <span class="text-sm font-semibold">Coach</span>
                         </label>
                         <label
-                            class="flex items-center space-x-3 bg-white/5 border border-white/10 rounded-2xl p-3 cursor-pointer hover:bg-white/10 transition">
+                            class="flex items-center space-x-3 bg-white/[0.04] border border-white/8 rounded-xl p-3 cursor-pointer hover:bg-white/8 transition">
                             <input type="checkbox" name="roles" value="fan"
-                                class="form-checkbox h-5 w-5 text-primary-500 rounded border-gray-600 focus:ring-primary-500">
-                            <span class="text-sm font-bold">Fan</span>
+                                class="form-checkbox h-4 w-4 text-primary-500 rounded border-gray-600 focus:ring-primary-500">
+                            <span class="text-sm font-semibold">Fan</span>
                         </label>
                     </div>
                 </div>
 
                 <button type="submit"
-                    class="w-full gradient-primary py-4 rounded-2xl text-white font-black text-lg shadow-xl hover:scale-[1.02] active:scale-95 transition-all">
+                    class="w-full gradient-primary py-3.5 rounded-xl text-white font-bold text-sm shadow-lg shadow-primary-500/15 hover:scale-[1.01] active:scale-[0.99] transition-all">
                     S'inscrire
                 </button>
             </form>
 
-            <p class="text-center mt-8 text-white/40 text-[10px] font-black uppercase tracking-[0.2em]">
+            <p class="text-center mt-6 text-white/35 text-xs">
                 Déjà membre ?
-                <a href="{{ url_for('auth.login') }}" class="text-primary-400 hover:text-primary-300 transition ml-1">Se
+                <a href="{{ url_for('auth.login') }}"
+                    class="text-primary-400 hover:text-primary-300 transition font-bold ml-1">Se
                     connecter</a>
             </p>
         </div>

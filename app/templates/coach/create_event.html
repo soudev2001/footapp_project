@@ -4,11 +4,11 @@
 {% block content %}
 <div class="page-enter max-w-3xl mx-auto px-4 py-8">
     <!-- Header Hero -->
-    <div class="glass p-10 rounded-[40px] border-white/5 mb-10 relative overflow-hidden">
+    <div class="glass p-10 rounded-3xl border-white/5 mb-10 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-amber-500/10"></div>
         <div class="relative z-10">
             <a href="{{ url_for('main.calendar') }}"
-                class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-primary-400 mb-6 transition-colors">
+                class="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/40 hover:text-primary-400 mb-6 transition-colors">
                 <i class="fa-solid fa-arrow-left text-[8px]"></i> RETOUR AU CALENDRIER
             </a>
             <div class="flex items-center gap-6">
@@ -18,9 +18,9 @@
                 </div>
                 <div>
                     <h1
-                        class="text-4xl font-black italic uppercase tracking-tight leading-none mb-2 light:text-slate-900">
+                        class="text-4xl font-bold uppercase tracking-tight leading-none mb-2 light:text-slate-900">
                         Nouvel Événement</h1>
-                    <p class="text-white/40 light:text-slate-500 text-sm font-medium italic">Planifiez les prochaines
+                    <p class="text-white/40 light:text-slate-500 text-sm font-medium">Planifiez les prochaines
                         étapes de votre saison.</p>
                 </div>
             </div>
@@ -31,42 +31,42 @@
     <form action="{{ url_for('coach.create_event') }}" method="POST" class="space-y-8" onsubmit="handleSubmit(event)">
         <!-- Event Type Selection -->
         <div class="space-y-4">
-            <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-6">Nature de la
+            <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-6">Nature de la
                 session</label>
             <div class="grid grid-cols-2 gap-6">
                 <div class="relative">
                     <input type="radio" name="type" id="match" value="match" class="hidden peer" checked>
                     <label for="match"
-                        class="glass p-8 flex flex-col items-center justify-center cursor-pointer transition-all border-white/5 rounded-[40px] hover:bg-white/5 peer-checked:bg-primary-500/10 peer-checked:border-primary-500/50 group">
+                        class="glass p-8 flex flex-col items-center justify-center cursor-pointer transition-all border-white/5 rounded-3xl hover:bg-white/5 peer-checked:bg-primary-500/10 peer-checked:border-primary-500/50 group">
                         <div
                             class="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-4 shadow-xl group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-trophy text-white text-2xl"></i>
                         </div>
-                        <span class="font-black italic uppercase text-sm tracking-widest light:text-slate-900">MATCH
+                        <span class="font-bold uppercase text-sm tracking-wider light:text-slate-900">MATCH
                             OFFICIEL</span>
                     </label>
                 </div>
                 <div class="relative">
                     <input type="radio" name="type" id="training" value="training" class="hidden peer">
                     <label for="training"
-                        class="glass p-8 flex flex-col items-center justify-center cursor-pointer transition-all border-white/5 rounded-[40px] hover:bg-white/5 peer-checked:bg-amber-500/10 peer-checked:border-amber-500/50 group">
+                        class="glass p-8 flex flex-col items-center justify-center cursor-pointer transition-all border-white/5 rounded-3xl hover:bg-white/5 peer-checked:bg-amber-500/10 peer-checked:border-amber-500/50 group">
                         <div
                             class="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mb-4 shadow-xl group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-stopwatch text-white text-2xl"></i>
                         </div>
                         <span
-                            class="font-black italic uppercase text-sm tracking-widest light:text-slate-900">ENTRAÎNEMENT</span>
+                            class="font-bold uppercase text-sm tracking-wider light:text-slate-900">ENTRAÎNEMENT</span>
                     </label>
                 </div>
             </div>
         </div>
 
         <!-- Core Details -->
-        <div class="glass p-10 rounded-[48px] border-white/5 space-y-8 relative overflow-hidden">
+        <div class="glass p-10 rounded-3xl border-white/5 space-y-8 relative overflow-hidden">
             <div class="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 rounded-full blur-[80px] -mr-32 -mt-32"></div>
 
             <div class="space-y-3 relative z-10">
-                <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Titre ou
+                <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-2">Titre ou
                     Adversaire</label>
                 <div class="relative group">
                     <i
@@ -77,7 +77,7 @@
             </div>
 
             <div class="space-y-3 relative z-10">
-                <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Équipe
+                <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-2">Équipe
                     concernée</label>
                 <div class="relative group">
                     <i
@@ -100,7 +100,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
                 <div class="space-y-3">
-                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Date du
+                    <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-2">Date du
                         rendez-vous</label>
                     <div class="relative group">
                         <i
@@ -110,7 +110,7 @@
                     </div>
                 </div>
                 <div class="space-y-3">
-                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Heure de
+                    <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-2">Heure de
                         début</label>
                     <div class="relative group">
                         <i
@@ -122,7 +122,7 @@
             </div>
 
             <div class="space-y-3 relative z-10">
-                <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Lieu
+                <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-2">Lieu
                     physique</label>
                 <div class="relative group">
                     <i
@@ -133,7 +133,7 @@
             </div>
 
             <div class="space-y-3 relative z-10">
-                <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Instructions
+                <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-2">Instructions
                     supplémentaires (optionnel)</label>
                 <textarea name="description" rows="3" placeholder="Ex: Rendez-vous 45min avant le coup d'envoi..."
                     class="w-full glass bg-white/5 border border-white/10 rounded-3xl py-5 px-6 text-sm font-bold placeholder:text-white/10 focus:outline-none focus:border-primary-500/50 transition-all resize-none"></textarea>
@@ -141,8 +141,8 @@
         </div>
 
         <!-- Automation & Convocations -->
-        <div class="glass p-10 rounded-[48px] border-white/5 space-y-6">
-            <h3 class="text-xs font-black uppercase tracking-widest light:text-slate-900 mb-6 flex items-center gap-3">
+        <div class="glass p-10 rounded-3xl border-white/5 space-y-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider light:text-slate-900 mb-6 flex items-center gap-3">
                 <i class="fa-solid fa-robot text-primary-400"></i>
                 Paramètres de Convocation
             </h3>
@@ -156,9 +156,9 @@
                             <i class="fa-solid fa-users"></i>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black uppercase tracking-widest text-white light:text-slate-900">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-white light:text-slate-900">
                                 Tout l'effectif</p>
-                            <p class="text-[8px] font-medium text-white/20 uppercase tracking-widest mt-0.5">Automatique
+                            <p class="text-[8px] font-medium text-white/20 uppercase tracking-wider mt-0.5">Automatique
                             </p>
                         </div>
                     </div>
@@ -174,9 +174,9 @@
                             <i class="fa-solid fa-bell"></i>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black uppercase tracking-widest text-white light:text-slate-900">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-white light:text-slate-900">
                                 Rappel Smart</p>
-                            <p class="text-[8px] font-medium text-white/20 uppercase tracking-widest mt-0.5">Envoi à J-1
+                            <p class="text-[8px] font-medium text-white/20 uppercase tracking-wider mt-0.5">Envoi à J-1
                             </p>
                         </div>
                     </div>
@@ -191,9 +191,9 @@
                             <i class="fa-solid fa-check-double"></i>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black uppercase tracking-widest text-white light:text-slate-900">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-white light:text-slate-900">
                                 Confirmation de présence</p>
-                            <p class="text-[8px] font-medium text-white/20 uppercase tracking-widest mt-0.5">Action
+                            <p class="text-[8px] font-medium text-white/20 uppercase tracking-wider mt-0.5">Action
                                 Joueur</p>
                         </div>
                     </div>
@@ -205,7 +205,7 @@
 
         <!-- Submit Button -->
         <button type="submit" id="submitBtn"
-            class="w-full gradient-primary py-6 rounded-[32px] font-black text-xs text-black uppercase tracking-[0.3em] shadow-2xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4">
+            class="w-full gradient-primary py-6 rounded-2xl font-bold text-xs text-black uppercase tracking-[0.3em] shadow-2xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4">
             <i class="fa-solid fa-paper-plane text-lg"></i>
             PUBLIER L'ÉVÉNEMENT ELITE
         </button>

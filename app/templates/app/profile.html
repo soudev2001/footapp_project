@@ -1,125 +1,125 @@
 {% extends "base.html" %}
-{% block title %}Profil - FootLogic Elite{% endblock %}
+{% block title %}Profil — FootLogic{% endblock %}
 
 {% block content %}
 <div class="page-enter max-w-5xl mx-auto px-4 py-8">
     <!-- Profile Header Hero -->
-    <div class="glass p-12 rounded-[48px] border-white/5 mb-10 relative overflow-hidden group">
-        <div class="absolute inset-0 bg-gradient-to-br from-primary-600/10 via-transparent to-amber-600/10"></div>
+    <div class="glass p-10 rounded-3xl border-white/5 mb-8 relative overflow-hidden group">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-600/8 via-transparent to-amber-600/5"></div>
         <div
-            class="absolute -right-20 -top-20 w-96 h-96 bg-primary-500/5 rounded-full blur-[100px] group-hover:bg-primary-500/10 transition-all duration-1000">
+            class="absolute -right-20 -top-20 w-80 h-80 bg-primary-500/5 rounded-full blur-[80px] group-hover:bg-primary-500/8 transition-all duration-1000">
         </div>
 
-        <div class="relative z-10 flex flex-col md:flex-row items-center gap-10">
+        <div class="relative z-10 flex flex-col md:flex-row items-center gap-8">
             <div class="relative">
                 <div
-                    class="w-44 h-44 rounded-[56px] overflow-hidden shadow-2xl border-4 border-white/5 group-hover:scale-[1.02] transition-transform duration-700">
+                    class="w-36 h-36 rounded-3xl overflow-hidden shadow-2xl border-2 border-white/5 group-hover:scale-[1.02] transition-transform duration-500">
                     {% if current_user.profile.avatar %}
                     <img src="{{ current_user.profile.avatar }}" class="w-full h-full object-cover">
                     {% else %}
                     <div
-                        class="w-full h-full gradient-primary flex items-center justify-center text-6xl font-black italic text-black">
+                        class="w-full h-full gradient-primary flex items-center justify-center text-5xl font-extrabold text-white">
                         {{ current_user.profile.first_name[:1] if current_user.profile.first_name else '?' }}
                     </div>
                     {% endif %}
                 </div>
                 <div
-                    class="absolute -bottom-2 -right-2 w-12 h-12 gradient-accent rounded-2xl flex items-center justify-center text-black shadow-xl border-4 border-surface-950">
-                    <i class="fa-solid fa-bolt text-lg"></i>
+                    class="absolute -bottom-1.5 -right-1.5 w-10 h-10 gradient-accent rounded-xl flex items-center justify-center text-white shadow-lg border-2 border-surface-950">
+                    <i class="fa-solid fa-bolt text-sm"></i>
                 </div>
             </div>
 
             <div class="flex-1 text-center md:text-left">
-                <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-6">
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-4">
                     <span
-                        class="px-5 py-2 rounded-full bg-primary-500 text-black text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-primary-500/20">
+                        class="px-3 py-1.5 rounded-full bg-primary-500 text-white text-[10px] font-bold uppercase tracking-wider shadow-md shadow-primary-500/15">
                         {{ current_user.role|upper }}
                     </span>
                     <span
-                        class="px-5 py-2 rounded-full bg-white/5 border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-[0.2em]">
-                        Membre Elite
+                        class="px-3 py-1.5 rounded-full bg-white/5 border border-white/8 text-white/40 text-[10px] font-semibold uppercase tracking-wider">
+                        Membre
                     </span>
                 </div>
-                <h1
-                    class="text-6xl font-black mb-2 italic uppercase tracking-tighter light:text-slate-900 leading-none">
+                <h1 class="text-4xl font-extrabold mb-1.5 tracking-tight light:text-slate-900 leading-tight">
                     {{ current_user.profile.first_name }} {{ current_user.profile.last_name }}</h1>
-                <p class="text-white/20 font-black tracking-[0.3em] uppercase text-[10px] italic">{{ current_user.email
-                    }}</p>
+                <p class="text-white/25 font-medium tracking-wide text-xs">{{ current_user.email }}</p>
             </div>
 
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-3">
                 <a href="{{ url_for('main.edit_profile') }}"
-                    class="gradient-primary px-10 py-5 rounded-3xl font-black text-[10px] uppercase tracking-[0.2em] text-black shadow-2xl shadow-primary-500/30 hover:scale-[1.02] active:scale-95 transition-all">
-                    CONFIGURER MON COMPTE
+                    class="gradient-primary px-7 py-3.5 rounded-xl font-bold text-xs text-white shadow-lg shadow-primary-500/15 hover:scale-[1.01] active:scale-[0.99] transition-all text-center">
+                    Configurer mon compte
                 </a>
                 <a href="/logout"
-                    class="glass bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 px-10 py-5 rounded-3xl font-black text-[10px] uppercase tracking-[0.2em] text-red-500 text-center transition-all">
-                    DÉCONNEXION
+                    class="glass bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 px-7 py-3.5 rounded-xl font-bold text-xs text-red-400 text-center transition-all">
+                    Déconnexion
                 </a>
             </div>
         </div>
     </div>
 
-    <div class="grid lg:grid-cols-12 gap-10">
+    <div class="grid lg:grid-cols-12 gap-8">
         <!-- Main Stats & Info -->
-        <div class="lg:col-span-8 space-y-10">
+        <div class="lg:col-span-8 space-y-8">
             <!-- Role-Specific Content (Simulation) -->
             {% if roles.is_player %}
-            <div class="glass p-12 rounded-[56px] border-white/5 bg-gradient-to-br from-primary-500/5 to-transparent">
-                <div class="flex items-center justify-between mb-12">
-                    <h2 class="text-2xl font-black italic uppercase tracking-tight light:text-slate-900">Performance
-                        Athlete</h2>
+            <div class="glass p-10 rounded-3xl border-white/5 bg-gradient-to-br from-primary-500/[0.04] to-transparent">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-xl font-extrabold tracking-tight light:text-slate-900">Performance
+                        Athlète</h2>
                     <i class="fa-solid fa-chart-line text-primary-400"></i>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
-                    <div class="bg-white/5 p-8 rounded-[40px] border border-white/5 hover:bg-white/10 transition-all">
-                        <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mb-4">Buts Saison</p>
-                        <p class="text-4xl font-black italic text-primary-400 leading-none">12</p>
-                    </div>
-                    <div class="bg-white/5 p-8 rounded-[40px] border border-white/5 hover:bg-white/10 transition-all">
-                        <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mb-4">Assists</p>
-                        <p class="text-4xl font-black italic text-amber-500 leading-none">08</p>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-5 text-center">
+                    <div
+                        class="bg-white/[0.04] p-6 rounded-2xl border border-white/5 hover:bg-white/[0.06] transition-all">
+                        <p class="text-[10px] font-semibold text-white/25 uppercase tracking-wider mb-3">Buts Saison</p>
+                        <p class="text-3xl font-extrabold text-primary-400 leading-none">12</p>
                     </div>
                     <div
-                        class="bg-white/5 p-8 rounded-[40px] border border-white/5 hover:bg-white/10 transition-all col-span-2 md:col-span-1">
-                        <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mb-4">Matchs</p>
-                        <p class="text-4xl font-black italic text-white/60 leading-none">15</p>
+                        class="bg-white/[0.04] p-6 rounded-2xl border border-white/5 hover:bg-white/[0.06] transition-all">
+                        <p class="text-[10px] font-semibold text-white/25 uppercase tracking-wider mb-3">Assists</p>
+                        <p class="text-3xl font-extrabold text-amber-500 leading-none">08</p>
+                    </div>
+                    <div
+                        class="bg-white/[0.04] p-6 rounded-2xl border border-white/5 hover:bg-white/[0.06] transition-all col-span-2 md:col-span-1">
+                        <p class="text-[10px] font-semibold text-white/25 uppercase tracking-wider mb-3">Matchs</p>
+                        <p class="text-3xl font-extrabold text-white/50 leading-none">15</p>
                     </div>
                 </div>
             </div>
             {% endif %}
 
             <!-- Personal Info -->
-            <div class="glass p-12 rounded-[56px] border-white/5">
-                <div class="flex items-center justify-between mb-12">
-                    <h2 class="text-2xl font-black italic uppercase tracking-tight light:text-slate-900">Elite Vault
-                        Info</h2>
+            <div class="glass p-10 rounded-3xl border-white/5">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-xl font-extrabold tracking-tight light:text-slate-900">Informations</h2>
                     <i class="fa-solid fa-shield-halved text-white/10"></i>
                 </div>
-                <div class="grid md:grid-cols-2 gap-8">
+                <div class="grid md:grid-cols-2 gap-5">
                     <div
-                        class="flex items-center gap-8 p-8 glass bg-white/5 rounded-[40px] border border-white/5 hover:border-white/20 transition-all">
+                        class="flex items-center gap-5 p-6 glass bg-white/[0.04] rounded-2xl border border-white/5 hover:border-white/15 transition-all">
                         <div
-                            class="w-16 h-16 rounded-2xl bg-primary-500/10 flex items-center justify-center text-primary-400 text-2xl shadow-inner">
+                            class="w-12 h-12 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-400 text-lg shrink-0">
                             <i class="fa-solid fa-phone"></i>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Téléphone
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-0.5">Téléphone
                             </p>
-                            <p class="font-black italic text-lg">{{ current_user.profile.phone or '06 XX XX XX XX' }}
+                            <p class="font-bold text-base">{{ current_user.profile.phone or '06 XX XX XX XX' }}
                             </p>
                         </div>
                     </div>
                     <div
-                        class="flex items-center gap-8 p-8 glass bg-white/5 rounded-[40px] border border-white/5 hover:border-purple-500/20 transition-all">
+                        class="flex items-center gap-5 p-6 glass bg-white/[0.04] rounded-2xl border border-white/5 hover:border-purple-500/15 transition-all">
                         <div
-                            class="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 text-2xl shadow-inner">
+                            class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 text-lg shrink-0">
                             <i class="fa-solid fa-calendar-check"></i>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Elite Fan
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-0.5">Membre
+                                depuis
                             </p>
-                            <p class="font-black italic text-lg">Depuis 2026</p>
+                            <p class="font-bold text-base">2026</p>
                         </div>
                     </div>
                 </div>
@@ -127,56 +127,56 @@
         </div>
 
         <!-- Sidebar Activity Info -->
-        <div class="lg:col-span-4 space-y-10">
-            <div class="glass p-10 rounded-[48px] border-white/5 text-center relative overflow-hidden group">
+        <div class="lg:col-span-4 space-y-8">
+            <div class="glass p-8 rounded-3xl border-white/5 text-center relative overflow-hidden group">
                 <div class="absolute inset-0 bg-gradient-to-br from-primary-500/[0.03] to-transparent"></div>
                 <div
-                    class="w-20 h-20 gradient-primary rounded-3xl flex items-center justify-center mx-auto mb-8 text-3xl font-black italic shadow-2xl shadow-primary-500/20 group-hover:scale-110 transition-transform">
+                    class="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl font-extrabold text-white shadow-lg shadow-primary-500/15 group-hover:scale-105 transition-transform">
                     FL
                 </div>
-                <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-2">Club d'Appartenance
+                <h3 class="text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-1.5">Club d'Appartenance
                 </h3>
-                <p class="text-2xl font-black italic mb-10 text-gradient uppercase">FootLogic ELITE</p>
-                <div class="space-y-4">
+                <p class="text-xl font-extrabold mb-8 text-gradient">FootLogic</p>
+                <div class="space-y-3">
                     <a href="{{ url_for('main.public_club') }}"
-                        class="w-full py-5 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 block text-[10px] font-black uppercase tracking-[0.2em] transition-all">
-                        ACADÉMIE HUB
+                        class="w-full py-3.5 rounded-xl bg-white/5 border border-white/8 hover:bg-white/8 hover:border-white/15 block text-xs font-bold transition-all">
+                        Voir le club
                     </a>
                 </div>
             </div>
 
-            <div class="glass p-10 rounded-[48px] border-white/5">
+            <div class="glass p-8 rounded-3xl border-white/5">
                 <h3
-                    class="text-[10px] font-black uppercase tracking-[.3em] text-white/20 mb-10 flex items-center gap-4">
+                    class="text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-8 flex items-center gap-3">
                     <span class="w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
-                    COMMUNITY
+                    Paramètres rapides
                 </h3>
-                <div class="space-y-8">
+                <div class="space-y-6">
                     <div class="flex items-center justify-between group cursor-pointer">
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-3">
                             <div
-                                class="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-400">
-                                <i class="fa-solid fa-bell"></i>
+                                class="w-9 h-9 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400">
+                                <i class="fa-solid fa-bell text-sm"></i>
                             </div>
                             <span
-                                class="text-xs font-black uppercase tracking-widest text-white/60 group-hover:text-white transition-colors">Alertes
+                                class="text-xs font-bold text-white/50 group-hover:text-white transition-colors">Alertes
                                 Email</span>
                         </div>
-                        <div class="w-12 h-6 bg-primary-500 rounded-full relative p-1 transition-all">
-                            <div class="w-4 h-4 bg-black rounded-full absolute right-1"></div>
+                        <div class="w-10 h-5 bg-primary-500 rounded-full relative p-0.5 transition-all">
+                            <div class="w-4 h-4 bg-white rounded-full absolute right-0.5"></div>
                         </div>
                     </div>
                     <div class="flex items-center justify-between group cursor-pointer">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40">
-                                <i class="fa-solid fa-eye-slash"></i>
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center text-white/30">
+                                <i class="fa-solid fa-eye-slash text-sm"></i>
                             </div>
                             <span
-                                class="text-xs font-black uppercase tracking-widest text-white/20 group-hover:text-white transition-colors">Profil
+                                class="text-xs font-bold text-white/25 group-hover:text-white transition-colors">Profil
                                 Privé</span>
                         </div>
-                        <div class="w-12 h-6 bg-white/10 rounded-full relative p-1 transition-all">
-                            <div class="w-4 h-4 bg-white/20 rounded-full absolute left-1"></div>
+                        <div class="w-10 h-5 bg-white/10 rounded-full relative p-0.5 transition-all">
+                            <div class="w-4 h-4 bg-white/20 rounded-full absolute left-0.5"></div>
                         </div>
                     </div>
                 </div>

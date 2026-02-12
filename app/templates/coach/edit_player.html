@@ -4,16 +4,16 @@
 {% block content %}
 <div class="page-enter max-w-3xl mx-auto px-4 py-8">
     <!-- Header Hero -->
-    <div class="glass p-10 rounded-[40px] border-white/5 mb-10 relative overflow-hidden text-center">
+    <div class="glass p-10 rounded-3xl border-white/5 mb-10 relative overflow-hidden text-center">
         <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-amber-500/10"></div>
         <div class="relative z-10">
             <div
-                class="w-20 h-20 gradient-accent rounded-[32px] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-yellow-500/20">
+                class="w-20 h-20 gradient-accent rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-yellow-500/20">
                 <i class="fa-solid fa-user-pen text-black text-3xl"></i>
             </div>
-            <h1 class="text-4xl font-black italic uppercase tracking-tight leading-none mb-2 light:text-slate-900">
+            <h1 class="text-4xl font-bold uppercase tracking-tight leading-none mb-2 light:text-slate-900">
                 Edition Profil</h1>
-            <p class="text-white/40 light:text-slate-500 text-sm font-medium italic">Mise à jour des paramètres de
+            <p class="text-white/40 light:text-slate-500 text-sm font-medium">Mise à jour des paramètres de
                 performance pour {{ player.name }}.</p>
         </div>
     </div>
@@ -21,17 +21,17 @@
     <!-- Edit Form -->
     <form method="POST" class="space-y-8">
         <!-- Identity Section -->
-        <div class="glass p-10 rounded-[48px] border-white/5 space-y-8 relative overflow-hidden">
+        <div class="glass p-10 rounded-3xl border-white/5 space-y-8 relative overflow-hidden">
             <div class="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 rounded-full blur-[80px] -mr-32 -mt-32"></div>
 
             <h3
-                class="text-xs font-black uppercase tracking-widest light:text-slate-900 mb-6 flex items-center gap-3 relative z-10">
+                class="text-xs font-bold uppercase tracking-wider light:text-slate-900 mb-6 flex items-center gap-3 relative z-10">
                 <i class="fa-solid fa-id-card text-primary-400"></i>
                 Identité de l'athlète
             </h3>
 
             <div class="space-y-3 relative z-10">
-                <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Nom
+                <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-2">Nom
                     Complet</label>
                 <div class="relative group">
                     <i
@@ -43,7 +43,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
                 <div class="space-y-3">
-                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Numéro de
+                    <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-2">Numéro de
                         Maillot</label>
                     <div class="relative group">
                         <i
@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div class="space-y-3">
-                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Position
+                    <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-2">Position
                         sur le terrain</label>
                     <div class="relative group">
                         <i
@@ -78,15 +78,15 @@
         </div>
 
         <!-- Status & Performance Stats Section -->
-        <div class="glass p-10 rounded-[48px] border-white/5 space-y-8 relative overflow-hidden">
-            <h3 class="text-xs font-black uppercase tracking-widest light:text-slate-900 mb-6 flex items-center gap-3">
+        <div class="glass p-10 rounded-3xl border-white/5 space-y-8 relative overflow-hidden">
+            <h3 class="text-xs font-bold uppercase tracking-wider light:text-slate-900 mb-6 flex items-center gap-3">
                 <i class="fa-solid fa-heart-pulse text-amber-500"></i>
                 Statut & Profil Physique
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="space-y-3">
-                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">État de
+                    <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-2">État de
                         disponibilité</label>
                     <div class="relative group">
                         <i
@@ -108,7 +108,7 @@
                     </div>
                 </div>
                 <div class="space-y-3">
-                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Taille
+                    <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-2">Taille
                         (cm)</label>
                     <div class="relative group">
                         <i
@@ -118,7 +118,7 @@
                     </div>
                 </div>
                 <div class="space-y-3">
-                    <label class="block text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-2">Poids
+                    <label class="block text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] ml-2">Poids
                         Actuel (kg)</label>
                     <div class="relative group">
                         <i
@@ -133,11 +133,11 @@
         <!-- Form Actions -->
         <div class="flex gap-6 pt-4">
             <a href="{{ url_for('coach.player_detail', player_id=player._id) }}"
-                class="flex-1 glass bg-white/5 border border-white/10 py-6 rounded-[32px] font-black text-[10px] uppercase tracking-[0.2em] text-center text-white/40 hover:text-white hover:bg-white/10 transition-all">
+                class="flex-1 glass bg-white/5 border border-white/10 py-6 rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em] text-center text-white/40 hover:text-white hover:bg-white/10 transition-all">
                 ANNULER
             </a>
             <button type="submit"
-                class="flex-1 gradient-primary py-6 rounded-[32px] font-black text-[10px] uppercase tracking-[0.2em] text-black shadow-2xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                class="flex-1 gradient-primary py-6 rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em] text-black shadow-2xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
                 METTRE À JOUR LE PROFIL
             </button>
         </div>

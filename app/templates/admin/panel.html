@@ -14,9 +14,10 @@
                     class="w-full h-full object-cover light-logo">
             </div>
             <div>
-                <h1 class="text-white light:text-slate-900 font-black tracking-tight text-lg italic uppercase">GESTION
+                <h1 class="text-white light:text-slate-900 font-extrabold tracking-tight text-lg uppercase">Gestion
                 </h1>
-                <p class="text-primary-500 light:text-primary-600 text-[8px] uppercase tracking-[0.2em] font-black">{{
+                <p class="text-primary-500 light:text-primary-600 text-[8px] uppercase tracking-[0.2em] font-semibold">
+                    {{
                     current_user.profile.last_name or 'Club Console' }}</p>
             </div>
         </div>
@@ -67,18 +68,18 @@
         <div id="tab-members" class="animate-slide-up">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
                 <div>
-                    <h2 class="text-3xl font-black italic tracking-tight uppercase">MON <span
+                    <h2 class="text-3xl font-extrabold tracking-tight uppercase">MON <span
                             class="text-gradient">EFFECTIF</span></h2>
                     <p class="text-white/40 light:text-slate-500 text-sm mt-1">Gérez les coachs, joueurs et staff de
                         votre club.</p>
                 </div>
                 <div class="flex gap-3">
                     <button onclick="toggleModal('inviteModal')"
-                        class="bg-white/5 hover:bg-white/10 border border-white/10 px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all italic">
+                        class="bg-white/5 hover:bg-white/10 border border-white/10 px-5 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all">
                         <i class="fa-solid fa-envelope mr-2"></i> Inviter via Email
                     </button>
                     <button onclick="toggleModal('addMemberModal')"
-                        class="gradient-primary px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                        class="gradient-primary px-8 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
                         <i class="fa-solid fa-plus mr-2"></i> Ajouter Membre
                     </button>
                 </div>
@@ -87,12 +88,11 @@
             <div class="grid lg:grid-cols-3 gap-8">
                 <!-- Member Summary Card -->
                 <div class="lg:col-span-1 space-y-6">
-                    <div class="glass p-8 rounded-[32px] border-white/5 relative overflow-hidden">
+                    <div class="glass p-8 rounded-2xl border-white/5 relative overflow-hidden">
                         <div
                             class="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-3xl -mr-16 -mt-16">
                         </div>
-                        <h3
-                            class="text-xs font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-6">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-6">
                             Répartition</h3>
                         <div class="space-y-4">
                             <div
@@ -104,7 +104,7 @@
                                     </div>
                                     <span class="text-sm font-bold">Coachs</span>
                                 </div>
-                                <span class="font-black">2</span>
+                                <span class="font-bold">2</span>
                             </div>
                             <div
                                 class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
@@ -115,7 +115,7 @@
                                     </div>
                                     <span class="text-sm font-bold">Joueurs</span>
                                 </div>
-                                <span class="font-black">24</span>
+                                <span class="font-bold">24</span>
                             </div>
                             <div
                                 class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
@@ -126,7 +126,7 @@
                                     </div>
                                     <span class="text-sm font-bold">Équipes</span>
                                 </div>
-                                <span class="font-black">{{ stats.total_teams }}</span>
+                                <span class="font-bold">{{ stats.total_teams }}</span>
                             </div>
                         </div>
                     </div>
@@ -134,10 +134,10 @@
 
                 <!-- Member List -->
                 <div class="lg:col-span-2 space-y-4">
-                    <div class="glass rounded-[32px] border-white/5 overflow-hidden">
+                    <div class="glass rounded-2xl border-white/5 overflow-hidden">
                         <table class="w-full text-left">
                             <thead
-                                class="bg-white/5 text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 border-b border-white/5">
+                                class="bg-white/5 text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 border-b border-white/5">
                                 <tr>
                                     <th class="p-6">Membre</th>
                                     <th class="p-6">Rôle</th>
@@ -151,12 +151,12 @@
                                     <td class="p-6">
                                         <div class="flex items-center gap-4">
                                             <div
-                                                class="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center font-black">
+                                                class="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center font-bold">
                                                 {{ member.profile.first_name[:1] if member.profile and
                                                 member.profile.first_name else 'M' }}
                                             </div>
                                             <div>
-                                                <p class="text-sm font-black">{{ member.profile.first_name }} {{
+                                                <p class="text-sm font-bold">{{ member.profile.first_name }} {{
                                                     member.profile.last_name }}</p>
                                                 <p class="text-[10px] text-white/40 light:text-slate-500">{{
                                                     member.email }}</p>
@@ -165,7 +165,7 @@
                                     </td>
                                     <td class="p-6">
                                         <span
-                                            class="px-3 py-1 rounded-lg bg-primary-500/10 text-primary-400 text-[10px] font-black uppercase tracking-widest border border-primary-500/20">
+                                            class="px-3 py-1 rounded-lg bg-primary-500/10 text-primary-400 text-[10px] font-bold uppercase tracking-wider border border-primary-500/20">
                                             {{ member.role }}
                                         </span>
                                     </td>
@@ -180,7 +180,7 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="4" class="p-10 text-center text-white/20 light:text-slate-300 italic">
+                                    <td colspan="4" class="p-10 text-center text-white/20 light:text-slate-300">
                                         Aucun membre pour le
                                         moment.</td>
                                 </tr>
@@ -196,20 +196,20 @@
         <div id="tab-teams" class="hidden animate-slide-up">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
                 <div>
-                    <h2 class="text-3xl font-black italic tracking-tight uppercase">MES <span
+                    <h2 class="text-3xl font-extrabold tracking-tight uppercase">MES <span
                             class="text-gradient">ÉQUIPES</span></h2>
                     <p class="text-white/40 light:text-slate-500 text-sm mt-1">Gérez les différentes catégories et
                         équipes de votre club.</p>
                 </div>
                 <button onclick="toggleModal('addTeamModal')"
-                    class="gradient-primary px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    class="gradient-primary px-8 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
                     <i class="fa-solid fa-plus mr-2"></i> Créer une Équipe
                 </button>
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for team in teams %}
-                <div class="glass p-8 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all relative">
+                <div class="glass p-8 rounded-2xl border-white/5 group hover:bg-white/5 transition-all relative">
                     <div class="flex justify-between items-start mb-6">
                         <div
                             class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-lg text-xl">
@@ -222,8 +222,8 @@
                             </button>
                         </form>
                     </div>
-                    <h3 class="text-xl font-black italic uppercase mb-1">{{ team.name }}</h3>
-                    <p class="text-primary-400 text-[10px] font-black uppercase tracking-widest mb-4">{{ team.category
+                    <h3 class="text-xl font-extrabold uppercase mb-1">{{ team.name }}</h3>
+                    <p class="text-primary-400 text-[10px] font-bold uppercase tracking-wider mb-4">{{ team.category
                         }}</p>
                     <p class="text-white/40 text-xs mb-6 h-12 overflow-hidden">{{ team.description or 'Aucune
                         description.' }}</p>
@@ -235,13 +235,13 @@
                                 +{{ (team.coach_ids|length) if team.coach_ids else 0 }}
                             </div>
                         </div>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-white/20">Coachs</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-white/20">Coachs</span>
                     </div>
                 </div>
                 {% else %}
-                <div class="col-span-full py-20 text-center glass rounded-[40px] border-dashed border-white/10">
+                <div class="col-span-full py-20 text-center glass rounded-3xl border-dashed border-white/10">
                     <i class="fa-solid fa-layer-group text-4xl text-white/10 mb-4"></i>
-                    <p class="text-white/40 italic">Aucune équipe configurée pour le moment.</p>
+                    <p class="text-white/40">Aucune équipe configurée pour le moment.</p>
                 </div>
                 {% endfor %}
             </div>
@@ -250,38 +250,38 @@
         <!-- TAB: SUBSCRIPTION (Abonnement) -->
         <div id="tab-subscription" class="hidden animate-slide-up">
             <div class="mb-10 text-center md:text-left">
-                <h2 class="text-3xl font-black italic tracking-tight uppercase">GESTION <span
+                <h2 class="text-3xl font-extrabold tracking-tight uppercase">GESTION <span
                         class="text-gradient">ABONNEMENT</span></h2>
-                <p class="text-white/40 light:text-slate-500 text-sm mt-1 italic font-medium">Contrôlez votre accès aux
+                <p class="text-white/40 light:text-slate-500 text-sm mt-1 font-medium">Contrôlez votre accès aux
                     outils FootLogic Elite.
                 </p>
             </div>
 
             <div class="grid md:grid-cols-2 gap-10">
                 <div
-                    class="glass p-10 rounded-[40px] border-primary-500/30 bg-gradient-to-br from-primary-500/5 to-transparent flex flex-col justify-between">
+                    class="glass p-10 rounded-3xl border-primary-500/30 bg-gradient-to-br from-primary-500/5 to-transparent flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start mb-10">
                             <div>
                                 <span
-                                    class="px-3 py-1 rounded-lg bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest animate-pulse">
+                                    class="px-3 py-1 rounded-lg bg-primary-500 text-white text-[10px] font-bold uppercase tracking-wider animate-pulse">
                                     {{ subscription.status|default('INACTIF')|upper }}
                                 </span>
-                                <h3 class="text-4xl font-black mt-4 italic uppercase tracking-tighter">
+                                <h3 class="text-4xl font-bold mt-4 uppercase tracking-tighter">
                                     {{ subscription.details.name|default('SANS PLAN')|upper }}
                                 </h3>
                             </div>
                             <div class="text-right">
-                                <p class="text-3xl font-black">{{ subscription.billing.total_monthly|default('0.00') }}€
+                                <p class="text-3xl font-bold">{{ subscription.billing.total_monthly|default('0.00') }}€
                                 </p>
                                 <p
-                                    class="text-[10px] text-white/30 light:text-slate-400 font-black uppercase tracking-widest">
+                                    class="text-[10px] text-white/30 light:text-slate-400 font-bold uppercase tracking-wider">
                                     Facturé / Mois</p>
                             </div>
                         </div>
 
                         <div class="space-y-6 mb-10">
-                            <h4 class="text-[10px] font-black uppercase tracking-widest text-primary-400">Services
+                            <h4 class="text-[10px] font-bold uppercase tracking-wider text-primary-400">Services
                                 Inclus :</h4>
                             {% if subscription.details %}
                             {% for feat in subscription.details.features %}
@@ -292,7 +292,7 @@
                             </div>
                             {% endfor %}
                             {% else %}
-                            <p class="text-xs italic text-white/20">Veuillez choisir un pack pour débloquer les
+                            <p class="text-xs text-white/20">Veuillez choisir un pack pour débloquer les
                                 fonctionnalités.</p>
                             {% endif %}
                         </div>
@@ -302,10 +302,10 @@
                         class="pt-10 border-t border-white/5 space-y-6">
                         <div>
                             <label
-                                class="block text-[10px] font-black uppercase tracking-widest text-white/20 mb-3 ml-1">Changer
+                                class="block text-[10px] font-bold uppercase tracking-wider text-white/20 mb-3 ml-1">Changer
                                 de Pack</label>
                             <select name="plan_id"
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black appearance-none cursor-pointer">
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-bold appearance-none cursor-pointer">
                                 {% for pid, pinfo in plans.items() %}
                                 <option value="{{ pid }}" {% if subscription.plan_id==pid %}selected{% endif %}
                                     class="bg-slate-900">
@@ -315,47 +315,47 @@
                             </select>
                         </div>
                         <button type="submit"
-                            class="w-full gradient-primary py-5 rounded-3xl text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all text-center">
+                            class="w-full gradient-primary py-5 rounded-3xl text-sm font-bold uppercase tracking-wider shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all text-center">
                             METTRE À JOUR MON ACCÈS
                         </button>
                     </form>
                 </div>
 
                 <div class="space-y-6">
-                    <div class="glass p-8 rounded-[32px] border-white/5">
-                        <h4 class="text-sm font-black uppercase tracking-widest mb-6">Détail des Licences</h4>
+                    <div class="glass p-8 rounded-2xl border-white/5">
+                        <h4 class="text-sm font-bold uppercase tracking-wider mb-6">Détail des Licences</h4>
                         <div class="space-y-4">
                             <div
                                 class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
                                 <span class="text-xs font-bold text-white/40">Base Package</span>
-                                <span class="text-sm font-black">{{ subscription.billing.base_price|default('0')
+                                <span class="text-sm font-bold">{{ subscription.billing.base_price|default('0')
                                     }}€</span>
                             </div>
                             <div
                                 class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
                                 <div class="flex flex-col">
-                                    <span class="text-[10px] font-black uppercase text-primary-400">Coachs (x{{
+                                    <span class="text-[10px] font-bold uppercase text-primary-400">Coachs (x{{
                                         subscription.billing.coach_count|default(0) }})</span>
-                                    <span class="text-[9px] text-white/20 italic">Tarif: {{
+                                    <span class="text-[9px] text-white/20">Tarif: {{
                                         subscription.details.coach_license|default(0) }}€ / unité</span>
                                 </div>
-                                <span class="text-sm font-black text-green-400">+{{
+                                <span class="text-sm font-bold text-green-400">+{{
                                     subscription.billing.coach_cost_total|default('0.00') }}€</span>
                             </div>
                             <div
                                 class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
                                 <div class="flex flex-col">
-                                    <span class="text-[10px] font-black uppercase text-primary-400">Joueurs (x{{
+                                    <span class="text-[10px] font-bold uppercase text-primary-400">Joueurs (x{{
                                         subscription.billing.player_count|default(0) }})</span>
-                                    <span class="text-[9px] text-white/20 italic">Tarif: {{
+                                    <span class="text-[9px] text-white/20">Tarif: {{
                                         subscription.details.player_license|default(0) }}€ / unité</span>
                                 </div>
-                                <span class="text-sm font-black text-green-400">+{{
+                                <span class="text-sm font-bold text-green-400">+{{
                                     subscription.billing.player_cost_total|default('0.00') }}€</span>
                             </div>
                             <div class="pt-4 border-t border-white/5 flex items-center justify-between px-2">
-                                <span class="text-lg font-black italic uppercase">TOTAL ESTIMÉ</span>
-                                <span class="text-2xl font-black text-white italic">{{
+                                <span class="text-lg font-extrabold uppercase">TOTAL ESTIMÉ</span>
+                                <span class="text-2xl font-bold text-white">{{
                                     subscription.billing.total_monthly|default('0.00') }}€<small
                                         class="text-[10px] ml-1">HT/mois</small></span>
                             </div>
@@ -363,11 +363,11 @@
                     </div>
 
                     <div
-                        class="glass p-8 rounded-[32px] border-white/5 bg-gradient-to-br from-green-600/10 to-transparent">
+                        class="glass p-8 rounded-2xl border-white/5 bg-gradient-to-br from-green-600/10 to-transparent">
                         <i class="fa-solid fa-credit-card text-green-400 text-2xl mb-4"></i>
-                        <h4 class="text-sm font-black uppercase tracking-widest mb-2">Cycle de Facturation</h4>
-                        <p class="text-2xl font-black mb-1">01 {{ now_month|default('Mars') }} 2026</p>
-                        <p class="text-xs text-white/40 light:text-slate-500 italic">Evolution continue : Les frais
+                        <h4 class="text-sm font-bold uppercase tracking-wider mb-2">Cycle de Facturation</h4>
+                        <p class="text-2xl font-bold mb-1">01 {{ now_month|default('Mars') }} 2026</p>
+                        <p class="text-xs text-white/40 light:text-slate-500">Evolution continue : Les frais
                             s'adaptent automatiquement à la taille de votre effectif.</p>
                     </div>
                 </div>
@@ -377,61 +377,61 @@
         <!-- TAB: METRIQUES -->
         <div id="tab-metrics" class="hidden animate-slide-up">
             <div class="mb-10">
-                <h2 class="text-3xl font-black italic tracking-tight uppercase">ANALYSE <span
+                <h2 class="text-3xl font-extrabold tracking-tight uppercase">ANALYSE <span
                         class="text-gradient">PERFORMANCE</span></h2>
                 <p class="text-white/40 light:text-slate-500 text-sm mt-1">Surveillez l'activité et l'engagement de
                     votre club.</p>
             </div>
 
-            <div class="glass p-8 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all">
+            <div class="glass p-8 rounded-2xl border-white/5 group hover:bg-white/5 transition-all">
                 <div class="flex justify-between items-start mb-6">
                     <div
                         class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-lg text-xl">
                         <i class="fa-solid fa-users"></i>
                     </div>
                 </div>
-                <div class="text-4xl font-black mb-1 italic">{{ stats.total_members }}</div>
-                <div class="text-[10px] text-white/20 light:text-slate-400 font-black uppercase tracking-widest mt-2">
+                <div class="text-4xl font-bold mb-1">{{ stats.total_members }}</div>
+                <div class="text-[10px] text-white/20 light:text-slate-400 font-bold uppercase tracking-wider mt-2">
                     Membres Totaux</div>
             </div>
-            <div class="glass p-8 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all">
+            <div class="glass p-8 rounded-2xl border-white/5 group hover:bg-white/5 transition-all">
                 <div class="flex justify-between items-start mb-6">
                     <div
                         class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-lg text-xl">
                         <i class="fa-solid fa-user-tie"></i>
                     </div>
                 </div>
-                <div class="text-4xl font-black mb-1 italic">{{ stats.coaches }}</div>
-                <div class="text-[10px] text-white/20 font-black uppercase tracking-widest mt-2">Coachs</div>
+                <div class="text-4xl font-bold mb-1">{{ stats.coaches }}</div>
+                <div class="text-[10px] text-white/20 font-bold uppercase tracking-wider mt-2">Coachs</div>
             </div>
-            <div class="glass p-8 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all">
+            <div class="glass p-8 rounded-2xl border-white/5 group hover:bg-white/5 transition-all">
                 <div class="flex justify-between items-start mb-6">
                     <div
                         class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-lg text-xl">
                         <i class="fa-solid fa-running"></i>
                     </div>
                 </div>
-                <div class="text-4xl font-black mb-1 italic">{{ stats.players }}</div>
-                <div class="text-[10px] text-white/20 font-black uppercase tracking-widest mt-2">Joueurs</div>
+                <div class="text-4xl font-bold mb-1">{{ stats.players }}</div>
+                <div class="text-[10px] text-white/20 font-bold uppercase tracking-wider mt-2">Joueurs</div>
             </div>
-            <div class="glass p-8 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all">
+            <div class="glass p-8 rounded-2xl border-white/5 group hover:bg-white/5 transition-all">
                 <div class="flex justify-between items-start mb-6">
                     <div
                         class="w-12 h-12 gradient-success rounded-2xl flex items-center justify-center shadow-lg text-xl">
                         <i class="fa-solid fa-euro-sign"></i>
                     </div>
                 </div>
-                <div class="text-4xl font-black mb-1 italic">{{ stats.mrr }}€</div>
-                <div class="text-[10px] text-white/20 light:text-slate-400 font-black uppercase tracking-widest mt-2">
+                <div class="text-4xl font-bold mb-1">{{ stats.mrr }}€</div>
+                <div class="text-[10px] text-white/20 light:text-slate-400 font-bold uppercase tracking-wider mt-2">
                     Revenu Mensuel
                     (Simulation)</div>
             </div>
 
             <!-- engagement Chart -->
-            <div class="glass p-10 rounded-[40px] border-white/5 relative overflow-hidden">
+            <div class="glass p-10 rounded-3xl border-white/5 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 rounded-full blur-[100px] -mr-32 -mt-32">
                 </div>
-                <h3 class="text-lg font-black italic tracking-tight uppercase mb-2 relative z-10">Taux de Remplissage
+                <h3 class="text-lg font-extrabold tracking-tight uppercase mb-2 relative z-10">Taux de Remplissage
                 </h3>
                 <p class="text-white/30 light:text-slate-400 text-xs mb-10 relative z-10 font-medium">Réponses aux
                     convocations (6 derniers
@@ -458,7 +458,7 @@
                     </div>
                 </div>
                 <div
-                    class="flex justify-between mt-6 text-[10px] text-white/20 light:text-slate-400 font-black uppercase tracking-widest">
+                    class="flex justify-between mt-6 text-[10px] text-white/20 light:text-slate-400 font-bold uppercase tracking-wider">
                     <span>Sept</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Fev</span>
                 </div>
             </div>
@@ -467,29 +467,29 @@
         <!-- TAB: SETTINGS -->
         <div id="tab-settings" class="hidden animate-slide-up">
             <div class="mb-10">
-                <h2 class="text-3xl font-black italic tracking-tight uppercase">CONFIGURATION <span
+                <h2 class="text-3xl font-extrabold tracking-tight uppercase">CONFIGURATION <span
                         class="text-gradient">CLUB</span></h2>
-                <p class="text-white/40 text-sm mt-1 italic font-medium">Personnalisez l'identité de votre club sur la
+                <p class="text-white/40 text-sm mt-1 font-medium">Personnalisez l'identité de votre club sur la
                     plateforme.</p>
             </div>
 
             <div class="max-w-3xl space-y-8">
-                <div class="glass p-10 rounded-[40px] border-white/5">
+                <div class="glass p-10 rounded-3xl border-white/5">
                     <form class="space-y-6" action="{{ url_for('admin.update_club') }}" method="POST">
                         <div class="flex flex-col md:flex-row gap-8 items-center mb-10 pb-10 border-b border-white/5">
                             <div
-                                class="w-24 h-24 gradient-primary rounded-[32px] flex items-center justify-center text-3xl font-black shadow-2xl relative group cursor-pointer">
+                                class="w-24 h-24 gradient-primary rounded-2xl flex items-center justify-center text-3xl font-bold shadow-2xl relative group cursor-pointer">
                                 <i
                                     class="fa-solid fa-camera opacity-0 group-hover:opacity-60 transition-opacity absolute"></i>
                                 SC
                             </div>
                             <div class="flex-1 text-center md:text-left">
-                                <h4 class="font-black text-xl mb-1">Logo du Club</h4>
-                                <p class="text-xs text-white/40 light:text-slate-500 font-medium mb-4 italic">Format
+                                <h4 class="font-bold text-xl mb-1">Logo du Club</h4>
+                                <p class="text-xs text-white/40 light:text-slate-500 font-medium mb-4">Format
                                     recommandé: SVG ou PNG
                                     (512x512px)</p>
                                 <button type="button"
-                                    class="btn-primary px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest">Choisir
+                                    class="btn-primary px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider">Choisir
                                     un fichier</button>
                             </div>
                         </div>
@@ -497,36 +497,36 @@
                         <div class="grid grid-cols-2 gap-6">
                             <div class="col-span-2">
                                 <label
-                                    class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Nom
+                                    class="block text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-2 ml-1">Nom
                                     Public du Club</label>
                                 <input type="text" name="name" value="{{ club.name if club else 'Club Elite' }}"
                                     required
-                                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 italic font-medium">
+                                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 font-medium">
                             </div>
                             <div class="col-span-2">
                                 <label
-                                    class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Description</label>
+                                    class="block text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-2 ml-1">Description</label>
                                 <textarea name="description" rows="3"
-                                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 italic font-medium">{{ club.description or '' }}</textarea>
+                                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 font-medium">{{ club.description or '' }}</textarea>
                             </div>
                             <div>
                                 <label
-                                    class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Ville</label>
+                                    class="block text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-2 ml-1">Ville</label>
                                 <input type="text" name="city" value="{{ club.city or 'Paris' }}"
-                                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 italic font-medium">
+                                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 font-medium">
                             </div>
                             <div>
                                 <label
-                                    class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Année
+                                    class="block text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-2 ml-1">Année
                                     de Fondation</label>
                                 <input type="number" name="founded_year" value="{{ club.founded_year or 1992 }}"
-                                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 italic font-medium">
+                                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 font-medium">
                             </div>
                         </div>
 
                         <div class="pt-6">
                             <button type="submit"
-                                class="gradient-primary w-full py-5 rounded-3xl text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.01] transition-all">ENREGISTRER
+                                class="gradient-primary w-full py-5 rounded-3xl text-sm font-bold uppercase tracking-wider shadow-xl shadow-primary-500/20 hover:scale-[1.01] transition-all">ENREGISTRER
                                 LES MODIFICATIONS</button>
                         </div>
                     </form>
@@ -539,10 +539,10 @@
 <!-- Modal: Add Member -->
 <div id="addMemberModal"
     class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass max-w-lg w-full rounded-[40px] border-white/10 overflow-hidden animate-slide-up">
+    <div class="glass max-w-lg w-full rounded-3xl border-white/10 overflow-hidden animate-slide-up">
         <div class="p-8 lg:p-10">
             <div class="flex justify-between items-center mb-8">
-                <h3 class="text-2xl font-black italic uppercase">Nouveau <span class="text-gradient">Membre</span></h3>
+                <h3 class="text-2xl font-extrabold uppercase">Nouveau <span class="text-gradient">Membre</span></h3>
                 <button onclick="toggleModal('addMemberModal')"
                     class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all text-white/40">
                     <i class="fa-solid fa-xmark"></i>
@@ -553,26 +553,26 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label
-                            class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Prénom</label>
+                            class="block text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-2 ml-1">Prénom</label>
                         <input type="text" name="first_name" required
                             class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium">
                     </div>
                     <div>
                         <label
-                            class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Nom</label>
+                            class="block text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-2 ml-1">Nom</label>
                         <input type="text" name="last_name" required
                             class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium">
                     </div>
                 </div>
                 <div>
                     <label
-                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Email</label>
+                        class="block text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-2 ml-1">Email</label>
                     <input type="email" name="email" required
                         class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium">
                 </div>
                 <div>
                     <label
-                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Équipe
+                        class="block text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-2 ml-1">Équipe
                         (pour les joueurs)</label>
                     <select name="team_id"
                         class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium appearance-none">
@@ -585,7 +585,7 @@
                 </div>
                 <div>
                     <label
-                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Rôle</label>
+                        class="block text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-2 ml-1">Rôle</label>
                     <select name="role"
                         class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium appearance-none">
                         <option value="player" class="bg-slate-900">Joueur</option>
@@ -594,10 +594,10 @@
                 </div>
                 <div class="pt-4">
                     <button type="submit"
-                        class="gradient-primary w-full py-5 rounded-3xl text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.01] active:scale-95 transition-all">CRÉER
+                        class="gradient-primary w-full py-5 rounded-3xl text-sm font-bold uppercase tracking-wider shadow-xl shadow-primary-500/20 hover:scale-[1.01] active:scale-95 transition-all">CRÉER
                         LE COMPTE</button>
                     <p
-                        class="text-center mt-6 text-[10px] text-white/20 light:text-slate-400 font-black uppercase tracking-[0.2em] italic">
+                        class="text-center mt-6 text-[10px] text-white/20 light:text-slate-400 font-bold uppercase tracking-[0.2em]">
                         Un mot de passe par défaut sera généré.</p>
                 </div>
             </form>
@@ -608,10 +608,10 @@
 <!-- Modal: Add Team -->
 <div id="addTeamModal"
     class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass max-w-lg w-full rounded-[40px] border-white/10 overflow-hidden animate-slide-up">
+    <div class="glass max-w-lg w-full rounded-3xl border-white/10 overflow-hidden animate-slide-up">
         <div class="p-8 lg:p-10">
             <div class="flex justify-between items-center mb-8">
-                <h3 class="text-2xl font-black italic uppercase">Nouvelle <span class="text-gradient">Équipe</span></h3>
+                <h3 class="text-2xl font-extrabold uppercase">Nouvelle <span class="text-gradient">Équipe</span></h3>
                 <button onclick="toggleModal('addTeamModal')"
                     class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all text-white/40">
                     <i class="fa-solid fa-xmark"></i>
@@ -621,14 +621,14 @@
             <form action="{{ url_for('admin.add_team') }}" method="POST" class="space-y-6">
                 <div>
                     <label
-                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Nom
+                        class="block text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-2 ml-1">Nom
                         de l'équipe</label>
                     <input type="text" name="name" placeholder="ex: Seniors A, U17 G" required
                         class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium">
                 </div>
                 <div>
                     <label
-                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Catégorie</label>
+                        class="block text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-2 ml-1">Catégorie</label>
                     <select name="category"
                         class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium appearance-none">
                         <option value="Senior" class="bg-slate-900">Sénior</option>
@@ -641,14 +641,14 @@
                 </div>
                 <div>
                     <label
-                        class="block text-[10px] font-black uppercase tracking-widest text-white/20 light:text-slate-400 mb-2 ml-1">Description
+                        class="block text-[10px] font-bold uppercase tracking-wider text-white/20 light:text-slate-400 mb-2 ml-1">Description
                         (Optionnel)</label>
                     <textarea name="description" rows="2"
                         class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white focus:outline-none focus:border-primary-500 transition-all font-medium"></textarea>
                 </div>
                 <div class="pt-4">
                     <button type="submit"
-                        class="gradient-primary w-full py-5 rounded-3xl text-sm font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.01] active:scale-95 transition-all">CRÉER
+                        class="gradient-primary w-full py-5 rounded-3xl text-sm font-bold uppercase tracking-wider shadow-xl shadow-primary-500/20 hover:scale-[1.01] active:scale-95 transition-all">CRÉER
                         L'ÉQUIPE</button>
                 </div>
             </form>
@@ -660,9 +660,9 @@
 <div id="inviteModal"
     class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
     <!-- Similar structure simplified -->
-    <div class="glass max-w-lg w-full rounded-[40px] border-white/10 p-10">
+    <div class="glass max-w-lg w-full rounded-3xl border-white/10 p-10">
         <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xl font-black uppercase italic">Invitation <span class="text-gradient">Email</span></h3>
+            <h3 class="text-xl font-bold uppercase">Invitation <span class="text-gradient">Email</span></h3>
             <button onclick="toggleModal('inviteModal')" class="text-white/20 hover:text-white"><i
                     class="fa-solid fa-xmark"></i></button>
         </div>
@@ -670,7 +670,7 @@
             <input type="email" name="email" required placeholder="email@exemple.com"
                 class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 text-white">
             <button type="submit"
-                class="gradient-primary w-full py-4 rounded-2xl font-black uppercase tracking-widest text-xs">Envoyer
+                class="gradient-primary w-full py-4 rounded-2xl font-bold uppercase tracking-wider text-xs">Envoyer
                 Invitation</button>
         </form>
     </div>
@@ -729,8 +729,8 @@
 
 <style>
     .nav-item.active {
-        background-color: rgba(132, 204, 22, 0.1);
-        border-left: 4px solid #84cc16;
+        background-color: rgba(16, 185, 129, 0.1);
+        border-left: 4px solid #10b981;
     }
 </style>
 {% endblock %}

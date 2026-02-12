@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-enter max-w-5xl mx-auto px-4 py-8">
     <!-- Header Hero -->
-    <div class="glass p-10 rounded-[40px] border-white/5 mb-10 relative overflow-hidden">
+    <div class="glass p-10 rounded-3xl border-white/5 mb-10 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-amber-500/10"></div>
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
             <div class="flex items-center gap-6">
@@ -14,15 +14,15 @@
                 </div>
                 <div>
                     <h1
-                        class="text-4xl font-black italic uppercase tracking-tight leading-none mb-2 light:text-slate-900">
+                        class="text-4xl font-bold uppercase tracking-tight leading-none mb-2 light:text-slate-900">
                         Elite Vault</h1>
-                    <p class="text-white/40 light:text-slate-500 text-sm font-medium italic">Accédez à vos licences,
+                    <p class="text-white/40 light:text-slate-500 text-sm font-medium">Accédez à vos licences,
                         règlements et documents officiels.</p>
                 </div>
             </div>
             <div class="flex gap-4">
                 <button
-                    class="glass-light bg-white/5 border border-white/10 px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-white/10 transition-all">
+                    class="glass-light bg-white/5 border border-white/10 px-6 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-wider flex items-center gap-2 hover:bg-white/10 transition-all">
                     <i class="fa-solid fa-cloud-arrow-up text-primary-400"></i> DÉPOSER
                 </button>
             </div>
@@ -37,13 +37,13 @@
         ('Médical', 'fa-heart-pulse', 'Certificats, Bilans...', 'text-red-400')
         ] %}
         {% for cat, icon, desc, color in categories %}
-        <div class="glass p-8 rounded-[40px] border-white/5 group hover:border-white/20 transition-all cursor-pointer">
+        <div class="glass p-8 rounded-3xl border-white/5 group hover:border-white/20 transition-all cursor-pointer">
             <div
                 class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center {{ color }} text-2xl mb-6 group-hover:scale-110 transition-transform">
                 <i class="fa-solid {{ icon }}"></i>
             </div>
-            <h3 class="text-xl font-black italic uppercase light:text-slate-900 mb-2">{{ cat }}</h3>
-            <p class="text-[9px] font-black uppercase tracking-widest text-white/20 mb-8">{{ desc }}</p>
+            <h3 class="text-xl font-bold uppercase light:text-slate-900 mb-2">{{ cat }}</h3>
+            <p class="text-[9px] font-bold uppercase tracking-wider text-white/20 mb-8">{{ desc }}</p>
 
             <div class="space-y-4">
                 {% for i in range(1, 3) %}
@@ -52,9 +52,9 @@
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-file-pdf text-red-500/60 text-lg"></i>
                         <div>
-                            <p class="text-[10px] font-black uppercase text-white light:text-slate-900">Document_{{ i
+                            <p class="text-[10px] font-bold uppercase text-white light:text-slate-900">Document_{{ i
                                 }}.pdf</p>
-                            <p class="text-[8px] font-medium text-white/20 uppercase tracking-widest">1.2 MB • 02/02/26
+                            <p class="text-[8px] font-medium text-white/20 uppercase tracking-wider">1.2 MB • 02/02/26
                             </p>
                         </div>
                     </div>
@@ -70,14 +70,14 @@
     </div>
 
     <!-- Empty State / help -->
-    <div class="mt-20 p-12 glass rounded-[48px] border-white/5 text-center relative overflow-hidden">
+    <div class="mt-20 p-12 glass rounded-3xl border-white/5 text-center relative overflow-hidden">
         <div class="absolute inset-0 bg-primary-500/[0.02] -z-10"></div>
         <div class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6 text-white/10">
             <i class="fa-solid fa-shield-halved text-2xl"></i>
         </div>
-        <h3 class="text-xs font-black uppercase tracking-widest mb-2 light:text-slate-900 leading-none">Protection de
+        <h3 class="text-xs font-bold uppercase tracking-wider mb-2 light:text-slate-900 leading-none">Protection de
             vos données</h3>
-        <p class="text-white/20 light:text-slate-500 text-[10px] italic max-w-sm mx-auto">Tous vos documents sont
+        <p class="text-white/20 light:text-slate-500 text-[10px] max-w-sm mx-auto">Tous vos documents sont
             cryptés et accessibles uniquement par le staff autorisé et vous-même.</p>
     </div>
 </div>

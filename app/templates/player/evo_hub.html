@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-enter max-w-6xl mx-auto px-4 py-8">
     <!-- Header Hero: Elite Profile -->
-    <div class="glass p-12 rounded-[48px] border-white/5 mb-10 relative overflow-hidden group">
+    <div class="glass p-12 rounded-3xl border-white/5 mb-10 relative overflow-hidden group">
         <div class="absolute inset-0 bg-gradient-to-br from-primary-600/20 via-transparent to-amber-600/10"></div>
         <div
             class="absolute -right-24 -top-24 w-96 h-96 bg-primary-500/10 rounded-full blur-[120px] group-hover:bg-primary-500/20 transition-all duration-1000">
@@ -16,30 +16,30 @@
             <div class="flex items-center gap-8">
                 <div class="relative">
                     <div
-                        class="w-32 h-32 gradient-primary rounded-[40px] p-1.5 shadow-2xl relative z-10 group-hover:scale-105 transition-transform duration-700">
+                        class="w-32 h-32 gradient-primary rounded-3xl p-1.5 shadow-2xl relative z-10 group-hover:scale-105 transition-transform duration-700">
                         <img src="{{ player.photo or 'https://ui-avatars.com/api/?name=' + player.name + '&background=0D0D0D&color=fff' }}"
                             class="w-full h-full object-cover rounded-[36px] bg-black">
                     </div>
                     <div
-                        class="absolute -bottom-4 -right-4 w-14 h-14 glass border-4 border-surface-950 rounded-2xl flex items-center justify-center font-black text-xl text-primary-400 shadow-2xl z-20">
+                        class="absolute -bottom-4 -right-4 w-14 h-14 glass border-4 border-surface-950 rounded-2xl flex items-center justify-center font-bold text-xl text-primary-400 shadow-2xl z-20">
                         {{ player.jersey_number or '?' }}
                     </div>
                 </div>
                 <div>
                     <div class="flex items-center gap-3 mb-4">
                         <span
-                            class="px-4 py-1.5 rounded-full bg-primary-500 text-black text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-primary-500/20">
+                            class="px-4 py-1.5 rounded-full bg-primary-500 text-black text-[10px] font-bold uppercase tracking-[0.2em] shadow-lg shadow-primary-500/20">
                             {{ player.position or 'PROSPECT' }}
                         </span>
-                        <span class="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] italic">Elite
+                        <span class="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">Elite
                             Development Hub</span>
                     </div>
                     <h1
-                        class="text-6xl font-black italic uppercase tracking-tighter leading-none mb-2 light:text-slate-900">
+                        class="text-6xl font-bold uppercase tracking-tighter leading-none mb-2 light:text-slate-900">
                         {{ player.name }}</h1>
                     <div class="flex items-center gap-2">
                         <div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
-                        <p class="text-xs font-black text-white/40 uppercase tracking-widest italic">Forme Optimale •
+                        <p class="text-xs font-bold text-white/40 uppercase tracking-wider">Forme Optimale •
                             J15 Ready</p>
                     </div>
                 </div>
@@ -47,15 +47,15 @@
 
             <div class="flex gap-6">
                 <div
-                    class="text-center px-8 py-6 glass bg-white/5 rounded-[32px] border-white/10 group-hover:border-primary-500/30 transition-all duration-500">
-                    <p class="text-[9px] font-black text-white/20 uppercase tracking-[0.3em] mb-2">Global Rating</p>
-                    <p class="text-5xl font-black text-white italic tracking-tighter">{{ player.global_rating or '78' }}
+                    class="text-center px-8 py-6 glass bg-white/5 rounded-2xl border-white/10 group-hover:border-primary-500/30 transition-all duration-500">
+                    <p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em] mb-2">Global Rating</p>
+                    <p class="text-5xl font-bold text-white tracking-tighter">{{ player.global_rating or '78' }}
                     </p>
                 </div>
                 <div
-                    class="text-center px-8 py-6 glass bg-primary-500/5 rounded-[32px] border-primary-500/10 group-hover:border-primary-500/50 transition-all duration-500">
-                    <p class="text-[9px] font-black text-primary-400/40 uppercase tracking-[0.3em] mb-2">Potentiel</p>
-                    <p class="text-5xl font-black text-primary-400 italic tracking-tighter">{{ player.potential or '85'
+                    class="text-center px-8 py-6 glass bg-primary-500/5 rounded-2xl border-primary-500/10 group-hover:border-primary-500/50 transition-all duration-500">
+                    <p class="text-[9px] font-bold text-primary-400/40 uppercase tracking-[0.3em] mb-2">Potentiel</p>
+                    <p class="text-5xl font-bold text-primary-400 tracking-tighter">{{ player.potential or '85'
                         }}</p>
                 </div>
             </div>
@@ -65,10 +65,10 @@
     <div class="grid lg:grid-cols-12 gap-10">
         <!-- Technical Analysis: Radar & Bars -->
         <div class="lg:col-span-8 space-y-10">
-            <div class="glass p-12 rounded-[56px] border-white/5 relative overflow-hidden">
+            <div class="glass p-12 rounded-3xl border-white/5 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-12">
                     <h2
-                        class="text-2xl font-black italic uppercase tracking-tight light:text-slate-900 flex items-center gap-4">
+                        class="text-2xl font-bold uppercase tracking-tight light:text-slate-900 flex items-center gap-4">
                         <span class="w-2 h-8 gradient-primary rounded-full"></span>
                         ADN Technique
                     </h2>
@@ -95,14 +95,14 @@
                         } %}
                         {% for label, val in ratings.items() %}
                         <div class="group">
-                            <div class="flex justify-between text-[11px] font-black uppercase tracking-[0.2em] mb-4">
+                            <div class="flex justify-between text-[11px] font-bold uppercase tracking-[0.2em] mb-4">
                                 <span class="text-white/40 group-hover:text-primary-400 transition-colors">{{ label
                                     }}</span>
                                 <span class="text-white bg-white/5 px-3 py-1 rounded-lg border border-white/5">{{ val
                                     }}</span>
                             </div>
                             <div
-                                class="h-2 w-full bg-white/5 rounded-full overflow-hidden p-[1px] border border-white/5 italic">
+                                class="h-2 w-full bg-white/5 rounded-full overflow-hidden p-[1px] border border-white/5">
                                 <div class="h-full gradient-primary rounded-full shadow-[0_0_15px_rgba(132,204,22,0.3)] transition-all duration-1000"
                                     style="width: {{ val }}%"></div>
                             </div>
@@ -115,7 +115,7 @@
             <!-- Staff Evaluations -->
             <div class="space-y-8">
                 <div class="flex items-center gap-4 px-6">
-                    <h2 class="text-xl font-black italic uppercase tracking-tight light:text-slate-900">Rapports de
+                    <h2 class="text-xl font-bold uppercase tracking-tight light:text-slate-900">Rapports de
                         Performance</h2>
                     <div class="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent"></div>
                 </div>
@@ -124,7 +124,7 @@
                     {% if player.evaluations %}
                     {% for eval in player.evaluations|reverse %}
                     <div
-                        class="glass p-8 rounded-[40px] border-white/5 group hover:bg-white/5 hover:border-white/10 transition-all duration-500">
+                        class="glass p-8 rounded-3xl border-white/5 group hover:bg-white/5 hover:border-white/10 transition-all duration-500">
                         <div class="flex justify-between items-start mb-6">
                             <div class="flex items-center gap-4">
                                 <div
@@ -132,29 +132,29 @@
                                     <i class="fa-solid fa-user-tie text-black"></i>
                                 </div>
                                 <div>
-                                    <p class="text-xs font-black italic uppercase light:text-slate-900">{{
+                                    <p class="text-xs font-bold uppercase light:text-slate-900">{{
                                         eval.coach_name or 'Staff Technique' }}</p>
-                                    <p class="text-[9px] text-white/20 font-black uppercase tracking-widest mt-1">{{
+                                    <p class="text-[9px] text-white/20 font-bold uppercase tracking-wider mt-1">{{
                                         eval.date.strftime('%d %b %Y') if eval.date else 'Session Elite' }}</p>
                                 </div>
                             </div>
                             <span
-                                class="px-4 py-1.5 rounded-xl bg-primary-500/5 text-primary-400 text-[9px] font-black uppercase tracking-widest border border-primary-500/10">
+                                class="px-4 py-1.5 rounded-xl bg-primary-500/5 text-primary-400 text-[9px] font-bold uppercase tracking-wider border border-primary-500/10">
                                 {{ eval.type or 'Match' }}
                             </span>
                         </div>
                         <p
-                            class="text-sm text-white/60 leading-relaxed italic font-medium px-2 group-hover:text-white transition-colors">
+                            class="text-sm text-white/60 leading-relaxed font-medium px-2 group-hover:text-white transition-colors">
                             "{{ eval.comment }}"
                         </p>
                     </div>
                     {% endfor %}
                     {% else %}
-                    <div class="col-span-2 glass p-16 rounded-[48px] border-white/5 text-center border-dashed">
+                    <div class="col-span-2 glass p-16 rounded-3xl border-white/5 text-center border-dashed">
                         <div class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6">
                             <i class="fa-solid fa-comment-slash text-2xl text-white/10"></i>
                         </div>
-                        <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">En attente du
+                        <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">En attente du
                             prochain rapport de performance</p>
                     </div>
                     {% endif %}
@@ -164,21 +164,21 @@
 
         <!-- Physical Sidebar -->
         <div class="lg:col-span-4 space-y-10">
-            <div class="glass p-10 rounded-[48px] border-white/5 relative overflow-hidden group">
+            <div class="glass p-10 rounded-3xl border-white/5 relative overflow-hidden group">
                 <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent"></div>
                 <h3
-                    class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-10 flex items-center gap-4">
+                    class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/20 mb-10 flex items-center gap-4">
                     <span class="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
                     MÉTRIQUES BIOMÉTRIQUES
                 </h3>
 
                 <div class="space-y-10">
                     <div
-                        class="flex items-end justify-between p-6 bg-white/5 rounded-[32px] border border-white/5 hover:border-white/10 transition-all">
+                        class="flex items-end justify-between p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-white/10 transition-all">
                         <div>
-                            <p class="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] mb-2">Masse
+                            <p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em] mb-2">Masse
                                 Corporelle</p>
-                            <p class="text-3xl font-black text-white italic tracking-tighter">{{ player.weight or '74'
+                            <p class="text-3xl font-bold text-white tracking-tighter">{{ player.weight or '74'
                                 }} <span class="text-xs text-white/20 not-italic uppercase ml-1">kg</span></p>
                         </div>
                         <div class="flex items-end h-12 w-24 gap-1.5">
@@ -191,10 +191,10 @@
                     </div>
 
                     <div
-                        class="flex items-center justify-between p-6 bg-white/5 rounded-[32px] border border-white/5 hover:border-white/10 transition-all">
+                        class="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-white/10 transition-all">
                         <div>
-                            <p class="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] mb-2">Envergure</p>
-                            <p class="text-3xl font-black text-white italic tracking-tighter">{{ player.height or '182'
+                            <p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em] mb-2">Envergure</p>
+                            <p class="text-3xl font-bold text-white tracking-tighter">{{ player.height or '182'
                                 }} <span class="text-xs text-white/20 not-italic uppercase ml-1">cm</span></p>
                         </div>
                         <div
@@ -207,9 +207,9 @@
 
             <!-- Training Consistency -->
             <div
-                class="glass p-10 rounded-[48px] border-white/5 bg-gradient-to-b from-transparent to-primary-500/5 relative overflow-hidden">
+                class="glass p-10 rounded-3xl border-white/5 bg-gradient-to-b from-transparent to-primary-500/5 relative overflow-hidden">
                 <h3
-                    class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-10 flex items-center gap-4">
+                    class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/20 mb-10 flex items-center gap-4">
                     <span class="w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
                     DISCIPLINE & ASSIDUITÉ
                 </h3>
@@ -224,19 +224,19 @@
                             stroke-dasharray="237 264" stroke-linecap="round" class="transition-all duration-1000" />
                         <defs>
                             <linearGradient id="eliteGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" style="stop-color:#84cc16" />
+                                <stop offset="0%" style="stop-color:#10b981" />
                                 <stop offset="100%" style="stop-color:#bef264" />
                             </linearGradient>
                         </defs>
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center z-20">
-                        <span class="text-4xl font-black italic tracking-tighter text-white leading-none">92%</span>
-                        <span class="text-[8px] font-black uppercase tracking-widest text-primary-400 mt-1">ÉLITE</span>
+                        <span class="text-4xl font-bold tracking-tighter text-white leading-none">92%</span>
+                        <span class="text-[8px] font-bold uppercase tracking-wider text-primary-400 mt-1">ÉLITE</span>
                     </div>
                 </div>
 
-                <div class="p-6 glass bg-white/5 rounded-[32px] border border-white/5 text-center">
-                    <p class="text-[10px] text-white/40 font-black uppercase tracking-[0.2em] leading-relaxed">
+                <div class="p-6 glass bg-white/5 rounded-2xl border border-white/5 text-center">
+                    <p class="text-[10px] text-white/40 font-bold uppercase tracking-[0.2em] leading-relaxed">
                         Engagement total sur les 30 derniers jours</p>
                 </div>
             </div>
@@ -257,15 +257,15 @@
                     label: 'Profil Elite',
                     data: Object.values(ratings),
                     backgroundColor: 'rgba(132, 204, 22, 0.15)',
-                    borderColor: '#84cc16',
+                    borderColor: '#10b981',
                     borderWidth: 3,
-                    pointBackgroundColor: '#84cc16',
+                    pointBackgroundColor: '#10b981',
                     pointBorderColor: '#000',
                     pointBorderWidth: 3,
                     pointRadius: 4,
                     pointHoverRadius: 6,
                     pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: '#84cc16'
+                    pointHoverBorderColor: '#10b981'
                 }]
             },
             options: {
@@ -304,7 +304,7 @@
 
 <style>
     .text-gradient {
-        background: linear-gradient(to right, #84cc16, #a3e635);
+        background: linear-gradient(to right, #10b981, #a3e635);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }

@@ -4,23 +4,23 @@
 {% block content %}
 <div class="page-enter max-w-7xl mx-auto px-4 py-8">
     <!-- Breadcrumbs -->
-    <div class="flex items-center gap-3 mb-10 text-[10px] font-black uppercase tracking-widest text-white/20">
+    <div class="flex items-center gap-3 mb-10 text-[10px] font-bold uppercase tracking-wider text-white/20">
         <a href="{{ url_for('main.shop_catalog') }}" class="hover:text-primary-400">Boutique</a>
         <i class="fa-solid fa-chevron-right text-[8px]"></i>
         <span class="text-white/40">{{ product.category }}</span>
         <i class="fa-solid fa-chevron-right text-[8px]"></i>
-        <span class="text-primary-400 italic">{{ product.name }}</span>
+        <span class="text-primary-400">{{ product.name }}</span>
     </div>
 
     <!-- Product Layout -->
     <div class="grid lg:grid-cols-2 gap-12 lg:gap-20">
         <!-- Visuals Column -->
         <div class="space-y-6">
-            <div class="glass rounded-[48px] border-white/5 overflow-hidden aspect-square shadow-2xl relative">
+            <div class="glass rounded-3xl border-white/5 overflow-hidden aspect-square shadow-2xl relative">
                 <img src="{{ product.image }}" alt="{{ product.name }}" class="w-full h-full object-cover">
                 <div class="absolute top-8 left-8">
                     <span
-                        class="px-6 py-3 rounded-2xl glass bg-black/40 text-sm font-black italic tracking-tight text-white border border-white/10 uppercase">
+                        class="px-6 py-3 rounded-2xl glass bg-black/40 text-sm font-bold tracking-tight text-white border border-white/10 uppercase">
                         Équipement Officiel
                     </span>
                 </div>
@@ -30,12 +30,12 @@
         <!-- Details Column -->
         <div class="flex flex-col">
             <div class="mb-10">
-                <span class="text-[11px] font-black text-primary-400 uppercase tracking-[0.3em] italic mb-4 block">{{
+                <span class="text-[11px] font-bold text-primary-400 uppercase tracking-[0.3em] mb-4 block">{{
                     product.category }}</span>
-                <h1 class="text-5xl lg:text-6xl font-black italic uppercase tracking-tighter leading-none mb-6">{{
+                <h1 class="text-5xl lg:text-6xl font-bold uppercase tracking-tighter leading-none mb-6">{{
                     product.name }}</h1>
                 <div class="flex items-center gap-6">
-                    <span class="text-4xl font-black text-gradient italic">{{ product.price }}€</span>
+                    <span class="text-4xl font-bold text-gradient">{{ product.price }}€</span>
                     <div class="h-8 w-px bg-white/10"></div>
                     <div class="flex items-center gap-2">
                         <div class="flex text-amber-500 text-xs">
@@ -45,14 +45,14 @@
                             <i class="fa-solid fa-star"></i>
                             <i class="fa-solid fa-star-half-stroke"></i>
                         </div>
-                        <span class="text-[10px] font-bold text-white/20 uppercase tracking-widest">4.8 (24 Avis)</span>
+                        <span class="text-[10px] font-bold text-white/20 uppercase tracking-wider">4.8 (24 Avis)</span>
                     </div>
                 </div>
             </div>
 
-            <div class="glass p-8 rounded-[40px] border-white/5 mb-10">
-                <h3 class="text-xs font-black uppercase tracking-widest text-white/40 mb-4">Description du produit</h3>
-                <p class="text-gray-400 text-sm leading-relaxed italic font-medium">
+            <div class="glass p-8 rounded-3xl border-white/5 mb-10">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-white/40 mb-4">Description du produit</h3>
+                <p class="text-gray-400 text-sm leading-relaxed font-medium">
                     {{ product.description or 'Produit conçu pour la performance et le confort des supporters de
                     FootLogic Elite.' }}
                 </p>
@@ -63,12 +63,12 @@
                 {% if product.sizes %}
                 <div>
                     <label
-                        class="text-[10px] font-black uppercase tracking-widest text-white/20 ml-2 mb-3 block">Choisir
+                        class="text-[10px] font-bold uppercase tracking-wider text-white/20 ml-2 mb-3 block">Choisir
                         la taille</label>
                     <div class="flex flex-wrap gap-3">
                         {% for size in product.sizes %}
                         <button onclick="selectSize(this)"
-                            class="size-btn w-14 h-14 rounded-2xl glass border border-white/10 text-xs font-black hover:border-primary-500 hover:text-primary-400 transition-all">
+                            class="size-btn w-14 h-14 rounded-2xl glass border border-white/10 text-xs font-bold hover:border-primary-500 hover:text-primary-400 transition-all">
                             {{ size }}
                         </button>
                         {% endfor %}
@@ -78,12 +78,12 @@
 
                 <div>
                     <label
-                        class="text-[10px] font-black uppercase tracking-widest text-white/20 ml-2 mb-3 block">Quantité</label>
+                        class="text-[10px] font-bold uppercase tracking-wider text-white/20 ml-2 mb-3 block">Quantité</label>
                     <div class="flex items-center gap-4 bg-white/5 border border-white/10 w-fit rounded-2xl p-2 px-4">
                         <button onclick="changeQty(-1)"
                             class="w-8 h-8 flex items-center justify-center text-white/40 hover:text-white transition-colors"><i
                                 class="fa-solid fa-minus"></i></button>
-                        <span id="qty" class="w-8 text-center font-black text-sm">1</span>
+                        <span id="qty" class="w-8 text-center font-bold text-sm">1</span>
                         <button onclick="changeQty(1)"
                             class="w-8 h-8 flex items-center justify-center text-white/40 hover:text-white transition-colors"><i
                                 class="fa-solid fa-plus"></i></button>
@@ -94,7 +94,7 @@
             <!-- Action Buttons -->
             <div class="flex gap-4 mt-auto">
                 <button onclick="handleAddToCart()"
-                    class="flex-1 gradient-primary py-6 rounded-[28px] text-xs font-black uppercase tracking-[0.2em] shadow-2xl shadow-primary-500/30 hover:scale-[1.02] active:scale-95 transition-all outline-none">
+                    class="flex-1 gradient-primary py-6 rounded-[28px] text-xs font-bold uppercase tracking-[0.2em] shadow-2xl shadow-primary-500/30 hover:scale-[1.02] active:scale-95 transition-all outline-none">
                     <i class="fa-solid fa-cart-shopping mr-3"></i> AJOUTER AU PANIER
                 </button>
                 <button
@@ -108,19 +108,19 @@
     <!-- Related Products -->
     {% if related_products %}
     <div class="mt-32">
-        <h2 class="text-2xl font-black italic uppercase mb-10">Ces articles pourraient <span class="text-gradient">vous
+        <h2 class="text-2xl font-bold uppercase mb-10">Ces articles pourraient <span class="text-gradient">vous
                 plaire</span></h2>
         <div class="grid md:grid-cols-4 gap-8">
             {% for rel in related_products if rel._id|string != product._id|string %}
             <a href="{{ url_for('main.shop_product', product_id=rel._id|string) }}"
-                class="glass p-6 rounded-[32px] border-white/5 group hover:bg-white/5 transition-all duration-500">
+                class="glass p-6 rounded-2xl border-white/5 group hover:bg-white/5 transition-all duration-500">
                 <div class="aspect-square rounded-2xl overflow-hidden mb-6 relative">
                     <img src="{{ rel.image }}" alt="{{ rel.name }}"
                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                 </div>
-                <p class="text-[8px] font-black text-white/20 uppercase tracking-widest mb-1">{{ rel.category }}</p>
-                <h4 class="font-black italic text-sm mb-4">{{ rel.name }}</h4>
-                <p class="text-primary-400 font-black italic text-sm">{{ rel.price }}€</p>
+                <p class="text-[8px] font-bold text-white/20 uppercase tracking-wider mb-1">{{ rel.category }}</p>
+                <h4 class="font-bold text-sm mb-4">{{ rel.name }}</h4>
+                <p class="text-primary-400 font-bold text-sm">{{ rel.price }}€</p>
             </a>
             {% endfor %}
         </div>

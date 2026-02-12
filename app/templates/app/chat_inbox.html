@@ -6,14 +6,14 @@
     <!-- Header Hero -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
         <div>
-            <h1 class="text-4xl font-black italic uppercase tracking-tighter flex items-center gap-4">
+            <h1 class="text-4xl font-bold uppercase tracking-tighter flex items-center gap-4">
                 <span
                     class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary-500/20">
                     <i class="fa-solid fa-comment-dots text-white text-xl"></i>
                 </span>
                 Messages
             </h1>
-            <p class="text-white/40 mt-2 font-medium italic tracking-wide">Connectez-vous avec votre équipe et votre
+            <p class="text-white/40 mt-2 font-medium tracking-wide">Connectez-vous avec votre équipe et votre
                 staff.</p>
         </div>
         <button
@@ -34,7 +34,7 @@
 
     <!-- Active Staff & Players (Horizontal Scroll) -->
     <div class="mb-12">
-        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-6 flex items-center gap-3">
+        <h3 class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/20 mb-6 flex items-center gap-3">
             <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
             DISPONIBLES MAINTENANT
         </h3>
@@ -45,7 +45,7 @@
                     class="w-16 h-16 rounded-[24px] glass border-2 border-dashed border-white/10 flex items-center justify-center text-white/10 group-hover:border-primary-500/50 group-hover:text-primary-400 transition-all duration-500 bg-white/5 group-hover:bg-primary-500/5">
                     <i class="fa-solid fa-plus text-xl"></i>
                 </div>
-                <span class="text-[9px] text-white/20 font-black uppercase tracking-widest italic">Nouveau</span>
+                <span class="text-[9px] text-white/20 font-bold uppercase tracking-wider">Nouveau</span>
             </div>
 
             {% for user in online_users %}
@@ -66,7 +66,7 @@
                     </div>
                 </div>
                 <span
-                    class="text-[9px] text-white/40 font-black uppercase tracking-widest group-hover:text-white transition-colors">{{
+                    class="text-[9px] text-white/40 font-bold uppercase tracking-wider group-hover:text-white transition-colors">{{
                     user.name or 'Membre' }}</span>
             </a>
             {% else %}
@@ -90,7 +90,7 @@
                     </div>
                 </div>
                 <span
-                    class="text-[9px] text-white/40 font-black uppercase tracking-widest group-hover:text-white transition-colors">{{
+                    class="text-[9px] text-white/40 font-bold uppercase tracking-wider group-hover:text-white transition-colors">{{
                     name }}</span>
             </a>
             {% endfor %}
@@ -103,7 +103,7 @@
         <!-- Pinned / Important Section -->
         <div>
             <h3
-                class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-6 flex items-center gap-3 px-4">
+                class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/20 mb-6 flex items-center gap-3 px-4">
                 <i class="fa-solid fa-thumbtack text-[8px]"></i>
                 ÉPINGLÉ
             </h3>
@@ -114,7 +114,7 @@
                     class="glass p-6 flex items-center gap-6 group hover:bg-white/5 transition-all duration-500 rounded-[36px] border border-white/5 hover:border-primary-500/30">
                     <div class="relative flex-shrink-0">
                         <div
-                            class="w-16 h-16 gradient-primary rounded-3xl flex items-center justify-center text-white font-black italic shadow-2xl group-hover:scale-105 transition-transform duration-500 text-sm">
+                            class="w-16 h-16 gradient-primary rounded-3xl flex items-center justify-center text-white font-bold shadow-2xl group-hover:scale-105 transition-transform duration-500 text-sm">
                             U15
                         </div>
                         <div
@@ -125,17 +125,17 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex justify-between items-center mb-1">
                             <h3
-                                class="font-black italic text-lg truncate tracking-tight group-hover:text-primary-400 transition-colors">
+                                class="font-bold text-lg truncate tracking-tight group-hover:text-primary-400 transition-colors">
                                 Groupe U15 - Équipe Première</h3>
                             <span
-                                class="text-[10px] text-primary-400 font-black uppercase tracking-widest italic">Maintenant</span>
+                                class="text-[10px] text-primary-400 font-bold uppercase tracking-wider">Maintenant</span>
                         </div>
-                        <p class="text-sm text-white/40 italic font-medium truncate">Coach: "Rendez-vous à 18h au Stade
+                        <p class="text-sm text-white/40 font-medium truncate">Coach: "Rendez-vous à 18h au Stade
                             de France..."</p>
                     </div>
                     <div class="flex flex-col items-end gap-2">
                         <span
-                            class="bg-primary-500 text-black text-[9px] font-black px-2.5 py-1.5 rounded-xl shadow-lg shadow-primary-500/20">4</span>
+                            class="bg-primary-500 text-black text-[9px] font-bold px-2.5 py-1.5 rounded-xl shadow-lg shadow-primary-500/20">4</span>
                     </div>
                 </a>
 
@@ -155,12 +155,12 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex justify-between items-center mb-1">
                             <h3
-                                class="font-black italic text-lg truncate tracking-tight group-hover:text-amber-400 transition-colors">
+                                class="font-bold text-lg truncate tracking-tight group-hover:text-amber-400 transition-colors">
                                 Coach Thomas</h3>
-                            <span class="text-[10px] text-white/20 font-black uppercase tracking-widest italic">Il y a
+                            <span class="text-[10px] text-white/20 font-bold uppercase tracking-wider">Il y a
                                 2h</span>
                         </div>
-                        <p class="text-sm text-white/40 italic font-medium truncate">"Ton analyse de match est
+                        <p class="text-sm text-white/40 font-medium truncate">"Ton analyse de match est
                             impressionnante."</p>
                     </div>
                 </a>
@@ -170,7 +170,7 @@
         <!-- Recent Feed -->
         <div>
             <h3
-                class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-6 flex items-center gap-3 px-4">
+                class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/20 mb-6 flex items-center gap-3 px-4">
                 DÉFAUT
             </h3>
 
@@ -190,10 +190,10 @@
                             <h3
                                 class="font-bold text-base truncate tracking-tight group-hover:text-white transition-colors">
                                 {{ name }}</h3>
-                            <span class="text-[9px] text-white/20 font-black uppercase tracking-widest">{{ time
+                            <span class="text-[9px] text-white/20 font-bold uppercase tracking-wider">{{ time
                                 }}</span>
                         </div>
-                        <p class="text-sm text-white/20 font-medium truncate italic">{{ msg }}</p>
+                        <p class="text-sm text-white/20 font-medium truncate">{{ msg }}</p>
                     </div>
                 </a>
                 {% endfor %}

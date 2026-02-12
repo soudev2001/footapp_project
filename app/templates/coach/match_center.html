@@ -10,7 +10,7 @@
         <div class="relative min-w-[200px]">
             <form id="teamFilterForm" method="GET" action="{{ url_for('coach.match_center') }}">
                 <select name="team_id" onchange="this.form.submit()"
-                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-xs font-black uppercase tracking-widest focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
+                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-xs font-bold uppercase tracking-wider focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
                     {% for team in teams %}
                     <option value="{{ team._id|string }}" {% if selected_team_id==team._id|string %}selected{% endif %}
                         class="bg-slate-900">
@@ -29,17 +29,17 @@
             {% for match in upcoming_matches %}
             <a href="{{ url_for('coach.match_center', match_id=match._id, team_id=selected_team_id) }}"
                 class="flex-shrink-0 glass p-4 rounded-2xl border {% if selected_match and selected_match._id == match._id %}border-primary-500 bg-primary-500/5{% else %}border-white/5 hover:border-white/10{% endif %} transition-all min-w-[150px]">
-                <p class="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">{{ match.date.strftime('%d
+                <p class="text-[9px] font-bold text-white/20 uppercase tracking-wider mb-1">{{ match.date.strftime('%d
                     %b • %H:%M') }}</p>
-                <p class="font-black italic text-xs">vs {{ match.opponent }}</p>
+                <p class="font-bold text-xs">vs {{ match.opponent }}</p>
             </a>
             {% endfor %}
             {% for match in completed_matches %}
             <a href="{{ url_for('coach.match_center', match_id=match._id, team_id=selected_team_id) }}"
                 class="flex-shrink-0 glass p-4 rounded-2xl border {% if selected_match and selected_match._id == match._id %}border-primary-500 bg-primary-500/5{% else %}border-white/5 hover:border-white/10{% endif %} transition-all min-w-[150px]">
-                <p class="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">{{ match.date.strftime('%d
+                <p class="text-[9px] font-bold text-white/20 uppercase tracking-wider mb-1">{{ match.date.strftime('%d
                     %b') }}</p>
-                <p class="font-black italic text-xs">vs {{ match.opponent }}</p>
+                <p class="font-bold text-xs">vs {{ match.opponent }}</p>
             </a>
             {% endfor %}
         </div>
@@ -48,16 +48,16 @@
     {% if selected_match %}
     <!-- Scoreboard Header -->
     <div
-        class="glass p-10 rounded-[48px] border-white/5 relative overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] mb-10">
+        class="glass p-10 rounded-3xl border-white/5 relative overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] mb-10">
         <div class="absolute top-0 right-0 w-96 h-96 bg-primary-500/10 rounded-full blur-[120px] -mr-48 -mt-48"></div>
 
         <div class="relative z-10">
             <div class="flex justify-between items-center mb-12">
-                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">{{
+                <span class="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">{{
                     selected_match.competition or 'CHAMPIONNAT' }}</span>
                 <div class="flex gap-2">
                     <span
-                        class="px-4 py-1.5 rounded-full {% if selected_match.status == 'live' %}bg-red-500 animate-pulse text-white{% elif selected_match.status == 'completed' %}bg-white/5 text-white/40{% else %}bg-primary-500/20 text-primary-400{% endif %} border border-white/10 text-[9px] font-black uppercase tracking-widest flex items-center gap-2">
+                        class="px-4 py-1.5 rounded-full {% if selected_match.status == 'live' %}bg-red-500 animate-pulse text-white{% elif selected_match.status == 'completed' %}bg-white/5 text-white/40{% else %}bg-primary-500/20 text-primary-400{% endif %} border border-white/10 text-[9px] font-bold uppercase tracking-wider flex items-center gap-2">
                         {% if selected_match.status == 'live' %}<i class="fa-solid fa-satellite-dish"></i>{% endif %}
                         {{ selected_match.status }}
                     </span>
@@ -69,11 +69,11 @@
                 <!-- Home Team -->
                 <div class="flex flex-col items-center gap-4 w-1/3">
                     <div
-                        class="w-24 h-24 gradient-primary rounded-[32px] flex items-center justify-center text-4xl font-black shadow-2xl">
+                        class="w-24 h-24 gradient-primary rounded-2xl flex items-center justify-center text-4xl font-bold shadow-2xl">
                         FC</div>
                     <div class="text-center">
-                        <span class="block font-black text-lg italic tracking-tight">FOOTLOGIC ELITE</span>
-                        <span class="text-[9px] font-black text-green-400 uppercase tracking-widest mt-1">{% if
+                        <span class="block font-bold text-lg tracking-tight">FOOTLOGIC ELITE</span>
+                        <span class="text-[9px] font-bold text-green-400 uppercase tracking-wider mt-1">{% if
                             selected_match.is_home %}DOMICILE{% else %}EXTÉRIEUR{% endif %}</span>
                     </div>
                 </div>
@@ -81,10 +81,10 @@
                 <!-- Score -->
                 <div class="flex flex-col items-center w-1/3">
                     <div class="flex items-center gap-6 mb-4">
-                        <span class="text-6xl md:text-8xl font-black italic tracking-tighter text-gradient">{{
+                        <span class="text-6xl md:text-8xl font-bold tracking-tighter text-gradient">{{
                             selected_match.score.home }}</span>
-                        <span class="text-4xl font-black text-white/5 italic">-</span>
-                        <span class="text-6xl md:text-8xl font-black italic tracking-tighter text-white/20">{{
+                        <span class="text-4xl font-bold text-white/5">-</span>
+                        <span class="text-6xl md:text-8xl font-bold tracking-tighter text-white/20">{{
                             selected_match.score.away }}</span>
                     </div>
                 </div>
@@ -92,12 +92,12 @@
                 <!-- Away Team -->
                 <div class="flex flex-col items-center gap-4 w-1/3">
                     <div
-                        class="w-24 h-24 bg-white/5 border border-white/10 rounded-[32px] flex items-center justify-center text-4xl font-black shadow-2xl">
+                        class="w-24 h-24 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-4xl font-bold shadow-2xl">
                         {{ selected_match.opponent[:2].upper() }}</div>
                     <div class="text-center">
-                        <span class="block font-black text-lg italic tracking-tight text-white/40">{{
+                        <span class="block font-bold text-lg tracking-tight text-white/40">{{
                             selected_match.opponent.upper() }}</span>
-                        <span class="text-[9px] font-black text-white/20 uppercase tracking-widest mt-1">{% if not
+                        <span class="text-[9px] font-bold text-white/20 uppercase tracking-wider mt-1">{% if not
                             selected_match.is_home %}DOMICILE{% else %}EXTÉRIEUR{% endif %}</span>
                     </div>
                 </div>
@@ -109,7 +109,7 @@
         <!-- Timeline -->
         <div class="lg:col-span-2 space-y-10">
             <div class="flex items-center gap-4 mb-2 px-4">
-                <h2 class="text-sm font-black uppercase tracking-widest text-white/20 italic">Timeline de la Rencontre
+                <h2 class="text-sm font-bold uppercase tracking-wider text-white/20">Timeline de la Rencontre
                 </h2>
                 <div class="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent"></div>
             </div>
@@ -119,10 +119,10 @@
                 <div class="relative pl-12">
                     <div class="absolute left-0 top-0 bottom-0 w-px bg-white/5 ml-[23px]"></div>
                     <div
-                        class="absolute left-0 top-6 w-12 h-12 {% if event.type == 'goal' %}gradient-primary{% else %}glass{% endif %} rounded-2xl flex items-center justify-center text-xs font-black border-4 border-black z-10 shadow-xl">
+                        class="absolute left-0 top-6 w-12 h-12 {% if event.type == 'goal' %}gradient-primary{% else %}glass{% endif %} rounded-2xl flex items-center justify-center text-xs font-bold border-4 border-black z-10 shadow-xl">
                         {{ event.minute }}'
                     </div>
-                    <div class="glass p-6 rounded-[32px] border-white/5 flex items-center gap-6">
+                    <div class="glass p-6 rounded-2xl border-white/5 flex items-center gap-6">
                         <div class="w-12 h-12 rounded-2xl flex items-center justify-center">
                             {% if event.type == 'goal' %}<i class="fa-solid fa-futbol text-primary-400 text-xl"></i>{%
                             endif %}
@@ -134,8 +134,8 @@
                                 class="fa-solid fa-arrows-rotate text-green-500 text-xl"></i>{% endif %}
                         </div>
                         <div class="flex-1">
-                            <p class="font-black text-white italic uppercase">{{ event.type.replace('_', ' ') }}</p>
-                            <p class="text-[10px] text-white/20 font-black uppercase tracking-widest mt-1">
+                            <p class="font-bold text-white uppercase">{{ event.type.replace('_', ' ') }}</p>
+                            <p class="text-[10px] text-white/20 font-bold uppercase tracking-wider mt-1">
                                 {% for p in players if p._id|string == event.player_id|string %}
                                 {{ p.name }}
                                 {% endfor %}
@@ -144,9 +144,9 @@
                     </div>
                 </div>
                 {% else %}
-                <div class="text-center py-20 glass rounded-[40px] border-white/5 border-dashed">
+                <div class="text-center py-20 glass rounded-3xl border-white/5 border-dashed">
                     <i class="fa-solid fa-clock-rotate-left text-white/5 text-4xl mb-4"></i>
-                    <p class="text-white/20 font-black italic uppercase text-xs tracking-widest">Aucun événement
+                    <p class="text-white/20 font-bold uppercase text-xs tracking-wider">Aucun événement
                         enregistré</p>
                 </div>
                 {% endfor %}
@@ -155,8 +155,8 @@
 
         <!-- Controls -->
         <div class="space-y-8">
-            <div class="glass p-8 rounded-[40px] border-white/5">
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] mb-8 text-white/20">Actions Match</h3>
+            <div class="glass p-8 rounded-3xl border-white/5">
+                <h3 class="text-[10px] font-bold uppercase tracking-[0.2em] mb-8 text-white/20">Actions Match</h3>
 
                 <a href="{{ url_for('main.match_live', match_id=selected_match._id) }}" target="_blank"
                     class="w-full flex items-center justify-center gap-2 glass px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider text-primary-400 hover:bg-white/5 transition mb-6 border border-primary-500/20">
@@ -167,56 +167,56 @@
                     <button onclick="showEventModal('goal')"
                         class="glass p-5 rounded-3xl border-white/5 hover:border-primary-500/30 transition-all flex flex-col items-center gap-3">
                         <i class="fa-solid fa-futbol text-primary-400"></i>
-                        <span class="text-[9px] font-black uppercase">BUT</span>
+                        <span class="text-[9px] font-bold uppercase">BUT</span>
                     </button>
                     <button onclick="showEventModal('yellow_card')"
                         class="glass p-5 rounded-3xl border-white/5 hover:border-yellow-500/30 transition-all flex flex-col items-center gap-3">
                         <i class="fa-solid fa-square text-yellow-500"></i>
-                        <span class="text-[9px] font-black uppercase">CARTE J.</span>
+                        <span class="text-[9px] font-bold uppercase">CARTE J.</span>
                     </button>
                     <button onclick="showEventModal('red_card')"
                         class="glass p-5 rounded-3xl border-white/5 hover:border-red-500/30 transition-all flex flex-col items-center gap-3">
                         <i class="fa-solid fa-square text-red-500"></i>
-                        <span class="text-[9px] font-black uppercase">CARTE R.</span>
+                        <span class="text-[9px] font-bold uppercase">CARTE R.</span>
                     </button>
                     <button onclick="showEventModal('sub')"
                         class="glass p-5 rounded-3xl border-white/5 hover:border-green-500/30 transition-all flex flex-col items-center gap-3">
                         <i class="fa-solid fa-arrows-rotate text-green-500"></i>
-                        <span class="text-[9px] font-black uppercase">SUB</span>
+                        <span class="text-[9px] font-bold uppercase">SUB</span>
                     </button>
                 </div>
 
                 <div class="mt-8 pt-8 border-t border-white/5 space-y-4">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-[10px] font-black text-white/20 uppercase">Score & État</span>
+                        <span class="text-[10px] font-bold text-white/20 uppercase">Score & État</span>
                     </div>
                     <div class="flex items-center gap-4">
                         <input type="number" id="homeScore" value="{{ selected_match.score.home }}"
-                            class="w-full bg-white/5 border border-white/10 rounded-xl py-3 text-center font-black">
+                            class="w-full bg-white/5 border border-white/10 rounded-xl py-3 text-center font-bold">
                         <span class="text-white/20">-</span>
                         <input type="number" id="awayScore" value="{{ selected_match.score.away }}"
-                            class="w-full bg-white/5 border border-white/10 rounded-xl py-3 text-center font-black">
+                            class="w-full bg-white/5 border border-white/10 rounded-xl py-3 text-center font-bold">
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <button onclick="saveScore()"
-                            class="gradient-primary py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary-500/20">
+                            class="gradient-primary py-4 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-xl shadow-primary-500/20">
                             UPDATE SCORE
                         </button>
 
                         {% if selected_match.status == 'scheduled' %}
                         <button onclick="changeMatchStatus('start')"
-                            class="bg-green-500 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest text-black shadow-xl shadow-green-500/20">
+                            class="bg-green-500 py-4 rounded-xl font-bold text-[10px] uppercase tracking-wider text-black shadow-xl shadow-green-500/20">
                             COMMENCER
                         </button>
                         {% elif selected_match.status == 'live' %}
                         <button onclick="changeMatchStatus('finish')"
-                            class="bg-red-500 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest text-white shadow-xl shadow-red-500/20">
+                            class="bg-red-500 py-4 rounded-xl font-bold text-[10px] uppercase tracking-wider text-white shadow-xl shadow-red-500/20">
                             TERMINER
                         </button>
                         {% else %}
                         <button disabled
-                            class="bg-white/5 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest text-white/20 cursor-not-allowed">
+                            class="bg-white/5 py-4 rounded-xl font-bold text-[10px] uppercase tracking-wider text-white/20 cursor-not-allowed">
                             MATCH FINI
                         </button>
                         {% endif %}
@@ -227,7 +227,7 @@
     </div>
     {% else %}
     <div class="text-center py-40">
-        <h2 class="text-2xl font-black italic text-white/20 uppercase">Aucun match sélectionné</h2>
+        <h2 class="text-2xl font-bold text-white/20 uppercase">Aucun match sélectionné</h2>
         <p class="text-white/10 mt-2">Veuillez choisir un match dans la liste ci-dessus.</p>
     </div>
     {% endif %}
@@ -236,18 +236,18 @@
 <!-- Event Modal -->
 <div id="eventModal"
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden">
-    <div class="glass w-full max-w-md p-8 rounded-[40px] border-white/10 shadow-2xl">
-        <h3 id="modalTitle" class="text-xl font-black italic uppercase mb-6">Enregistrer un événement</h3>
+    <div class="glass w-full max-w-md p-8 rounded-3xl border-white/10 shadow-2xl">
+        <h3 id="modalTitle" class="text-xl font-bold uppercase mb-6">Enregistrer un événement</h3>
         <div class="space-y-6">
             <div>
-                <label class="text-[10px] font-black text-white/20 uppercase ml-2">Minute</label>
+                <label class="text-[10px] font-bold text-white/20 uppercase ml-2">Minute</label>
                 <input type="number" id="eventMinute" value="0"
-                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 font-black mt-2">
+                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 font-bold mt-2">
             </div>
             <div>
-                <label class="text-[10px] font-black text-white/20 uppercase ml-2">Joueur</label>
+                <label class="text-[10px] font-bold text-white/20 uppercase ml-2">Joueur</label>
                 <select id="eventPlayer"
-                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 font-black mt-2 appearance-none">
+                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 font-bold mt-2 appearance-none">
                     {% for p in players %}
                     <option value="{{ p._id }}" class="bg-surface-950">{{ p.name }} (#{{ p.jersey_number }})</option>
                     {% endfor %}
@@ -255,9 +255,9 @@
             </div>
             <div class="flex gap-4 pt-4">
                 <button onclick="hideEventModal()"
-                    class="flex-1 glass py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest">Annuler</button>
+                    class="flex-1 glass py-4 rounded-2xl font-bold text-[10px] uppercase tracking-wider">Annuler</button>
                 <button onclick="submitEvent()"
-                    class="flex-1 gradient-primary py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest">Confirmer</button>
+                    class="flex-1 gradient-primary py-4 rounded-2xl font-bold text-[10px] uppercase tracking-wider">Confirmer</button>
             </div>
         </div>
     </div>

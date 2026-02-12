@@ -5,30 +5,30 @@
 {% block content %}
 <div class="page-enter max-w-7xl mx-auto px-4 py-8">
     <!-- Header -->
-    <div class="glass p-10 rounded-[48px] border-white/5 mb-12 relative overflow-hidden">
+    <div class="glass p-10 rounded-3xl border-white/5 mb-12 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-transparent to-transparent"></div>
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
             <div>
                 <div class="flex items-center gap-3 mb-4">
                     <span
-                        class="px-3 py-1 rounded-lg bg-primary-500/10 text-primary-400 text-[8px] font-black uppercase tracking-widest border border-primary-500/20">
+                        class="px-3 py-1 rounded-lg bg-primary-500/10 text-primary-400 text-[8px] font-bold uppercase tracking-wider border border-primary-500/20">
                         {{ event.type | upper }}
                     </span>
-                    <span class="text-white/20 text-[10px] font-black uppercase tracking-widest">
+                    <span class="text-white/20 text-[10px] font-bold uppercase tracking-wider">
                         <i class="fa-solid fa-calendar mr-2"></i>{{ event.date.strftime('%d %B %Y') if event.date else
                         'Date' }}
                     </span>
                 </div>
-                <h1 class="text-4xl font-black italic uppercase tracking-tighter">{{ event.title }}</h1>
+                <h1 class="text-4xl font-bold uppercase tracking-tighter">{{ event.title }}</h1>
             </div>
 
             <div class="flex gap-4">
                 <button
-                    class="px-8 py-4 glass rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all border border-white/5">
+                    class="px-8 py-4 glass rounded-2xl font-bold text-[10px] uppercase tracking-wider hover:bg-white/10 transition-all border border-white/5">
                     <i class="fa-solid fa-share-nodes mr-2"></i>PARTAGER LIEN
                 </button>
                 <button onclick="toggleModal('performanceModal')"
-                    class="px-8 py-4 bg-amber-500 text-black rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-amber-500/20">
+                    class="px-8 py-4 bg-amber-500 text-black rounded-2xl font-bold text-[10px] uppercase tracking-wider hover:scale-105 transition-all shadow-xl shadow-amber-500/20">
                     SÉANCE TERMINÉE
                 </button>
             </div>
@@ -39,28 +39,28 @@
         <!-- Left Column: Convocations -->
         <div class="lg:col-span-2 space-y-10">
             <div class="flex items-center justify-between px-4">
-                <h3 class="text-2xl font-black italic uppercase tracking-tight">Convocations</h3>
+                <h3 class="text-2xl font-bold uppercase tracking-tight">Convocations</h3>
                 <button onclick="toggleModal('inviteModal')"
-                    class="text-[10px] font-black uppercase tracking-widest text-primary-400 hover:text-white transition-colors">
+                    class="text-[10px] font-bold uppercase tracking-wider text-primary-400 hover:text-white transition-colors">
                     <i class="fa-solid fa-plus mr-2"></i>Convoker des joueurs
                 </button>
             </div>
 
             <div class="grid md:grid-cols-2 gap-6">
                 <!-- Status Stats -->
-                <div class="glass p-6 rounded-[32px] border-white/5 flex items-center justify-between">
+                <div class="glass p-6 rounded-2xl border-white/5 flex items-center justify-between">
                     <div>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-white/20">Présents</p>
-                        <p class="text-3xl font-black italic text-green-500">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-white/20">Présents</p>
+                        <p class="text-3xl font-bold text-green-500">
                             {{ event.convocations | selectattr('status', 'equalto', 'confirmed') | list | length }}
                         </p>
                     </div>
                     <i class="fa-solid fa-circle-check text-4xl text-green-500/20"></i>
                 </div>
-                <div class="glass p-6 rounded-[32px] border-white/5 flex items-center justify-between">
+                <div class="glass p-6 rounded-2xl border-white/5 flex items-center justify-between">
                     <div>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-white/20">En Attente</p>
-                        <p class="text-3xl font-black italic text-amber-500">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-white/20">En Attente</p>
+                        <p class="text-3xl font-bold text-amber-500">
                             {{ event.convocations | selectattr('status', 'equalto', 'pending') | list | length }}
                         </p>
                     </div>
@@ -69,16 +69,16 @@
             </div>
 
             <!-- Players List -->
-            <div class="glass rounded-[40px] border-white/5 overflow-hidden">
+            <div class="glass rounded-3xl border-white/5 overflow-hidden">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-white/[0.02] border-b border-white/5">
-                            <th class="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-white/20">Joueur
+                            <th class="px-8 py-5 text-[9px] font-bold uppercase tracking-wider text-white/20">Joueur
                             </th>
-                            <th class="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-white/20">Statut
+                            <th class="px-8 py-5 text-[9px] font-bold uppercase tracking-wider text-white/20">Statut
                             </th>
                             <th
-                                class="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-white/20 text-right">
+                                class="px-8 py-5 text-[9px] font-bold uppercase tracking-wider text-white/20 text-right">
                                 Actions</th>
                         </tr>
                     </thead>
@@ -89,26 +89,26 @@
                             <td class="px-8 py-5">
                                 <div class="flex items-center gap-4">
                                     <div
-                                        class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center font-black text-[10px]">
+                                        class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center font-bold text-[10px]">
                                         {{ conv.player_id[:2]|upper }}
                                     </div>
-                                    <span class="font-bold italic uppercase text-xs">{{ conv.player_id }}</span>
+                                    <span class="font-bold uppercase text-xs">{{ conv.player_id }}</span>
                                 </div>
                             </td>
                             <td class="px-8 py-5">
                                 {% if conv.status == 'confirmed' %}
                                 <span
-                                    class="text-[9px] font-black uppercase tracking-widest text-green-500 flex items-center gap-2">
+                                    class="text-[9px] font-bold uppercase tracking-wider text-green-500 flex items-center gap-2">
                                     <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Présent
                                 </span>
                                 {% elif conv.status == 'refused' %}
                                 <span
-                                    class="text-[9px] font-black uppercase tracking-widest text-red-500 flex items-center gap-2">
+                                    class="text-[9px] font-bold uppercase tracking-wider text-red-500 flex items-center gap-2">
                                     <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Absenter
                                 </span>
                                 {% else %}
                                 <span
-                                    class="text-[9px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2">
+                                    class="text-[9px] font-bold uppercase tracking-wider text-amber-500 flex items-center gap-2">
                                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> En attente
                                 </span>
                                 {% endif %}
@@ -129,20 +129,20 @@
         <!-- Right Column: Logistics & Forum -->
         <div class="space-y-10">
             <!-- Logistics Tasks -->
-            <div class="glass p-8 rounded-[40px] border-white/5">
-                <h4 class="text-xl font-black italic uppercase tracking-tight mb-8">Logistique</h4>
+            <div class="glass p-8 rounded-3xl border-white/5">
+                <h4 class="text-xl font-bold uppercase tracking-tight mb-8">Logistique</h4>
                 <div class="space-y-4">
                     <div class="flex items-center justify-between glass p-4 rounded-2xl border-white/5">
                         <div class="flex items-center gap-3">
                             <i class="fa-solid fa-car text-blue-400"></i>
-                            <span class="text-[10px] font-black uppercase">Covoiturage</span>
+                            <span class="text-[10px] font-bold uppercase">Covoiturage</span>
                         </div>
-                        <span class="text-[9px] font-bold text-white/20 italic">2 voitures dispos</span>
+                        <span class="text-[9px] font-bold text-white/20">2 voitures dispos</span>
                     </div>
                     <div class="flex items-center justify-between glass p-4 rounded-2xl border-white/5">
                         <div class="flex items-center gap-3">
                             <i class="fa-solid fa-kit-medical text-red-400"></i>
-                            <span class="text-[10px] font-black uppercase">Pharmacie</span>
+                            <span class="text-[10px] font-bold uppercase">Pharmacie</span>
                         </div>
                         <span class="text-[9px] font-bold text-primary-400 uppercase">Assigné</span>
                     </div>
@@ -150,26 +150,26 @@
                         class="flex items-center justify-between glass p-4 rounded-2xl border-white/5 border-dashed bg-white/5">
                         <div class="flex items-center gap-3 opacity-20">
                             <i class="fa-solid fa-cookie-bite"></i>
-                            <span class="text-[10px] font-black uppercase">Goûter</span>
+                            <span class="text-[10px] font-bold uppercase">Goûter</span>
                         </div>
                         <button
-                            class="text-[8px] font-black uppercase text-primary-500 underline underline-offset-4">S'en
+                            class="text-[8px] font-bold uppercase text-primary-500 underline underline-offset-4">S'en
                             charger</button>
                     </div>
                 </div>
             </div>
 
             <!-- Forum Preview -->
-            <div class="glass p-8 rounded-[40px] border-white/5">
+            <div class="glass p-8 rounded-3xl border-white/5">
                 <div class="flex items-center justify-between mb-8">
-                    <h4 class="text-xl font-black italic uppercase tracking-tight">Forum Event</h4>
+                    <h4 class="text-xl font-bold uppercase tracking-tight">Forum Event</h4>
                     <span class="w-2 h-2 rounded-full bg-primary-500 animate-pulse"></span>
                 </div>
                 <div class="space-y-6">
                     <div class="flex gap-4">
                         <div class="w-8 h-8 rounded-lg bg-white/5 flex-shrink-0"></div>
                         <div class="glass p-4 rounded-2xl rounded-tl-none border-white/5 flex-1">
-                            <p class="text-[10px] font-bold text-white/60 leading-relaxed italic">
+                            <p class="text-[10px] font-bold text-white/60 leading-relaxed">
                                 "N'oubliez pas les protèges-tibias pour le match amical !"
                             </p>
                         </div>
@@ -177,7 +177,7 @@
                 </div>
                 <div class="mt-8 pt-6 border-t border-white/5">
                     <button
-                        class="w-full py-4 glass rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-white/10 transition-all border border-white/5">
+                        class="w-full py-4 glass rounded-2xl font-bold text-[9px] uppercase tracking-wider hover:bg-white/10 transition-all border border-white/5">
                         OUVRIR LE LIVE CHAT
                     </button>
                 </div>
@@ -189,10 +189,10 @@
 <!-- Modal: Invite Players -->
 <div id="inviteModal"
     class="fixed inset-0 z-[100] hidden bg-black/90 backdrop-blur-xl flex items-center justify-center p-6">
-    <div class="glass max-w-lg w-full rounded-[48px] border-white/10 overflow-hidden animate-slide-up shadow-2xl">
+    <div class="glass max-w-lg w-full rounded-3xl border-white/10 overflow-hidden animate-slide-up shadow-2xl">
         <div class="p-10 lg:p-12">
             <div class="flex justify-between items-center mb-10">
-                <h3 class="text-3xl font-black italic uppercase tracking-tighter leading-none">Convoquer <span
+                <h3 class="text-3xl font-bold uppercase tracking-tighter leading-none">Convoquer <span
                         class="text-gradient">Effectif</span></h3>
                 <button onclick="toggleModal('inviteModal')"
                     class="w-12 h-12 rounded-2xl glass hover:bg-white/10 flex items-center justify-center transition-all text-white/20 hover:text-white border border-white/10">
@@ -207,12 +207,12 @@
                         class="flex items-center justify-between p-4 glass rounded-2xl border-white/5 hover:bg-white/5 cursor-pointer transition-colors group">
                         <div class="flex items-center gap-4">
                             <div
-                                class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center font-black text-primary-500">
+                                class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center font-bold text-primary-500">
                                 {{ player.name[:1] }}
                             </div>
                             <div>
-                                <p class="font-black italic uppercase text-xs">{{ player.name }}</p>
-                                <p class="text-[8px] font-bold text-white/20 uppercase tracking-widest">{{
+                                <p class="font-bold uppercase text-xs">{{ player.name }}</p>
+                                <p class="text-[8px] font-bold text-white/20 uppercase tracking-wider">{{
                                     player.category }}</p>
                             </div>
                         </div>
@@ -224,7 +224,7 @@
 
                 <div class="pt-6">
                     <button type="submit"
-                        class="gradient-primary w-full py-5 rounded-[28px] text-xs font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                        class="gradient-primary w-full py-5 rounded-[28px] text-xs font-bold uppercase tracking-wider shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
                         ENVOYER LES CONVOCATIONS
                     </button>
                 </div>
@@ -236,10 +236,10 @@
 <!-- Modal: Post-Match Performance -->
 <div id="performanceModal"
     class="fixed inset-0 z-[100] hidden bg-black/90 backdrop-blur-xl flex items-center justify-center p-6">
-    <div class="glass max-w-2xl w-full rounded-[48px] border-white/10 overflow-hidden animate-slide-up shadow-2xl">
+    <div class="glass max-w-2xl w-full rounded-3xl border-white/10 overflow-hidden animate-slide-up shadow-2xl">
         <div class="p-10 lg:p-12">
             <div class="flex justify-between items-center mb-10">
-                <h3 class="text-3xl font-black italic uppercase tracking-tighter leading-none">Stats de la <span
+                <h3 class="text-3xl font-bold uppercase tracking-tighter leading-none">Stats de la <span
                         class="text-gradient">Séance / Match</span></h3>
                 <button onclick="toggleModal('performanceModal')"
                     class="w-12 h-12 rounded-2xl glass hover:bg-white/10 flex items-center justify-center transition-all text-white/20 hover:text-white border border-white/10">
@@ -249,24 +249,24 @@
 
             <form action="{{ url_for('isy.save_performance', event_id=event._id) }}" method="POST" class="space-y-6">
                 <!-- Score Interface -->
-                <div class="grid grid-cols-3 gap-6 items-center bg-white/5 p-8 rounded-[32px] border border-white/5">
+                <div class="grid grid-cols-3 gap-6 items-center bg-white/5 p-8 rounded-2xl border border-white/5">
                     <div class="text-center">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-white/20 mb-4">NOUS</p>
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-white/20 mb-4">NOUS</p>
                         <input type="number" name="score_us" value="0"
-                            class="w-20 bg-transparent text-5xl font-black italic text-center focus:outline-none">
+                            class="w-20 bg-transparent text-5xl font-bold text-center focus:outline-none">
                     </div>
-                    <div class="text-center font-black text-2xl text-white/10">VS</div>
+                    <div class="text-center font-bold text-2xl text-white/10">VS</div>
                     <div class="text-center">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-white/20 mb-4">EUX</p>
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-white/20 mb-4">EUX</p>
                         <input type="number" name="score_them" value="0"
-                            class="w-20 bg-transparent text-5xl font-black italic text-center focus:outline-none">
+                            class="w-20 bg-transparent text-5xl font-bold text-center focus:outline-none">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label
-                            class="block text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-3 ml-2">Buteurs</label>
+                            class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/20 mb-3 ml-2">Buteurs</label>
                         <select name="scorers" multiple
                             class="w-full bg-white/[0.03] border border-white/10 rounded-[24px] py-4 px-6 text-white focus:outline-none focus:border-primary-500 transition-all font-bold h-32">
                             {% for player in players %}
@@ -276,7 +276,7 @@
                     </div>
                     <div>
                         <label
-                            class="block text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-3 ml-2">Passeurs</label>
+                            class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/20 mb-3 ml-2">Passeurs</label>
                         <select name="assists" multiple
                             class="w-full bg-white/[0.03] border border-white/10 rounded-[24px] py-4 px-6 text-white focus:outline-none focus:border-primary-500 transition-all font-bold h-32">
                             {% for player in players %}
@@ -289,7 +289,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label
-                            class="block text-[10px) font-black uppercase tracking-[0.3em] text-white/20 mb-3 ml-2">Man
+                            class="block text-[10px) font-bold uppercase tracking-[0.3em] text-white/20 mb-3 ml-2">Man
                             of the Match</label>
                         <select name="motm"
                             class="w-full bg-white/[0.03] border border-white/10 rounded-[24px] py-5 px-8 text-white focus:outline-none focus:border-primary-500 transition-all font-bold appearance-none">
@@ -301,7 +301,7 @@
                     </div>
                     <div>
                         <label
-                            class="block text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-3 ml-2">Notes
+                            class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/20 mb-3 ml-2">Notes
                             Coach</label>
                         <input type="text" name="notes" placeholder="Points d'amélioration..."
                             class="w-full bg-white/[0.03] border border-white/10 rounded-[24px] py-5 px-8 text-white focus:outline-none focus:border-primary-500 transition-all font-bold">
@@ -310,7 +310,7 @@
 
                 <div class="pt-6">
                     <button type="submit"
-                        class="gradient-primary w-full py-5 rounded-[28px] text-xs font-black uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                        class="gradient-primary w-full py-5 rounded-[28px] text-xs font-bold uppercase tracking-wider shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
                         ENREGISTRER LA PERFORMANCE
                     </button>
                 </div>

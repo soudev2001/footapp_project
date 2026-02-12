@@ -4,24 +4,24 @@
 {% block content %}
 <div class="page-enter max-w-5xl mx-auto px-4 py-8">
     <div class="flex items-center justify-between mb-12">
-        <h1 class="text-4xl font-black italic uppercase tracking-tighter">MON <span class="text-gradient">PANIER</span>
+        <h1 class="text-4xl font-bold uppercase tracking-tighter">MON <span class="text-gradient">PANIER</span>
         </h1>
         <a href="{{ url_for('main.shop_catalog') }}"
-            class="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">
+            class="text-[10px] font-bold uppercase tracking-wider text-white/40 hover:text-white transition-colors">
             <i class="fa-solid fa-arrow-left mr-2"></i> Continuer les achats
         </a>
     </div>
 
-    <div id="cartEmpty" class="hidden glass p-20 rounded-[48px] border-white/5 text-center">
+    <div id="cartEmpty" class="hidden glass p-20 rounded-3xl border-white/5 text-center">
         <div
-            class="w-24 h-24 bg-white/5 rounded-[32px] flex items-center justify-center mx-auto mb-8 border border-white/10">
+            class="w-24 h-24 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-8 border border-white/10">
             <i class="fa-solid fa-cart-arrow-down text-white/10 text-4xl"></i>
         </div>
-        <h2 class="text-2xl font-black italic uppercase mb-2">Votre panier est vide</h2>
-        <p class="text-white/20 text-sm mb-10 italic">C'est le moment idéal pour découvrir notre nouvelle collection.
+        <h2 class="text-2xl font-bold uppercase mb-2">Votre panier est vide</h2>
+        <p class="text-white/20 text-sm mb-10">C'est le moment idéal pour découvrir notre nouvelle collection.
         </p>
         <a href="{{ url_for('main.shop_catalog') }}"
-            class="gradient-primary px-12 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary-500/20">VOIR
+            class="gradient-primary px-12 py-5 rounded-2xl text-[10px] font-bold uppercase tracking-wider shadow-xl shadow-primary-500/20">VOIR
             LA BOUTIQUE</a>
     </div>
 
@@ -33,27 +33,27 @@
 
         <!-- Summary -->
         <div class="lg:col-span-1">
-            <div class="glass p-10 rounded-[40px] border-white/5 sticky top-24">
-                <h3 class="text-xs font-black uppercase tracking-widest text-primary-400 mb-8 italic">Récapitulatif</h3>
+            <div class="glass p-10 rounded-3xl border-white/5 sticky top-24">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-primary-400 mb-8">Récapitulatif</h3>
 
                 <div class="space-y-6 mb-10 pb-10 border-b border-white/5">
                     <div class="flex justify-between items-center">
                         <span class="text-xs font-bold text-white/40 uppercase">Sous-total</span>
-                        <span id="subtotal" class="font-black text-lg">0.00€</span>
+                        <span id="subtotal" class="font-bold text-lg">0.00€</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-xs font-bold text-white/40 uppercase">Livraison (Stade)</span>
-                        <span class="text-xs font-black text-green-400 uppercase">OFFERT</span>
+                        <span class="text-xs font-bold text-green-400 uppercase">OFFERT</span>
                     </div>
                 </div>
 
                 <div class="flex justify-between items-center mb-10">
-                    <span class="text-sm font-black italic uppercase">TOTAL TTC</span>
-                    <span id="total" class="text-3xl font-black italic text-gradient tracking-tighter">0.00€</span>
+                    <span class="text-sm font-bold uppercase">TOTAL TTC</span>
+                    <span id="total" class="text-3xl font-bold text-gradient tracking-tighter">0.00€</span>
                 </div>
 
                 <a href="{{ url_for('main.checkout') }}"
-                    class="w-full gradient-primary py-6 rounded-[24px] text-xs font-black uppercase tracking-widest shadow-2xl shadow-primary-500/30 flex items-center justify-center hover:scale-[1.02] active:scale-95 transition-all outline-none">
+                    class="w-full gradient-primary py-6 rounded-[24px] text-xs font-bold uppercase tracking-wider shadow-2xl shadow-primary-500/30 flex items-center justify-center hover:scale-[1.02] active:scale-95 transition-all outline-none">
                     PASSER À LA RÉSERVATION
                 </a>
             </div>
@@ -62,7 +62,7 @@
 </div>
 
 <template id="cartItemTemplate">
-    <div class="glass p-8 rounded-[40px] border-white/5 flex gap-8 items-center group relative overflow-hidden">
+    <div class="glass p-8 rounded-3xl border-white/5 flex gap-8 items-center group relative overflow-hidden">
         <div
             class="absolute inset-0 bg-primary-500/5 translate-x-full group-hover:translate-x-0 transition-transform duration-700">
         </div>
@@ -72,24 +72,24 @@
         <div class="flex-1 z-10">
             <div class="flex items-start justify-between">
                 <div>
-                    <h4 class="font-black italic uppercase text-lg item-name">Product Name</h4>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-white/20 mt-1">Taille: <span
+                    <h4 class="font-bold uppercase text-lg item-name">Product Name</h4>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-white/20 mt-1">Taille: <span
                             class="item-size">-</span></p>
                 </div>
-                <p class="text-lg font-black italic item-price">0.00€</p>
+                <p class="text-lg font-bold item-price">0.00€</p>
             </div>
             <div class="flex items-center justify-between mt-6">
                 <div class="flex items-center gap-4 bg-white/5 rounded-xl p-1.5 border border-white/10">
                     <button
                         class="w-8 h-8 flex items-center justify-center text-white/40 hover:text-white transition-colors item-minus"><i
                             class="fa-solid fa-minus"></i></button>
-                    <span class="w-6 text-center font-black text-xs item-qty">1</span>
+                    <span class="w-6 text-center font-bold text-xs item-qty">1</span>
                     <button
                         class="w-8 h-8 flex items-center justify-center text-white/40 hover:text-white transition-colors item-plus"><i
                             class="fa-solid fa-plus"></i></button>
                 </div>
                 <button
-                    class="text-[10px] font-black uppercase tracking-widest text-red-400/50 hover:text-red-400 transition-colors item-remove">Supprimer</button>
+                    class="text-[10px] font-bold uppercase tracking-wider text-red-400/50 hover:text-red-400 transition-colors item-remove">Supprimer</button>
             </div>
         </div>
     </div>

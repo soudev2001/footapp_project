@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-enter max-w-5xl mx-auto px-4 py-8">
     <!-- Header Hero -->
-    <div class="glass p-8 rounded-[40px] border-white/5 mb-10 relative overflow-hidden">
+    <div class="glass p-8 rounded-3xl border-white/5 mb-10 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-amber-500/10"></div>
 
         <div class="relative z-10 flex flex-col md:flex-row justify-between gap-8" id="attendance-config"
@@ -16,7 +16,7 @@
                         class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary-500/20">
                         <i class="fa-solid fa-clipboard-check text-white text-xl"></i>
                     </span>
-                    <h1 class="text-3xl font-black italic uppercase tracking-tight">Pointage Elite</h1>
+                    <h1 class="text-3xl font-bold uppercase tracking-tight">Pointage Elite</h1>
                 </div>
 
                 <div class="flex items-center gap-4">
@@ -24,7 +24,7 @@
                     <div class="relative min-w-[200px]">
                         <form id="teamFilterForm" method="GET" action="{{ url_for('coach.attendance') }}">
                             <select name="team_id" onchange="this.form.submit()"
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-xs font-black uppercase tracking-widest focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-xs font-bold uppercase tracking-wider focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
                                 {% for team in teams %}
                                 <option value="{{ team._id|string }}" {% if selected_team_id==team._id|string
                                     %}selected{% endif %} class="bg-slate-900">
@@ -42,7 +42,7 @@
                     <div class="relative group flex-1">
                         <select
                             onchange="window.location.href='/coach/attendance/' + this.value + '?team_id={{ selected_team_id }}'"
-                            class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-12 text-sm font-black text-primary-400 cursor-pointer appearance-none focus:outline-none focus:border-primary-500/50 transition-all">
+                            class="w-full glass bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-12 text-sm font-bold text-primary-400 cursor-pointer appearance-none focus:outline-none focus:border-primary-500/50 transition-all">
                             {% for event in events %}
                             <option value="{{ event._id }}" class="bg-surface-950 text-white" {% if selected_event and
                                 selected_event._id==event._id %}selected{% endif %}>
@@ -60,10 +60,10 @@
             <div class="flex gap-6 items-center">
                 <div class="text-center group">
                     <p
-                        class="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] mb-1 group-hover:text-primary-400 transition-colors">
+                        class="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em] mb-1 group-hover:text-primary-400 transition-colors">
                         Taux de Présence</p>
                     <div class="relative">
-                        <span class="text-5xl font-black text-white italic leading-none"
+                        <span class="text-5xl font-bold text-white leading-none"
                             id="presentPercentage">0%</span>
                         <div class="h-1 w-full bg-white/5 mt-2 rounded-full overflow-hidden">
                             <div id="percentageBar" class="h-full gradient-primary transition-all duration-1000"
@@ -73,8 +73,8 @@
                 </div>
                 <div class="w-px h-16 bg-white/10"></div>
                 <div class="text-right">
-                    <span class="block text-4xl font-black text-primary-400" id="presentCount">0/0</span>
-                    <span class="text-[9px] font-black text-white/20 uppercase tracking-widest leading-none">Athlètes
+                    <span class="block text-4xl font-bold text-primary-400" id="presentCount">0/0</span>
+                    <span class="text-[9px] font-bold text-white/20 uppercase tracking-wider leading-none">Athlètes
                         Confirmés</span>
                 </div>
             </div>
@@ -90,12 +90,12 @@
         </div>
         <div class="grid grid-cols-2 gap-4">
             <button onclick="markAll('present')"
-                class="glass-light bg-white/5 border border-white/5 py-4 rounded-[28px] font-black text-[10px] hover:bg-primary-500 hover:text-black hover:border-transparent transition-all flex items-center justify-center gap-3 group">
+                class="glass-light bg-white/5 border border-white/5 py-4 rounded-[28px] font-bold text-[10px] hover:bg-primary-500 hover:text-black hover:border-transparent transition-all flex items-center justify-center gap-3 group">
                 <i class="fa-solid fa-check-double text-primary-500 group-hover:text-black"></i>
                 PRÉSENTS
             </button>
             <button onclick="markAll('reset')"
-                class="glass bg-white/5 border border-white/5 py-4 rounded-[28px] font-black text-[10px] text-white/40 hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-3">
+                class="glass bg-white/5 border border-white/5 py-4 rounded-[28px] font-bold text-[10px] text-white/40 hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-3">
                 <i class="fa-solid fa-rotate-left"></i>
                 RESET
             </button>
@@ -105,7 +105,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-32" id="playerList">
         {% for player in players %}
         {% set status = attendance_data.get(player._id|string, '') %}
-        <div class="player-row glass p-6 rounded-[32px] border-white/5 flex items-center justify-between group hover:bg-white/5 transition-all duration-500 animate-slide-in"
+        <div class="player-row glass p-6 rounded-2xl border-white/5 flex items-center justify-between group hover:bg-white/5 transition-all duration-500 animate-slide-in"
             style="--idx: {{ loop.index0 }}" data-player-id="{{ player._id }}" data-name="{{ player.name|lower }}">
             <div class="flex items-center gap-5">
                 <div class="relative">
@@ -117,14 +117,14 @@
                 </div>
                 <div>
                     <p
-                        class="font-black text-xl italic group-hover:text-primary-400 transition-colors leading-none mb-2">
+                        class="font-bold text-xl group-hover:text-primary-400 transition-colors leading-none mb-2">
                         {{ player.name }}</p>
                     <div class="flex items-center gap-2">
                         <span
-                            class="px-2 py-0.5 rounded-lg bg-white/5 text-[8px] font-black text-white/40 uppercase tracking-widest border border-white/5">
+                            class="px-2 py-0.5 rounded-lg bg-white/5 text-[8px] font-bold text-white/40 uppercase tracking-wider border border-white/5">
                             {{ player.position }}
                         </span>
-                        <span class="text-[10px] font-bold text-white/20 italic">#{{ player.jersey_number or '--'
+                        <span class="text-[10px] font-bold text-white/20">#{{ player.jersey_number or '--'
                             }}</span>
                     </div>
                 </div>
@@ -155,9 +155,9 @@
     <!-- Floating Save Control -->
     <div class="fixed bottom-10 left-0 right-0 px-6 z-50 pointer-events-none">
         <div class="max-w-md mx-auto pointer-events-auto">
-            <div class="glass p-3 rounded-[32px] border-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)]">
+            <div class="glass p-3 rounded-2xl border-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)]">
                 <button onclick="saveAttendance()" id="saveBtn"
-                    class="w-full gradient-primary py-5 rounded-[24px] font-black text-xs text-black uppercase tracking-[0.2em] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
+                    class="w-full gradient-primary py-5 rounded-[24px] font-bold text-xs text-black uppercase tracking-[0.2em] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
                     <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
                     Synchroniser les données
                 </button>
@@ -193,7 +193,7 @@
     }
 
     .status-btn.present.active {
-        background: #84cc16;
+        background: #10b981;
         color: black;
     }
 
@@ -319,7 +319,7 @@
             .then(data => {
                 if (data.status === 'success') {
                     btn.innerHTML = '<i class="fa-solid fa-shield-check"></i> SYNC TERMINÉE';
-                    btn.style.background = '#84cc16';
+                    btn.style.background = '#10b981';
                     setTimeout(() => {
                         btn.innerHTML = originalHTML;
                         btn.style.background = '';

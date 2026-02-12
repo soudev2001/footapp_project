@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-enter max-w-7xl mx-auto px-4 py-8">
     <!-- Header Hero -->
-    <div class="glass p-10 rounded-[40px] border-white/5 mb-10 relative overflow-hidden">
+    <div class="glass p-10 rounded-3xl border-white/5 mb-10 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-amber-500/10"></div>
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
             <div class="flex items-center gap-6">
@@ -14,14 +14,14 @@
                 </div>
                 <div>
                     <h1
-                        class="text-4xl font-black italic uppercase tracking-tight leading-none mb-2 light:text-slate-900">
+                        class="text-4xl font-bold uppercase tracking-tight leading-none mb-2 light:text-slate-900">
                         Scouting Center</h1>
                     <div class="flex items-center gap-4 mt-2">
                         {% if teams %}
                         <div class="relative min-w-[180px]">
                             <form id="teamFilterForm" method="GET" action="{{ url_for('coach.scouting') }}">
                                 <select name="team_id" onchange="this.form.submit()"
-                                    class="w-full bg-white/5 border border-white/10 rounded-xl py-2 px-4 text-white text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
+                                    class="w-full bg-white/5 border border-white/10 rounded-xl py-2 px-4 text-white text-[10px] font-bold uppercase tracking-wider focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
                                     {% for team in teams %}
                                     <option value="{{ team._id|string }}" {% if selected_team_id==team._id|string
                                         %}selected{% endif %} class="bg-slate-900">
@@ -37,9 +37,9 @@
             </div>
             <div class="flex gap-4">
                 <div class="text-center px-6 py-4 glass rounded-3xl border-white/5">
-                    <p class="text-[9px] font-black text-white/20 light:text-slate-400 uppercase tracking-widest mb-1">
+                    <p class="text-[9px] font-bold text-white/20 light:text-slate-400 uppercase tracking-wider mb-1">
                         Agents Libres</p>
-                    <p class="text-3xl font-black text-white italic light:text-slate-900">{{ free_agents|length }}</p>
+                    <p class="text-3xl font-bold text-white light:text-slate-900">{{ free_agents|length }}</p>
                 </div>
             </div>
         </div>
@@ -54,15 +54,15 @@
         </div>
         <div class="flex gap-2 p-1.5 bg-white/5 rounded-2xl border border-white/10">
             <button
-                class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-primary-500 text-white shadow-lg">Tous</button>
+                class="px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-primary-500 text-white shadow-lg">Tous</button>
             <button
-                class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">Gardiens</button>
+                class="px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider text-white/40 hover:text-white transition-colors">Gardiens</button>
             <button
-                class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">Défenseurs</button>
+                class="px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider text-white/40 hover:text-white transition-colors">Défenseurs</button>
             <button
-                class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">Milieux</button>
+                class="px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider text-white/40 hover:text-white transition-colors">Milieux</button>
             <button
-                class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">Attaquants</button>
+                class="px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider text-white/40 hover:text-white transition-colors">Attaquants</button>
         </div>
     </div>
 
@@ -71,23 +71,23 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for agent in free_agents %}
         <div
-            class="glass p-8 rounded-[40px] border-white/5 group hover:bg-white/5 transition-all duration-500 relative overflow-hidden flex flex-col">
+            class="glass p-8 rounded-3xl border-white/5 group hover:bg-white/5 transition-all duration-500 relative overflow-hidden flex flex-col">
             <div class="absolute top-0 right-0 w-32 h-32 bg-primary-500/5 rounded-full blur-[60px] -mr-16 -mt-16"></div>
 
             <!-- Profile Header -->
             <div class="flex items-center gap-6 mb-8 relative z-10">
                 <div class="relative">
                     <div
-                        class="w-20 h-20 gradient-primary rounded-[28px] flex items-center justify-center text-3xl font-black shadow-2xl group-hover:scale-105 transition-transform">
+                        class="w-20 h-20 gradient-primary rounded-[28px] flex items-center justify-center text-3xl font-bold shadow-2xl group-hover:scale-105 transition-transform">
                         {{ agent.profile.first_name[0] if agent.profile.first_name else '?' }}
                     </div>
                 </div>
                 <div>
-                    <h3 class="text-xl font-black italic uppercase light:text-slate-900">{{ agent.profile.first_name }}
+                    <h3 class="text-xl font-bold uppercase light:text-slate-900">{{ agent.profile.first_name }}
                         {{ agent.profile.last_name }}</h3>
                     <div class="flex items-center gap-2 mt-1">
                         <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        <span class="text-[9px] font-black text-primary-400 uppercase tracking-widest">Disponible
+                        <span class="text-[9px] font-bold text-primary-400 uppercase tracking-wider">Disponible
                             Immédiatement</span>
                     </div>
                 </div>
@@ -96,14 +96,14 @@
             <!-- Stats/Specs -->
             <div class="grid grid-cols-2 gap-4 mb-8 relative z-10">
                 <div class="p-4 bg-white/5 rounded-3xl border border-white/5">
-                    <p class="text-[9px] font-black text-white/20 light:text-slate-400 uppercase tracking-widest mb-1">
+                    <p class="text-[9px] font-bold text-white/20 light:text-slate-400 uppercase tracking-wider mb-1">
                         Région</p>
-                    <p class="font-black text-sm italic">{{ agent.city or 'Île-de-France' }}</p>
+                    <p class="font-bold text-sm">{{ agent.city or 'Île-de-France' }}</p>
                 </div>
                 <div class="p-4 bg-white/5 rounded-3xl border border-white/5">
-                    <p class="text-[9px] font-black text-white/20 light:text-slate-400 uppercase tracking-widest mb-1">
+                    <p class="text-[9px] font-bold text-white/20 light:text-slate-400 uppercase tracking-wider mb-1">
                         Âge</p>
-                    <p class="font-black text-sm italic">22 Ans</p>
+                    <p class="font-bold text-sm">22 Ans</p>
                 </div>
             </div>
 
@@ -116,7 +116,7 @@
                         <i
                             class="fa-solid fa-people-group absolute left-5 top-1/2 -translate-y-1/2 text-white/20 text-xs"></i>
                         <select name="team_id" required
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-black text-white focus:outline-none focus:border-primary-500/50 transition-all appearance-none cursor-pointer">
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold text-white focus:outline-none focus:border-primary-500/50 transition-all appearance-none cursor-pointer">
                             {% for team in teams %}
                             <option value="{{ team._id|string }}" {% if selected_team_id==team._id|string %}selected{%
                                 endif %} class="bg-slate-900">
@@ -139,7 +139,7 @@
                 </div>
 
                 <button type="submit"
-                    class="w-full gradient-primary py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    class="w-full gradient-primary py-5 rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
                     PROPOSER UN CONTRAT
                 </button>
             </form>
@@ -147,12 +147,12 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="glass p-20 rounded-[40px] border-white/5 text-center">
-        <div class="w-20 h-20 bg-white/5 rounded-[32px] flex items-center justify-center mx-auto mb-6">
+    <div class="glass p-20 rounded-3xl border-white/5 text-center">
+        <div class="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <i class="fa-solid fa-users-slash text-white/10 text-3xl"></i>
         </div>
-        <h3 class="text-xl font-black uppercase tracking-widest mb-2 light:text-slate-900">Aucun profil libre</h3>
-        <p class="text-white/20 light:text-slate-500 text-sm italic">Invitez des joueurs sans club sur la plateforme
+        <h3 class="text-xl font-bold uppercase tracking-wider mb-2 light:text-slate-900">Aucun profil libre</h3>
+        <p class="text-white/20 light:text-slate-500 text-sm">Invitez des joueurs sans club sur la plateforme
             pour les voir apparaître ici.</p>
     </div>
     {% endif %}

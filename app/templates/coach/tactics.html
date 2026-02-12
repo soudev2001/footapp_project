@@ -7,14 +7,14 @@
     data-formation="{{ lineup.formation or '4-3-3' }}">
     <!-- Sidebar / Players List -->
     <div class="w-full lg:w-96 flex flex-col gap-6">
-        <div class="glass p-6 rounded-[40px] border-white/5 flex-1 flex flex-col overflow-hidden">
+        <div class="glass p-6 rounded-3xl border-white/5 flex-1 flex flex-col overflow-hidden">
             <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h2 class="font-black text-white italic uppercase text-sm tracking-widest">Effectif Équipe</h2>
+                    <h2 class="font-bold text-white uppercase text-sm tracking-wider">Effectif Équipe</h2>
                     {% if teams %}
                     <form id="teamFilterForm" method="GET" action="{{ url_for('coach.tactics') }}" class="mt-4">
                         <select name="team_id" onchange="this.form.submit()"
-                            class="w-full bg-white/5 border border-white/10 rounded-xl py-2 px-4 text-white text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
+                            class="w-full bg-white/5 border border-white/10 rounded-xl py-2 px-4 text-white text-[10px] font-bold uppercase tracking-wider focus:outline-none focus:border-primary-500 appearance-none cursor-pointer transition-all">
                             {% for team in teams %}
                             <option value="{{ team._id|string }}" {% if selected_team_id==team._id|string %}selected{%
                                 endif %} class="bg-slate-900">
@@ -35,12 +35,12 @@
                     data-player-number="{{ player.jersey_number or '?' }}" data-player-pos="{{ player.position }}">
                     <div class="flex items-center gap-4">
                         <div
-                            class="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center font-black text-xs shadow-lg group-hover:scale-110 transition-transform">
+                            class="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center font-bold text-xs shadow-lg group-hover:scale-110 transition-transform">
                             {{ player.jersey_number or '?' }}
                         </div>
                         <div>
-                            <p class="text-sm font-black text-white italic">{{ player.name }}</p>
-                            <p class="text-[9px] text-white/20 font-black uppercase tracking-widest">{{ player.position
+                            <p class="text-sm font-bold text-white">{{ player.name }}</p>
+                            <p class="text-[9px] text-white/20 font-bold uppercase tracking-wider">{{ player.position
                                 }}</p>
                         </div>
                     </div>
@@ -50,11 +50,11 @@
             </div>
         </div>
 
-        <div class="glass p-8 rounded-[40px] border-white/5 bg-gradient-to-br from-primary-500/10 to-transparent">
-            <h3 class="font-black text-white text-xs uppercase tracking-widest mb-6">Configuration Système</h3>
+        <div class="glass p-8 rounded-3xl border-white/5 bg-gradient-to-br from-primary-500/10 to-transparent">
+            <h3 class="font-bold text-white text-xs uppercase tracking-wider mb-6">Configuration Système</h3>
             <div class="relative group">
                 <select id="formationSelect" onchange="updateFormation()"
-                    class="w-full bg-surface-950 border border-white/10 py-4 px-6 rounded-2xl text-sm font-black italic outline-none focus:ring-2 focus:ring-primary-500 transition appearance-none cursor-pointer">
+                    class="w-full bg-surface-950 border border-white/10 py-4 px-6 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-primary-500 transition appearance-none cursor-pointer">
                     <option value="4-3-3" {% if lineup.formation=='4-3-3' %}selected{% endif %}>4 - 3 - 3 ATTAQUE
                     </option>
                     <option value="4-4-2" {% if lineup.formation=='4-4-2' %}selected{% endif %}>4 - 4 - 2 CLASSIQUE
@@ -72,7 +72,7 @@
     </div>
 
     <!-- Pitch Area -->
-    <div class="flex-1 glass rounded-[40px] border-white/5 bg-emerald-950/20 relative overflow-hidden group shadow-2xl"
+    <div class="flex-1 glass rounded-3xl border-white/5 bg-emerald-950/20 relative overflow-hidden group shadow-2xl"
         id="pitch">
         <!-- Pitch Markings (SVG for precise scale) -->
         <div class="absolute inset-0 opacity-20 pointer-events-none">
@@ -110,11 +110,11 @@
     <div class="absolute flex flex-col items-center transition-all duration-500 cursor-pointer group/slot"
         style="left: 50%; top: 50%;">
         <div
-            class="slot-circle w-14 h-14 rounded-2xl glass-light border-2 border-dashed border-white/20 flex items-center justify-center font-black text-white/20 group-hover/slot:border-primary-500/50 transition-all">
+            class="slot-circle w-14 h-14 rounded-2xl glass-light border-2 border-dashed border-white/20 flex items-center justify-center font-bold text-white/20 group-hover/slot:border-primary-500/50 transition-all">
             <!-- Content Injected -->
         </div>
         <p
-            class="slot-name mt-3 glass px-4 py-1.5 rounded-xl text-[9px] font-black text-white/40 uppercase tracking-widest border border-white/5 shadow-2xl backdrop-blur-md">
+            class="slot-name mt-3 glass px-4 py-1.5 rounded-xl text-[9px] font-bold text-white/40 uppercase tracking-wider border border-white/5 shadow-2xl backdrop-blur-md">
             POSITION
         </p>
     </div>

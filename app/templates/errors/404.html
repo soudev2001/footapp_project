@@ -9,7 +9,7 @@
             class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary-600 rounded-full mix-blend-overlay filter blur-[100px] opacity-20">
         </div>
 
-        <h1 class="text-[12rem] font-black leading-none text-white/5 select-none">404</h1>
+        <h1 class="text-[12rem] font-bold leading-none text-white/5 select-none">404</h1>
         <div class="absolute inset-0 flex items-center justify-center">
             <div
                 class="w-32 h-32 rounded-3xl gradient-primary flex items-center justify-center rotate-12 shadow-2xl animate-float">
@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <h2 class="text-5xl font-black text-white light:text-slate-900 mb-4 italic uppercase tracking-tighter">Hors-Jeu !
+    <h2 class="text-5xl font-bold text-white light:text-slate-900 mb-4 uppercase tracking-tighter">Hors-Jeu !
     </h2>
     <p class="text-lg text-gray-400 light:text-slate-500 max-w-md mx-auto mb-10 font-medium">
         Oups ! On dirait que vous avez dépassé la ligne de défense. Cette page n'est pas sur la feuille de match.
@@ -26,12 +26,12 @@
 
     <div class="flex flex-col sm:flex-row gap-4">
         <a href="{{ url_for('main.index') }}"
-            class="btn-primary px-10 py-4 rounded-2xl font-black transition flex items-center justify-center gap-3 uppercase tracking-widest text-xs">
+            class="btn-primary px-10 py-4 rounded-2xl font-bold transition flex items-center justify-center gap-3 uppercase tracking-wider text-xs">
             <i class="fa-solid fa-person-running"></i>
             Retour terrain
         </a>
         <a href="javascript:history.back()"
-            class="glass-light px-10 py-4 rounded-2xl font-black hover:bg-white/10 transition border border-white/5 uppercase tracking-widest text-xs">
+            class="glass-light px-10 py-4 rounded-2xl font-bold hover:bg-white/10 transition border border-white/5 uppercase tracking-wider text-xs">
             Dernière action
         </a>
     </div>
@@ -39,14 +39,14 @@
     <!-- Quick Links -->
     <div class="mt-20 grid grid-cols-2 lg:grid-cols-4 gap-8 opacity-50 hover:opacity-100 transition duration-500">
         <a href="{{ url_for('main.feed') }}"
-            class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-primary-400 transition">Fil
+            class="text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-primary-400 transition">Fil
             d'actu</a>
         <a href="{{ url_for('main.calendar') }}"
-            class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-primary-400 transition">Planning</a>
+            class="text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-primary-400 transition">Planning</a>
         <a href="{{ url_for('main.roster') }}"
-            class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-primary-400 transition">Effectif</a>
+            class="text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-primary-400 transition">Effectif</a>
         <a href="{{ url_for('main.help') }}"
-            class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-primary-400 transition">Support</a>
+            class="text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-primary-400 transition">Support</a>
     </div>
 </div>
 

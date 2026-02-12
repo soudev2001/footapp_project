@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-enter max-w-5xl mx-auto px-4 py-8">
     <!-- Header -->
-    <div class="glass p-10 rounded-[40px] border-white/5 mb-10 relative overflow-hidden">
+    <div class="glass p-10 rounded-3xl border-white/5 mb-10 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-amber-500/10"></div>
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
             <div class="flex items-center gap-6">
@@ -14,17 +14,17 @@
                 </div>
                 <div>
                     <h1
-                        class="text-4xl font-black italic uppercase tracking-tight leading-none mb-2 light:text-slate-900">
+                        class="text-4xl font-bold uppercase tracking-tight leading-none mb-2 light:text-slate-900">
                         Mes Contrats</h1>
-                    <p class="text-white/40 light:text-slate-500 text-sm font-medium italic">Gérez vos engagements et
+                    <p class="text-white/40 light:text-slate-500 text-sm font-medium">Gérez vos engagements et
                         propositions de clubs.</p>
                 </div>
             </div>
             <div class="flex gap-4">
                 <div class="text-center px-6 py-4 glass rounded-3xl border-white/5">
-                    <p class="text-[9px] font-black text-white/20 light:text-slate-400 uppercase tracking-widest mb-1">
+                    <p class="text-[9px] font-bold text-white/20 light:text-slate-400 uppercase tracking-wider mb-1">
                         Offres en attente</p>
-                    <p class="text-3xl font-black text-amber-500 italic">
+                    <p class="text-3xl font-bold text-amber-500">
                         {{ contracts|selectattr('status', 'equalto', 'pending')|list|length }}
                     </p>
                 </div>
@@ -35,9 +35,9 @@
     {% if contracts %}
     <div class="grid gap-8">
         {% for contract in contracts %}
-        <div class="glass p-8 rounded-[40px] border-white/5 relative overflow-hidden group">
+        <div class="glass p-8 rounded-3xl border-white/5 relative overflow-hidden group">
             <!-- Status Ribbon -->
-            <div class="absolute top-0 right-0 px-8 py-2 rounded-bl-3xl text-[10px] font-black uppercase tracking-widest
+            <div class="absolute top-0 right-0 px-8 py-2 rounded-bl-3xl text-[10px] font-bold uppercase tracking-wider
                 {% if contract.status == 'pending' %}bg-amber-500/20 text-amber-500
                 {% elif contract.status == 'active' %}bg-green-500/20 text-green-500
                 {% else %}bg-red-500/20 text-red-500{% endif %}">
@@ -58,14 +58,14 @@
                         </div>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-black italic uppercase light:text-slate-900 leading-none mb-2">{{
+                        <h3 class="text-2xl font-bold uppercase light:text-slate-900 leading-none mb-2">{{
                             contract.club.name }}</h3>
                         <div class="flex items-center gap-3">
                             <span
-                                class="text-[9px] font-black text-white/20 light:text-slate-400 uppercase tracking-widest">Reçu
+                                class="text-[9px] font-bold text-white/20 light:text-slate-400 uppercase tracking-wider">Reçu
                                 le {{ contract.created_at.strftime('%d %b %Y') }}</span>
                             <span class="w-1 h-1 rounded-full bg-white/10"></span>
-                            <span class="text-[9px] font-black text-primary-400 uppercase tracking-widest">Poste: {{
+                            <span class="text-[9px] font-bold text-primary-400 uppercase tracking-wider">Poste: {{
                                 contract.role|upper }}</span>
                         </div>
                     </div>
@@ -75,16 +75,16 @@
                 <div class="grid grid-cols-2 gap-4 w-full lg:w-96">
                     <div class="p-4 bg-white/5 rounded-3xl border border-white/5">
                         <p
-                            class="text-[9px] font-black text-white/20 light:text-slate-400 uppercase tracking-widest mb-1">
+                            class="text-[9px] font-bold text-white/20 light:text-slate-400 uppercase tracking-wider mb-1">
                             Salaire</p>
-                        <p class="font-black text-lg italic text-white light:text-slate-900">{{ contract.salary or '0'
+                        <p class="font-bold text-lg text-white light:text-slate-900">{{ contract.salary or '0'
                             }}<span class="text-xs ml-1 font-medium text-white/40">€/m</span></p>
                     </div>
                     <div class="p-4 bg-white/5 rounded-3xl border border-white/5">
                         <p
-                            class="text-[9px] font-black text-white/20 light:text-slate-400 uppercase tracking-widest mb-1">
+                            class="text-[9px] font-bold text-white/20 light:text-slate-400 uppercase tracking-wider mb-1">
                             Statut</p>
-                        <p class="font-black text-lg italic text-white light:text-slate-900">{{
+                        <p class="font-bold text-lg text-white light:text-slate-900">{{
                             contract.status|capitalize }}</p>
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                         class="flex-1">
                         <input type="hidden" name="action" value="rejected">
                         <button type="submit"
-                            class="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/20 font-black text-[10px] uppercase tracking-widest transition-all">
+                            class="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/20 font-bold text-[10px] uppercase tracking-wider transition-all">
                             REFUSER
                         </button>
                     </form>
@@ -104,7 +104,7 @@
                         class="flex-1">
                         <input type="hidden" name="action" value="active">
                         <button type="submit"
-                            class="w-full px-6 py-4 rounded-2xl gradient-primary text-white font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                            class="w-full px-6 py-4 rounded-2xl gradient-primary text-white font-bold text-[10px] uppercase tracking-wider shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all">
                             ACCEPTER
                         </button>
                     </form>
@@ -114,7 +114,7 @@
 
             {% if contract.conditions %}
             <div
-                class="mt-8 p-6 bg-white/5 rounded-3xl border border-white/5 italic text-sm text-white/60 leading-relaxed">
+                class="mt-8 p-6 bg-white/5 rounded-3xl border border-white/5 text-sm text-white/60 leading-relaxed">
                 "{{ contract.conditions }}"
             </div>
             {% endif %}
@@ -122,12 +122,12 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="glass p-20 rounded-[40px] border-white/5 text-center">
-        <div class="w-20 h-20 bg-white/5 rounded-[32px] flex items-center justify-center mx-auto mb-6">
+    <div class="glass p-20 rounded-3xl border-white/5 text-center">
+        <div class="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <i class="fa-solid fa-file-contract text-white/10 text-3xl"></i>
         </div>
-        <h3 class="text-xl font-black uppercase tracking-widest mb-2 light:text-slate-900">Aucune offre</h3>
-        <p class="text-white/20 light:text-slate-500 text-sm italic">Les offres de recrutement apparaîtront ici dès
+        <h3 class="text-xl font-bold uppercase tracking-wider mb-2 light:text-slate-900">Aucune offre</h3>
+        <p class="text-white/20 light:text-slate-500 text-sm">Les offres de recrutement apparaîtront ici dès
             qu'un coach vous contactera.</p>
     </div>
     {% endif %}
