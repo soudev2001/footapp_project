@@ -17,9 +17,19 @@ def dashboard():
     # Calculate some stats for the dashboard
     total_projects = len(projects)
     
+    # Get all tickets to count actives
+    all_tickets = project_service.tickets_collection.find({'status': {'$ne': 'done'}})
+    active_tickets_count = project_service.tickets_collection.count_documents({'status': {'$ne': 'done'}})
+    
+    # Count superadmins (role='admin' AND club_id=None)
+    user_service = get_user_service()
+    superadmin_count = user_service.collection.count_documents({'role': 'admin', 'club_id': None})
+    
     return render_template('superadmin/dashboard.html', 
                          projects=projects,
-                         total_projects=total_projects)
+                         total_projects=total_projects,
+                         active_tickets=active_tickets_count,
+                         superadmin_count=superadmin_count)
 
 @superadmin_bp.route('/projects')
 @login_required

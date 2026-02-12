@@ -86,6 +86,9 @@ def login():
             
             # Redirect based on role
             if user['role'] == 'admin':
+                # Superadmins (in this logic) are admins without a club_id
+                if not user.get('club_id'):
+                    return redirect(url_for('superadmin.dashboard'))
                 return redirect(url_for('admin.admin_panel'))
             elif user['role'] == 'coach':
                 return redirect(url_for('main.dashboard'))
