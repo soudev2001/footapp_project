@@ -44,10 +44,21 @@
             </div>
             <span class="font-bold text-sm">Que s'est-il passé ?</span>
         </div>
-        <p class="text-xs text-gray-400 leading-relaxed">
+        <p class="text-xs text-gray-400 leading-relaxed mb-4">
             Une erreur inattendue s'est produite sur nos serveurs. Notre équipe technique est déjà sur le terrain.
             Si le problème persiste, contactez notre support.
         </p>
+
+        {% if error %}
+        <div class="p-4 bg-black/40 rounded-xl border border-white/5 overflow-auto max-h-40">
+            <div class="text-[10px] uppercase tracking-widest text-white/30 font-black mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-bug"></i> Details Technique
+            </div>
+            <code class="text-[10px] text-orange-300/80 font-mono break-all">
+                {{ error }}
+            </code>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Quick Links -->
@@ -83,5 +94,3 @@
     }
 </style>
 {% endblock %}
-
-

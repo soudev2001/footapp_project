@@ -7,6 +7,25 @@ from app.routes.auth import login_required
 main_bp = Blueprint('main', __name__)
 
 # ============================================================
+# PWA & ROOT ASSETS
+# ============================================================
+
+from flask import send_from_directory, current_app
+import os
+
+@main_bp.route('/sw.js')
+def service_worker():
+    return send_from_directory(os.path.join(current_app.root_path, 'static'), 'sw.js')
+
+@main_bp.route('/manifest.json')
+def manifest():
+    return send_from_directory(os.path.join(current_app.root_path, 'static'), 'manifest.json')
+
+@main_bp.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(current_app.root_path, 'static', 'img', 'icons'), 'icon.svg')
+
+# ============================================================
 # PUBLIC PAGES
 # ============================================================
 

@@ -61,7 +61,7 @@ def create_app(config_name='default'):
     
     @app.errorhandler(500)
     def server_error(e):
-        return render_template('errors/500.html'), 500
+        return render_template('errors/500.html', error=e), 500
     
     return app
 

@@ -271,7 +271,10 @@ def seed_all():
 if __name__ == '__main__':
     # Standalone execution
     import sys
-    sys.path.insert(0, 'c:/Users/Soufiane/repos/FootLogic/FootLogic_project/FootLogic_v2')
+    import os
+    
+    # Add current directory to path if needed (when running from root)
+    sys.path.append(os.getcwd())
     
     from app import create_app
     app = create_app()
