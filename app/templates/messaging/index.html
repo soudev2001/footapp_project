@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}Messages - FootLogic{% endblock %}
+
+{% block content %}
+<div class="flex h-[calc(100vh-5rem)] -mt-20 pt-20 overflow-hidden">
+    <!-- Chat Sidebar -->
+    <aside class="w-80 glass flex flex-col border-r border-white/5">
+        <div class="p-6 border-b border-white/5">
+            <h2 class="text-xl font-extrabold tracking-tight">Mes <span class="text-gradient">Messages</span></h2>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-4">
+            <!-- Team Chats -->
+            <div class="space-y-1">
+                <h3 class="text-[10px] font-semibold uppercase tracking-wider text-white/20 px-3 mb-2">Équipes</h3>
+                {% for team in teams %}
+                <button onclick="loadChat('team', '{{ team._id|string }}', '{{ team.name }}')"
+                    class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all text-left group">
+                    <div
+                        class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center text-xs shadow-lg">
+                        <i class="fa-solid fa-people-group"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold group-hover:text-primary-400 transition-colors">{{ team.name }}</p>
+                        <p class="text-[10px] text-white/25">Groupe de l'équipe</p>
+                    </div>
+                </button>
+                {% endfor %}
+            </div>
+
+            <!-- Direct Messages -->
+            <div class="space-y-1">
+                <h3 class="text-[10px] font-semibold uppercase tracking-wider text-white/20 px-3 mb-2">Membres</h3>
+                {% for member in members if member._id|string != current_user.id %}
+                <button
+                    onclick="loadChat('direct', '{{ member._id|string }}', '{{ member.profile.first_name }} {{ member.profile.last_name }}')"
+                    class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all text-left group">
+                    <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center font-bold text-xs">
+                        {{ member.profile.first_name[:1] }}
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold group-hover:text-primary-400 transition-colors">
+                            {{ member.profile.first_name }} {{ member.profile.last_name }}
+                        </p>
+                        <p class="text-[10px] text-white/25">{{ member.role|capitalize }}</p>
+                    </div>
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+    </aside>
+
+    <!-- Chat Main Area -->
+    <main class="flex-1 flex flex-col relative">
+        <!-- Chat Header -->
+        <div id="chatHeader" class="h-16 border-b border-white/5 px-8 flex items-center justify-between glass hidden">
+            <div class="flex items-center gap-4">
+                <div id="activeChatAvatar"
+                    class="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center text-xs font-bold">
+                    ?
+                </div>
+                <div>
+                    <h3 id="activeChatName" class="text-sm font-bold">Sélectionnez une discussion</h3>
+                    <p id="activeChatStatus" class="text-[10px] text-green-400 font-medium">En ligne</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button
+                    class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center text-white/30 hover:text-white transition-all">
+                    <i class="fa-solid fa-phone text-xs"></i>
+                </button>
+                <button
+                    class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center text-white/30 hover:text-white transition-all">
+                    <i class="fa-solid fa-video text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-8 space-y-6 custom-scrollbar flex flex-col">
+            <div class="flex-1 flex flex-col items-center justify-center text-center opacity-40">
+                <div class="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center mb-6">
+                    <i class="fa-solid fa-comments text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">FootLogic Chat</h3>
+                <p class="text-sm max-w-xs">Sélectionnez un membre ou une équipe pour commencer à discuter.</p>
+            </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div id="chatInputArea" class="p-6 glass border-t border-white/5 hidden">
+            <div class="relative max-w-4xl mx-auto">
+                <input type="text" id="messageInput" placeholder="Écrire un message..."
+                    class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-16 text-sm focus:outline-none focus:border-primary-500/50 transition-all">
+                <button onclick="sendMessage()"
+                    class="absolute right-2 top-2 bottom-2 w-12 gradient-primary rounded-xl flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    let currentChat = {
+        type: null,
+        id: null
+    };
+
+    async function loadChat(type, id, name) {
+        currentChat.type = type;
+        currentChat.id = id;
+
+        // Update UI
+        document.getElementById('chatHeader').classList.remove('hidden');
+        document.getElementById('chatInputArea').classList.remove('hidden');
+        document.getElementById('activeChatName').innerText = name;
+        document.getElementById('activeChatAvatar').innerText = name.charAt(0);
+
+        // Fetch History
+        const endpoint = type === 'team' ? `/messages/history/team/${id}` : `/messages/history/direct/${id}`;
+        try {
+            const response = await fetch(endpoint);
+            const data = await response.json();
+            renderMessages(data.history);
+        } catch (err) {
+            console.error('Failed to load chat:', err);
+        }
+    }
+
+    function renderMessages(history) {
+        const container = document.getElementById('chatMessages');
+        container.innerHTML = '';
+
+        if (history.length === 0) {
+            container.innerHTML = `
+            <div class="flex-1 flex flex-col items-center justify-center text-center opacity-30">
+                <p class="text-sm">Aucun message pour le moment.</p>
+            </div>
+        `;
+            return;
+        }
+
+        history.forEach(msg => {
+            const isMe = msg.sender_id === '{{ current_user.id }}';
+            const msgHtml = `
+            <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[70%]">
+                    ${!isMe && currentChat.type === 'team' ? `<span class="text-[10px] text-white/30 ml-2 mb-1 cursor-default font-medium">${msg.sender_name}</span>` : ''}
+                    <div class="px-4 py-2.5 rounded-2xl text-sm font-medium ${isMe ? 'gradient-primary text-white rounded-tr-none' : 'bg-white/10 text-white/90 rounded-tl-none border border-white/5'}">
+                        ${msg.content}
+                    </div>
+                </div>
+            </div>
+        `;
+            container.insertAdjacentHTML('beforeend', msgHtml);
+        });
+
+        // Scroll to bottom
+        container.scrollTop = container.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const content = input.value.trim();
+        if (!content || !currentChat.id) return;
+
+        const payload = {
+            content: content,
+            type: currentChat.type
+        };
+
+        if (currentChat.type === 'team') payload.team_id = currentChat.id;
+        else payload.receiver_id = currentChat.id;
+
+        try {
+            const response = await fetch('/messages/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                input.value = '';
+                // Refresh history
+                loadChat(currentChat.type, currentChat.id, document.getElementById('activeChatName').innerText);
+            }
+        } catch (err) {
+            console.error('Failed to send message:', err);
+        }
+    }
+
+    // Enter key to send
+    document.getElementById('messageInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+</script>
+
+<style>
+    /* Chat specific styles */
+    #chatMessages {
+        background-image: radial-gradient(circle at center, rgba(16, 185, 129, 0.02) 0%, transparent 100%);
+    }
+</style>
+{% endblock %}

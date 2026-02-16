@@ -308,9 +308,26 @@ def add_team():
     name = request.form.get('name')
     category = request.form.get('category', 'Senior')
     description = request.form.get('description', '')
+    colors = {
+        'primary': request.form.get('primary_color', '#10b981'),
+        'secondary': request.form.get('secondary_color', '#0f172a')
+    }
     
-    team_service.create(club_id, name, category, description=description)
-    flash(f'Équipe {name} créée avec succès !', 'success')
+@admin_bp.route('/teams/<team_id>/update-colors', methods=['POST'])
+@login_required
+@role_required('admin')
+def update_team_colors(team_id):
+    """Update team primary and secondary colors"""
+    from app.services import get_team_service
+    team_service = get_team_service()
+    
+    colors = {
+        'primary': request.form.get('primary_color'),
+        'secondary': request.form.get('secondary_color')
+    }
+    
+    team_service.update(team_id, {'colors': colors})
+    flash('Couleurs de l\'équipe mises à jour !', 'success')
     return redirect(url_for('admin.admin_panel'))
 
 @admin_bp.route('/teams/<team_id>/delete', methods=['POST'])

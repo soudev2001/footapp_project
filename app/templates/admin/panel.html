@@ -280,13 +280,21 @@
                         <div class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-md">
                             <i class="fa-solid fa-shield-halved text-sm"></i>
                         </div>
-                        <form action="{{ url_for('admin.delete_team', team_id=team._id|string) }}" method="POST"
-                            onsubmit="return confirm('Supprimer cette équipe ?')">
-                            <button type="submit"
-                                class="w-7 h-7 rounded-lg bg-white/[0.03] hover:bg-red-500/10 flex items-center justify-center text-white/10 hover:text-red-400 transition-all">
-                                <i class="fa-solid fa-trash-can text-xs"></i>
+                        <div class="flex gap-2">
+                            <button
+                                onclick="openPersonalizeModal('{{ team._id|string }}', '{{ team.name }}', '{{ team.colors.primary if team.colors else '#10b981' }}', '{{ team.colors.secondary if team.colors else '#0f172a' }}')"
+                                class="w-7 h-7 rounded-lg bg-white/[0.03] hover:bg-primary-500/10 flex items-center justify-center text-white/10 hover:text-primary-400 transition-all"
+                                title="Personnaliser">
+                                <i class="fa-solid fa-palette text-xs"></i>
                             </button>
-                        </form>
+                            <form action="{{ url_for('admin.delete_team', team_id=team._id|string) }}" method="POST"
+                                onsubmit="return confirm('Supprimer cette équipe ?')">
+                                <button type="submit"
+                                    class="w-7 h-7 rounded-lg bg-white/[0.03] hover:bg-red-500/10 flex items-center justify-center text-white/10 hover:text-red-400 transition-all">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                     <h3 class="text-lg font-extrabold mb-0.5">{{ team.name }}</h3>
                     <p class="text-primary-400/80 text-[10px] font-semibold uppercase tracking-wider mb-3">{{
@@ -824,8 +832,30 @@
                     <label
                         class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Description
                         (Optionnel)</label>
-                    <textarea name="description" rows="2"
+                    <textarea name="description" rows="1"
                         class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label
+                            class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-1.5 ml-0.5">Couleur
+                            Primaire</label>
+                        <div class="flex items-center gap-2">
+                            <input type="color" name="primary_color" value="#10b981"
+                                class="w-10 h-10 border-none bg-transparent cursor-pointer">
+                            <span class="text-[10px] text-white/40 font-mono">#10b981</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-1.5 ml-0.5">Couleur
+                            Secondaire</label>
+                        <div class="flex items-center gap-2">
+                            <input type="color" name="secondary_color" value="#0f172a"
+                                class="w-10 h-10 border-none bg-transparent cursor-pointer">
+                            <span class="text-[10px] text-white/40 font-mono">#0f172a</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="pt-3">
                     <button type="submit"
@@ -858,7 +888,50 @@
     </div>
 </div>
 
+<!-- Modal: Personalize Team -->
+<div id="personalizeTeamModal"
+    class="fixed inset-0 z-[100] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass max-w-md w-full rounded-2xl border border-white/8 p-7 animate-slide-up">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-extrabold">Personnaliser <span class="text-gradient"
+                    id="persoTeamName">Équipe</span></h3>
+            <button onclick="toggleModal('personalizeTeamModal')"
+                class="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center hover:bg-white/8 transition-all text-white/30 hover:text-white/60">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+        </div>
+        <form id="personalizeForm" method="POST" class="space-y-6">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label
+                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-2 ml-0.5">Couleur
+                        Primaire</label>
+                    <input type="color" name="primary_color" id="persoPrimary"
+                        class="w-full h-12 border-none bg-transparent cursor-pointer rounded-xl overflow-hidden">
+                </div>
+                <div>
+                    <label
+                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-2 ml-0.5">Couleur
+                        Secondaire</label>
+                    <input type="color" name="secondary_color" id="persoSecondary"
+                        class="w-full h-12 border-none bg-transparent cursor-pointer rounded-xl overflow-hidden">
+                </div>
+            </div>
+            <button type="submit"
+                class="gradient-primary w-full py-4 rounded-xl font-bold text-sm shadow-lg shadow-primary-500/15">Enregistrer
+                les couleurs</button>
+        </form>
+    </div>
+</div>
+
 <script>
+    function openPersonalizeModal(id, name, p, s) {
+        document.getElementById('persoTeamName').innerText = name;
+        document.getElementById('persoPrimary').value = p;
+        document.getElementById('persoSecondary').value = s;
+        document.getElementById('personalizeForm').action = `/admin/teams/${id}/update-colors`;
+        toggleModal('personalizeTeamModal');
+    }
     function toggleModal(id) {
         const modal = document.getElementById(id);
         modal.classList.toggle('hidden');

@@ -16,9 +16,9 @@ class TeamService:
         """Get team by ID"""
         return self.collection.find_one({'_id': ObjectId(team_id)})
 
-    def create(self, club_id, name, category, coach_ids=None, description=''):
+    def create(self, club_id, name, category, coach_ids=None, description='', colors=None, logo=''):
         """Create a new team via model helper"""
-        team_data = create_team(club_id, name, category, coach_ids, description)
+        team_data = create_team(club_id, name, category, coach_ids, description, colors, logo)
         result = self.collection.insert_one(team_data)
         team_data['_id'] = result.inserted_id
         return team_data

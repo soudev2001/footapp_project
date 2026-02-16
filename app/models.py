@@ -58,8 +58,24 @@ TEAM_SCHEMA = {
     'name': str,              # e.g., 'Senior A', 'U15', 'Reserve'
     'category': str,          # e.g., 'Senior', 'Youth', 'Academy'
     'coach_ids': [ObjectId],  # List of coach user_ids
+    'colors': {
+        'primary': str,
+        'secondary': str
+    },
+    'logo': str,
     'created_at': datetime,
     'description': str
+}
+
+MESSAGE_SCHEMA = {
+    '_id': ObjectId,
+    'sender_id': ObjectId,
+    'receiver_id': ObjectId, # Optional for DM
+    'team_id': ObjectId,     # Optional for group chat
+    'content': str,
+    'type': str,             # 'direct', 'team'
+    'read_by': [ObjectId],   # List of users who read the message
+    'created_at': datetime
 }
 
 PLAYER_SCHEMA = {
@@ -210,13 +226,18 @@ def create_club(name, city, colors, logo='', stadium='', founded_year=2000, desc
         'created_at': datetime.utcnow()
     }
 
-def create_team(club_id, name, category, coach_ids=None, description=''):
+def create_team(club_id, name, category, coach_ids=None, description='', colors=None, logo=''):
     """Create a new team document"""
     return {
         'club_id': ObjectId(club_id),
         'name': name,
         'category': category,
         'coach_ids': [ObjectId(cid) for cid in coach_ids] if coach_ids else [],
+        'colors': colors or {
+            'primary': '#10b981',
+            'secondary': '#0f172a'
+        },
+        'logo': logo,
         'description': description,
         'created_at': datetime.utcnow()
     }
@@ -312,4 +333,16 @@ def create_post(club_id, author_id, title, content, category='news', image=''):
         'comments': [],
         'created_at': datetime.utcnow(),
         'category': category
+    }
+
+def create_message(sender_id, content, receiver_id=None, team_id=None, msg_type='direct'):
+    """Create a new message document"""
+    return {
+        'sender_id': ObjectId(sender_id),
+        'receiver_id': ObjectId(receiver_id) if receiver_id else None,
+        'team_id': ObjectId(team_id) if team_id else None,
+        'content': content,
+        'type': msg_type,
+        'read_by': [ObjectId(sender_id)],
+        'created_at': datetime.utcnow()
     }

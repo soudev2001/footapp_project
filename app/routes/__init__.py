@@ -8,4 +8,5 @@ from .coach import coach_bp
 from .player import player_bp
 from .isy import isy_bp
 from .superadmin import superadmin_bp
+from .messaging import messaging_bp
 
