@@ -212,7 +212,7 @@ def update_club():
     
     club_service.update(club_id, update_data)
     
-    flash('Configuration du club mise a jour!', 'success')
+    flash(f'Configuration du club mise à jour ! (Couleur : {primary_color})', 'success')
     return redirect(url_for('admin.admin_panel'))
 
 @admin_bp.route('/users')
