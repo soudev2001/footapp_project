@@ -55,18 +55,21 @@
                     },
                     colors: {
                         'primary': {
-                            DEFAULT: 'var(--primary-color)',
-                            50: 'var(--primary-color)',
-                            100: 'var(--primary-color)',
-                            200: 'var(--primary-color)',
-                            300: 'var(--primary-color)',
-                            400: 'var(--primary-color)',
-                            500: 'var(--primary-color)',
-                            600: 'var(--primary-color)',
-                            700: 'var(--primary-color)',
-                            800: 'var(--primary-color)',
-                            900: 'var(--primary-color)',
-                            950: 'var(--primary-color)',
+                            DEFAULT: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                            50: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                            100: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                            200: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                            300: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                            400: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                            500: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                            600: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                            700: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                            800: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                            900: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                            950: 'rgb(var(--primary-rgb) / <alpha-value>)',
+                        },
+                        'secondary': {
+                            DEFAULT: 'rgb(var(--secondary-rgb) / <alpha-value>)',
                         },
                         'accent': {
                             400: '#fbbf24',
@@ -92,6 +95,28 @@
                 }
             }
         }
+
+        // Helper to convert hex to RGB for Tailwind opacity support
+        function updateRGBCustomProperties() {
+            const root = document.documentElement;
+            const getColorRGB = (hex) => {
+                if (!hex || hex.length < 7) return null;
+                const r = parseInt(hex.slice(1, 3), 16);
+                const g = parseInt(hex.slice(3, 5), 16);
+                const b = parseInt(hex.slice(5, 7), 16);
+                return `${r} ${g} ${b}`;
+            }
+
+            const p = getComputedStyle(root).getPropertyValue('--primary-color').trim();
+            const s = getComputedStyle(root).getPropertyValue('--secondary-color').trim();
+
+            const pRGB = getColorRGB(p);
+            if (pRGB) root.style.setProperty('--primary-rgb', pRGB);
+
+            const sRGB = getColorRGB(s);
+            if (sRGB) root.style.setProperty('--secondary-rgb', sRGB);
+        }
+        document.addEventListener('DOMContentLoaded', updateRGBCustomProperties);
     </script>
 
     <!-- Custom Style -->

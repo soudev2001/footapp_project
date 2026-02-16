@@ -277,7 +277,8 @@
                         class="absolute -right-8 -top-8 w-24 h-24 bg-primary-500/5 rounded-full blur-[40px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     </div>
                     <div class="flex justify-between items-start mb-5">
-                        <div class="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-md">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
+                            style="background: linear-gradient(135deg, {{ team.colors.primary if team.colors else '#10b981' }} 0%, {{ team.colors.secondary if team.colors else '#059669' }} 100%);">
                             <i class="fa-solid fa-shield-halved text-sm"></i>
                         </div>
                         <div class="flex gap-2">
