@@ -282,7 +282,7 @@
                         </div>
                         <div class="flex gap-2">
                             <button
-                                onclick="openPersonalizeModal('{{ team._id|string }}', '{{ team.name }}', '{{ team.colors.primary if team.colors else '#10b981' }}', '{{ team.colors.secondary if team.colors else '#0f172a' }}')"
+                                onclick="openPersonalizeModal('{{ team._id|string }}', {{ team.name|tojson|safe }}, '{{ team.colors.primary if team.colors else '#10b981' }}', '{{ team.colors.secondary if team.colors else '#0f172a' }}')"
                                 class="w-7 h-7 rounded-lg bg-white/[0.03] hover:bg-primary-500/10 flex items-center justify-center text-white/10 hover:text-primary-400 transition-all"
                                 title="Personnaliser">
                                 <i class="fa-solid fa-palette text-xs"></i>

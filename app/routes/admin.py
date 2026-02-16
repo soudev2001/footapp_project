@@ -308,11 +308,11 @@ def add_team():
     name = request.form.get('name')
     category = request.form.get('category', 'Senior')
     description = request.form.get('description', '')
-    colors = {
-        'primary': request.form.get('primary_color', '#10b981'),
-        'secondary': request.form.get('secondary_color', '#0f172a')
-    }
     
+    team_service.create(club_id, name, category, description=description, colors=colors)
+    flash(f'Équipe {name} créée avec succès !', 'success')
+    return redirect(url_for('admin.admin_panel'))
+
 @admin_bp.route('/teams/<team_id>/update-colors', methods=['POST'])
 @login_required
 @role_required('admin')
