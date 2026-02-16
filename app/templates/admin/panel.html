@@ -281,9 +281,11 @@
                             <i class="fa-solid fa-shield-halved text-sm"></i>
                         </div>
                         <div class="flex gap-2">
-                            <button
-                                onclick="openPersonalizeModal('{{ team._id|string }}', {{ team.name|tojson|safe }}, '{{ team.colors.primary if team.colors else '#10b981' }}', '{{ team.colors.secondary if team.colors else '#0f172a' }}')"
-                                class="w-7 h-7 rounded-lg bg-white/[0.03] hover:bg-primary-500/10 flex items-center justify-center text-white/10 hover:text-primary-400 transition-all"
+                            <button type="button" data-id="{{ team._id|string }}" data-name="{{ team.name }}"
+                                data-primary="{{ team.colors.primary if team.colors else '#10b981' }}"
+                                data-secondary="{{ team.colors.secondary if team.colors else '#0f172a' }}"
+                                onclick="openPersonalizeModal(this)"
+                                class="w-7 h-7 rounded-lg bg-white/[0.03] hover:bg-primary-500/10 flex items-center justify-center text-white/10 hover:text-primary-400 transition-all font-medium"
                                 title="Personnaliser">
                                 <i class="fa-solid fa-palette text-xs"></i>
                             </button>
@@ -923,65 +925,52 @@
         </form>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-    function openPersonalizeModal(id, name, p, s) {
-        document.getElementById('persoTeamName').innerText = name;
-        document.getElementById('persoPrimary').value = p;
-        document.getElementById('persoSecondary').value = s;
-        document.getElementById('personalizeForm').action = `/admin/teams/${id}/update-colors`;
+    function openPersonalizeModal(btn) {
+        const d = btn.dataset;
+        document.getElementById('persoTeamName').innerText = d.name;
+        document.getElementById('persoPrimary').value = d.primary;
+        document.getElementById('persoSecondary').value = d.secondary;
+        document.getElementById('personalizeForm').action = '/admin/teams/' + d.id + '/update-colors';
         toggleModal('personalizeTeamModal');
     }
     function toggleModal(id) {
-        const modal = document.getElementById(id);
-        modal.classList.toggle('hidden');
+        document.getElementById(id).classList.toggle('hidden');
     }
     function switchTab(tabId) {
-        ['members', 'teams', 'subscription', 'metrics', 'settings'].forEach(t => {
+        const tabs = ['members', 'teams', 'subscription', 'metrics', 'settings'];
+        tabs.forEach(t => {
             const tab = document.getElementById('tab-' + t);
             const nav = document.getElementById('nav-' + t);
             if (tab) tab.classList.add('hidden');
             if (nav) {
                 nav.classList.remove('active');
-                // Remove white text from inactive
                 const span = nav.querySelector('span');
-                if (span) {
-                    span.classList.remove('text-white');
-                    span.classList.add('text-gray-400');
-                }
+                if (span) { span.classList.remove('text-white'); span.classList.add('text-gray-400'); }
                 const icon = nav.querySelector('i');
                 if (icon) icon.classList.replace('opacity-100', 'opacity-50');
             }
         });
-
         const activeTab = document.getElementById('tab-' + tabId);
         const activeNav = document.getElementById('nav-' + tabId);
         if (activeTab) activeTab.classList.remove('hidden');
         if (activeNav) {
             activeNav.classList.add('active');
             const span = activeNav.querySelector('span');
-            if (span) {
-                span.classList.remove('text-gray-400');
-                span.classList.add('text-white');
-            }
+            if (span) { span.classList.remove('text-gray-400'); span.classList.add('text-white'); }
             const icon = activeNav.querySelector('i');
             if (icon) icon.classList.replace('opacity-50', 'opacity-100');
         }
-        // Update URL hash without jumping
         history.replaceState(null, null, '#' + tabId);
     }
-
-    // Initialize from Hash
     document.addEventListener('DOMContentLoaded', () => {
         const hash = window.location.hash.replace('#', '');
-        if (['members', 'teams', 'subscription', 'metrics', 'settings'].includes(hash)) {
-            switchTab(hash);
-        } else {
-            switchTab('members');
-        }
+        switchTab(['members', 'teams', 'subscription', 'metrics', 'settings'].includes(hash) ? hash : 'members');
     });
 </script>
-
 <style>
     .nav-item.active {
         background-color: rgba(16, 185, 129, 0.1);
