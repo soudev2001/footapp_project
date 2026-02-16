@@ -51,6 +51,10 @@ def get_project_service():
     from .project_service import ProjectService
     return ProjectService()
 
+def get_notification_service():
+    from .notification_service import NotificationService
+    return NotificationService(mongo.db)
+
 # Role helpers
 from .user_service import has_permission, get_nav_for_role, ROLE_PERMISSIONS
 

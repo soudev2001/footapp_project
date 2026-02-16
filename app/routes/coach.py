@@ -70,6 +70,20 @@ def roster():
         
     players = player_service.get_by_club(club_id, team_id=selected_team_id)
     
+    # Enrich players with user account status
+    from app.services import get_user_service
+    user_service = get_user_service()
+    user_ids = [p.get('user_id') for p in players if p.get('user_id')]
+    users = {str(u['_id']): u for u in user_service.collection.find({'_id': {'$in': user_ids}})}
+    
+    for player in players:
+        uid = str(player.get('user_id'))
+        if uid in users:
+            player['account_status'] = users[uid].get('account_status', 'active')
+            player['email'] = users[uid].get('email')
+        else:
+            player['account_status'] = 'no_account'
+
     # Simple grouping for the roster view by position
     by_position = {
         'GK': [p for p in players if p.get('position') == 'GK'],
@@ -142,24 +156,59 @@ def add_player():
     team_service = get_team_service()
     
     if request.method == 'POST':
+        from flask import current_app
+        from app.services import get_user_service
+        user_service = get_user_service()
+
+        admin_config = current_app.config.get('ADMIN_CONFIG', {})
+        player_defaults = admin_config.get('player_defaults', {})
+
+        email = request.form.get('email')
+        first_name = request.form.get('first_name', request.form.get('name', 'Joueur'))
+        last_name = request.form.get('last_name', '')
+        password = request.form.get('password', admin_config.get('default_password', 'FootLogic2026!'))
+
+        # Handle User Account
+        user = user_service.get_by_email(email)
+        if not user:
+            profile = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'avatar': '',
+                'phone': ''
+            }
+            user = user_service.create(
+                email=email,
+                password=password,
+                role=player_defaults.get('role', 'player'),
+                club_id=club_id,
+                profile=profile
+            )
+            flash(f'Compte créé pour {email} avec le mot de passe défini.', 'success')
+        else:
+            flash(f'Compte existant trouvé pour {email}.', 'info')
+
         data = {
-            'name': request.form.get('name'),
+            'name': f"{first_name} {last_name}".strip(),
+            'user_id': user['_id'],
             'jersey_number': int(request.form.get('jersey_number', 0)),
             'position': request.form.get('position'),
             'status': 'active',
-            'height': int(request.form.get('height', 175)),
-            'weight': int(request.form.get('weight', 70)),
+            'height': int(request.form.get('height', player_defaults.get('height', 175))),
+            'weight': int(request.form.get('weight', player_defaults.get('weight', 70))),
             'team_id': request.form.get('team_id')
         }
-        
+
         player_service.create(club_id=club_id, **data)
-        flash('Nouveau joueur ajoute a l\'effectif.', 'success')
+        flash('Nouveau joueur ajouté à l\'effectif.', 'success')
         return redirect(url_for('coach.roster', team_id=data['team_id']))
     
+    from flask import current_app as _app
+    admin_config = _app.config.get('ADMIN_CONFIG', {})
     teams = team_service.get_by_club(club_id)
     selected_team_id = request.args.get('team_id')
-    
-    return render_template('coach/add_player.html', teams=teams, selected_team_id=selected_team_id)
+
+    return render_template('coach/add_player.html', teams=teams, selected_team_id=selected_team_id, admin_config=admin_config)
 
 @coach_bp.route('/player/<player_id>/delete', methods=['POST'])
 @login_required
@@ -339,9 +388,30 @@ def save_tactics():
         club_id=club_id,
         formation=data.get('formation'),
         starters=data.get('starters'),
-        team_id=team_id
+        team_id=team_id,
+        substitutes=data.get('substitutes')
     )
     
+    return {"status": "success"}
+
+@coach_bp.route('/tactics/save-config', methods=['POST'])
+@login_required
+@role_required('coach', 'admin')
+def save_tactical_config():
+    """Save tactical configuration (style, pressing, etc.)"""
+    data = request.json
+    club_id = session.get('club_id')
+    team_id = data.get('team_id')
+
+    from app.services import get_player_service
+    player_service = get_player_service()
+
+    player_service.save_tactical_config(
+        club_id=club_id,
+        team_id=team_id,
+        config=data.get('config')
+    )
+
     return {"status": "success"}
 
 @coach_bp.route('/create-event', methods=['GET', 'POST'])

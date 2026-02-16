@@ -4,7 +4,10 @@
 {% block content %}
 <div class="lg:h-[calc(100vh-100px)] h-auto flex flex-col lg:flex-row gap-6 p-6 page-enter overflow-y-auto lg:overflow-hidden"
     id="tactics-config" data-starters='{{ (lineup.starters or {}) | tojson | safe }}'
-    data-formation="{{ lineup.formation or '4-3-3' }}">
+    data-substitutes='{{ (lineup.substitutes or []) | tojson | safe }}'
+    data-formation="{{ lineup.formation or '4-3-3' }}"
+    data-tactical-config='{{ (lineup.tactical_config or {}) | tojson | safe }}'>
+
     <!-- Sidebar / Players List -->
     <div class="w-full lg:w-96 flex flex-col gap-6">
         <div class="glass p-6 rounded-3xl border-white/5 flex-1 flex flex-col overflow-hidden">
@@ -29,10 +32,18 @@
 
             <div class="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar" id="availablePlayers">
                 {% for player in players %}
-                <div onclick="selectPlayerCard(this)"
-                    class="p-4 rounded-[24px] bg-white/5 border border-white/5 flex items-center justify-between group hover:border-primary-500/30 transition cursor-pointer player-card"
+                <div draggable="true"
+                    class="p-4 rounded-[24px] bg-white/5 border border-white/5 flex items-center justify-between group hover:border-primary-500/30 transition cursor-grab active:cursor-grabbing player-card"
                     data-player-id="{{ player._id }}" data-player-name="{{ player.name }}"
-                    data-player-number="{{ player.jersey_number or '?' }}" data-player-pos="{{ player.position }}">
+                    data-player-number="{{ player.jersey_number or '?' }}" data-player-pos="{{ player.position }}"
+                    data-player-vit="{{ player.get('technical_ratings', {}).get('VIT', 50) }}"
+                    data-player-tir="{{ player.get('technical_ratings', {}).get('TIR', 50) }}"
+                    data-player-pas="{{ player.get('technical_ratings', {}).get('PAS', 50) }}"
+                    data-player-dri="{{ player.get('technical_ratings', {}).get('DRI', 50) }}"
+                    data-player-def="{{ player.get('technical_ratings', {}).get('DEF', 50) }}"
+                    data-player-phy="{{ player.get('technical_ratings', {}).get('PHY', 50) }}"
+                    onclick="selectPlayerCard(this)" ondragstart="onDragStart(event, this)"
+                    ondragend="onDragEnd(event)">
                     <div class="flex items-center gap-4">
                         <div
                             class="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center font-bold text-xs shadow-lg group-hover:scale-110 transition-transform">
@@ -40,11 +51,11 @@
                         </div>
                         <div>
                             <p class="text-sm font-bold text-white">{{ player.name }}</p>
-                            <p class="text-[9px] text-white/20 font-bold uppercase tracking-wider">{{ player.position
-                                }}</p>
+                            <p class="text-[9px] text-white/20 font-bold uppercase tracking-wider">{{ player.position }}
+                            </p>
                         </div>
                     </div>
-                    <i class="fa-solid fa-plus text-white/10 group-hover:text-primary-400"></i>
+                    <i class="fa-solid fa-grip-vertical text-white/10 group-hover:text-primary-400"></i>
                 </div>
                 {% endfor %}
             </div>
@@ -71,47 +82,69 @@
         </div>
     </div>
 
-    <!-- Pitch Area -->
-    <div class="flex-1 glass rounded-3xl border-white/5 bg-emerald-950/20 relative overflow-hidden group shadow-2xl"
-        id="pitch">
-        <!-- Pitch Markings (SVG for precise scale) -->
-        <div class="absolute inset-0 opacity-20 pointer-events-none">
-            <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <rect x="5" y="5" width="90" height="90" fill="none" stroke="white" stroke-width="0.5" rx="5" />
-                <line x1="5" y1="50" x2="95" y2="50" stroke="white" stroke-width="0.5" />
-                <circle cx="50" cy="50" r="10" fill="none" stroke="white" stroke-width="0.5" />
-                <rect x="30" y="5" width="40" height="12" fill="none" stroke="white" stroke-width="0.5" />
-                <rect x="30" y="83" width="40" height="12" fill="none" stroke="white" stroke-width="0.5" />
-            </svg>
+    <!-- Main Area: Pitch + Bench -->
+    <div class="flex-1 flex flex-col gap-6">
+        <!-- Pitch Area -->
+        <div class="flex-1 glass rounded-3xl border-white/5 bg-emerald-950/20 relative overflow-hidden group shadow-2xl"
+            id="pitch" ondragover="onDragOverPitch(event)" ondrop="onDropPitch(event)">
+            <!-- Pitch Markings -->
+            <div class="absolute inset-0 opacity-20 pointer-events-none">
+                <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <rect x="5" y="5" width="90" height="90" fill="none" stroke="white" stroke-width="0.5" rx="5" />
+                    <line x1="5" y1="50" x2="95" y2="50" stroke="white" stroke-width="0.5" />
+                    <circle cx="50" cy="50" r="10" fill="none" stroke="white" stroke-width="0.5" />
+                    <rect x="30" y="5" width="40" height="12" fill="none" stroke="white" stroke-width="0.5" />
+                    <rect x="30" y="83" width="40" height="12" fill="none" stroke="white" stroke-width="0.5" />
+                </svg>
+            </div>
+
+            <!-- Players on Pitch -->
+            <div class="absolute inset-0 z-10" id="pitchArea"></div>
+
+            <!-- Pitch Controls -->
+            <div class="absolute top-10 right-10 flex flex-col gap-4 z-20">
+                <button onclick="saveTactics()" id="saveBtn"
+                    class="w-14 h-14 rounded-2xl gradient-primary border border-white/20 flex items-center justify-center text-white hover:scale-105 active:scale-95 transition shadow-2xl shadow-primary-500/20"
+                    title="Sauvegarder">
+                    <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                </button>
+                <button onclick="openTacticalConfig()"
+                    class="w-14 h-14 rounded-2xl glass hover:bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 hover:scale-105 active:scale-95 transition shadow-2xl"
+                    title="Configuration Tactique">
+                    <i class="fa-solid fa-chess text-lg"></i>
+                </button>
+                <button onclick="resetPitch()"
+                    class="w-14 h-14 rounded-2xl glass hover:bg-white/10 border border-white/20 flex items-center justify-center text-white transition shadow-2xl"
+                    title="Réinitialiser">
+                    <i class="fa-solid fa-rotate-left text-lg"></i>
+                </button>
+            </div>
         </div>
 
-        <!-- Players Context Area -->
-        <div class="absolute inset-0 z-10" id="pitchArea">
-            <!-- Player slots will be injected here -->
-        </div>
-
-        <!-- Pitch Controls -->
-        <div class="absolute top-10 right-10 flex flex-col gap-4 z-20">
-            <button onclick="saveTactics()" id="saveBtn"
-                class="w-14 h-14 rounded-2xl gradient-primary border border-white/20 flex items-center justify-center text-white hover:scale-105 active:scale-95 transition shadow-2xl shadow-primary-500/20"
-                title="Sauvegarder">
-                <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
-            </button>
-            <button onclick="resetPitch()"
-                class="w-14 h-14 rounded-2xl glass hover:bg-white/10 border border-white/20 flex items-center justify-center text-white transition shadow-2xl"
-                title="Réinitialiser">
-                <i class="fa-solid fa-rotate-left text-lg"></i>
-            </button>
+        <!-- Bench / Substitutes -->
+        <div class="glass rounded-3xl border-white/5 p-6" id="benchArea" ondragover="onDragOverBench(event)"
+            ondrop="onDropBench(event)">
+            <div class="flex items-center gap-3 mb-4">
+                <i class="fa-solid fa-chair text-primary-400"></i>
+                <h3 class="font-bold text-white text-xs uppercase tracking-wider">Banc des remplaçants</h3>
+                <span id="benchCount" class="text-[10px] text-white/30 font-bold">0 joueurs</span>
+            </div>
+            <div class="flex flex-wrap gap-3 min-h-[60px]" id="benchSlots">
+                <div
+                    class="bench-placeholder text-white/10 text-xs italic flex items-center justify-center w-full py-4">
+                    Glissez des joueurs ici pour les ajouter au banc
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Player Slot Template -->
 <template id="playerSlotTemplate">
     <div class="absolute flex flex-col items-center transition-all duration-500 cursor-pointer group/slot"
         style="left: 50%; top: 50%;">
-        <div
-            class="slot-circle w-14 h-14 rounded-2xl glass-light border-2 border-dashed border-white/20 flex items-center justify-center font-bold text-white/20 group-hover/slot:border-primary-500/50 transition-all">
-            <!-- Content Injected -->
+        <div class="slot-circle w-14 h-14 rounded-2xl glass-light border-2 border-dashed border-white/20 flex items-center justify-center font-bold text-white/20 group-hover/slot:border-primary-500/50 transition-all"
+            ondragover="onDragOverSlot(event)" ondrop="onDropSlot(event, this)">
         </div>
         <p
             class="slot-name mt-3 glass px-4 py-1.5 rounded-xl text-[9px] font-bold text-white/40 uppercase tracking-wider border border-white/5 shadow-2xl backdrop-blur-md">
@@ -119,6 +152,436 @@
         </p>
     </div>
 </template>
+
+<!-- Tactical Configuration Modal -->
+<div id="tacticalModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-xl"
+    onclick="closeTacticalConfig(event)">
+    <div class="tactical-modal-inner relative w-full lg:max-w-6xl h-full lg:h-[90vh] max-h-[95vh] mx-4 rounded-[40px] overflow-hidden flex flex-col transform scale-0 transition-transform duration-500 glass-dark border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)]"
+        id="tacticalModalInner">
+
+        <!-- Header -->
+        <div class="relative px-8 py-8 border-b border-white/5 overflow-hidden">
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-primary-500/10 opacity-30">
+            </div>
+            <div class="relative flex items-center justify-between z-10">
+                <div class="flex items-center gap-6">
+                    <div
+                        class="w-16 h-16 rounded-[24px] bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-[0_8px_32px_rgba(245,158,11,0.3)] group-hover:rotate-12 transition-transform duration-500">
+                        <i class="fa-solid fa-chess text-black text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl lg:text-3xl font-black text-white uppercase tracking-tighter">Plan de Jeu
+                            <span class="text-amber-400">Elite</span>
+                        </h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            <p class="text-[10px] text-white/40 font-bold uppercase tracking-[0.2em]">Configuration
+                                Stratégique en temps réel</p>
+                        </div>
+                    </div>
+                </div>
+                <button
+                    onclick="closeTacticalConfig({target:document.getElementById('tacticalModal'),currentTarget:document.getElementById('tacticalModal')})"
+                    class="w-12 h-12 rounded-2xl glass hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all duration-300 hover:rotate-90">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row overflow-hidden flex-1 min-h-0">
+            <!-- Left: Options Scroll Area -->
+            <div
+                class="flex-1 p-6 lg:p-10 space-y-10 overflow-y-auto custom-scrollbar max-h-[50vh] lg:max-h-[calc(90vh-180px)]">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                    <!-- Style de passe -->
+                    <div class="tactic-section group">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-primary-500/10 flex items-center justify-center text-primary-400">
+                                    <i class="fa-solid fa-arrows-turn-right text-sm"></i>
+                                </div>
+                                <h3 class="text-sm font-black text-white uppercase tracking-wider">Style de passe</h3>
+                            </div>
+                            <span class="text-[10px] text-white/20 font-bold uppercase tracking-widest">Offense</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3" id="passingStyle">
+                            <button onclick="setTactic('passing', 'courte', this)" class="tactic-btn"
+                                data-value="courte">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-square-small text-[10px]"></i></div>
+                                <span>Courte</span>
+                            </button>
+                            <button onclick="setTactic('passing', 'direct', this)" class="tactic-btn"
+                                data-value="direct">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-bolt text-[10px]"></i></div>
+                                <span>Direct</span>
+                            </button>
+                            <button onclick="setTactic('passing', 'long', this)" class="tactic-btn" data-value="long">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-arrows-left-right text-[10px]"></i>
+                                </div>
+                                <span>Long</span>
+                            </button>
+                            <button onclick="setTactic('passing', 'mixte', this)" class="tactic-btn" data-value="mixte">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-shuffle text-[10px]"></i></div>
+                                <span>Mixte</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Espace de jeu -->
+                    <div class="tactic-section group">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                                    <i class="fa-solid fa-expand text-sm"></i>
+                                </div>
+                                <h3 class="text-sm font-black text-white uppercase tracking-wider">Espace de jeu</h3>
+                            </div>
+                            <span class="text-[10px] text-white/20 font-bold uppercase tracking-widest">Largeur</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3" id="playSpace">
+                            <button onclick="setTactic('space', 'couloir_gauche', this)" class="tactic-btn"
+                                data-value="couloir_gauche">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-arrow-left text-[10px]"></i></div>
+                                <span>Couloir G</span>
+                            </button>
+                            <button onclick="setTactic('space', 'couloir_droit', this)" class="tactic-btn"
+                                data-value="couloir_droit">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                                <span>Couloir D</span>
+                            </button>
+                            <button onclick="setTactic('space', 'axe', this)" class="tactic-btn" data-value="axe">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-arrows-up-down text-[10px]"></i>
+                                </div>
+                                <span>Axe</span>
+                            </button>
+                            <button onclick="setTactic('space', 'deux_couloirs', this)" class="tactic-btn"
+                                data-value="deux_couloirs">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-arrows-left-right text-[10px]"></i>
+                                </div>
+                                <span>Couloirs</span>
+                            </button>
+                            <button onclick="setTactic('space', 'mixte', this)" class="tactic-btn col-span-2"
+                                data-value="mixte">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-shuffle text-[10px]"></i></div>
+                                <span>Mixte</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Style défensif -->
+                    <div class="tactic-section group">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
+                                    <i class="fa-solid fa-shield-halved text-sm"></i>
+                                </div>
+                                <h3 class="text-sm font-black text-white uppercase tracking-wider">Ligne Défensive</h3>
+                            </div>
+                            <span class="text-[10px] text-white/20 font-bold uppercase tracking-widest">Position</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3" id="defensiveStyle">
+                            <button onclick="setTactic('defensive', 'bloc_bas', this)" class="tactic-btn"
+                                data-value="bloc_bas">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-arrow-down text-[10px]"></i></div>
+                                <span>Bas</span>
+                            </button>
+                            <button onclick="setTactic('defensive', 'bloc_median', this)" class="tactic-btn"
+                                data-value="bloc_median">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-minus text-[10px]"></i></div>
+                                <span>Médian</span>
+                            </button>
+                            <button onclick="setTactic('defensive', 'bloc_haut', this)" class="tactic-btn"
+                                data-value="bloc_haut">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-arrow-up text-[10px]"></i></div>
+                                <span>Haut</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pressing -->
+                    <div class="tactic-section group">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400">
+                                    <i class="fa-solid fa-fire text-sm"></i>
+                                </div>
+                                <h3 class="text-sm font-black text-white uppercase tracking-wider">Intensité Pressing
+                                </h3>
+                            </div>
+                            <span class="text-[10px] text-white/20 font-bold uppercase tracking-widest">Énergie</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3" id="pressingStyle">
+                            <button onclick="setTactic('pressing', 'bas', this)" class="tactic-btn" data-value="bas">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-angles-down text-[10px]"></i></div>
+                                <span>Constant</span>
+                            </button>
+                            <button onclick="setTactic('pressing', 'median', this)" class="tactic-btn"
+                                data-value="median">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-grip-lines text-[10px]"></i></div>
+                                <span>Soutenu</span>
+                            </button>
+                            <button onclick="setTactic('pressing', 'haut', this)" class="tactic-btn" data-value="haut">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-angles-up text-[10px]"></i></div>
+                                <span>Agressif</span>
+                            </button>
+                            <button onclick="setTactic('pressing', 'tout_terrain', this)" class="tactic-btn"
+                                data-value="tout_terrain">
+                                <div class="tactic-btn-icon"><i class="fa-solid fa-explosion text-[10px]"></i></div>
+                                <span>Total</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Marquage -->
+                    <div class="tactic-section group">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center text-violet-400">
+                                    <i class="fa-solid fa-crosshairs text-sm"></i>
+                                </div>
+                                <h3 class="text-sm font-black text-white uppercase tracking-wider">Marquage</h3>
+                            </div>
+                            <span class="text-[10px] text-white/20 font-bold uppercase tracking-widest">Défense</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3" id="markingStyle">
+                            <button onclick="setTactic('marking', 'individuel', this)" class="tactic-btn"
+                                data-value="individuel">
+                                <i class="fa-solid fa-user-lock text-[10px] mb-1"></i>
+                                <span>Individuel</span>
+                            </button>
+                            <button onclick="setTactic('marking', 'zone', this)" class="tactic-btn" data-value="zone">
+                                <i class="fa-solid fa-border-all text-[10px] mb-1"></i>
+                                <span>Zone</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Contre-pressing toggle -->
+                    <div class="tactic-section">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+                                <i class="fa-solid fa-bolt-lightning text-sm"></i>
+                            </div>
+                            <h3 class="text-sm font-black text-white uppercase tracking-wider">Phase de Transition</h3>
+                        </div>
+                        <label
+                            class="relative flex items-center justify-between p-6 rounded-[24px] bg-white/[0.03] border border-white/5 cursor-pointer hover:bg-white/5 hover:border-amber-500/30 transition-all duration-300 group"
+                            id="counterPressingToggle">
+                            <div class="flex flex-col gap-1">
+                                <p class="text-xs font-bold text-white uppercase tracking-wider">Contre-pressing</p>
+                                <p class="text-[9px] text-white/30 font-medium">Récupération ultra-rapide</p>
+                            </div>
+                            <div class="w-14 h-8 rounded-full bg-white/5 border border-white/10 relative transition-all duration-500"
+                                id="cpToggleBg">
+                                <div class="w-6 h-6 rounded-full bg-white/20 absolute top-1 left-1 shadow-lg transition-all duration-500"
+                                    id="cpToggleDot"></div>
+                            </div>
+                            <input type="checkbox" id="counterPressing" class="hidden"
+                                onchange="setCounterPressing(this.checked)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Premium Preview -->
+            <div
+                class="w-full lg:w-[450px] bg-black/40 border-t lg:border-t-0 lg:border-l border-white/5 flex flex-col relative overflow-y-auto lg:overflow-hidden custom-scrollbar">
+                <!-- Abstract BG patterns -->
+                <div class="absolute inset-0 opacity-20 pointer-events-none">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 blur-[100px] rounded-full"></div>
+                    <div class="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/10 blur-[100px] rounded-full"></div>
+                </div>
+
+                <div class="p-8 lg:p-10 flex flex-col h-full relative z-10">
+                    <div class="flex items-center justify-between mb-8">
+                        <h3 class="text-xs font-black text-white/30 uppercase tracking-[0.2em]">Visualiseur Tactique
+                        </h3>
+                        <div class="flex gap-1">
+                            <div class="w-1.5 h-1.5 rounded-full bg-primary-500"></div>
+                            <div class="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+                            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="flex-1 relative rounded-[32px] bg-[#022c22]/30 border border-emerald-500/20 overflow-hidden shadow-inner group">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                        <svg id="previewPitch" viewBox="0 0 300 450" class="w-full h-full relative z-10"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <!-- Field Markings -->
+                            <rect x="10" y="10" width="280" height="430" rx="20" fill="none"
+                                stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+                            <line x1="10" y1="225" x2="290" y2="225" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+                            <circle cx="150" cy="225" r="45" fill="none" stroke="rgba(255,255,255,0.08)"
+                                stroke-width="1" />
+
+                            <!-- Dynamic Tactical Zones -->
+                            <rect id="pvZoneLeft" x="10" y="10" width="80" height="430" fill="transparent"
+                                class="transition-all duration-700 ease-out" />
+                            <rect id="pvZoneRight" x="210" y="10" width="80" height="430" fill="transparent"
+                                class="transition-all duration-700 ease-out" />
+                            <rect id="pvZoneCenter" x="90" y="10" width="120" height="430" fill="transparent"
+                                class="transition-all duration-700 ease-out" />
+
+                            <!-- Defensive & Pressing Lines -->
+                            <g class="lines-group">
+                                <line id="pvDefLine" x1="20" y1="340" x2="280" y2="340" stroke="rgba(59,130,246,0.6)"
+                                    stroke-width="3" stroke-dasharray="10,5" class="transition-all duration-700" />
+                                <text id="pvDefLabel" x="150" y="358" text-anchor="middle" fill="rgba(59,130,246,0.8)"
+                                    font-size="10" font-weight="900" class="transition-all duration-700">BLOC
+                                    MÉDIAN</text>
+
+                                <line id="pvPressLine" x1="20" y1="180" x2="280" y2="180" stroke="rgba(239,68,68,0.6)"
+                                    stroke-width="3" stroke-dasharray="10,5" class="transition-all duration-700" />
+                                <text id="pvPressLabel" x="150" y="172" text-anchor="middle" fill="rgba(239,68,68,0.8)"
+                                    font-size="10" font-weight="900"
+                                    class="transition-all duration-700 uppercase">Pressing</text>
+                            </g>
+
+                            <!-- Animation elements -->
+                            <g id="pvPassArrows" class="transition-all duration-700"></g>
+                            <g id="pvMarking" class="transition-all duration-700"></g>
+
+                            <!-- Counter pressing indicator -->
+                            <g id="pvCounterPress" opacity="0" class="transition-all duration-700 origin-center">
+                                <circle cx="150" cy="225" r="30" fill="rgba(245,158,11,0.1)"
+                                    stroke="rgba(245,158,11,0.5)" stroke-width="2" class="animate-pulse" />
+                                <text x="150" y="228" text-anchor="middle" fill="rgba(245,158,11,0.9)" font-size="8"
+                                    font-weight="900">GEGENPRESSING</text>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <!-- Config summary Card -->
+                    <div class="mt-8 p-6 rounded-[30px] glass-dark border border-white/5 shadow-xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <p class="text-[10px] text-white/20 font-black uppercase tracking-[0.2em]">Tableau de Bord
+                            </p>
+                            <i class="fa-solid fa-list-check text-white/20 text-xs"></i>
+                        </div>
+                        <div class="space-y-3" id="configSummary">
+                            <div class="flex items-center justify-center py-4">
+                                <p class="text-xs text-white/30 italic">Configuration vierge...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="relative px-8 py-8 border-t border-white/5 bg-black/20 overflow-hidden">
+            <div class="relative flex items-center justify-between z-10 gap-6">
+                <button onclick="resetTacticalConfig()"
+                    class="group flex items-center gap-3 px-8 py-4 rounded-[20px] glass hover:bg-white/5 border border-white/10 text-white/50 hover:text-white text-xs font-bold uppercase tracking-wider transition-all duration-300">
+                    <i class="fa-solid fa-rotate-left group-hover:-rotate-45 transition-transform duration-300"></i>
+                    <span>Réinitialiser</span>
+                </button>
+                <button onclick="saveTacticalConfig()" id="saveTacConfigBtn"
+                    class="group flex-1 lg:flex-none lg:px-14 py-4 rounded-[20px] bg-gradient-to-r from-amber-400 to-amber-600 text-black text-sm font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-[0_12px_40px_rgba(245,158,11,0.2)] flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Optimiser & Valider</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FIFA Player Card Modal -->
+<div id="fifaModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm"
+    onclick="closeFifaModal(event)">
+    <div class="fifa-card relative w-80 rounded-3xl overflow-hidden transform scale-0 transition-transform duration-300"
+        id="fifaCardInner">
+        <!-- Gold gradient top -->
+        <div class="bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 p-1 rounded-3xl">
+            <div class="bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 rounded-[22px] overflow-hidden">
+                <!-- Header with overall rating -->
+                <div class="bg-gradient-to-r from-amber-500/20 to-transparent p-6 pb-4">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="text-5xl font-black text-amber-400" id="fifaOverall">85</div>
+                            <div class="text-xs font-bold text-amber-400/60 uppercase tracking-widest mt-1"
+                                id="fifaPosition">ST</div>
+                        </div>
+                        <div
+                            class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400/20 to-amber-600/10 border-2 border-amber-500/30 flex items-center justify-center">
+                            <span class="text-3xl font-black text-white" id="fifaNumber">9</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Name -->
+                <div class="px-6 py-3 border-t border-amber-500/20">
+                    <h2 class="text-xl font-black text-white uppercase tracking-wider" id="fifaName">JOUEUR</h2>
+                    <p class="text-[10px] text-amber-400/50 font-bold uppercase tracking-widest mt-1" id="fifaClub">
+                        FootLogic Elite</p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="px-6 pb-6 pt-2">
+                    <div class="grid grid-cols-3 gap-3">
+                        <div
+                            class="fifa-stat text-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition">
+                            <div class="text-xl font-black text-white" id="fifaVIT">50</div>
+                            <div class="text-[8px] font-bold text-amber-400/60 uppercase tracking-widest">VIT</div>
+                        </div>
+                        <div
+                            class="fifa-stat text-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition">
+                            <div class="text-xl font-black text-white" id="fifaTIR">50</div>
+                            <div class="text-[8px] font-bold text-amber-400/60 uppercase tracking-widest">TIR</div>
+                        </div>
+                        <div
+                            class="fifa-stat text-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition">
+                            <div class="text-xl font-black text-white" id="fifaPAS">50</div>
+                            <div class="text-[8px] font-bold text-amber-400/60 uppercase tracking-widest">PAS</div>
+                        </div>
+                        <div
+                            class="fifa-stat text-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition">
+                            <div class="text-xl font-black text-white" id="fifaDRI">50</div>
+                            <div class="text-[8px] font-bold text-amber-400/60 uppercase tracking-widest">DRI</div>
+                        </div>
+                        <div
+                            class="fifa-stat text-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition">
+                            <div class="text-xl font-black text-white" id="fifaDEF">50</div>
+                            <div class="text-[8px] font-bold text-amber-400/60 uppercase tracking-widest">DEF</div>
+                        </div>
+                        <div
+                            class="fifa-stat text-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition">
+                            <div class="text-xl font-black text-white" id="fifaPHY">50</div>
+                            <div class="text-[8px] font-bold text-amber-400/60 uppercase tracking-widest">PHY</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="px-6 pb-6">
+                    <button onclick="removePlayerFromSlot()"
+                        class="w-full py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold uppercase tracking-wider hover:bg-red-500/20 transition">
+                        <i class="fa-solid fa-xmark mr-2"></i>Retirer du terrain
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast"
+    class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transform translate-y-20 opacity-0 transition-all duration-500 pointer-events-none">
+    <div
+        class="glass px-8 py-4 rounded-2xl border border-primary-500/30 shadow-2xl shadow-primary-500/10 flex items-center gap-3">
+        <i class="fa-solid fa-check-circle text-green-400 text-lg"></i>
+        <span class="text-white text-sm font-bold" id="toastMessage">Sauvegardé !</span>
+    </div>
+</div>
 
 <style>
     .custom-scrollbar::-webkit-scrollbar {
@@ -140,6 +603,11 @@
         border-color: rgba(255, 255, 255, 0.05) !important;
     }
 
+    .player-card.dragging {
+        opacity: 0.5;
+        transform: scale(0.95);
+    }
+
     .slot-circle.filled {
         background: white;
         color: black;
@@ -147,51 +615,425 @@
         border-color: #000;
         border-width: 4px;
         box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+    }
+
+    .slot-circle.drag-over {
+        border-color: rgb(34, 197, 94) !important;
+        border-style: solid !important;
+        background: rgba(34, 197, 94, 0.15);
+        transform: scale(1.15);
+        box-shadow: 0 0 25px rgba(34, 197, 94, 0.3);
+    }
+
+    .bench-card {
+        animation: benchSlideIn 0.3s ease-out;
+    }
+
+    @keyframes benchSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px) scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    #benchArea.drag-over {
+        border-color: rgba(34, 197, 94, 0.5) !important;
+        background: rgba(34, 197, 94, 0.05);
+    }
+
+    /* FIFA Modal animations */
+    #fifaModal.show {
+        display: flex !important;
+    }
+
+    #fifaModal.show .fifa-card {
+        transform: scale(1);
+    }
+
+    .fifa-stat {
+        animation: fifaStatPop 0.4s ease-out backwards;
+    }
+
+    .fifa-stat:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .fifa-stat:nth-child(2) {
+        animation-delay: 0.15s;
+    }
+
+    .fifa-stat:nth-child(3) {
+        animation-delay: 0.2s;
+    }
+
+    .fifa-stat:nth-child(4) {
+        animation-delay: 0.25s;
+    }
+
+    .fifa-stat:nth-child(5) {
+        animation-delay: 0.3s;
+    }
+
+    .fifa-stat:nth-child(6) {
+        animation-delay: 0.35s;
+    }
+
+    @keyframes fifaStatPop {
+        from {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* Toast animation */
+    #toast.show {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+
+    /* Tactical config modal */
+    #tacticalModal.show {
+        display: flex !important;
+    }
+
+    #tacticalModal.show .tactical-modal-inner {
+        transform: scale(1);
+    }
+
+    .glass-dark {
+        background: rgba(10, 10, 15, 0.85);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+    }
+
+    .tactic-btn {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 20px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+
+    .tactic-btn-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.4s;
+    }
+
+    .tactic-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .tactic-btn.active {
+        background: rgba(245, 158, 11, 0.1);
+        border-color: rgba(245, 158, 11, 0.5);
+        color: rgb(245, 158, 11);
+        box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.2);
+    }
+
+    .tactic-btn.active .tactic-btn-icon {
+        background: rgba(245, 158, 11, 0.2);
+        color: rgb(245, 158, 11);
+    }
+
+    /* Counter Pressing Toggle specific styles */
+    #cpToggleBg.on {
+        background: rgba(245, 158, 11, 0.2);
+        border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    #cpToggleDot.on {
+        left: calc(100% - 28px);
+        background: rgb(245, 158, 11);
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+        transform: scale(1.1);
+    }
+
+    /* Summary items anim */
+    .summary-item {
+        animation: summarySlideIn 0.4s ease-out backwards;
+    }
+
+    @keyframes summarySlideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 </style>
 
 <script>
+    // ============================================================
+    // STATE
+    // ============================================================
     const pitchArea = document.getElementById('pitchArea');
     const slotTemplate = document.getElementById('playerSlotTemplate');
     const configEl = document.getElementById('tactics-config');
     const starters = JSON.parse(configEl.getAttribute('data-starters'));
+    const savedSubstitutes = JSON.parse(configEl.getAttribute('data-substitutes'));
     const initialFormation = configEl.getAttribute('data-formation');
 
     let activeSlot = null;
     let assignment = { ...starters };
+    let substitutes = [...savedSubstitutes];
+    let draggedPlayerId = null;
+    let draggedFromSlot = null;
+    let draggedFromBench = false;
+    let currentModalPlayerId = null;
+    let currentModalSlotPos = null;
 
+    // Player data lookup
+    const playerData = {};
+    document.querySelectorAll('.player-card').forEach(card => {
+        const id = card.getAttribute('data-player-id');
+        playerData[id] = {
+            id,
+            name: card.getAttribute('data-player-name'),
+            number: card.getAttribute('data-player-number'),
+            position: card.getAttribute('data-player-pos'),
+            vit: parseInt(card.getAttribute('data-player-vit')) || 50,
+            tir: parseInt(card.getAttribute('data-player-tir')) || 50,
+            pas: parseInt(card.getAttribute('data-player-pas')) || 50,
+            dri: parseInt(card.getAttribute('data-player-dri')) || 50,
+            def: parseInt(card.getAttribute('data-player-def')) || 50,
+            phy: parseInt(card.getAttribute('data-player-phy')) || 50,
+        };
+    });
+
+    // ============================================================
+    // FORMATIONS
+    // ============================================================
     const formations = {
         '4-3-3': {
-            'GK': [50, 85],
-            'LB': [15, 65], 'CB1': [38, 70], 'CB2': [62, 70], 'RB': [85, 65],
+            'GK': [50, 85], 'LB': [15, 65], 'CB1': [38, 70], 'CB2': [62, 70], 'RB': [85, 65],
             'CDM': [50, 55], 'CM1': [30, 45], 'CM2': [70, 45],
             'LW': [20, 25], 'ST': [50, 15], 'RW': [80, 25]
         },
         '4-4-2': {
-            'GK': [50, 85],
-            'LB': [15, 70], 'CB1': [38, 72], 'CB2': [62, 72], 'RB': [85, 70],
+            'GK': [50, 85], 'LB': [15, 70], 'CB1': [38, 72], 'CB2': [62, 72], 'RB': [85, 70],
             'LM': [15, 45], 'CM1': [38, 48], 'CM2': [62, 48], 'RM': [85, 45],
             'ST1': [40, 20], 'ST2': [60, 20]
         },
         '3-5-2': {
-            'GK': [50, 85],
-            'CB1': [25, 70], 'CB2': [50, 72], 'CB3': [75, 70],
-            'LWB': [10, 50], 'RWB': [90, 50],
-            'CDM': [50, 58], 'CM1': [35, 45], 'CM2': [65, 45],
+            'GK': [50, 85], 'CB1': [25, 70], 'CB2': [50, 72], 'CB3': [75, 70],
+            'LWB': [10, 50], 'RWB': [90, 50], 'CDM': [50, 58], 'CM1': [35, 45], 'CM2': [65, 45],
             'ST1': [40, 20], 'ST2': [60, 20]
         },
         '4-2-3-1': {
-            'GK': [50, 85],
-            'LB': [15, 70], 'CB1': [38, 72], 'CB2': [62, 72], 'RB': [85, 70],
-            'CDM1': [40, 55], 'CDM2': [60, 55],
-            'LAM': [25, 35], 'CAM': [50, 35], 'RAM': [75, 35],
+            'GK': [50, 85], 'LB': [15, 70], 'CB1': [38, 72], 'CB2': [62, 72], 'RB': [85, 70],
+            'CDM1': [40, 55], 'CDM2': [60, 55], 'LAM': [25, 35], 'CAM': [50, 35], 'RAM': [75, 35],
             'ST': [50, 15]
         }
     };
 
+    // ============================================================
+    // DRAG & DROP
+    // ============================================================
+    function onDragStart(e, el) {
+        draggedPlayerId = el.getAttribute('data-player-id');
+        draggedFromSlot = null;
+        draggedFromBench = false;
+        el.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedPlayerId);
+    }
+
+    function onDragEnd(e) {
+        e.target.classList.remove('dragging');
+        draggedPlayerId = null;
+        draggedFromSlot = null;
+        draggedFromBench = false;
+        document.querySelectorAll('.slot-circle.drag-over').forEach(s => s.classList.remove('drag-over'));
+        document.getElementById('benchArea').classList.remove('drag-over');
+    }
+
+    function onDragStartFromSlot(e, slotEl) {
+        const pos = slotEl.closest('[data-pos]').getAttribute('data-pos');
+        draggedPlayerId = assignment[pos];
+        draggedFromSlot = pos;
+        draggedFromBench = false;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedPlayerId);
+    }
+
+    function onDragStartFromBench(e, benchCard) {
+        draggedPlayerId = benchCard.getAttribute('data-player-id');
+        draggedFromSlot = null;
+        draggedFromBench = true;
+        benchCard.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedPlayerId);
+    }
+
+    function onDragOverSlot(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        e.currentTarget.classList.add('drag-over');
+    }
+
+    function onDragLeaveSlot(e) {
+        e.currentTarget.classList.remove('drag-over');
+    }
+
+    function onDropSlot(e, slotCircle) {
+        e.preventDefault();
+        e.stopPropagation();
+        slotCircle.classList.remove('drag-over');
+
+        const playerId = e.dataTransfer.getData('text/plain') || draggedPlayerId;
+        if (!playerId || !playerData[playerId]) return;
+
+        const slotContainer = slotCircle.closest('[data-pos]');
+        const pos = slotContainer.getAttribute('data-pos');
+
+        // If dragged from another slot, clear that slot
+        if (draggedFromSlot && draggedFromSlot !== pos) {
+            // Swap: if target slot has a player, move them to the source slot
+            const existingPlayer = assignment[pos];
+            if (existingPlayer) {
+                assignment[draggedFromSlot] = existingPlayer;
+                const srcSlot = document.querySelector(`[data-pos="${draggedFromSlot}"]`);
+                if (srcSlot) {
+                    const p = playerData[existingPlayer];
+                    fillSlot(srcSlot, p.name, p.number);
+                }
+            } else {
+                clearSlot(draggedFromSlot);
+            }
+        }
+
+        // If dragged from bench, remove from bench
+        if (draggedFromBench) {
+            substitutes = substitutes.filter(id => id !== playerId);
+            renderBench();
+        }
+
+        // If there was already a player in this slot (and not swapping), free them
+        const oldPlayer = assignment[pos];
+        if (oldPlayer && oldPlayer !== playerId && !draggedFromSlot) {
+            const oldCard = document.querySelector(`.player-card[data-player-id="${oldPlayer}"]`);
+            if (oldCard) oldCard.classList.remove('selected');
+        }
+
+        // Assign player to slot
+        assignment[pos] = playerId;
+        fillSlot(slotContainer, playerData[playerId].name, playerData[playerId].number);
+        markPlayerSelected(playerId);
+
+        draggedPlayerId = null;
+        draggedFromSlot = null;
+        draggedFromBench = false;
+    }
+
+    function onDragOverPitch(e) {
+        e.preventDefault();
+    }
+
+    function onDropPitch(e) {
+        e.preventDefault();
+        // Only handle if not dropped on a specific slot (that's handled by onDropSlot)
+    }
+
+    function onDragOverBench(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        document.getElementById('benchArea').classList.add('drag-over');
+    }
+
+    function onDragLeaveBench(e) {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+            document.getElementById('benchArea').classList.remove('drag-over');
+        }
+    }
+
+    function onDropBench(e) {
+        e.preventDefault();
+        document.getElementById('benchArea').classList.remove('drag-over');
+
+        const playerId = e.dataTransfer.getData('text/plain') || draggedPlayerId;
+        if (!playerId || !playerData[playerId]) return;
+
+        // If already on bench, ignore
+        if (substitutes.includes(playerId) && !draggedFromSlot) return;
+
+        // If dragged from a pitch slot, clear the slot
+        if (draggedFromSlot) {
+            clearSlot(draggedFromSlot);
+        }
+
+        // Remove from starters if assigned anywhere
+        Object.keys(assignment).forEach(pos => {
+            if (assignment[pos] === playerId) {
+                clearSlot(pos);
+            }
+        });
+
+        // Add to bench
+        if (!substitutes.includes(playerId)) {
+            substitutes.push(playerId);
+        }
+        markPlayerSelected(playerId);
+        renderBench();
+
+        draggedPlayerId = null;
+        draggedFromSlot = null;
+        draggedFromBench = false;
+    }
+
+    // ============================================================
+    // PITCH RENDERING
+    // ============================================================
     function updateFormation() {
         const formation = document.getElementById('formationSelect').value;
         const config = formations[formation] || formations['4-3-3'];
+
+        // Clear unmatched assignments
+        const validPositions = Object.keys(config);
+        Object.keys(assignment).forEach(pos => {
+            if (!validPositions.includes(pos)) {
+                const playerId = assignment[pos];
+                if (playerId) {
+                    const card = document.querySelector(`.player-card[data-player-id="${playerId}"]`);
+                    if (card) card.classList.remove('selected');
+                }
+                delete assignment[pos];
+            }
+        });
 
         pitchArea.innerHTML = '';
         Object.entries(config).forEach(([pos, coords]) => {
@@ -199,24 +1041,41 @@
             const container = clone.querySelector('div');
             container.style.left = coords[0] + '%';
             container.style.top = coords[1] + '%';
+            container.style.transform = 'translate(-50%, -50%)';
             container.setAttribute('data-pos', pos);
-            container.onclick = () => activateSlot(container);
+            container.onclick = (e) => handleSlotClick(e, container);
+
+            const slotCircle = clone.querySelector('.slot-circle');
+            slotCircle.addEventListener('dragleave', onDragLeaveSlot);
 
             const nameEl = clone.querySelector('.slot-name');
             nameEl.innerText = pos;
 
-            // Check if already assigned
+            // Restore assigned player
             if (assignment[pos]) {
-                const playerId = assignment[pos];
-                const playerCard = document.querySelector(`[data-player-id="${playerId}"]`);
-                if (playerCard) {
-                    fillSlot(container, playerCard.querySelector('p').innerText, playerCard.querySelector('.gradient-primary').innerText);
-                    playerCard.classList.add('selected');
+                const p = playerData[assignment[pos]];
+                if (p) {
+                    fillSlot(container, p.name, p.number);
+                    markPlayerSelected(p.id);
                 }
             }
 
             pitchArea.appendChild(clone);
         });
+    }
+
+    function handleSlotClick(e, container) {
+        const pos = container.getAttribute('data-pos');
+        const playerId = assignment[pos];
+
+        // If slot has a player, show FIFA modal
+        if (playerId && playerData[playerId]) {
+            openFifaModal(playerId, pos);
+            return;
+        }
+
+        // Otherwise activate slot for click-to-select
+        activateSlot(container);
     }
 
     function activateSlot(el) {
@@ -229,28 +1088,21 @@
         const id = el.getAttribute('data-player-id');
         const name = el.getAttribute('data-player-name');
         const number = el.getAttribute('data-player-number');
-        const pos = el.getAttribute('data-player-pos');
-        selectPlayer(id, name, number, pos);
-    }
 
-    function selectPlayer(id, name, number, pos) {
-        if (!activeSlot) {
-            alert("Sélectionnez d'abord un emplacement sur le terrain");
-            return;
-        }
+        if (!activeSlot) return; // No slot selected, drag instead
 
         const currentPos = activeSlot.getAttribute('data-pos');
 
-        // Remove old player from selection if swapped
+        // Remove old player from this slot
         const oldId = assignment[currentPos];
         if (oldId) {
-            const oldCard = document.querySelector(`[data-player-id="${oldId}"]`);
+            const oldCard = document.querySelector(`.player-card[data-player-id="${oldId}"]`);
             if (oldCard) oldCard.classList.remove('selected');
         }
 
         assignment[currentPos] = id;
         fillSlot(activeSlot, name, number);
-        document.querySelector(`[data-player-id="${id}"]`).classList.add('selected');
+        markPlayerSelected(id);
         activeSlot = null;
     }
 
@@ -260,18 +1112,151 @@
         circle.classList.add('filled', 'text-black');
         circle.classList.remove('text-white/20', 'border-primary-500');
 
+        // Make filled slots draggable
+        circle.setAttribute('draggable', 'true');
+        circle.ondragstart = (e) => onDragStartFromSlot(e, circle);
+
         const nameEl = slot.querySelector('.slot-name');
         nameEl.innerText = name.split(' ')[0].toUpperCase();
         nameEl.classList.remove('text-white/40');
         nameEl.classList.add('text-primary-400');
     }
 
-    function resetPitch() {
-        assignment = {};
-        document.querySelectorAll('.player-card').forEach(c => c.classList.remove('selected'));
-        updateFormation();
+    function clearSlot(pos) {
+        const playerId = assignment[pos];
+        if (playerId) {
+            const card = document.querySelector(`.player-card[data-player-id="${playerId}"]`);
+            if (card) card.classList.remove('selected');
+        }
+        delete assignment[pos];
+
+        const slotEl = document.querySelector(`[data-pos="${pos}"]`);
+        if (slotEl) {
+            const circle = slotEl.querySelector('.slot-circle');
+            circle.innerHTML = '';
+            circle.classList.remove('filled', 'text-black');
+            circle.classList.add('text-white/20');
+            circle.removeAttribute('draggable');
+            circle.ondragstart = null;
+
+            const nameEl = slotEl.querySelector('.slot-name');
+            nameEl.innerText = pos;
+            nameEl.classList.remove('text-primary-400');
+            nameEl.classList.add('text-white/40');
+        }
     }
 
+    function markPlayerSelected(playerId) {
+        const card = document.querySelector(`.player-card[data-player-id="${playerId}"]`);
+        if (card) card.classList.add('selected');
+    }
+
+    // ============================================================
+    // BENCH RENDERING
+    // ============================================================
+    function renderBench() {
+        const benchSlots = document.getElementById('benchSlots');
+        benchSlots.innerHTML = '';
+
+        if (substitutes.length === 0) {
+            benchSlots.innerHTML = '<div class="bench-placeholder text-white/10 text-xs italic flex items-center justify-center w-full py-4">Glissez des joueurs ici pour les ajouter au banc</div>';
+        } else {
+            substitutes.forEach(playerId => {
+                const p = playerData[playerId];
+                if (!p) return;
+
+                const card = document.createElement('div');
+                card.className = 'bench-card p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3 cursor-grab active:cursor-grabbing hover:border-primary-500/30 transition';
+                card.setAttribute('draggable', 'true');
+                card.setAttribute('data-player-id', playerId);
+                card.ondragstart = (e) => onDragStartFromBench(e, card);
+                card.ondragend = (e) => { card.classList.remove('dragging'); onDragEnd(e); };
+                card.onclick = () => openFifaModal(playerId, null);
+
+                card.innerHTML = `
+                    <div class="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center font-bold text-xs shadow-lg">${p.number}</div>
+                    <div>
+                        <p class="text-xs font-bold text-white">${p.name}</p>
+                        <p class="text-[8px] text-white/20 font-bold uppercase">${p.position}</p>
+                    </div>
+                    <button onclick="event.stopPropagation(); removeFromBench('${playerId}')" class="ml-auto text-white/10 hover:text-red-400 transition">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                `;
+                benchSlots.appendChild(card);
+            });
+        }
+
+        document.getElementById('benchCount').textContent = substitutes.length + ' joueur' + (substitutes.length > 1 ? 's' : '');
+    }
+
+    function removeFromBench(playerId) {
+        substitutes = substitutes.filter(id => id !== playerId);
+        const card = document.querySelector(`.player-card[data-player-id="${playerId}"]`);
+        if (card) card.classList.remove('selected');
+        renderBench();
+    }
+
+    // ============================================================
+    // FIFA MODAL
+    // ============================================================
+    function openFifaModal(playerId, slotPos) {
+        const p = playerData[playerId];
+        if (!p) return;
+
+        currentModalPlayerId = playerId;
+        currentModalSlotPos = slotPos;
+
+        const overall = Math.round((p.vit + p.tir + p.pas + p.dri + p.def + p.phy) / 6);
+
+        document.getElementById('fifaOverall').textContent = overall;
+        document.getElementById('fifaPosition').textContent = p.position;
+        document.getElementById('fifaNumber').textContent = p.number;
+        document.getElementById('fifaName').textContent = p.name.toUpperCase();
+        document.getElementById('fifaClub').textContent = 'FootLogic Elite';
+        document.getElementById('fifaVIT').textContent = p.vit;
+        document.getElementById('fifaTIR').textContent = p.tir;
+        document.getElementById('fifaPAS').textContent = p.pas;
+        document.getElementById('fifaDRI').textContent = p.dri;
+        document.getElementById('fifaDEF').textContent = p.def;
+        document.getElementById('fifaPHY').textContent = p.phy;
+
+        // Color stats based on value
+        document.querySelectorAll('.fifa-stat .text-xl').forEach(el => {
+            const val = parseInt(el.textContent);
+            if (val >= 80) el.classList.add('text-green-400');
+            else if (val >= 60) el.className = el.className.replace('text-white', '') + ' text-amber-400';
+            else el.className = el.className.replace('text-white', '') + ' text-red-400';
+        });
+
+        const modal = document.getElementById('fifaModal');
+        modal.classList.add('show');
+        setTimeout(() => {
+            document.getElementById('fifaCardInner').style.transform = 'scale(1)';
+        }, 10);
+    }
+
+    function closeFifaModal(e) {
+        if (e && e.target !== e.currentTarget) return;
+        const modal = document.getElementById('fifaModal');
+        document.getElementById('fifaCardInner').style.transform = 'scale(0)';
+        setTimeout(() => modal.classList.remove('show'), 300);
+        currentModalPlayerId = null;
+        currentModalSlotPos = null;
+    }
+
+    function removePlayerFromSlot() {
+        if (currentModalSlotPos && assignment[currentModalSlotPos]) {
+            clearSlot(currentModalSlotPos);
+        } else if (currentModalPlayerId && substitutes.includes(currentModalPlayerId)) {
+            removeFromBench(currentModalPlayerId);
+        }
+        closeFifaModal({ target: document.getElementById('fifaModal'), currentTarget: document.getElementById('fifaModal') });
+    }
+
+    // ============================================================
+    // SAVE & RESET
+    // ============================================================
     function saveTactics() {
         const btn = document.getElementById('saveBtn');
         const formation = document.getElementById('formationSelect').value;
@@ -285,6 +1270,7 @@
             body: JSON.stringify({
                 formation: formation,
                 starters: assignment,
+                substitutes: substitutes,
                 team_id: '{{ selected_team_id }}'
             })
         })
@@ -292,15 +1278,296 @@
             .then(d => {
                 btn.innerHTML = '<i class="fa-solid fa-check"></i>';
                 btn.classList.replace('gradient-primary', 'bg-green-500');
+                showToast('Tactique sauvegardée avec succès !');
                 setTimeout(() => {
                     btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i>';
                     btn.classList.replace('bg-green-500', 'gradient-primary');
                     btn.disabled = false;
                 }, 2000);
+            })
+            .catch(() => {
+                btn.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i>';
+                btn.classList.replace('gradient-primary', 'bg-red-500');
+                showToast('Erreur de sauvegarde');
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i>';
+                    btn.classList.replace('bg-red-500', 'gradient-primary');
+                    btn.disabled = false;
+                }, 2000);
             });
     }
 
-    // Initialize
+    function resetPitch() {
+        // Free all starters
+        Object.keys(assignment).forEach(pos => {
+            const playerId = assignment[pos];
+            if (playerId) {
+                const card = document.querySelector(`.player-card[data-player-id="${playerId}"]`);
+                if (card) card.classList.remove('selected');
+            }
+        });
+        // Free all bench
+        substitutes.forEach(playerId => {
+            const card = document.querySelector(`.player-card[data-player-id="${playerId}"]`);
+            if (card) card.classList.remove('selected');
+        });
+
+        assignment = {};
+        substitutes = [];
+        updateFormation();
+        renderBench();
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastMessage').textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ============================================================
+    // TACTICAL CONFIGURATION
+    // ============================================================
+    const savedTacticalConfig = JSON.parse(configEl.getAttribute('data-tactical-config') || '{}');
+    let tacticalConfig = {
+        passing: savedTacticalConfig.passing || null,
+        space: savedTacticalConfig.space || null,
+        defensive: savedTacticalConfig.defensive || null,
+        pressing: savedTacticalConfig.pressing || null,
+        marking: savedTacticalConfig.marking || null,
+        counter_pressing: savedTacticalConfig.counter_pressing || false
+    };
+
+    function openTacticalConfig() {
+        const modal = document.getElementById('tacticalModal');
+        modal.classList.add('show');
+        setTimeout(() => {
+            document.getElementById('tacticalModalInner').style.transform = 'scale(1)';
+        }, 10);
+        restoreTacticalUI();
+        updatePreview();
+    }
+
+    function closeTacticalConfig(e) {
+        if (e && e.target !== e.currentTarget) return;
+        document.getElementById('tacticalModalInner').style.transform = 'scale(0)';
+        setTimeout(() => document.getElementById('tacticalModal').classList.remove('show'), 300);
+    }
+
+    function setTactic(category, value, btn) {
+        tacticalConfig[category] = value;
+        // Update active state for category buttons
+        const parentMap = {
+            passing: 'passingStyle', space: 'playSpace', defensive: 'defensiveStyle',
+            pressing: 'pressingStyle', marking: 'markingStyle'
+        };
+        const container = document.getElementById(parentMap[category]);
+        if (container) {
+            container.querySelectorAll('.tactic-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        updatePreview();
+        updateSummary();
+    }
+
+    function setCounterPressing(checked) {
+        tacticalConfig.counter_pressing = checked;
+        document.getElementById('cpToggleBg').classList.toggle('on', checked);
+        document.getElementById('cpToggleDot').classList.toggle('on', checked);
+        updatePreview();
+        updateSummary();
+    }
+
+    function restoreTacticalUI() {
+        // Restore buttons
+        const map = {
+            passing: 'passingStyle', space: 'playSpace', defensive: 'defensiveStyle',
+            pressing: 'pressingStyle', marking: 'markingStyle'
+        };
+        Object.entries(map).forEach(([key, containerId]) => {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.querySelectorAll('.tactic-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-value') === tacticalConfig[key]);
+            });
+        });
+        // Restore counter pressing
+        const cp = tacticalConfig.counter_pressing;
+        document.getElementById('counterPressing').checked = cp;
+        document.getElementById('cpToggleBg').classList.toggle('on', cp);
+        document.getElementById('cpToggleDot').classList.toggle('on', cp);
+        updateSummary();
+    }
+
+    // Toggle counter pressing on label click
+    document.getElementById('counterPressingToggle').addEventListener('click', function (e) {
+        if (e.target.tagName === 'INPUT') return;
+        const cb = document.getElementById('counterPressing');
+        cb.checked = !cb.checked;
+        setCounterPressing(cb.checked);
+    });
+
+    function updatePreview() {
+        // Space zones
+        const zoneL = document.getElementById('pvZoneLeft');
+        const zoneR = document.getElementById('pvZoneRight');
+        const zoneC = document.getElementById('pvZoneCenter');
+        zoneL.setAttribute('fill', 'transparent');
+        zoneR.setAttribute('fill', 'transparent');
+        zoneC.setAttribute('fill', 'transparent');
+
+        if (tacticalConfig.space === 'couloir_gauche') {
+            zoneL.setAttribute('fill', 'rgba(16,185,129,0.1)');
+        } else if (tacticalConfig.space === 'couloir_droit') {
+            zoneR.setAttribute('fill', 'rgba(16,185,129,0.1)');
+        } else if (tacticalConfig.space === 'axe') {
+            zoneC.setAttribute('fill', 'rgba(16,185,129,0.1)');
+        } else if (tacticalConfig.space === 'deux_couloirs') {
+            zoneL.setAttribute('fill', 'rgba(16,185,129,0.1)');
+            zoneR.setAttribute('fill', 'rgba(16,185,129,0.1)');
+        } else if (tacticalConfig.space === 'mixte') {
+            zoneL.setAttribute('fill', 'rgba(16,185,129,0.05)');
+            zoneR.setAttribute('fill', 'rgba(16,185,129,0.05)');
+            zoneC.setAttribute('fill', 'rgba(16,185,129,0.05)');
+        }
+
+        // Defensive line
+        const defLine = document.getElementById('pvDefLine');
+        const defLabel = document.getElementById('pvDefLabel');
+        const defPositions = { bloc_bas: 380, bloc_median: 340, bloc_haut: 290 };
+        const defY = defPositions[tacticalConfig.defensive] || 340;
+        defLine.setAttribute('y1', defY);
+        defLine.setAttribute('y2', defY);
+        defLabel.setAttribute('y', defY + 15);
+        const defNames = { bloc_bas: 'BLOC BAS', bloc_median: 'BLOC MÉDIAN', bloc_haut: 'BLOC HAUT' };
+        defLabel.textContent = defNames[tacticalConfig.defensive] || 'BLOC MÉDIAN';
+
+        // Pressing line
+        const pressLine = document.getElementById('pvPressLine');
+        const pressLabel = document.getElementById('pvPressLabel');
+        const pressPositions = { haut: 100, median: 180, bas: 260, tout_terrain: 140 };
+        const pressY = pressPositions[tacticalConfig.pressing] || 180;
+        pressLine.setAttribute('y1', pressY);
+        pressLine.setAttribute('y2', pressY);
+        pressLabel.setAttribute('y', pressY - 10);
+        const pressNames = { haut: 'PRESSING HAUT', median: 'PRESSING MÉDIAN', bas: 'PRESSING BAS', tout_terrain: 'PRESSING TOTAL' };
+        pressLabel.textContent = pressNames[tacticalConfig.pressing] || 'PRESSING';
+
+        if (tacticalConfig.pressing === 'tout_terrain') {
+            pressLine.setAttribute('stroke-dasharray', '4,2');
+            pressLine.setAttribute('stroke', 'rgba(239,68,68,0.7)');
+        } else {
+            pressLine.setAttribute('stroke-dasharray', '8,4');
+            pressLine.setAttribute('stroke', 'rgba(239,68,68,0.5)');
+        }
+
+        // Passing arrows
+        const passG = document.getElementById('pvPassArrows');
+        passG.innerHTML = '';
+        const passColor = 'rgba(168,85,247,0.4)';
+        if (tacticalConfig.passing === 'courte') {
+            for (let i = 0; i < 3; i++) {
+                const x = 100 + i * 50;
+                passG.innerHTML += `<line x1="${x}" y1="280" x2="${x}" y2="250" stroke="${passColor}" stroke-width="1.5" marker-end="url(#arrowPurple)"/>`;
+            }
+        } else if (tacticalConfig.passing === 'long') {
+            passG.innerHTML += `<line x1="150" y1="350" x2="150" y2="120" stroke="${passColor}" stroke-width="2" stroke-dasharray="6,3"/>`;
+        } else if (tacticalConfig.passing === 'direct') {
+            passG.innerHTML += `<line x1="150" y1="300" x2="150" y2="150" stroke="${passColor}" stroke-width="2.5"/>`;
+        }
+
+        // Counter pressing
+        const cpGroup = document.getElementById('pvCounterPress');
+        cpGroup.setAttribute('opacity', tacticalConfig.counter_pressing ? '1' : '0');
+
+        // Marking
+        const markG = document.getElementById('pvMarking');
+        markG.innerHTML = '';
+        if (tacticalConfig.marking === 'individuel') {
+            const positions = [[80, 320], [150, 310], [220, 320], [120, 340], [180, 340]];
+            positions.forEach(([x, y]) => {
+                markG.innerHTML += `<circle cx="${x}" cy="${y}" r="6" fill="none" stroke="rgba(139,92,246,0.4)" stroke-width="1" stroke-dasharray="3,2"/>`;
+                markG.innerHTML += `<circle cx="${x}" cy="${y}" r="2" fill="rgba(139,92,246,0.5)"/>`;
+            });
+        } else if (tacticalConfig.marking === 'zone') {
+            markG.innerHTML += `<rect x="40" y="300" width="70" height="50" rx="4" fill="rgba(139,92,246,0.06)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>`;
+            markG.innerHTML += `<rect x="115" y="300" width="70" height="50" rx="4" fill="rgba(139,92,246,0.06)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>`;
+            markG.innerHTML += `<rect x="190" y="300" width="70" height="50" rx="4" fill="rgba(139,92,246,0.06)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>`;
+        }
+    }
+
+    function updateSummary() {
+        const summary = document.getElementById('configSummary');
+        const labels = {
+            passing: { label: 'Passes', courte: 'Courtes', direct: 'Directes', long: 'Longues', mixte: 'Mixtes' },
+            space: { label: 'Espace', couloir_gauche: 'Couloir G', couloir_droit: 'Couloir D', axe: 'Axe', deux_couloirs: '2 Couloirs', mixte: 'Mixte' },
+            defensive: { label: 'Défense', bloc_bas: 'Bloc bas', bloc_median: 'Bloc médian', bloc_haut: 'Bloc haut' },
+            pressing: { label: 'Pressing', haut: 'Haut', median: 'Médian', bas: 'Bas', tout_terrain: 'Total' },
+            marking: { label: 'Marquage', individuel: 'Individuel', zone: 'En zone' }
+        };
+
+        Object.entries(labels).forEach(([key, data]) => {
+            const val = tacticalConfig[key];
+            if (val) {
+                hasConfig = true;
+                html += `<div class="summary-item flex items-center justify-between border-b border-white/5 pb-2">
+                            <span class="text-[10px] text-white/30 font-bold uppercase tracking-widest">${data.label}</span>
+                            <span class="text-[10px] text-amber-400 font-extrabold uppercase tracking-tight">${data[val] || val}</span>
+                         </div>`;
+            }
+        });
+        if (tacticalConfig.counter_pressing) {
+            hasConfig = true;
+            html += `<div class="summary-item flex items-center justify-between border-b border-white/5 pb-2">
+                        <span class="text-[10px] text-white/30 font-bold uppercase tracking-widest">Transition</span>
+                        <span class="text-[10px] text-amber-400 font-extrabold uppercase tracking-tight">CONTRE-PRESSING</span>
+                     </div>`;
+        }
+        summary.innerHTML = hasConfig ? html : '<div class="flex items-center justify-center py-4"><p class="text-[10px] text-white/20 italic">Configuration vierge...</p></div>';
+    }
+
+    function resetTacticalConfig() {
+        tacticalConfig = { passing: null, space: null, defensive: null, pressing: null, marking: null, counter_pressing: false };
+        restoreTacticalUI();
+        updatePreview();
+        updateSummary();
+    }
+
+    function saveTacticalConfig() {
+        const btn = document.getElementById('saveTacConfigBtn');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Sauvegarde...';
+        btn.disabled = true;
+
+        fetch('/coach/tactics/save-config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                config: tacticalConfig,
+                team_id: '{{ selected_team_id }}'
+            })
+        })
+            .then(r => r.json())
+            .then(() => {
+                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Validé !';
+                showToast('Plan de jeu sauvegardé !');
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Valider le Plan';
+                    btn.disabled = false;
+                    closeTacticalConfig({ target: document.getElementById('tacticalModal'), currentTarget: document.getElementById('tacticalModal') });
+                }, 1500);
+            })
+            .catch(() => {
+                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Valider le Plan';
+                btn.disabled = false;
+                showToast('Erreur de sauvegarde');
+            });
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    document.getElementById('benchArea').addEventListener('dragleave', onDragLeaveBench);
     updateFormation();
+    renderBench();
 </script>
 {% endblock %}

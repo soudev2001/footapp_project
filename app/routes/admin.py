@@ -88,8 +88,8 @@ def add_member():
             'avatar': '',
             'phone': ''
         }
-        # In this demo, we use a simple password
-        new_user = user_service.create(email, 'Member123!', role=role, club_id=club_id, profile=profile)
+        # Create a pending user (no password yet)
+        new_user = user_service.create_pending_user(email, role=role, club_id=club_id, profile=profile)
         
         # If the member is a player, create their player profile too
         if role == 'player':
@@ -103,8 +103,13 @@ def add_member():
                 position="À définir",
                 jersey_number=None
             )
+        
+        # Automatically send invitation
+        from app.services import get_notification_service
+        notification_service = get_notification_service()
+        notification_service.send_invitation(new_user)
             
-        flash(f'Membre {first_name} ajoute avec succes au club!', 'success')
+        flash(f'Membre {first_name} ajouté en attente. Une invitation a été envoyée à {email}.', 'success')
         
     return redirect(url_for('admin.admin_panel'))
 
@@ -112,9 +117,34 @@ def add_member():
 @login_required
 @role_required('admin')
 def invite_member():
-    """Send an invitation email (Simulated)"""
+    """Send or Resend an invitation email"""
+    from app.services import get_user_service, get_notification_service
+    user_service = get_user_service()
+    notification_service = get_notification_service()
+    
     email = request.form.get('email')
-    flash(f'Invitation envoyee avec succes a {email}!', 'success')
+    user = user_service.get_by_email(email)
+    
+    if user:
+        if user.get('account_status') == 'active':
+            flash(f'L\'utilisateur {email} est déjà actif.', 'info')
+        else:
+            # Re-generate token if missing
+            if not user.get('invitation_token'):
+                import secrets
+                from bson import ObjectId
+                token = secrets.token_urlsafe(32)
+                user_service.collection.update_one(
+                    {'_id': user['_id']},
+                    {'$set': {'invitation_token': token}}
+                )
+                user['invitation_token'] = token
+                
+            notification_service.send_invitation(user)
+            flash(f'Invitation renvoyée avec succès à {email}!', 'success')
+    else:
+        flash(f'Utilisateur avec l\'email {email} non trouvé.', 'error')
+        
     return redirect(url_for('admin.admin_panel'))
 
 @admin_bp.route('/update-subscription', methods=['POST'])

@@ -13,8 +13,7 @@
                     <i class="fa-solid fa-users text-white text-2xl"></i>
                 </div>
                 <div>
-                    <h1
-                        class="text-4xl font-bold uppercase tracking-tight leading-none mb-2 light:text-slate-900">
+                    <h1 class="text-4xl font-bold uppercase tracking-tight leading-none mb-2 light:text-slate-900">
                         Effectif Équipe</h1>
                     <div class="flex items-center gap-4">
                         {% if teams %}
@@ -117,6 +116,12 @@
                                 <div
                                     class="absolute -bottom-2 -right-2 w-6 h-6 rounded-full border-2 border-surface-950 {% if player.status == 'active' %}bg-green-500{% else %}bg-red-500{% endif %}">
                                 </div>
+                                {% if player.account_status == 'pending' %}
+                                <div class="absolute -top-2 -left-2 w-7 h-7 bg-primary-500 rounded-full flex items-center justify-center text-[10px] font-bold text-black border-2 border-surface-950 animate-pulse"
+                                    title="Compte en attente">
+                                    P
+                                </div>
+                                {% endif %}
                             </div>
                             <div>
                                 <h3
@@ -152,8 +157,7 @@
                                 class="bg-primary-500/5 rounded-3xl p-4 text-center border border-primary-500/10 hover:bg-primary-500/10 transition-colors">
                                 <p class="text-lg font-bold text-primary-400">{{ player.stats.matches_played or
                                     0 }}</p>
-                                <p
-                                    class="text-[7px] font-bold text-primary-400/40 uppercase tracking-wider mt-1">
+                                <p class="text-[7px] font-bold text-primary-400/40 uppercase tracking-wider mt-1">
                                     App.</p>
                             </div>
                         </div>
@@ -170,6 +174,15 @@
                                     <i
                                         class="fa-solid fa-pen-to-square text-[10px] text-white/20 group-hover:text-primary-400"></i>
                                 </a>
+                                {% if player.account_status == 'pending' %}
+                                <form action="{{ url_for('admin.invite_member') }}" method="POST" class="contents">
+                                    <input type="hidden" name="email" value="{{ player.email }}">
+                                    <button type="submit" title="Renvoyer l'invitation"
+                                        class="w-12 h-12 bg-primary-500/10 hover:bg-primary-500/20 rounded-2xl flex items-center justify-center transition-all border border-primary-500/20">
+                                        <i class="fa-solid fa-paper-plane text-[10px] text-primary-400"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
                                 <form action="{{ url_for('coach.delete_player', player_id=player._id) }}" method="POST"
                                     onsubmit="return confirm('Confirmer la suppression de cet athlète ?')"
                                     class="contents">

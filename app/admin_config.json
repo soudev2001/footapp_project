@@ -1,0 +1,18 @@
+{
+    "admin_email": "admin@footlogic.com",
+    "default_password": "FootLogic2026!",
+    "club_name": "FootLogic Elite",
+    "smtp": {
+        "enabled": false,
+        "gmail_account": "",
+        "gmail_app_password": "",
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": 587
+    },
+    "player_defaults": {
+        "role": "player",
+        "account_status": "active",
+        "height": 175,
+        "weight": 70
+    }
+}

@@ -38,8 +38,10 @@ class PlayerService:
     
     def create(self, club_id, jersey_number, position, name, **kwargs):
         """Create a new player"""
+        team_id = kwargs.get('team_id')
         player = {
             'club_id': ObjectId(club_id),
+            'team_id': ObjectId(team_id) if team_id else None,
             'user_id': ObjectId(kwargs['user_id']) if kwargs.get('user_id') else None,
             'jersey_number': jersey_number,
             'position': position,
@@ -177,18 +179,19 @@ class PlayerService:
         
         return lineup
 
-    def save_lineup(self, club_id, formation, starters, team_id=None):
+    def save_lineup(self, club_id, formation, starters, team_id=None, substitutes=None):
         """Save a custom lineup for a club/team"""
         query = {'club_id': ObjectId(club_id)}
         if team_id:
             query['team_id'] = ObjectId(team_id)
-            
+
         return self.db.lineups.update_one(
             query,
             {
                 '$set': {
                     'formation': formation,
-                    'starters': starters, # { "GK": "player_id", "LB": "player_id", ... }
+                    'starters': starters,
+                    'substitutes': substitutes or [],
                     'team_id': ObjectId(team_id) if team_id else None,
                     'updated_at': datetime.utcnow()
                 }
@@ -201,9 +204,27 @@ class PlayerService:
         query = {'club_id': ObjectId(club_id)}
         if team_id:
             query['team_id'] = ObjectId(team_id)
-            
+
         lineup = self.db.lineups.find_one(query)
         if not lineup:
-            return {'formation': '4-3-3', 'starters': {}}
+            return {'formation': '4-3-3', 'starters': {}, 'substitutes': [], 'tactical_config': {}}
         return lineup
+
+    def save_tactical_config(self, club_id, team_id=None, config=None):
+        """Save tactical configuration for a club/team"""
+        query = {'club_id': ObjectId(club_id)}
+        if team_id:
+            query['team_id'] = ObjectId(team_id)
+
+        return self.db.lineups.update_one(
+            query,
+            {
+                '$set': {
+                    'tactical_config': config or {},
+                    'team_id': ObjectId(team_id) if team_id else None,
+                    'updated_at': datetime.utcnow()
+                }
+            },
+            upsert=True
+        )
 

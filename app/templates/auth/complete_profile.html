@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Activer mon compte — FootLogic{% endblock %}
+
+{% block content %}
+<div class="page-enter min-h-[85vh] flex items-center justify-center px-4 py-8">
+    <div class="glass max-w-4xl w-full flex flex-col md:flex-row rounded-3xl shadow-2xl overflow-hidden border-white/5">
+
+        <!-- Welcome Section (Left) -->
+        <div
+            class="hidden md:flex w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 relative items-center justify-center p-12 overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+            </div>
+
+            <div class="relative z-10 text-center">
+                <div
+                    class="w-20 h-20 bg-white/15 backdrop-blur-2xl rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl animate-float border border-white/15">
+                    <img src="{{ url_for('static', filename='img/logo_dark.png') }}" class="w-14 h-14 object-contain">
+                </div>
+                <h2 class="text-3xl font-extrabold mb-4 tracking-tight leading-tight text-white">
+                    Bienvenue dans <br> l'élite
+                </h2>
+                <p class="text-white/60 text-sm leading-relaxed max-w-xs mx-auto font-medium">
+                    Vous avez été ajouté par votre club. Finalisez votre profil pour accéder à vos statistiques et au
+                    match center.
+                </p>
+            </div>
+        </div>
+
+        <!-- Form Section (Right) -->
+        <div class="w-full md:w-1/2 p-8 lg:p-12">
+            <div class="mb-8 text-center md:text-left">
+                <h1 class="text-3xl font-extrabold mb-2 light:text-slate-900">Activer mon compte</h1>
+                <p class="text-white/40 light:text-slate-500 text-sm">Complétez vos informations pour commencer.</p>
+            </div>
+
+            <form method="POST" class="space-y-5">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label
+                            class="block text-[10px] font-semibold uppercase tracking-wider text-white/35 mb-2 ml-1">Prénom</label>
+                        <input type="text" name="first_name" value="{{ user.profile.first_name }}" required
+                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white placeholder:text-white/15 focus:outline-none focus:border-primary-500/50 transition-all font-medium text-sm">
+                    </div>
+                    <div>
+                        <label
+                            class="block text-[10px] font-semibold uppercase tracking-wider text-white/35 mb-2 ml-1">Nom</label>
+                        <input type="text" name="last_name" value="{{ user.profile.last_name }}" required
+                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white placeholder:text-white/15 focus:outline-none focus:border-primary-500/50 transition-all font-medium text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/35 mb-2 ml-1">Téléphone</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition text-sm"></i>
+                        <input type="tel" name="phone" placeholder="06 12 34 56 78"
+                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder:text-white/15 focus:outline-none focus:border-primary-500/50 transition-all font-medium text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/35 mb-2 ml-1">Nouveau
+                        mot de passe</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition text-sm"></i>
+                        <input type="password" name="password" required placeholder="••••••••"
+                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder:text-white/15 focus:outline-none focus:border-primary-500/50 transition-all font-medium text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/35 mb-2 ml-1">Confirmer
+                        le mot de passe</label>
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-check-double absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition text-sm"></i>
+                        <input type="password" name="confirm_password" required placeholder="••••••••"
+                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder:text-white/15 focus:outline-none focus:border-primary-500/50 transition-all font-medium text-sm">
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit"
+                        class="w-full gradient-primary py-4 rounded-2xl text-white font-bold text-sm shadow-xl shadow-primary-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all">
+                        Finaliser mon compte
+                    </button>
+                    <p
+                        class="text-center mt-5 text-[10px] text-white/20 font-semibold uppercase tracking-wider leading-relaxed">
+                        En finalisant, vous acceptez nos <a href="#"
+                            class="text-primary-400/60 hover:text-primary-400 transition">Conditions d'utilisation</a>.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

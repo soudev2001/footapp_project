@@ -26,6 +26,9 @@ USER_SCHEMA = {
     'role': str,  # 'admin', 'coach', 'player', 'fan'
     'club_id': ObjectId,
     'created_at': datetime,
+    'account_status': str,    # 'pending', 'active'
+    'invitation_token': str,  # For joining/confirming account
+    'invite_sent_at': datetime,
     'profile': {
         'first_name': str,
         'last_name': str,
@@ -183,6 +186,9 @@ def create_user(email, password_hash, role='player', club_id=None, profile=None,
         'roles': roles,
         'club_id': ObjectId(club_id) if club_id else None,
         'created_at': datetime.utcnow(),
+        'account_status': kwargs.get('account_status', 'active'),
+        'invitation_token': kwargs.get('invitation_token'),
+        'invite_sent_at': kwargs.get('invite_sent_at'),
         'profile': profile or {
             'first_name': '',
             'last_name': '',

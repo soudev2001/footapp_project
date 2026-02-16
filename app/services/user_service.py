@@ -42,11 +42,13 @@ class UserService:
             
         user = {
             'email': email,
-            'password_hash': generate_password_hash(password),
+            'password_hash': generate_password_hash(password) if password else None,
             'role': role,        # Primary role for backward compatibility
             'roles': roles,      # List of all roles
             'club_id': ObjectId(club_id) if club_id else None,
             'created_at': datetime.utcnow(),
+            'account_status': profile.get('account_status', 'active') if profile else 'active',
+            'invitation_token': None,
             'profile': profile or {
                 'first_name': '',
                 'last_name': '',
@@ -56,6 +58,37 @@ class UserService:
         }
         result = self.collection.insert_one(user)
         user['_id'] = result.inserted_id
+        return user
+    
+    def create_pending_user(self, email, role='player', club_id=None, profile=None):
+        """Create a user in pending state (no password yet)"""
+        import secrets
+        from datetime import datetime
+        
+        token = secrets.token_urlsafe(32)
+        if profile is None:
+            profile = {}
+        profile['account_status'] = 'pending'
+        
+        user = self.create(
+            email=email,
+            password=None, # No password yet
+            role=role,
+            club_id=club_id,
+            profile=profile
+        )
+        
+        # Add invitation details
+        self.collection.update_one(
+            {'_id': user['_id']},
+            {'$set': {
+                'account_status': 'pending',
+                'invitation_token': token,
+                'invite_sent_at': datetime.utcnow()
+            }}
+        )
+        user['invitation_token'] = token
+        user['account_status'] = 'pending'
         return user
     
     def verify_password(self, email, password):
@@ -116,7 +149,6 @@ def get_nav_for_role(role):
         'coach': [
             {'name': 'Dashboard', 'url': '/coach/dashboard', 'icon': 'fa-gauge'},
             {'name': 'Isy HUB', 'url': '/isy/hub', 'icon': 'fa-rocket'},
-            {'name': 'Effectif Pro', 'url': '/isy/members', 'icon': 'fa-users-gear'},
             {'name': 'Effectif', 'url': '/coach/roster', 'icon': 'fa-users'},
             {'name': 'Tactiques', 'url': '/coach/tactics', 'icon': 'fa-chess-board'},
             {'name': 'Match Center', 'url': '/coach/match-center', 'icon': 'fa-gamepad'},

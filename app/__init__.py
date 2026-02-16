@@ -16,6 +16,7 @@ def create_app(config_name='default'):
     
     # Register all blueprints
     from app.routes import main_bp, api_bp, auth_bp, admin_bp, coach_bp, player_bp, isy_bp, superadmin_bp
+    from app.routes.auth_extra import auth_extra_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(auth_bp)
@@ -24,6 +25,7 @@ def create_app(config_name='default'):
     app.register_blueprint(player_bp)
     app.register_blueprint(isy_bp)
     app.register_blueprint(superadmin_bp)
+    app.register_blueprint(auth_extra_bp)
     
     # Context processor for templates
     @app.context_processor
