@@ -197,11 +197,13 @@
                 % endif %
             }
 
-            /* Helper for RGB conversions if needed for opacity */
+            /* Default RGB legacy support */
             --primary-rgb: 16,
             185,
             129;
-            /* Default Emerald 500 */
+            --secondary-rgb: 15,
+            23,
+            42;
         }
 
         .gradient-primary {
@@ -249,10 +251,14 @@
                     </div>
                     <div
                         class="relative h-full w-full bg-surface-950 rounded-xl border border-white/10 flex items-center justify-center p-2 shadow-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                        {% if club and club.logo %}
+                        <img src="{{ club.logo }}" class="w-full h-full object-contain">
+                        {% else %}
                         <img src="{{ url_for('static', filename='img/logo_dark.png') }}"
                             class="w-full h-full object-contain dark-logo">
                         <img src="{{ url_for('static', filename='img/logo_light.png') }}"
                             class="w-full h-full object-contain light-logo">
+                        {% endif %}
                     </div>
                 </div>
                 <div class="flex flex-col">

@@ -191,12 +191,26 @@ def update_club():
     founded_year = request.form.get('founded_year')
     description = request.form.get('description')
     
-    club_service.update(club_id, {
+    logo = request.form.get('logo')
+    primary_color = request.form.get('primary_color')
+    secondary_color = request.form.get('secondary_color')
+    
+    update_data = {
         'name': name,
         'city': city,
         'founded_year': int(founded_year) if founded_year else 1985,
         'description': description
-    })
+    }
+    
+    if logo:
+        update_data['logo'] = logo
+    if primary_color and secondary_color:
+        update_data['colors'] = {
+            'primary': primary_color,
+            'secondary': secondary_color
+        }
+    
+    club_service.update(club_id, update_data)
     
     flash('Configuration du club mise a jour!', 'success')
     return redirect(url_for('admin.admin_panel'))

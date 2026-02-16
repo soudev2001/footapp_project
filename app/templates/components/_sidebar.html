@@ -6,12 +6,19 @@
     <!-- Sidebar Header -->
     <div class="sidebar-header">
         <a href="/" class="sidebar-logo">
+            {% if club and club.logo %}
+            <img src="{{ club.logo }}" class="w-8 h-8 rounded-lg object-contain border border-white/10 p-1 bg-white/5">
+            {% else %}
             <div class="sidebar-logo-icon gradient-primary">
                 <i class="fa-solid fa-futbol text-white"></i>
             </div>
+            {% endif %}
             <div class="sidebar-logo-text">
-                <span class="sidebar-logo-title">Foot<span class="text-primary-500">Logic</span></span>
-                <span class="sidebar-logo-subtitle">Sports Platform</span>
+                <span class="sidebar-logo-title">
+                    {% if club %}{{ club.name }}{% else %}Foot<span class="text-primary-500">Logic</span>{% endif %}
+                </span>
+                <span class="sidebar-logo-subtitle">{% if club %}{{ club.city }}{% else %}Sports Platform{% endif
+                    %}</span>
             </div>
         </a>
         <button id="sidebar-close" class="sidebar-close-btn" aria-label="Fermer">
