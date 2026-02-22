@@ -654,25 +654,31 @@
 
         <!-- Header -->
         <div class="relative px-8 py-8 border-b border-white/5 overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-transparent to-purple-500/10 opacity-30"></div>
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-transparent to-purple-500/10 opacity-30">
+            </div>
             <div class="relative flex items-center justify-between z-10">
                 <div class="flex items-center gap-6">
-                    <div class="w-16 h-16 rounded-[16px] bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.15)]">
+                    <div
+                        class="w-16 h-16 rounded-[16px] bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.15)]">
                         <i class="fa-solid fa-chart-line text-indigo-400 text-2xl"></i>
                     </div>
                     <div>
                         <h2 class="text-3xl lg:text-4xl font-[900] text-slate-900 dark:text-white uppercase italic tracking-tighter"
                             style="font-family: 'Oswald', sans-serif;">
-                            ANALYTIQUE <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">TACTIQUE</span>
+                            ANALYTIQUE <span
+                                class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">TACTIQUE</span>
                         </h2>
                         <div class="flex items-center gap-2 mt-1">
                             <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-                            <p class="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-[0.2em]">
+                            <p
+                                class="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-[0.2em]">
                                 Métriques & Chimie en temps réel</p>
                         </div>
                     </div>
                 </div>
-                <button onclick="closeTacticsAnalytics({target:document.getElementById('tacticsAnalyticsModal'),currentTarget:document.getElementById('tacticsAnalyticsModal')})"
+                <button
+                    onclick="closeTacticsAnalytics({target:document.getElementById('tacticsAnalyticsModal'),currentTarget:document.getElementById('tacticsAnalyticsModal')})"
                     class="w-12 h-12 rounded-2xl glass hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all duration-300 hover:rotate-90">
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
@@ -680,20 +686,25 @@
         </div>
 
         <!-- Tabs Navigation -->
-        <div class="px-8 py-4 border-b border-white/5 flex gap-2 overflow-x-auto custom-scrollbar bg-slate-50/5 dark:bg-black/20">
-            <button onclick="switchAnalyticsTab('metrics', this)" class="analytics-tab active px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+        <div
+            class="px-8 py-4 border-b border-white/5 flex gap-2 overflow-x-auto custom-scrollbar bg-slate-50/5 dark:bg-black/20">
+            <button onclick="switchAnalyticsTab('metrics', this)"
+                class="analytics-tab active px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
                 data-tab="metrics">
                 <i class="fa-solid fa-chart-simple text-sm mr-2"></i>Métriques
             </button>
-            <button onclick="switchAnalyticsTab('chemistry', this)" class="analytics-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+            <button onclick="switchAnalyticsTab('chemistry', this)"
+                class="analytics-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
                 data-tab="chemistry">
                 <i class="fa-solid fa-link text-sm mr-2"></i>Chimie
             </button>
-            <button onclick="switchAnalyticsTab('suggestions', this)" class="analytics-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+            <button onclick="switchAnalyticsTab('suggestions', this)"
+                class="analytics-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
                 data-tab="suggestions">
                 <i class="fa-solid fa-lightbulb text-sm mr-2"></i>Suggestions
             </button>
-            <button onclick="switchAnalyticsTab('heatmap', this)" class="analytics-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+            <button onclick="switchAnalyticsTab('heatmap', this)"
+                class="analytics-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
                 data-tab="heatmap">
                 <i class="fa-solid fa-fire text-sm mr-2"></i>Heat Map
             </button>
@@ -705,50 +716,65 @@
             <div id="metricsTab" class="analytics-content space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <!-- Metric Card: Defensive Width -->
-                    <div class="glass-dark border border-white/5 rounded-[24px] p-6 hover:border-indigo-500/30 transition-all">
+                    <div
+                        class="glass-dark border border-white/5 rounded-[24px] p-6 hover:border-indigo-500/30 transition-all">
                         <div class="flex items-center justify-between mb-4">
-                            <span class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest">Largeur Défense</span>
+                            <span
+                                class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest">Largeur
+                                Défense</span>
                             <i class="fa-solid fa-arrows-left-right text-indigo-400"></i>
                         </div>
                         <div class="text-3xl font-[900] text-white mb-2" id="metricDefWidth">87%</div>
                         <div class="h-2 rounded-full bg-white/5 overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full" style="width: 87%"></div>
+                            <div class="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full"
+                                style="width: 87%"></div>
                         </div>
                     </div>
 
                     <!-- Metric Card: Attack Depth -->
-                    <div class="glass-dark border border-white/5 rounded-[24px] p-6 hover:border-purple-500/30 transition-all">
+                    <div
+                        class="glass-dark border border-white/5 rounded-[24px] p-6 hover:border-purple-500/30 transition-all">
                         <div class="flex items-center justify-between mb-4">
-                            <span class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest">Profondeur Attaque</span>
+                            <span
+                                class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest">Profondeur
+                                Attaque</span>
                             <i class="fa-solid fa-arrows-up-down text-purple-400"></i>
                         </div>
                         <div class="text-3xl font-[900] text-white mb-2" id="metricAttackDepth">72%</div>
                         <div class="h-2 rounded-full bg-white/5 overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full" style="width: 72%"></div>
+                            <div class="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full"
+                                style="width: 72%"></div>
                         </div>
                     </div>
 
                     <!-- Metric Card: Compactness -->
-                    <div class="glass-dark border border-white/5 rounded-[24px] p-6 hover:border-cyan-500/30 transition-all">
+                    <div
+                        class="glass-dark border border-white/5 rounded-[24px] p-6 hover:border-cyan-500/30 transition-all">
                         <div class="flex items-center justify-between mb-4">
-                            <span class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest">Compacité</span>
+                            <span
+                                class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest">Compacité</span>
                             <i class="fa-solid fa-circle text-cyan-400"></i>
                         </div>
                         <div class="text-3xl font-[900] text-white mb-2" id="metricCompactness">81%</div>
                         <div class="h-2 rounded-full bg-white/5 overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-full" style="width: 81%"></div>
+                            <div class="h-full bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-full"
+                                style="width: 81%"></div>
                         </div>
                     </div>
 
                     <!-- Metric Card: Balance -->
-                    <div class="glass-dark border border-white/5 rounded-[24px] p-6 hover:border-emerald-500/30 transition-all">
+                    <div
+                        class="glass-dark border border-white/5 rounded-[24px] p-6 hover:border-emerald-500/30 transition-all">
                         <div class="flex items-center justify-between mb-4">
-                            <span class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest">Équilibre A/D</span>
+                            <span
+                                class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest">Équilibre
+                                A/D</span>
                             <i class="fa-solid fa-scale-balanced text-emerald-400"></i>
                         </div>
                         <div class="text-3xl font-[900] text-white mb-2" id="metricBalance">62%</div>
                         <div class="h-2 rounded-full bg-white/5 overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full" style="width: 62%"></div>
+                            <div class="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full"
+                                style="width: 62%"></div>
                         </div>
                     </div>
                 </div>
@@ -757,15 +783,22 @@
                 <div class="glass-dark border border-white/5 rounded-[24px] p-8">
                     <div class="flex items-center justify-between mb-6">
                         <div>
-                            <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">Score d'Adéquation Formation</p>
+                            <p
+                                class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">
+                                Score d'Adéquation Formation</p>
                             <h3 class="text-2xl font-[900] text-white">Très Bon</h3>
                         </div>
-                        <div class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">87</div>
+                        <div
+                            class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
+                            87</div>
                     </div>
                     <div class="h-3 rounded-full bg-white/5 overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-full" style="width: 87%; background-size: 200% 100%; animation: gradientShift 3s ease infinite;"></div>
+                        <div class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-full"
+                            style="width: 87%; background-size: 200% 100%; animation: gradientShift 3s ease infinite;">
+                        </div>
                     </div>
-                    <p class="text-xs text-slate-400 dark:text-white/40 mt-4">Cette formation s'adapte bien à votre effectif avec un bon équilibre attaque/défense.</p>
+                    <p class="text-xs text-slate-400 dark:text-white/40 mt-4">Cette formation s'adapte bien à votre
+                        effectif avec un bon équilibre attaque/défense.</p>
                 </div>
             </div>
 
@@ -776,13 +809,18 @@
                     <div class="glass-dark border border-white/5 rounded-[24px] p-8">
                         <div class="flex items-center justify-between mb-6">
                             <div>
-                                <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">Chimie Globale</p>
+                                <p
+                                    class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">
+                                    Chimie Globale</p>
                                 <h3 class="text-2xl font-[900] text-white">Excellent</h3>
                             </div>
-                            <div class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">94</div>
+                            <div
+                                class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+                                94</div>
                         </div>
                         <div class="h-3 rounded-full bg-white/5 overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full" style="width: 94%;"></div>
+                            <div class="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full"
+                                style="width: 94%;"></div>
                         </div>
                     </div>
 
@@ -790,13 +828,18 @@
                     <div class="glass-dark border border-white/5 rounded-[24px] p-8">
                         <div class="flex items-center justify-between mb-6">
                             <div>
-                                <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">Chimie Défense</p>
+                                <p
+                                    class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">
+                                    Chimie Défense</p>
                                 <h3 class="text-2xl font-[900] text-white">Très Bonne</h3>
                             </div>
-                            <div class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">88</div>
+                            <div
+                                class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">
+                                88</div>
                         </div>
                         <div class="h-3 rounded-full bg-white/5 overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full" style="width: 88%;"></div>
+                            <div class="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full"
+                                style="width: 88%;"></div>
                         </div>
                     </div>
                 </div>
@@ -807,13 +850,18 @@
                     <div class="glass-dark border border-white/5 rounded-[24px] p-8">
                         <div class="flex items-center justify-between mb-6">
                             <div>
-                                <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">Chimie Milieu</p>
+                                <p
+                                    class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">
+                                    Chimie Milieu</p>
                                 <h3 class="text-2xl font-[900] text-white">Excellent</h3>
                             </div>
-                            <div class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">91</div>
+                            <div
+                                class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
+                                91</div>
                         </div>
                         <div class="h-3 rounded-full bg-white/5 overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full" style="width: 91%;"></div>
+                            <div class="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
+                                style="width: 91%;"></div>
                         </div>
                     </div>
 
@@ -821,13 +869,18 @@
                     <div class="glass-dark border border-white/5 rounded-[24px] p-8">
                         <div class="flex items-center justify-between mb-6">
                             <div>
-                                <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">Chimie Attaque</p>
+                                <p
+                                    class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">
+                                    Chimie Attaque</p>
                                 <h3 class="text-2xl font-[900] text-white">Bonne</h3>
                             </div>
-                            <div class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-pink-400">79</div>
+                            <div
+                                class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-pink-400">
+                                79</div>
                         </div>
                         <div class="h-3 rounded-full bg-white/5 overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-red-500 to-pink-500 rounded-full" style="width: 79%;"></div>
+                            <div class="h-full bg-gradient-to-r from-red-500 to-pink-500 rounded-full"
+                                style="width: 79%;"></div>
                         </div>
                     </div>
                 </div>
@@ -837,45 +890,54 @@
             <div id="suggestionsTab" class="analytics-content hidden space-y-6">
                 <div class="space-y-4" id="suggestionsList">
                     <!-- Suggestion Item -->
-                    <div class="glass-dark border border-emerald-500/20 rounded-[24px] p-6 hover:border-emerald-500/40 transition-all">
+                    <div
+                        class="glass-dark border border-emerald-500/20 rounded-[24px] p-6 hover:border-emerald-500/40 transition-all">
                         <div class="flex gap-4">
-                            <div class="w-12 h-12 rounded-[12px] bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                            <div
+                                class="w-12 h-12 rounded-[12px] bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
                                 <i class="fa-solid fa-check-circle text-emerald-400 text-lg"></i>
                             </div>
                             <div class="flex-1">
                                 <h4 class="text-sm font-[900] text-white mb-1">Bonne Formation</h4>
                                 <p class="text-[12px] text-slate-400 dark:text-white/40 leading-relaxed">
-                                    Votre formation 4-3-3 est bien adaptée à votre effectif. Les positions sont bien distribuées.
+                                    Votre formation 4-3-3 est bien adaptée à votre effectif. Les positions sont bien
+                                    distribuées.
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Suggestion Item -->
-                    <div class="glass-dark border border-amber-500/20 rounded-[24px] p-6 hover:border-amber-500/40 transition-all">
+                    <div
+                        class="glass-dark border border-amber-500/20 rounded-[24px] p-6 hover:border-amber-500/40 transition-all">
                         <div class="flex gap-4">
-                            <div class="w-12 h-12 rounded-[12px] bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                            <div
+                                class="w-12 h-12 rounded-[12px] bg-amber-500/10 flex items-center justify-center flex-shrink-0">
                                 <i class="fa-solid fa-lightbulb text-amber-400 text-lg"></i>
                             </div>
                             <div class="flex-1">
                                 <h4 class="text-sm font-[900] text-white mb-1">Ajuster les Ailes</h4>
                                 <p class="text-[12px] text-slate-400 dark:text-white/40 leading-relaxed">
-                                    Considérez d'utiliser des ailiers plus rapides pour exploiter les flancs. Cela augmenterait votre capacité offensif.
+                                    Considérez d'utiliser des ailiers plus rapides pour exploiter les flancs. Cela
+                                    augmenterait votre capacité offensif.
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Suggestion Item -->
-                    <div class="glass-dark border border-indigo-500/20 rounded-[24px] p-6 hover:border-indigo-500/40 transition-all">
+                    <div
+                        class="glass-dark border border-indigo-500/20 rounded-[24px] p-6 hover:border-indigo-500/40 transition-all">
                         <div class="flex gap-4">
-                            <div class="w-12 h-12 rounded-[12px] bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
+                            <div
+                                class="w-12 h-12 rounded-[12px] bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
                                 <i class="fa-solid fa-chart-line text-indigo-400 text-lg"></i>
                             </div>
                             <div class="flex-1">
                                 <h4 class="text-sm font-[900] text-white mb-1">Améliorer la Profondeur</h4>
                                 <p class="text-[12px] text-slate-400 dark:text-white/40 leading-relaxed">
-                                    Augmentez la profondeur offensive en avançant le milieu de terrain central pour plus de présence en attaque.
+                                    Augmentez la profondeur offensive en avançant le milieu de terrain central pour plus
+                                    de présence en attaque.
                                 </p>
                             </div>
                         </div>
@@ -887,14 +949,16 @@
             <div id="heatmapTab" class="analytics-content hidden">
                 <div class="glass-dark border border-white/5 rounded-[24px] p-8">
                     <div class="text-center">
-                        <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-4">Couverture Terrain</p>
+                        <p
+                            class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-4">
+                            Couverture Terrain</p>
                         <svg viewBox="0 0 105 68" class="w-full max-w-2xl mx-auto" id="heatmapPitch">
                             <!-- Pitch background -->
-                            <rect width="105" height="68" fill="url(#pitchGradient)" opacity="0.3"/>
+                            <rect width="105" height="68" fill="url(#pitchGradient)" opacity="0.3" />
                             <!-- Heat map circles -->
-                            <circle cx="52.5" cy="34" r="25" fill="url(#heatGradient)" opacity="0.6"/>
-                            <circle cx="20" cy="20" r="15" fill="url(#heatGradient2)" opacity="0.5"/>
-                            <circle cx="85" cy="20" r="15" fill="url(#heatGradient2)" opacity="0.5"/>
+                            <circle cx="52.5" cy="34" r="25" fill="url(#heatGradient)" opacity="0.6" />
+                            <circle cx="20" cy="20" r="15" fill="url(#heatGradient2)" opacity="0.5" />
+                            <circle cx="85" cy="20" r="15" fill="url(#heatGradient2)" opacity="0.5" />
                         </svg>
                     </div>
                 </div>
@@ -904,8 +968,10 @@
         <!-- Footer -->
         <div class="relative px-8 py-8 border-t border-white/5 bg-slate-50/50 dark:bg-black/20">
             <div class="relative flex items-center justify-between z-10">
-                <p class="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-wider">Dernière mise à jour: <span id="analyticsTimestamp">à l'instant</span></p>
-                <button onclick="closeTacticsAnalytics({target:document.getElementById('tacticsAnalyticsModal'),currentTarget:document.getElementById('tacticsAnalyticsModal')})"
+                <p class="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-wider">Dernière
+                    mise à jour: <span id="analyticsTimestamp">à l'instant</span></p>
+                <button
+                    onclick="closeTacticsAnalytics({target:document.getElementById('tacticsAnalyticsModal'),currentTarget:document.getElementById('tacticsAnalyticsModal')})"
                     class="px-8 py-3 rounded-[16px] glass hover:bg-white/10 text-white/60 hover:text-white text-xs font-bold uppercase tracking-wider transition-all">
                     Fermer
                 </button>
@@ -1031,26 +1097,59 @@
             </div>
         </div>
 
-        <!-- Load Preset Modal -->
+        <!-- Load Preset Modal - SIMPLIFIED & INTERACTIVE -->
         <div id="loadPresetModal"
-            class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/80 dark:bg-black/80 backdrop-blur-sm"
+            class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/80 dark:bg-black/80 backdrop-blur-xl"
             onclick="closeLoadPresetModal(event)">
-            <div class="w-full max-w-2xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-3xl p-8 shadow-2xl modal-inner-transition transform scale-0 relative h-[80vh] flex flex-col"
+            <div class="w-full max-w-4xl mx-4 bg-white dark:bg-gradient-to-br dark:from-[#0f172a] dark:to-[#1a1f3a] border border-slate-200 dark:border-white/10 rounded-[32px] shadow-2xl modal-inner-transition transform scale-0 relative overflow-hidden"
                 id="loadPresetModalInner">
-                <button onclick="closeLoadPresetModal({target:this, currentTarget:this})"
-                    class="absolute top-4 right-4 text-slate-400 dark:text-white/20 hover:text-slate-900 dark:hover:text-white transition">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
 
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
-                    <i class="fa-solid fa-folder-open text-amber-400"></i>
-                    Charger une Tactique
-                </h3>
+                <!-- Header with gradient -->
+                <div class="relative px-8 py-8 border-b border-slate-200 dark:border-white/5 bg-gradient-to-r from-amber-50 dark:from-amber-500/5 to-transparent">
+                    <button onclick="closeLoadPresetModal({target:this, currentTarget:this})"
+                        class="absolute top-6 right-6 w-10 h-10 rounded-xl glass hover:bg-white/10 flex items-center justify-center text-slate-400 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
 
-                <div class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2" id="presetList">
-                    <div class="text-center py-10">
-                        <i class="fa-solid fa-spinner fa-spin text-white/20 text-2xl"></i>
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-[16px] bg-gradient-to-br from-amber-400/20 to-amber-600/20 border border-amber-500/30 flex items-center justify-center">
+                            <i class="fa-solid fa-bookmark text-amber-500 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-3xl font-[900] text-slate-900 dark:text-white uppercase italic tracking-tighter"
+                                style="font-family: 'Oswald', sans-serif;">
+                                MES TACTIQUES <span class="text-amber-500">(MAX 5)</span>
+                            </h2>
+                            <p class="text-xs text-slate-500 dark:text-white/40 font-bold uppercase tracking-[0.2em] mt-1">
+                                <i class="fa-solid fa-play text-green-500 mr-1"></i>Cliquez pour charger
+                            </p>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Presets Grid -->
+                <div class="p-8 max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="presetList">
+                        <!-- Loading state -->
+                        <div class="col-span-full text-center py-16">
+                            <div class="inline-block">
+                                <i class="fa-solid fa-spinner fa-spin text-amber-400 text-4xl mb-4 block"></i>
+                                <p class="text-white/40 text-sm font-bold uppercase tracking-wider">Chargement des tactiques...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Info -->
+                <div class="px-8 py-6 border-t border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex items-center justify-between">
+                    <p class="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-circle text-emerald-500 mr-2"></i>
+                        <span id="presetCount">0</span> tactique(s) sauvegardée(s)
+                    </p>
+                    <button onclick="closeLoadPresetModal({target:this, currentTarget:this})"
+                        class="px-6 py-2 rounded-lg glass hover:bg-white/10 text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white text-xs font-bold uppercase tracking-wider transition">
+                        Fermer
+                    </button>
                 </div>
             </div>
         </div>
@@ -1861,6 +1960,7 @@
             opacity: 0;
             transform: translateY(10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -1869,9 +1969,17 @@
 
     /* Gradient Animation for Metrics */
     @keyframes gradientShift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
     }
 
     /* Glow effect on hover for metric cards */
@@ -1883,6 +1991,185 @@
     .light .glass-dark {
         background: rgba(255, 255, 255, 0.95);
         border-color: #e2e8f0;
+    }
+
+    /* ============================================================
+       SIMPLE SAVE/LOAD TACTIQUE CARDS
+       ============================================================ */
+
+    /* Tactique Card Base */
+    .tactique-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 24px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        animation: slideInCard 0.4s ease-out backwards;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    @keyframes slideInCard {
+        from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(-20px) scale(0.9);
+        }
+    }
+
+    .tactique-card:nth-child(1) { animation-delay: 0.1s; }
+    .tactique-card:nth-child(2) { animation-delay: 0.15s; }
+    .tactique-card:nth-child(3) { animation-delay: 0.2s; }
+    .tactique-card:nth-child(4) { animation-delay: 0.25s; }
+    .tactique-card:nth-child(5) { animation-delay: 0.3s; }
+
+    .tactique-card:hover {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+        border-color: rgba(251, 191, 36, 0.5);
+        box-shadow: 0 0 40px rgba(251, 191, 36, 0.15), 0 8px 32px rgba(0, 0, 0, 0.2);
+        transform: translateY(-4px);
+    }
+
+    .tactique-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+
+    .tactique-card:hover::before {
+        opacity: 1;
+    }
+
+    /* Light mode card */
+    .light .tactique-card {
+        background: linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(241, 245, 249, 0.8) 100%);
+        border-color: #e2e8f0;
+    }
+
+    .light .tactique-card:hover {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+        border-color: #d97706;
+        box-shadow: 0 0 30px rgba(217, 119, 6, 0.1), 0 8px 32px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Formation Badge */
+    .formation-badge {
+        display: inline-block;
+        padding: 6px 16px;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: #000;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        width: fit-content;
+    }
+
+    .light .formation-badge {
+        box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2);
+    }
+
+    /* Load Button Animation */
+    @keyframes loadingPulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .tactique-card.loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    /* Action Buttons */
+    .tactique-action-btn {
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+    }
+
+    .tactique-load-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        flex: 1;
+    }
+
+    .tactique-load-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .tactique-load-btn:active {
+        transform: translateY(0);
+    }
+
+    .tactique-delete-btn {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        padding: 8px 12px;
+    }
+
+    .tactique-delete-btn:hover {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    /* Light mode buttons */
+    .light .tactique-delete-btn {
+        background: rgba(239, 68, 68, 0.08);
+        border-color: rgba(239, 68, 68, 0.25);
+        color: #dc2626;
+    }
+
+    .light .tactique-delete-btn:hover {
+        background: rgba(239, 68, 68, 0.15);
+    }
+
+    /* Success Animation */
+    @keyframes successPulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+        100% { transform: scale(1); }
+    }
+
+    .tactique-card.success {
+        border-color: #10b981;
+        animation: successPulse 0.5s ease;
+    }
+
+    .light .tactique-card.success {
+        border-color: #059669;
     }
 
 </style>
@@ -2044,19 +2331,23 @@
                     set_pieces: setPieces
                 })
             })
-                .then(r => r.json())
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.json();
+                })
                 .then(() => {
-                    status.textContent = 'Enregistré';
-                    status.className = 'absolute -bottom-6 right-2 text-[9px] font-bold uppercase tracking-widest transition-all text-green-500/50';
+                    status.textContent = 'Enregistré ✓';
+                    status.className = 'absolute -bottom-6 right-2 text-[9px] font-bold uppercase tracking-widest transition-all text-green-400';
                     setTimeout(() => {
-                        if (status.textContent === 'Enregistré') {
+                        if (status.textContent.startsWith('Enregistré')) {
                             status.className = 'absolute -bottom-6 right-2 text-[9px] font-bold uppercase tracking-widest transition-all text-white/5';
                         }
                     }, 3000);
                 })
-                .catch(() => {
-                    status.textContent = 'Erreur';
-                    status.className = 'absolute -bottom-6 right-2 text-[9px] font-bold uppercase tracking-widest transition-all text-red-500/50';
+                .catch(err => {
+                    console.error('AutoSave failed:', err);
+                    status.textContent = '⚠ Erreur auto-save';
+                    status.className = 'absolute -bottom-6 right-2 text-[9px] font-bold uppercase tracking-widest transition-all text-red-400';
                 });
         }, 2000);
     }
@@ -3260,44 +3551,114 @@
 
     function loadPresets() {
         const list = document.getElementById('presetList');
-        list.innerHTML = '<div class="text-center py-10"><i class="fa-solid fa-spinner fa-spin text-white/20 text-2xl"></i></div>';
+        list.innerHTML = '<div class="col-span-full text-center py-16"><div class="inline-block"><i class="fa-solid fa-spinner fa-spin text-amber-400 text-4xl mb-4 block"></i><p class="text-white/40 text-sm font-bold">Chargement...</p></div></div>';
 
         fetch(`/coach/tactics/presets?team_id={{ selected_team_id }}`)
             .then(r => r.json())
             .then(data => {
-                if (data.length === 0) {
-                    list.innerHTML = '<div class="text-center py-10 text-white/30 italic">Aucune tactique sauvegardée.</div>';
+                // PHASE 3: Limiter à 5 presets max
+                const maxPresets = data.slice(0, 5);
+
+                if (maxPresets.length === 0) {
+                    list.innerHTML = `
+                        <div class="col-span-full text-center py-16">
+                            <div class="inline-block">
+                                <i class="fa-solid fa-folder-open text-white/20 text-5xl mb-4 block"></i>
+                                <p class="text-white/40 text-sm font-bold uppercase tracking-wider">Aucune tactique sauvegardée</p>
+                                <p class="text-white/20 text-xs mt-2">Créez une nouvelle tactique et sauvegardez-la pour la réutiliser</p>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('presetCount').textContent = '0';
                     return;
                 }
 
                 list.innerHTML = '';
-                data.forEach(preset => {
+                maxPresets.forEach((preset, index) => {
                     const el = document.createElement('div');
-                    el.className = 'glass p-4 rounded-xl border border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition flex items-center justify-between group';
+                    el.className = 'tactique-card relative z-10';
+                    el.setAttribute('data-preset-id', preset._id);
+
+                    // Formation color
+                    const formations = {
+                        '4-3-3': 'from-blue-400 to-blue-600',
+                        '4-4-2': 'from-emerald-400 to-emerald-600',
+                        '3-5-2': 'from-purple-400 to-purple-600',
+                        '4-2-3-1': 'from-orange-400 to-orange-600',
+                        '5-3-2': 'from-red-400 to-red-600',
+                        '4-1-2-1-2': 'from-pink-400 to-pink-600',
+                        '4-3-2-1': 'from-cyan-400 to-cyan-600',
+                        '3-4-3': 'from-indigo-400 to-indigo-600',
+                        '4-5-1': 'from-teal-400 to-teal-600',
+                        '5-4-1': 'from-violet-400 to-violet-600'
+                    };
+                    const formationColor = formations[preset.formation] || 'from-amber-400 to-amber-600';
+
                     el.innerHTML = `
                         <div>
-                            <h4 class="font-bold text-slate-900 dark:text-white text-sm">${preset.name}</h4>
-                            <p class="text-xs text-slate-500 dark:text-white/40">${preset.formation} • ${preset.description || 'Pas de description'}</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                             <button onclick="applyPreset('${preset._id}')" 
-                                class="px-4 py-2 rounded-lg bg-primary-500/20 text-primary-400 text-xs font-bold uppercase hover:bg-primary-500 hover:text-white transition">
-                                Charger
-                            </button>
-                            <button onclick="deletePreset('${preset._id}', this)" 
-                                class="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition">
-                                <i class="fa-solid fa-trash text-xs"></i>
-                            </button>
+                            <!-- Name and Formation -->
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <h4 class="font-[900] text-white text-lg uppercase tracking-tighter">${preset.name}</h4>
+                                    <p class="text-[11px] text-white/50 font-bold uppercase tracking-widest mt-1">
+                                        <i class="fa-solid fa-shield text-white/30 mr-1"></i>Sauvegardée
+                                    </p>
+                                </div>
+                                <span class="formation-badge">${preset.formation}</span>
+                            </div>
+
+                            <!-- Description if available -->
+                            ${preset.description ? `<p class="text-xs text-white/60">${preset.description}</p>` : ''}
+
+                            <!-- Actions -->
+                            <div class="flex items-center gap-3 mt-4">
+                                <button onclick="applyPresetWithAnimation('${preset._id}')"
+                                    class="tactique-load-btn tactique-action-btn relative overflow-hidden group">
+                                    <i class="fa-solid fa-play group-hover:translate-x-1 transition-transform mr-2"></i>
+                                    <span>Charger</span>
+                                </button>
+                                <button onclick="deletePresetCard('${preset._id}', this)"
+                                    class="tactique-delete-btn tactique-action-btn hover:scale-110 transition-transform"
+                                    title="Supprimer">
+                                    <i class="fa-solid fa-trash text-sm"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
                     list.appendChild(el);
                 });
+
+                // Update count
+                document.getElementById('presetCount').textContent = maxPresets.length;
+            })
+            .catch(() => {
+                list.innerHTML = '<div class="col-span-full text-center py-10 text-red-400">Erreur de chargement</div>';
             });
     }
 
-    function applyPreset(presetId) {
-        if (!confirm('Charger cette tactique remplacera la configuration actuelle. Continuer ?')) return;
+    // PHASE 3: Apply preset with animation
+    function applyPresetWithAnimation(presetId) {
+        const card = document.querySelector(`[data-preset-id="${presetId}"]`);
+        if (!card) return;
 
+        // Add loading state
+        card.classList.add('loading');
+
+        if (!confirm('Charger cette tactique remplacera la configuration actuelle. Continuer ?')) {
+            card.classList.remove('loading');
+            return;
+        }
+
+        applyPreset(presetId, card);
+    }
+
+    // PHASE 3: Delete with confirmation
+    function deletePresetCard(presetId, btn) {
+        if (!confirm('Supprimer cette tactique ? (Cette action est irréversible)')) return;
+        deletePreset(presetId, btn);
+    }
+
+    function applyPreset(presetId, card) {
         fetch('/coach/tactics/preset/load', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -3308,17 +3669,68 @@
         })
             .then(r => r.json())
             .then(d => {
-                location.reload();
+                // Add success animation if card element provided
+                if (card) {
+                    card.classList.remove('loading');
+                    card.classList.add('success');
+
+                    // Show success message
+                    const originalBtn = card.querySelector('.tactique-load-btn');
+                    if (originalBtn) {
+                        const originalHTML = originalBtn.innerHTML;
+                        originalBtn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Chargée!';
+                        originalBtn.style.opacity = '0.7';
+                    }
+
+                    // Reload after animation
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    location.reload();
+                }
+            })
+            .catch(err => {
+                if (card) card.classList.remove('loading');
+                alert('Erreur lors du chargement de la tactique');
             });
     }
 
     function deletePreset(presetId, btn) {
-        if (!confirm('Supprimer cette tactique ?')) return;
+        const card = document.querySelector(`[data-preset-id="${presetId}"]`);
+        if (!card) return;
+
+        // Add fade-out animation
+        card.style.animation = 'fadeOut 0.3s ease forwards';
 
         fetch(`/coach/tactics/preset/${presetId}`, { method: 'DELETE' })
             .then(r => r.json())
             .then(() => {
-                btn.closest('div.glass').remove();
+                // Remove card after animation
+                setTimeout(() => {
+                    card.remove();
+
+                    // Update count
+                    const count = document.querySelectorAll('.tactique-card').length;
+                    document.getElementById('presetCount').textContent = count;
+
+                    // Show empty state if no presets left
+                    if (count === 0) {
+                        const list = document.getElementById('presetList');
+                        list.innerHTML = `
+                            <div class="col-span-full text-center py-16">
+                                <div class="inline-block">
+                                    <i class="fa-solid fa-folder-open text-white/20 text-5xl mb-4 block"></i>
+                                    <p class="text-white/40 text-sm font-bold uppercase tracking-wider">Aucune tactique sauvegardée</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }, 300);
+            })
+            .catch(() => {
+                card.style.animation = 'none'; // Reset animation if error
+                alert('Erreur lors de la suppression');
             });
     }
 
