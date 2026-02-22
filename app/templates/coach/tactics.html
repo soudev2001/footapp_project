@@ -202,6 +202,12 @@
                     title="Analytique Tactique">
                     <i class="fa-solid fa-chart-line text-lg"></i>
                 </button>
+                <!-- Phase 4: Visualiseur Button -->
+                <button onclick="openVisualiser()"
+                    class="w-14 h-14 rounded-2xl glass hover:bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 hover:scale-105 active:scale-95 transition shadow-2xl"
+                    title="Visualiseur Tactique">
+                    <i class="fa-solid fa-play text-lg"></i>
+                </button>
                 <button onclick="openTacticalConfig()"
                     class="w-14 h-14 rounded-2xl glass hover:bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 hover:scale-105 active:scale-95 transition shadow-2xl"
                     title="Configuration Tactique">
@@ -972,6 +978,174 @@
                     mise à jour: <span id="analyticsTimestamp">à l'instant</span></p>
                 <button
                     onclick="closeTacticsAnalytics({target:document.getElementById('tacticsAnalyticsModal'),currentTarget:document.getElementById('tacticsAnalyticsModal')})"
+                    class="px-8 py-3 rounded-[16px] glass hover:bg-white/10 text-white/60 hover:text-white text-xs font-bold uppercase tracking-wider transition-all">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PHASE 4: VISUALISEUR TACTIQUE Modal -->
+<div id="visualiserModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/80 dark:bg-black/80 backdrop-blur-xl"
+    onclick="closeVisualiser(event)">
+    <div class="tactical-modal-inner relative w-full lg:max-w-6xl h-full lg:h-[90vh] max-h-[95vh] mx-4 rounded-[40px] overflow-hidden flex flex-col transform scale-0 modal-inner-transition glass-dark border border-slate-200 dark:border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)]"
+        id="visualiserModalInner">
+
+        <!-- Header -->
+        <div class="relative px-8 py-8 border-b border-white/5 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-rose-500/10 via-transparent to-pink-500/10 opacity-30"></div>
+            <div class="relative flex items-center justify-between z-10">
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 rounded-[16px] bg-gradient-to-br from-rose-500/20 to-pink-500/20 border border-rose-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.15)]">
+                        <i class="fa-solid fa-play text-rose-400 text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl lg:text-4xl font-[900] text-slate-900 dark:text-white uppercase italic tracking-tighter"
+                            style="font-family: 'Oswald', sans-serif;">
+                            VISUALISEUR <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-pink-400">TACTIQUE</span>
+                        </h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                            <p class="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-[0.2em]">
+                                Prévisualisation en temps réel</p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="closeVisualiser({target:document.getElementById('visualiserModal'),currentTarget:document.getElementById('visualiserModal')})"
+                    class="w-12 h-12 rounded-2xl glass hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all duration-300 hover:rotate-90">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Visualization Tabs -->
+        <div class="px-8 py-4 border-b border-white/5 flex gap-2 overflow-x-auto custom-scrollbar bg-slate-50/5 dark:bg-black/20">
+            <button onclick="switchVisualiserTab('pitch', this)" class="visualiser-tab active px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+                data-tab="pitch">
+                <i class="fa-solid fa-futbol text-sm mr-2"></i>Terrain
+            </button>
+            <button onclick="switchVisualiserTab('coverage', this)" class="visualiser-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+                data-tab="coverage">
+                <i class="fa-solid fa-fire text-sm mr-2"></i>Couverture
+            </button>
+            <button onclick="switchVisualiserTab('passing', this)" class="visualiser-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+                data-tab="passing">
+                <i class="fa-solid fa-arrows text-sm mr-2"></i>Passes
+            </button>
+            <button onclick="switchVisualiserTab('phases', this)" class="visualiser-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+                data-tab="phases">
+                <i class="fa-solid fa-circle-play text-sm mr-2"></i>Phases
+            </button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-8 bg-gradient-to-b from-slate-900/20 to-transparent">
+            <!-- Pitch Tab -->
+            <div id="pitchTab" class="visualiser-content space-y-6">
+                <div class="glass-dark border border-white/5 rounded-[24px] p-8">
+                    <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-6">Visualisation Terrain</p>
+                    <svg viewBox="0 0 105 68" class="w-full max-w-4xl mx-auto" id="mainPitch" style="min-height: 300px;">
+                        <!-- Pitch background -->
+                        <rect width="105" height="68" fill="#047857" opacity="0.6"/>
+                        <!-- Pitch lines -->
+                        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="white" stroke-width="0.5" opacity="0.4"/>
+                        <line x1="0" y1="34" x2="105" y2="34" stroke="white" stroke-width="0.5" opacity="0.4"/>
+                        <rect x="0" y="13.6" width="16.5" height="40.8" fill="none" stroke="white" stroke-width="0.3" opacity="0.3"/>
+                        <rect x="88.5" y="13.6" width="16.5" height="40.8" fill="none" stroke="white" stroke-width="0.3" opacity="0.3"/>
+                        <!-- Center circle -->
+                        <circle cx="52.5" cy="34" r="9.15" fill="none" stroke="white" stroke-width="0.3" opacity="0.3"/>
+                        <!-- Animated player positions -->
+                        <g id="playerPositions"></g>
+                    </svg>
+                    <p class="text-xs text-white/40 text-center mt-4">Formation actuelle avec positionnement des joueurs</p>
+                </div>
+            </div>
+
+            <!-- Coverage Tab -->
+            <div id="coverageTab" class="visualiser-content hidden space-y-6">
+                <div class="glass-dark border border-white/5 rounded-[24px] p-8">
+                    <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-6">Zones de Couverture</p>
+                    <svg viewBox="0 0 105 68" class="w-full max-w-4xl mx-auto" id="coveragePitch" style="min-height: 300px;">
+                        <rect width="105" height="68" fill="#047857" opacity="0.6"/>
+                        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="white" stroke-width="0.5" opacity="0.4"/>
+                        <line x1="0" y1="34" x2="105" y2="34" stroke="white" stroke-width="0.5" opacity="0.4"/>
+                        <!-- Coverage zones -->
+                        <g id="coverageZones" opacity="0.5"></g>
+                    </svg>
+                    <p class="text-xs text-white/40 text-center mt-4">Zones de couverture par ligne (Défense, Milieu, Attaque)</p>
+                </div>
+            </div>
+
+            <!-- Passing Lines Tab -->
+            <div id="passingTab" class="visualiser-content hidden space-y-6">
+                <div class="glass-dark border border-white/5 rounded-[24px] p-8">
+                    <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-6">Lignes de Passe</p>
+                    <svg viewBox="0 0 105 68" class="w-full max-w-4xl mx-auto" id="passingPitch" style="min-height: 300px;">
+                        <rect width="105" height="68" fill="#047857" opacity="0.6"/>
+                        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="white" stroke-width="0.5" opacity="0.4"/>
+                        <line x1="0" y1="34" x2="105" y2="34" stroke="white" stroke-width="0.5" opacity="0.4"/>
+                        <!-- Passing lines -->
+                        <g id="passingLines" opacity="0.6"></g>
+                    </svg>
+                    <p class="text-xs text-white/40 text-center mt-4">Lignes de passe entre joueurs proches</p>
+                </div>
+            </div>
+
+            <!-- Game Phases Tab -->
+            <div id="phasesTab" class="visualiser-content hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <button onclick="switchPhase('defense')" class="phase-btn active px-6 py-4 rounded-[16px] text-sm font-bold uppercase tracking-wider transition-all"
+                        data-phase="defense">
+                        <i class="fa-solid fa-shield text-lg mb-2 block"></i>DÉFENSE
+                    </button>
+                    <button onclick="switchPhase('transition')" class="phase-btn px-6 py-4 rounded-[16px] text-sm font-bold uppercase tracking-wider transition-all"
+                        data-phase="transition">
+                        <i class="fa-solid fa-arrows-rotate text-lg mb-2 block"></i>TRANSITION
+                    </button>
+                    <button onclick="switchPhase('attack')" class="phase-btn px-6 py-4 rounded-[16px] text-sm font-bold uppercase tracking-wider transition-all"
+                        data-phase="attack">
+                        <i class="fa-solid fa-triangle-exclamation text-lg mb-2 block"></i>ATTAQUE
+                    </button>
+                </div>
+
+                <div class="glass-dark border border-white/5 rounded-[24px] p-8">
+                    <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-6" id="phaseTitle">Phase Défensive</p>
+                    <svg viewBox="0 0 105 68" class="w-full max-w-4xl mx-auto" id="phasesPitch" style="min-height: 300px;">
+                        <rect width="105" height="68" fill="#047857" opacity="0.6"/>
+                        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="white" stroke-width="0.5" opacity="0.4"/>
+                        <line x1="0" y1="34" x2="105" y2="34" stroke="white" stroke-width="0.5" opacity="0.4"/>
+                        <!-- Phase visualization -->
+                        <g id="phaseContent"></g>
+                    </svg>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-dark border border-indigo-500/20 rounded-[16px] p-4">
+                        <p class="text-[9px] text-indigo-400 font-bold uppercase tracking-wider mb-2"><i class="fa-solid fa-shield mr-1"></i>Bloc Défensif</p>
+                        <p class="text-xs text-white/60" id="defenseInfo">Haut</p>
+                    </div>
+                    <div class="glass-dark border border-purple-500/20 rounded-[16px] p-4">
+                        <p class="text-[9px] text-purple-400 font-bold uppercase tracking-wider mb-2"><i class="fa-solid fa-person mr-1"></i>Pressing</p>
+                        <p class="text-xs text-white/60" id="pressingInfo">Median</p>
+                    </div>
+                    <div class="glass-dark border border-rose-500/20 rounded-[16px] p-4">
+                        <p class="text-[9px] text-rose-400 font-bold uppercase tracking-wider mb-2"><i class="fa-solid fa-forward mr-1"></i>Attaque</p>
+                        <p class="text-xs text-white/60" id="attackInfo">Profonde</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="relative px-8 py-8 border-t border-white/5 bg-slate-50/50 dark:bg-black/20 overflow-hidden">
+            <div class="relative flex items-center justify-between z-10 gap-6">
+                <button onclick="playVisualisationAnimation()" class="group flex items-center gap-3 px-8 py-4 rounded-[20px] glass hover:bg-white/10 border border-white/10 text-white/60 hover:text-white text-xs font-bold uppercase tracking-wider transition-all duration-300">
+                    <i class="fa-solid fa-play group-hover:scale-125 transition-transform"></i>
+                    <span>Animer</span>
+                </button>
+                <button onclick="closeVisualiser({target:document.getElementById('visualiserModal'),currentTarget:document.getElementById('visualiserModal')})"
                     class="px-8 py-3 rounded-[16px] glass hover:bg-white/10 text-white/60 hover:text-white text-xs font-bold uppercase tracking-wider transition-all">
                     Fermer
                 </button>
@@ -2170,6 +2344,100 @@
 
     .light .tactique-card.success {
         border-color: #059669;
+    }
+
+    /* ============================================================
+       PHASE 4: VISUALISEUR TACTIQUE STYLES
+       ============================================================ */
+
+    /* Visualiser Tab Navigation */
+    .visualiser-tab {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .visualiser-tab:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .visualiser-tab.active {
+        background: linear-gradient(135deg, rgba(244, 63, 94, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%);
+        border-color: rgba(244, 63, 94, 0.5);
+        color: #f43f5e;
+        box-shadow: 0 0 20px rgba(244, 63, 94, 0.2);
+    }
+
+    .light .visualiser-tab {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        color: #64748b;
+    }
+
+    .light .visualiser-tab.active {
+        background: linear-gradient(135deg, #ffe4e6 0%, #fbecf3 100%);
+        border-color: #f43f5e;
+        color: #be123c;
+    }
+
+    /* Visualiser Content Animation */
+    .visualiser-content {
+        animation: fadeInContent 0.3s ease;
+    }
+
+    /* Phase Buttons */
+    .phase-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .phase-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .phase-btn.active {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+        border-color: rgba(99, 102, 241, 0.5);
+        color: #818cf8;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+
+    .phase-btn[data-phase="defense"].active {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%);
+        border-color: rgba(59, 130, 246, 0.5);
+        color: #3b82f6;
+    }
+
+    .phase-btn[data-phase="transition"].active {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+        border-color: rgba(168, 85, 247, 0.5);
+        color: #a855f7;
+    }
+
+    .phase-btn[data-phase="attack"].active {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%);
+        border-color: rgba(239, 68, 68, 0.5);
+        color: #ef4444;
+    }
+
+    /* Light mode phase buttons */
+    .light .phase-btn {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        color: #64748b;
+    }
+
+    .light .phase-btn.active {
+        background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+        border-color: #818cf8;
+        color: #4f46e5;
     }
 
 </style>
@@ -3732,6 +4000,250 @@
                 card.style.animation = 'none'; // Reset animation if error
                 alert('Erreur lors de la suppression');
             });
+    }
+
+    // ============================================================
+    // PHASE 4: VISUALISEUR TACTIQUE FUNCTIONS
+    // ============================================================
+    let currentVisualiserTab = 'pitch';
+    let currentPhase = 'defense';
+
+    function openVisualiser() {
+        const modal = document.getElementById('visualiserModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            document.getElementById('visualiserModalInner').style.transform = 'scale(1)';
+        }, 10);
+        renderPlayerPositions();
+    }
+
+    function closeVisualiser(e) {
+        if (e && e.target !== e.currentTarget) return;
+        document.getElementById('visualiserModalInner').style.transform = 'scale(0)';
+        setTimeout(() => {
+            const modal = document.getElementById('visualiserModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
+    }
+
+    function switchVisualiserTab(tabName, btn) {
+        // Hide all content tabs
+        document.querySelectorAll('.visualiser-content').forEach(tab => {
+            tab.classList.add('hidden');
+        });
+
+        // Remove active class from all buttons
+        document.querySelectorAll('.visualiser-tab').forEach(b => {
+            b.classList.remove('active');
+        });
+
+        // Show selected content tab
+        const contentTab = document.getElementById(tabName + 'Tab');
+        if (contentTab) {
+            contentTab.classList.remove('hidden');
+        }
+
+        // Add active class to clicked button
+        if (btn) {
+            btn.classList.add('active');
+        }
+
+        currentVisualiserTab = tabName;
+
+        // Render content based on tab
+        if (tabName === 'pitch') {
+            renderPlayerPositions();
+        } else if (tabName === 'coverage') {
+            renderCoverageZones();
+        } else if (tabName === 'passing') {
+            renderPassingLines();
+        } else if (tabName === 'phases') {
+            renderPhase(currentPhase);
+        }
+    }
+
+    function switchPhase(phaseName) {
+        currentPhase = phaseName;
+
+        // Update phase buttons
+        document.querySelectorAll('.phase-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-phase') === phaseName);
+        });
+
+        // Update title
+        const phaseNames = {
+            defense: 'Phase Défensive',
+            transition: 'Phase Transition',
+            attack: 'Phase Attaque'
+        };
+        document.getElementById('phaseTitle').textContent = phaseNames[phaseName] || 'Phase Tactique';
+
+        renderPhase(phaseName);
+    }
+
+    function renderPlayerPositions() {
+        const g = document.getElementById('playerPositions');
+        g.innerHTML = '';
+
+        // Get current positions from assignment
+        const formation = formations[document.getElementById('formationSelect').value] || formations['4-3-3'];
+        let posIndex = 0;
+
+        Object.entries(formation).forEach(([pos, [x, y]]) => {
+            // Create circle for player
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y);
+            circle.setAttribute('r', '1.8');
+            circle.setAttribute('fill', '#10b981');
+            circle.setAttribute('opacity', '0.8');
+            circle.setAttribute('stroke', '#ffffff');
+            circle.setAttribute('stroke-width', '0.2');
+
+            // Add number
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', x);
+            text.setAttribute('y', y);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('dominant-baseline', 'middle');
+            text.setAttribute('font-size', '1.2');
+            text.setAttribute('font-weight', 'bold');
+            text.setAttribute('fill', 'white');
+            text.setAttribute('pointer-events', 'none');
+            text.textContent = pos.substring(0, 2).toUpperCase();
+
+            g.appendChild(circle);
+            g.appendChild(text);
+
+            posIndex++;
+        });
+    }
+
+    function renderCoverageZones() {
+        const g = document.getElementById('coverageZones');
+        g.innerHTML = '';
+
+        // Draw coverage zones (defensive, midfield, attacking thirds)
+        const zones = [
+            { x: 0, y: 0, width: 35, height: 68, color: '#3b82f6', label: 'DÉFENSE' },
+            { x: 35, y: 0, width: 35, height: 68, color: '#a855f7', label: 'MILIEU' },
+            { x: 70, y: 0, width: 35, height: 68, color: '#ef4444', label: 'ATTAQUE' }
+        ];
+
+        zones.forEach(zone => {
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', zone.x);
+            rect.setAttribute('y', zone.y);
+            rect.setAttribute('width', zone.width);
+            rect.setAttribute('height', zone.height);
+            rect.setAttribute('fill', zone.color);
+            rect.setAttribute('opacity', '0.2');
+
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', zone.x + zone.width / 2);
+            text.setAttribute('y', zone.y + zone.height / 2);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('dominant-baseline', 'middle');
+            text.setAttribute('font-size', '2');
+            text.setAttribute('font-weight', 'bold');
+            text.setAttribute('fill', zone.color);
+            text.setAttribute('opacity', '0.6');
+            text.textContent = zone.label;
+
+            g.appendChild(rect);
+            g.appendChild(text);
+        });
+    }
+
+    function renderPassingLines() {
+        const g = document.getElementById('passingLines');
+        g.innerHTML = '';
+
+        const formation = formations[document.getElementById('formationSelect').value] || formations['4-3-3'];
+        const positions = Object.entries(formation).map(([pos, coords]) => ({ pos, x: coords[0], y: coords[1] }));
+
+        // Draw lines between adjacent players (simple passing triangles)
+        positions.forEach((player, i) => {
+            // Connect to next 2 players in same line
+            for (let j = i + 1; j < Math.min(i + 3, positions.length); j++) {
+                const distance = Math.sqrt(Math.pow(positions[j].x - player.x, 2) + Math.pow(positions[j].y - player.y, 2));
+                if (distance < 35) { // Only draw if players are close enough
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', player.x);
+                    line.setAttribute('y1', player.y);
+                    line.setAttribute('x2', positions[j].x);
+                    line.setAttribute('y2', positions[j].y);
+                    line.setAttribute('stroke', '#fbbf24');
+                    line.setAttribute('stroke-width', '0.3');
+                    line.setAttribute('stroke-dasharray', '1,1');
+                    g.appendChild(line);
+                }
+            }
+        });
+    }
+
+    function renderPhase(phase) {
+        const g = document.getElementById('phaseContent');
+        g.innerHTML = '';
+
+        const formation = formations[document.getElementById('formationSelect').value] || formations['4-3-3'];
+        const positions = Object.entries(formation);
+
+        if (phase === 'defense') {
+            // Draw defensive line (lower on pitch)
+            positions.forEach(([pos, [x, y]]) => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', x);
+                circle.setAttribute('cy', y > 50 ? y : 50); // Move down for defensive
+                circle.setAttribute('r', '1.8');
+                circle.setAttribute('fill', '#3b82f6');
+                circle.setAttribute('opacity', '0.7');
+                g.appendChild(circle);
+            });
+            document.getElementById('defenseInfo').textContent = 'Bloc Median';
+            document.getElementById('pressingInfo').textContent = 'Bas';
+            document.getElementById('attackInfo').textContent = 'Profonde';
+
+        } else if (phase === 'transition') {
+            // Show balanced positioning
+            positions.forEach(([pos, [x, y]]) => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', x);
+                circle.setAttribute('cy', y);
+                circle.setAttribute('r', '1.8');
+                circle.setAttribute('fill', '#a855f7');
+                circle.setAttribute('opacity', '0.7');
+                g.appendChild(circle);
+            });
+            document.getElementById('defenseInfo').textContent = 'Bloc Median';
+            document.getElementById('pressingInfo').textContent = 'Median';
+            document.getElementById('attackInfo').textContent = 'Équilibré';
+
+        } else if (phase === 'attack') {
+            // Draw attacking formation (higher on pitch)
+            positions.forEach(([pos, [x, y]]) => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', x);
+                circle.setAttribute('cy', y < 40 ? y : 40); // Move up for attacking
+                circle.setAttribute('r', '1.8');
+                circle.setAttribute('fill', '#ef4444');
+                circle.setAttribute('opacity', '0.7');
+                g.appendChild(circle);
+            });
+            document.getElementById('defenseInfo').textContent = 'Bloc Haut';
+            document.getElementById('pressingInfo').textContent = 'Haut';
+            document.getElementById('attackInfo').textContent = 'Avancé';
+        }
+    }
+
+    function playVisualisationAnimation() {
+        // Simple animation: cycle through phases
+        const phases = ['defense', 'transition', 'attack'];
+        let idx = phases.indexOf(currentPhase);
+        idx = (idx + 1) % phases.length;
+        switchPhase(phases[idx]);
     }
 
     // ============================================================
