@@ -25,9 +25,20 @@ class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
 
+class TestingConfig(Config):
+    """Testing configuration"""
+    TESTING = True
+    DEBUG = True
+    WTF_CSRF_ENABLED = False
+    MONGO_URI = os.environ.get(
+        'MONGO_URI_TEST',
+        'mongodb+srv://soufiane:gogo@cluster0.05omqhe.mongodb.net/FootClubApp_Test'
+    )
+
 config = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,
+    'testing': TestingConfig,
     'default': DevelopmentConfig
 }
 

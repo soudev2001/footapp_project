@@ -188,6 +188,40 @@ CONTRACT_SCHEMA = {
 }
 
 # ============================================================
+# TACTICS SCHEMAS
+# ============================================================
+
+SAVED_TACTIC_SCHEMA = {
+    '_id': ObjectId,
+    'club_id': ObjectId,
+    'team_id': ObjectId,
+    'name': str,
+    'description': str,
+    'formation': str,  # '4-3-3', '4-4-2', etc.
+    'starters': [ObjectId],  # List of player_ids
+    'substitutes': [ObjectId],  # List of player_ids
+    'instructions': {
+        'passing': str,  # 'courte', 'direct', 'long', 'mixte'
+        'space': str,    # 'couloir_gauche', 'couloir_droit', 'axe', 'deux_couloirs', 'mixte'
+        'defensive': str, # 'bloc_bas', 'bloc_median', 'bloc_haut'
+        'pressing': str,  # 'bas', 'median', 'haut', 'tout_terrain'
+        'marking': str,   # 'individuel', 'zone'
+        'counter_pressing': bool,
+        'goalkeeper_distribution': str # 'courte', 'longue', 'rapide'
+    },
+    'captains': [ObjectId],  # List of player_ids (ordered)
+    'set_pieces': {          # List of player_ids (ordered)
+        'penalties': [ObjectId],
+        'corners_left': [ObjectId],
+        'corners_right': [ObjectId],
+        'free_kicks_direct': [ObjectId],
+        'free_kicks_indirect': [ObjectId]
+    },
+    'created_at': datetime,
+    'updated_at': datetime
+}
+
+# ============================================================
 # MODEL HELPER FUNCTIONS
 # ============================================================
 
@@ -345,4 +379,25 @@ def create_message(sender_id, content, receiver_id=None, team_id=None, msg_type=
         'type': msg_type,
         'read_by': [ObjectId(sender_id)],
         'created_at': datetime.utcnow()
+    }
+
+def create_saved_tactic(club_id, team_id, name, formation, starters, substitutes, instructions=None, description='', captains=None, set_pieces=None):
+    """Create a new saved tactic document"""
+    now = datetime.utcnow()
+    return {
+        'club_id': ObjectId(club_id),
+        'team_id': ObjectId(team_id) if team_id else None,
+        'name': name,
+        'description': description,
+        'formation': formation,
+        'starters': [ObjectId(p) for p in starters],
+        'substitutes': [ObjectId(p) for p in substitutes],
+        'instructions': instructions or {},
+        'captains': [ObjectId(p) for p in (captains or [])],
+        'set_pieces': {
+            k: [ObjectId(p) for p in (v or [])] 
+            for k, v in (set_pieces or {}).items()
+        },
+        'created_at': now,
+        'updated_at': now
     }

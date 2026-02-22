@@ -58,6 +58,9 @@ class PlayerService:
             'height': kwargs.get('height', 175),
             'weight': kwargs.get('weight', 70),
             'status': kwargs.get('status', 'active'),
+            'technical_ratings': kwargs.get('technical_ratings', {
+                'VIT': 50, 'TIR': 50, 'PAS': 50, 'DRI': 50, 'DEF': 50, 'PHY': 50
+            }),
             'created_at': datetime.utcnow(),
             # ISY CLUB PRO FEATURES
             'parents': kwargs.get('parents', {
@@ -179,23 +182,27 @@ class PlayerService:
         
         return lineup
 
-    def save_lineup(self, club_id, formation, starters, team_id=None, substitutes=None):
+    def save_lineup(self, club_id, formation, starters, team_id=None, substitutes=None, name=None, captains=None, set_pieces=None):
         """Save a custom lineup for a club/team"""
         query = {'club_id': ObjectId(club_id)}
         if team_id:
             query['team_id'] = ObjectId(team_id)
 
+        update_data = {
+            'formation': formation,
+            'starters': starters,
+            'substitutes': substitutes or [],
+            'team_id': ObjectId(team_id) if team_id else None,
+            'captains': [ObjectId(p) for p in (captains or [])],
+            'set_pieces': {k: [ObjectId(p) for p in (v or [])] for k, v in (set_pieces or {}).items()},
+            'updated_at': datetime.utcnow()
+        }
+        if name:
+            update_data['name'] = name
+
         return self.db.lineups.update_one(
             query,
-            {
-                '$set': {
-                    'formation': formation,
-                    'starters': starters,
-                    'substitutes': substitutes or [],
-                    'team_id': ObjectId(team_id) if team_id else None,
-                    'updated_at': datetime.utcnow()
-                }
-            },
+            {'$set': update_data},
             upsert=True
         )
 
@@ -227,4 +234,46 @@ class PlayerService:
             },
             upsert=True
         )
+
+    def save_tactic_preset(self, club_id, team_id, name, formation, starters, substitutes, instructions=None, description='', captains=None, set_pieces=None):
+        """Save a new tactical preset (upsert by name/club/team)"""
+        from app.models import create_saved_tactic
+        tactic = create_saved_tactic(club_id, team_id, name, formation, starters, substitutes, instructions, description, captains, set_pieces)
+        
+        query = {
+            'club_id': ObjectId(club_id),
+            'name': name
+        }
+        if team_id:
+            query['team_id'] = ObjectId(team_id)
+        else:
+            query['team_id'] = None
+
+        result = self.db.saved_tactics.update_one(
+            query,
+            {'$set': tactic},
+            upsert=True
+        )
+        
+        if result.upserted_id:
+            return str(result.upserted_id)
+        
+        # If it was an update, we need to find the ID
+        existing = self.db.saved_tactics.find_one(query)
+        return str(existing['_id'])
+
+    def get_tactic_presets(self, club_id, team_id=None):
+        """Get all saved tactics for a club/team"""
+        query = {'club_id': ObjectId(club_id)}
+        if team_id:
+            query['team_id'] = ObjectId(team_id)
+        return list(self.db.saved_tactics.find(query).sort('created_at', -1))
+
+    def get_tactic_preset(self, preset_id):
+        """Get a specific preset"""
+        return self.db.saved_tactics.find_one({'_id': ObjectId(preset_id)})
+    
+    def delete_tactic_preset(self, preset_id):
+        """Delete a tactic preset"""
+        return self.db.saved_tactics.delete_one({'_id': ObjectId(preset_id)})
 

@@ -172,7 +172,7 @@
 
         :root {
                 {
-                % if current_team and current_team.colors %
+                % if current_team and current_team.colors and not request.blueprint=='admin' %
             }
 
             --primary-color: {

@@ -1,6 +1,6 @@
 # FootLogic V2 - Coach Routes
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app.routes.auth import login_required, role_required
 
 coach_bp = Blueprint('coach', __name__, url_prefix='/coach')
@@ -389,7 +389,9 @@ def save_tactics():
         formation=data.get('formation'),
         starters=data.get('starters'),
         team_id=team_id,
-        substitutes=data.get('substitutes')
+        substitutes=data.get('substitutes'),
+        captains=data.get('captains'),
+        set_pieces=data.get('set_pieces')
     )
     
     return {"status": "success"}
@@ -412,6 +414,97 @@ def save_tactical_config():
         config=data.get('config')
     )
 
+    return {"status": "success"}
+
+@coach_bp.route('/tactics/preset/save', methods=['POST'])
+@login_required
+@role_required('coach', 'admin')
+def save_tactic_preset():
+    """Save current lineup as a preset"""
+    data = request.json
+    club_id = session.get('club_id')
+    team_id = data.get('team_id')
+    
+    from app.services import get_player_service
+    player_service = get_player_service()
+    
+    preset_id = player_service.save_tactic_preset(
+        club_id=club_id,
+        team_id=team_id,
+        name=data.get('name'),
+        description=data.get('description', ''),
+        formation=data.get('formation'),
+        starters=data.get('starters'),
+        substitutes=data.get('substitutes'),
+        instructions=data.get('instructions'),
+        captains=data.get('captains'),
+        set_pieces=data.get('set_pieces')
+    )
+    
+    return {"status": "success", "preset_id": preset_id}
+
+@coach_bp.route('/tactics/presets')
+@login_required
+@role_required('coach', 'admin')
+def get_tactic_presets():
+    """Get saved presets"""
+    club_id = session.get('club_id')
+    team_id = request.args.get('team_id')
+    
+    from app.services import get_player_service
+    from app.models import serialize_docs
+    player_service = get_player_service()
+    
+    presets = player_service.get_tactic_presets(club_id, team_id)
+    return jsonify(serialize_docs(presets))
+
+@coach_bp.route('/tactics/preset/load', methods=['POST'])
+@login_required
+@role_required('coach', 'admin')
+def load_tactic_preset():
+    """Load a preset into active lineup"""
+    data = request.json
+    preset_id = data.get('preset_id')
+    club_id = session.get('club_id')
+    team_id = data.get('team_id')
+    
+    from app.services import get_player_service
+    player_service = get_player_service()
+    
+    preset = player_service.get_tactic_preset(preset_id)
+    if not preset:
+        return {"error": "Preset not found"}, 404
+        
+    # Apply to active lineup (one single save call)
+    player_service.save_lineup(
+        club_id=club_id,
+        team_id=team_id,
+        formation=preset.get('formation'),
+        starters=[str(s) for s in preset.get('starters', [])],
+        substitutes=[str(s) for s in preset.get('substitutes', [])],
+        name=preset.get('name'),
+        captains=[str(c) for c in preset.get('captains', [])],
+        set_pieces={k: [str(p) for p in v] for k, v in preset.get('set_pieces', {}).items()}
+    )
+    
+    # Also apply instructions if present
+    if preset.get('instructions'):
+        player_service.save_tactical_config(
+            club_id=club_id,
+            team_id=team_id,
+            config=preset.get('instructions')
+        )
+    
+    return {"status": "success"}
+
+@coach_bp.route('/tactics/preset/<preset_id>', methods=['DELETE'])
+@login_required
+@role_required('coach', 'admin')
+def delete_tactic_preset(preset_id):
+    """Delete a tactic preset"""
+    from app.services import get_player_service
+    player_service = get_player_service()
+    player_service.delete_tactic_preset(preset_id)
     return {"status": "success"}
 
 @coach_bp.route('/create-event', methods=['GET', 'POST'])
@@ -617,5 +710,61 @@ def offer_contract():
     
     flash('Offre de contrat envoyee !', 'success')
     return redirect(url_for('coach.scouting', team_id=team_id))
+
+# ============================================================
+# CONVOCATION
+# ============================================================
+
+@coach_bp.route('/convocation')
+@login_required
+@role_required('coach', 'admin')
+def convocation():
+    """Convocation interface"""
+    from app.services import get_player_service, get_event_service, get_team_service
+    
+    player_service = get_player_service()
+    event_service = get_event_service()
+    
+    club_id = session.get('club_id')
+    
+    # Get upcoming events
+    events = event_service.get_upcoming(club_id)
+    
+    # Get players
+    players = player_service.get_players_by_club(club_id)
+    
+    return render_template('coach/convocation.html', 
+        events=events,
+        players=players
+    )
+
+@coach_bp.route('/convocation/send', methods=['POST'])
+@login_required
+@role_required('coach', 'admin')
+def send_convocation():
+    """Send convocation to selected players"""
+    from app.services import get_event_service, get_notification_service
+    
+    data = request.json
+    event_id = data.get('event_id')
+    player_ids = data.get('player_ids', [])
+    
+    event_service = get_event_service()
+    notification_service = get_notification_service()
+    
+    # Send notifications
+    event = event_service.get_by_id(event_id)
+    event_title = event.get('title', 'Match') if event else 'Match'
+    
+    for pid in player_ids:
+        notification_service.create_notification(
+            user_id=pid,
+            title="Convocation Match",
+            message=f"Vous êtes convoqué pour le match : {event_title}",
+            type="convocation",
+            link=f"/player/event/{event_id}"
+        )
+        
+    return {"status": "success", "count": len(player_ids)}
 
 

@@ -41,3 +41,17 @@ class NotificationService:
             'read': False
         }
         self.collection.insert_one(notification)
+
+    def create_notification(self, user_id, title, message, type='info', link=None):
+        """Create a generic notification"""
+        from bson import ObjectId
+        notification = {
+            'user_id': ObjectId(user_id),
+            'title': title,
+            'message': message,
+            'type': type,
+            'link': link,
+            'sent_at': datetime.utcnow(),
+            'read': False
+        }
+        self.collection.insert_one(notification)
