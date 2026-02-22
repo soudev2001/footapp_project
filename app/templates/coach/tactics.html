@@ -2,6 +2,8 @@
 {% block title %}Tactique Elite - FootLogic{% endblock %}
 
 {% block content %}
+<!-- Google Fonts: Oswald for Sporty Headers -->
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
 <div class="lg:h-[calc(100vh-100px)] h-auto flex flex-col lg:flex-row gap-6 p-6 page-enter overflow-y-auto lg:overflow-hidden"
     id="tactics-config" data-starters='{{ (lineup.starters or {}) | tojson | safe }}'
     data-substitutes='{{ (lineup.substitutes or []) | tojson | safe }}'
@@ -10,13 +12,26 @@
     data-captains='{{ (lineup.captains or []) | tojson | safe }}'
     data-set-pieces='{{ (lineup.set_pieces or {}) | tojson | safe }}'>
 
+    <!-- Theme Simulator Floating Button -->
+    <div class="fixed bottom-24 right-8 z-[100] flex flex-col gap-2">
+        <button onclick="toggleThemePreview()" id="themePreviewBtn"
+            class="w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-2xl border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-600 dark:text-amber-400 hover:scale-110 active:scale-95 transition-all">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+        </button>
+    </div>
+
     <!-- Sidebar / Players List -->
     <div class="w-full lg:w-96 flex flex-col gap-6">
         <div class="glass p-6 rounded-3xl border-white/5 flex-1 flex flex-col overflow-hidden">
             <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h2 class="font-bold text-slate-900 dark:text-white uppercase text-sm tracking-wider">Effectif
-                        Équipe</h2>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse"></span>
+                        <h2 class="font-black text-slate-900 dark:text-white uppercase text-[10px] tracking-[0.3em]"
+                            style="font-family: 'Oswald', sans-serif;">
+                            Effectif <span class="text-primary-500">Club</span>
+                        </h2>
+                    </div>
                     {% if teams %}
                     <form id="teamFilterForm" method="GET" action="{{ url_for('coach.tactics') }}" class="mt-4">
                         <select name="team_id" onchange="this.form.submit()"
@@ -91,8 +106,13 @@
             class="glass p-8 rounded-3xl border-slate-200 dark:border-white/5 bg-gradient-to-br from-primary-500/5 dark:from-primary-500/10 to-transparent">
 
             <div class="mb-8">
-                <h3 class="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wider mb-4">Nom de la
-                    tactique</h3>
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fa-solid fa-file-signature text-primary-500 text-xs"></i>
+                    <h3 class="font-black text-slate-900 dark:text-white text-[10px] uppercase tracking-[0.3em]"
+                        style="font-family: 'Oswald', sans-serif;">
+                        Nom de la <span class="text-primary-500">Tactique</span>
+                    </h3>
+                </div>
                 <div class="relative group">
                     <input type="text" id="tacticNameInput" placeholder="Sans titre (auto-save)"
                         value="{{ lineup.name or '' }}" oninput="triggerAutoSave()"
@@ -103,8 +123,13 @@
                 </div>
             </div>
 
-            <h3 class="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wider mb-6">Configuration
-                Système</h3>
+            <div class="flex items-center gap-2 mb-6">
+                <i class="fa-solid fa-chess-knight text-amber-500 text-xs"></i>
+                <h3 class="font-black text-slate-900 dark:text-white text-[10px] uppercase tracking-[0.3em]"
+                    style="font-family: 'Oswald', sans-serif;">
+                    Configuration <span class="text-amber-500">Système</span>
+                </h3>
+            </div>
             <div class="relative group">
                 <select id="formationSelect" onchange="updateFormation()"
                     class="w-full bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-white/10 py-4 px-6 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-primary-500 transition appearance-none cursor-pointer text-slate-900 dark:text-white">
@@ -148,101 +173,113 @@
     </div>
 
     <!-- Main Area: Pitch + Bench -->
-    <div class="flex-1 flex flex-col gap-6">
+    <div class="flex-1 flex flex-col lg:flex-row gap-6 pitch-3d-wrapper relative overflow-hidden">
+        <!-- Persistent Pitch Controls (Outside 3D scroll) -->
+        <div class="absolute top-6 right-6 flex flex-col gap-3 z-50">
+            <button onclick="saveTactics()" id="saveBtn"
+                class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 border border-white/20 flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all shadow-xl"
+                title="Sauvegarder">
+                <i class="fa-solid fa-floppy-disk"></i>
+            </button>
+            <div class="p-1.5 glass rounded-2xl border border-white/10 flex flex-col gap-1.5 shadow-2xl">
+                <button onclick="openSavePresetModal()"
+                    class="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white transition"
+                    title="Sauver Preset"><i class="fa-solid fa-bookmark text-xs"></i></button>
+                <button onclick="openLoadPresetModal()"
+                    class="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white transition"
+                    title="Charger Preset"><i class="fa-solid fa-folder-open text-xs"></i></button>
+                <div class="h-px bg-white/10 mx-1"></div>
+                <button onclick="openCaptainsModal()"
+                    class="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white transition"
+                    title="Capitaines"><i class="fa-solid fa-copyright text-xs"></i></button>
+                <button onclick="openTakersModal()"
+                    class="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white transition"
+                    title="Tireurs"><i class="fa-solid fa-bullseye text-xs"></i></button>
+                <div class="h-px bg-white/10 mx-1"></div>
+                <button onclick="openTacticsAnalytics()"
+                    class="w-9 h-9 rounded-lg hover:bg-indigo-500/20 flex items-center justify-center text-indigo-400 transition"
+                    title="Analytique"><i class="fa-solid fa-chart-line text-xs"></i></button>
+                <button onclick="openTacticalConfig()"
+                    class="w-9 h-9 rounded-lg hover:bg-amber-500/20 flex items-center justify-center text-amber-400 transition"
+                    title="Tactiques Avancées"><i class="fa-solid fa-chess text-xs"></i></button>
+            </div>
+            <button onclick="resetPitch()"
+                class="w-12 h-12 rounded-xl glass border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-red-500/20 transition-all shadow-xl"
+                title="Réinitialiser">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+        </div>
+
         <!-- Pitch Area -->
-        <div class="flex-1 glass rounded-3xl border-white/5 bg-emerald-950/20 relative overflow-hidden group shadow-2xl"
+        <div class="flex-1 glass rounded-3xl border-white/5 bg-emerald-950/20 relative overflow-hidden group shadow-2xl pitch-3d-surface"
             id="pitch" ondragover="onDragOverPitch(event)" ondrop="onDropPitch(event)">
             <!-- Pitch Markings -->
-            <div class="absolute inset-0 opacity-20 pointer-events-none">
-                <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <rect x="5" y="5" width="90" height="90" fill="none" stroke="white" stroke-width="0.5" rx="5" />
-                    <line x1="5" y1="50" x2="95" y2="50" stroke="white" stroke-width="0.5" />
-                    <circle cx="50" cy="50" r="10" fill="none" stroke="white" stroke-width="0.5" />
-                    <rect x="30" y="5" width="40" height="12" fill="none" stroke="white" stroke-width="0.5" />
-                    <rect x="30" y="83" width="40" height="12" fill="none" stroke="white" stroke-width="0.5" />
+            <div class="absolute inset-0 pointer-events-none">
+                <svg class="w-full h-full" viewBox="0 0 100 150" preserveAspectRatio="none">
+                    <!-- Field Boundaries -->
+                    <rect x="5" y="5" width="90" height="140" fill="none" stroke="white" stroke-width="0.4" rx="2" />
+
+                    <!-- Middle Line & Circle -->
+                    <line x1="5" y1="75" x2="95" y2="75" stroke="white" stroke-width="0.4" />
+                    <circle cx="50" cy="75" r="15" fill="none" stroke="white" stroke-width="0.4" />
+                    <circle cx="50" cy="75" r="0.5" fill="white" />
+
+                    <!-- Penalty Areas (Top) -->
+                    <rect x="25" y="5" width="50" height="25" fill="none" stroke="white" stroke-width="0.4" />
+                    <rect x="35" y="5" width="30" height="8" fill="none" stroke="white" stroke-width="0.4" />
+                    <circle cx="50" cy="20" r="0.5" fill="white" />
+                    <path d="M 35 30 Q 50 38 65 30" fill="none" stroke="white" stroke-width="0.4" />
+
+                    <!-- Penalty Areas (Bottom) -->
+                    <rect x="25" y="120" width="50" height="25" fill="none" stroke="white" stroke-width="0.4" />
+                    <rect x="35" y="137" width="30" height="8" fill="none" stroke="white" stroke-width="0.4" />
+                    <circle cx="50" cy="130" r="0.5" fill="white" />
+                    <path d="M 35 120 Q 50 112 65 120" fill="none" stroke="white" stroke-width="0.4" />
+
+                    <!-- Corners -->
+                    <path d="M 5 10 A 5 5 0 0 0 10 5" fill="none" stroke="white" stroke-width="0.4" />
+                    <path d="M 90 5 A 5 5 0 0 0 95 10" fill="none" stroke="white" stroke-width="0.4" />
+                    <path d="M 5 140 A 5 5 0 0 1 10 145" fill="none" stroke="white" stroke-width="0.4" />
+                    <path d="M 90 145 A 5 5 0 0 1 95 140" fill="none" stroke="white" stroke-width="0.4" />
                 </svg>
             </div>
 
             <!-- Players on Pitch -->
             <div class="absolute inset-0 z-10" id="pitchArea"></div>
+        </div>
+    </div>
 
-            <!-- Pitch Controls -->
-            <div class="absolute top-10 right-10 flex flex-col gap-4 z-20">
-                <button onclick="saveTactics()" id="saveBtn"
-                    class="w-14 h-14 rounded-2xl gradient-primary border border-white/20 flex items-center justify-center text-white hover:scale-105 active:scale-95 transition shadow-2xl shadow-primary-500/20"
-                    title="Sauvegarder l'équipe type">
-                    <i class="fa-solid fa-floppy-disk text-lg"></i>
-                </button>
-                <div class="flex flex-col gap-2 p-2 glass rounded-2xl border border-slate-200 dark:border-white/5">
-                    <button onclick="openSavePresetModal()"
-                        class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-slate-400 dark:text-white/50 hover:text-slate-900 dark:hover:text-white transition"
-                        title="Enregistrer comme tactique">
-                        <i class="fa-solid fa-bookmark"></i>
-                    </button>
-                    <button onclick="openLoadPresetModal()"
-                        class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-slate-400 dark:text-white/50 hover:text-slate-900 dark:hover:text-white transition"
-                        title="Charger une tactique">
-                        <i class="fa-solid fa-folder-open"></i>
-                    </button>
-                    <div class="h-px bg-slate-200 dark:bg-white/5 mx-2 my-1"></div>
-                    <button onclick="openCaptainsModal()"
-                        class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-slate-400 dark:text-white/50 hover:text-slate-900 dark:hover:text-white transition"
-                        title="Gérer les capitaines">
-                        <i class="fa-solid fa-copyright"></i>
-                    </button>
-                    <button onclick="openTakersModal()"
-                        class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center text-slate-400 dark:text-white/50 hover:text-slate-900 dark:hover:text-white transition"
-                        title="Gérer les tireurs">
-                        <i class="fa-solid fa-bullseye"></i>
-                    </button>
-                </div>
-                <!-- Phase 2: Analytics Button -->
-                <button onclick="openTacticsAnalytics()"
-                    class="w-14 h-14 rounded-2xl glass hover:bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 hover:scale-105 active:scale-95 transition shadow-2xl"
-                    title="Analytique Tactique">
-                    <i class="fa-solid fa-chart-line text-lg"></i>
-                </button>
-                <!-- Phase 4: Visualiseur Button -->
-                <button onclick="openVisualiser()"
-                    class="w-14 h-14 rounded-2xl glass hover:bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 hover:scale-105 active:scale-95 transition shadow-2xl"
-                    title="Visualiseur Tactique">
-                    <i class="fa-solid fa-play text-lg"></i>
-                </button>
-                <button onclick="openTacticalConfig()"
-                    class="w-14 h-14 rounded-2xl glass hover:bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 hover:scale-105 active:scale-95 transition shadow-2xl"
-                    title="Tactiques Avancées">
-                    <i class="fa-solid fa-chess text-lg"></i>
-                </button>
-                <button onclick="resetPitch()"
-                    class="w-14 h-14 rounded-2xl glass hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/20 flex items-center justify-center text-slate-700 dark:text-white transition shadow-2xl"
-                    title="Réinitialiser">
-                    <i class="fa-solid fa-rotate-left text-lg"></i>
-                </button>
+    <!-- Bench / Substitutes (Refactored to Fixed Width Side Panel) -->
+    <div class="glass rounded-3xl border-slate-200 dark:border-white/5 p-6 w-full lg:w-80 lg:shrink-0 flex flex-col h-full overflow-hidden"
+        id="benchArea" ondragover="onDragOverBench(event)" ondrop="onDropBench(event)">
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-2 rounded-full bg-primary-500 animate-ping"></div>
+                <h3 class="font-black text-slate-900 dark:text-white text-[10px] uppercase tracking-[0.3em]"
+                    style="font-family: 'Oswald', sans-serif;">
+                    Banc <span class="text-primary-500">Remplaçants</span>
+                </h3>
+            </div>
+            <div
+                class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                <span id="benchCount" class="text-[10px] text-primary-500 font-black tracking-widest">0</span>
             </div>
         </div>
 
-        <!-- Bench / Substitutes -->
-        <div class="glass rounded-3xl border-slate-200 dark:border-white/5 p-6" id="benchArea"
-            ondragover="onDragOverBench(event)" ondrop="onDropBench(event)">
-            <div class="flex items-center gap-3 mb-4">
-                <i class="fa-solid fa-chair text-primary-400"></i>
-                <h3 class="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wider">Banc des
-                    remplaçants</h3>
-                <span id="benchCount" class="text-[10px] text-slate-500 dark:text-white/30 font-bold">0 joueurs</span>
-            </div>
-            <div class="flex flex-wrap gap-3 min-h-[60px]" id="benchSlots">
-                <div
-                    class="bench-placeholder text-slate-400 dark:text-white/10 text-xs italic flex items-center justify-center w-full py-4">
-                    Glissez des joueurs ici pour les ajouter au banc
-                </div>
+        <!-- Scrollable Bench Slots -->
+        <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3" id="benchSlots">
+            <div
+                class="bench-placeholder text-slate-400 dark:text-white/10 text-[10px] italic text-center py-10 border-2 border-dashed border-white/5 rounded-2xl">
+                Déposer ici...
             </div>
         </div>
     </div>
 </div>
+</div>
 
 <!-- Player Slot Template -->
 <template id="playerSlotTemplate">
-    <div class="absolute flex flex-col items-center transition-all duration-500 cursor-pointer group/slot"
+    <div class="player-slot absolute flex flex-col items-center transition-all duration-500 cursor-pointer group/slot"
         style="left: 50%; top: 50%;">
         <div class="slot-circle w-14 h-14 rounded-2xl glass-light border-2 border-dashed border-slate-300 dark:border-white/20 flex items-center justify-center font-bold text-slate-400 dark:text-white/20 group-hover/slot:border-primary-500/50 transition-all"
             ondragover="onDragOverSlot(event)" ondrop="onDropSlot(event, this)">
@@ -520,16 +557,21 @@
                                 class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
                                 <i class="fa-solid fa-bolt-lightning text-sm"></i>
                             </div>
-                            <h3 class="text-sm font-black text-white uppercase tracking-wider">Phase de Transition</h3>
+                            <h3 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Phase
+                                de Transition</h3>
                         </div>
                         <label
                             class="relative flex items-center justify-between p-6 rounded-[24px] bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 hover:border-amber-500/30 transition-all duration-300 group"
                             id="counterPressingToggle">
                             <div class="flex flex-col gap-1">
-                                <p class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                                    Contre-pressing</p>
-                                <p class="text-[9px] text-slate-500 dark:text-white/30 font-medium">Récupération
-                                    ultra-rapide</p>
+                                <p
+                                    class="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
+                                    Contre-pressing <span
+                                        class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+                                </p>
+                                <p
+                                    class="text-[9px] text-amber-600 dark:text-amber-400 font-black italic uppercase tracking-tighter">
+                                    Récupération ultra-rapide</p>
                             </div>
                             <div class="w-14 h-8 rounded-full bg-slate-200 dark:bg-white/5 border border-slate-300 dark:border-white/10 relative transition-all duration-500"
                                 id="cpToggleBg">
@@ -552,9 +594,11 @@
                     <div class="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/10 blur-[100px] rounded-full"></div>
                 </div>
 
-                <div class="p-8 lg:p-10 flex flex-col h-full relative z-10">
-                    <div class="flex items-center justify-between mb-8">
-                        <h3 class="text-xs font-black text-white/30 uppercase tracking-[0.2em]">Visualiseur Tactique
+                <div class="p-8 lg:p-10 flex flex-col h-full relative z-10 max-h-full overflow-y-auto custom-scrollbar">
+                    <div class="flex items-center justify-between mb-8 shrink-0">
+                        <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]"
+                            style="font-family: 'Oswald', sans-serif;">
+                            Visualiseur <span class="text-primary-500">Tactique</span>
                         </h3>
                         <div class="flex gap-1">
                             <div class="w-1.5 h-1.5 rounded-full bg-primary-500"></div>
@@ -585,40 +629,47 @@
 
                             <!-- Defensive & Pressing Lines -->
                             <g class="lines-group">
-                                <line id="pvDefLine" x1="20" y1="340" x2="280" y2="340" stroke="rgba(59,130,246,0.6)"
-                                    stroke-width="3" stroke-dasharray="10,5" class="transition-all duration-700" />
-                                <text id="pvDefLabel" x="150" y="358" text-anchor="middle" fill="rgba(59,130,246,0.8)"
-                                    font-size="10" font-weight="900" class="transition-all duration-700">BLOC
-                                    MÉDIAN</text>
+                                <line id="pvDefLine" x1="20" y1="340" x2="280" y2="340" stroke="rgba(59,130,246,0.5)"
+                                    stroke-width="2" stroke-dasharray="8,4" class="transition-all duration-700" />
+                                <text id="pvDefLabel" x="150" y="358" text-anchor="middle" fill="rgba(59,130,246,1)"
+                                    font-size="8" font-weight="950"
+                                    style="font-family: 'Oswald', sans-serif; letter-spacing: 0.1em;"
+                                    class="transition-all duration-700 uppercase">BLOC MÉDIAN</text>
 
-                                <line id="pvPressLine" x1="20" y1="180" x2="280" y2="180" stroke="rgba(239,68,68,0.6)"
-                                    stroke-width="3" stroke-dasharray="10,5" class="transition-all duration-700" />
-                                <text id="pvPressLabel" x="150" y="172" text-anchor="middle" fill="rgba(239,68,68,0.8)"
-                                    font-size="10" font-weight="900"
-                                    class="transition-all duration-700 uppercase">Pressing</text>
+                                <line id="pvPressLine" x1="20" y1="180" x2="280" y2="180" stroke="rgba(239,68,68,0.5)"
+                                    stroke-width="2" stroke-dasharray="8,4" class="transition-all duration-700" />
+                                <text id="pvPressLabel" x="150" y="172" text-anchor="middle" fill="rgba(239,68,68,1)"
+                                    font-size="8" font-weight="950"
+                                    style="font-family: 'Oswald', sans-serif; letter-spacing: 0.1em;"
+                                    class="transition-all duration-700 uppercase">PRESSING</text>
                             </g>
 
                             <!-- Animation elements -->
                             <g id="pvPassArrows" class="transition-all duration-700"></g>
                             <g id="pvMarking" class="transition-all duration-700"></g>
 
-                            <!-- Counter pressing indicator -->
+                            <!-- Counter pressing indicator (Extra Intensity) -->
                             <g id="pvCounterPress" opacity="0" class="transition-all duration-700 origin-center">
-                                <circle cx="150" cy="225" r="30" fill="rgba(245,158,11,0.1)"
-                                    stroke="rgba(245,158,11,0.5)" stroke-width="2" class="animate-pulse" />
-                                <text x="150" y="228" text-anchor="middle" fill="rgba(245,158,11,0.9)" font-size="8"
-                                    font-weight="900">GEGENPRESSING</text>
+                                <circle cx="150" cy="225" r="45" fill="none" stroke="rgba(245,158,11,0.1)"
+                                    stroke-width="1" stroke-dasharray="4,4" class="animate-spin-slow" />
+                                <circle cx="150" cy="225" r="30" fill="rgba(245,158,11,0.15)"
+                                    stroke="rgba(245,158,11,0.6)" stroke-width="2" class="animate-pulse" />
+                                <path d="M 140 215 L 150 225 L 140 235 M 160 215 L 150 225 L 160 235"
+                                    stroke="rgba(245,158,11,0.8)" stroke-width="2" fill="none" class="animate-pulse" />
+                                <text x="150" y="228" text-anchor="middle" fill="rgba(245,158,11,1)" font-size="7"
+                                    font-weight="950"
+                                    style="letter-spacing: 0.1em; paint-order: stroke; stroke: rgba(0,0,0,0.5); stroke-width: 0.5px;">GEGENPRESSING</text>
                             </g>
                         </svg>
                     </div>
 
                     <!-- Config summary Card -->
                     <div
-                        class="mt-8 p-6 rounded-[30px] glass-dark border border-slate-200 dark:border-white/5 shadow-xl">
+                        class="mt-8 p-6 rounded-[30px] glass-dark border border-slate-200 dark:border-white/5 shadow-xl shrink-0">
                         <div class="flex items-center justify-between mb-4">
-                            <p
-                                class="text-[10px] text-slate-400 dark:text-white/20 font-black uppercase tracking-[0.2em]">
-                                Tableau de Bord
+                            <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]"
+                                style="font-family: 'Oswald', sans-serif;">
+                                Tableau de <span class="text-amber-500">Bord</span>
                             </p>
                             <i class="fa-solid fa-list-check text-slate-400 dark:text-white/20 text-xs"></i>
                         </div>
@@ -958,35 +1009,70 @@
                         <p
                             class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-4">
                             Couverture Terrain</p>
-                        <svg viewBox="0 0 105 68" class="w-full max-w-2xl mx-auto" id="heatmapPitch">
-                            <defs>
-                                <radialGradient id="pitchGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                                    <stop offset="0%" stop-color="#065f46" />
-                                    <stop offset="100%" stop-color="#022c22" />
-                                </radialGradient>
-                                <radialGradient id="heatGradient">
-                                    <stop offset="0%" stop-color="#fbbf24" />
-                                    <stop offset="40%" stop-color="#f59e0b" stop-opacity="0.6" />
-                                    <stop offset="100%" stop-color="#b45309" stop-opacity="0" />
-                                </radialGradient>
-                                <radialGradient id="heatGradient2">
-                                    <stop offset="0%" stop-color="#34d399" />
-                                    <stop offset="40%" stop-color="#10b981" stop-opacity="0.6" />
-                                    <stop offset="100%" stop-color="#065f46" stop-opacity="0" />
-                                </radialGradient>
-                                <radialGradient id="heatGradient3">
-                                    <stop offset="0%" stop-color="#6366f1" />
-                                    <stop offset="40%" stop-color="#4f46e5" stop-opacity="0.6" />
-                                    <stop offset="100%" stop-color="#312e81" stop-opacity="0" />
-                                </radialGradient>
-                            </defs>
-                            <!-- Pitch background -->
-                            <rect width="105" height="68" fill="url(#pitchGradient)" opacity="0.3" />
-                            <!-- Heat map circles -->
-                            <circle id="heatZone1" cx="52.5" cy="34" r="25" fill="url(#heatGradient)" opacity="0.6" />
-                            <circle id="heatZone2" cx="20" cy="20" r="15" fill="url(#heatGradient2)" opacity="0.5" />
-                            <circle id="heatZone3" cx="85" cy="20" r="15" fill="url(#heatGradient2)" opacity="0.5" />
-                        </svg>
+                        <div class="relative group/heatmap">
+                            <svg viewBox="0 0 105 68"
+                                class="w-full max-w-2xl mx-auto rounded-xl shadow-2xl overflow-hidden border border-white/10"
+                                id="heatmapPitch">
+                                <defs>
+                                    <radialGradient id="pitchGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                        <stop offset="0%" stop-color="#065f46" />
+                                        <stop offset="100%" stop-color="#022c22" />
+                                    </radialGradient>
+                                    <radialGradient id="heatGradient">
+                                        <stop offset="0%" stop-color="#fbbf24" />
+                                        <stop offset="40%" stop-color="#f59e0b" stop-opacity="0.6" />
+                                        <stop offset="100%" stop-color="#b45309" stop-opacity="0" />
+                                    </radialGradient>
+                                    <radialGradient id="heatGradient2">
+                                        <stop offset="0%" stop-color="#10b981" />
+                                        <stop offset="40%" stop-color="#059669" stop-opacity="0.5" />
+                                        <stop offset="100%" stop-color="#064e3b" stop-opacity="0" />
+                                    </radialGradient>
+                                </defs>
+                                <!-- Pitch background -->
+                                <rect width="105" height="68" fill="url(#pitchGradient)" />
+
+                                <!-- Pitch Markings -->
+                                <g stroke="rgba(255,255,255,0.2)" fill="none" stroke-width="0.5">
+                                    <rect x="0" y="0" width="105" height="68" />
+                                    <line x1="52.5" y1="0" x2="52.5" y2="68" />
+                                    <circle cx="52.5" cy="34" r="9.15" />
+                                    <!-- Penalty area Left -->
+                                    <rect x="0" y="13.84" width="16.5" height="40.32" />
+                                    <rect x="0" y="24.84" width="5.5" height="18.32" />
+                                    <!-- Penalty area Right -->
+                                    <rect x="88.5" y="13.84" width="16.5" height="40.32" />
+                                    <rect x="99.5" y="24.84" width="5.5" height="18.32" />
+                                </g>
+
+                                <!-- Heat map circles (Animated and Dynamic) -->
+                                <g class="mix-blend-screen opacity-80">
+                                    <circle id="heatZone1" cx="52.5" cy="34" r="25" fill="url(#heatGradient)"
+                                        class="transition-all duration-[1500ms] ease-in-out" />
+                                    <circle id="heatZone2" cx="20" cy="20" r="15" fill="url(#heatGradient2)"
+                                        class="transition-all duration-[1500ms] ease-in-out" />
+                                    <circle id="heatZone3" cx="85" cy="20" r="15" fill="url(#heatGradient2)"
+                                        class="transition-all duration-[1500ms] ease-in-out" />
+                                </g>
+                            </svg>
+                            <!-- Legend Overlay -->
+                            <div class="absolute bottom-4 left-4 flex gap-4">
+                                <div class="flex items-center gap-2">
+                                    <div
+                                        class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]">
+                                    </div>
+                                    <span
+                                        class="text-[8px] font-black text-white/50 uppercase tracking-widest">Influence</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div
+                                        class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]">
+                                    </div>
+                                    <span
+                                        class="text-[8px] font-black text-white/50 uppercase tracking-widest">Rotation</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1328,13 +1414,19 @@
             <i class="fa-solid fa-xmark text-lg"></i>
         </button>
 
-        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
-            <i class="fa-solid fa-copyright text-primary-400"></i>
-            Gestion des Capitaines
-        </h3>
-
-        <p class="text-xs text-slate-500 dark:text-white/40 mb-6 font-bold uppercase tracking-wider">Hiérarchie (1 à 5)
-        </p>
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center text-primary-500">
+                <i class="fa-solid fa-copyright text-xl"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter"
+                    style="font-family: 'Oswald', sans-serif;">
+                    Gestion des <span class="text-primary-500">Capitaines</span>
+                </h3>
+                <p class="text-[9px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-[0.2em]">Hiérarchie
+                    de commandement (1 à 5)</p>
+            </div>
+        </div>
 
         <div class="space-y-3" id="captainsSlotList">
             <!-- Captain slots will be here -->
@@ -1360,10 +1452,19 @@
             <i class="fa-solid fa-xmark text-lg"></i>
         </button>
 
-        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
-            <i class="fa-solid fa-bullseye text-amber-400"></i>
-            Tireurs Spécialisés
-        </h3>
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                <i class="fa-solid fa-bullseye text-xl"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter"
+                    style="font-family: 'Oswald', sans-serif;">
+                    Tireurs <span class="text-amber-500">Spécialisés</span>
+                </h3>
+                <p class="text-[9px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-[0.2em]">Assignation
+                    des coups de pied arrêtés</p>
+            </div>
+        </div>
 
         <!-- Tabs -->
         <div
@@ -1567,16 +1668,62 @@
     @media (max-width: 1024px) {
         .lg\:h-\[calc\(100vh-100px\)\] {
             height: auto !important;
-            min-height: 100vh;
+            padding-bottom: 5rem;
         }
 
         #pitch {
-            aspect-ratio: 4/5;
-            min-height: 500px;
+            aspect-ratio: 1/1.2 !important;
+            min-height: 480px;
+            max-height: 600px;
+            width: 100%;
+        }
+
+        .pitch-3d-surface {
+            transform: rotateX(15deg) translateY(-10px) scale(0.98);
+            /* Less tilt on mobile for better usability */
+        }
+
+        /* Scale down slots on mobile */
+        .slot-circle {
+            width: 3rem !important;
+            height: 3rem !important;
+        }
+
+        .slot-name {
+            font-size: 7px !important;
+            padding: 2px 6px !important;
         }
 
         .lg\:w-96 {
             width: 100% !important;
+            max-height: 400px;
+        }
+
+        /* Adjust Modals for Mobile */
+        .tactical-modal-inner {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100% !important;
+            max-height: 100% !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+        }
+    }
+
+    /* Small Phone adjustments */
+    @media (max-width: 480px) {
+        #pitch {
+            min-height: 400px;
+        }
+
+        .slot-circle {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+        }
+
+        #themePreviewBtn {
+            bottom: 5.5rem !important;
+            right: 1rem !important;
         }
     }
 
@@ -1585,46 +1732,79 @@
         transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
+    /* Modal inner transition with bounce effect */
     .modal-inner-transition {
-        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    .glass-dark {
-        background: rgba(10, 10, 15, 0.85);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+    /* GLASS SYSTEM - REFINED FOR BOTH MODES */
+    .glass {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.4s ease;
     }
 
-    .light .glass-dark {
-        background: rgba(255, 255, 255, 0.95);
-        border: 1px solid #cbd5e1;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        color: #0f172a;
+    .light .glass {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
     }
 
-    /* Pitch Dynamic Colors */
-    #pitch {
-        background: linear-gradient(to bottom, #064e3b, #065f46);
-        /* Dark: Emerald */
-        transition: background 0.5s ease;
+    /* 3D Pitch Implementation */
+    .pitch-3d-wrapper {
+        perspective: 1500px;
+        perspective-origin: 50% 0%;
+        transition: all 0.5s ease;
     }
 
-    .light #pitch {
-        background: linear-gradient(to bottom, #15803d, #16a34a);
-        /* Light: Grass Green */
+    .pitch-3d-surface {
+        transform: rotateX(25deg) translateY(-20px) scale(0.95);
+        transform-origin: top center;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s ease, box-shadow 0.5s ease;
+        background: radial-gradient(circle at center, #065f46 0%, #022c22 100%);
+        box-shadow:
+            0 20px 50px -10px rgba(0, 0, 0, 0.5),
+            0 50px 100px -20px rgba(0, 0, 0, 0.3),
+            inset 0 0 100px rgba(255, 255, 255, 0.05);
+    }
+
+    .pitch-3d-surface:hover {
+        transform: rotateX(22deg) translateY(-10px) scale(0.98);
+        box-shadow:
+            0 30px 60px -10px rgba(0, 0, 0, 0.6),
+            0 60px 120px -20px rgba(0, 0, 0, 0.4),
+            inset 0 0 120px rgba(255, 255, 255, 0.08);
+    }
+
+    .light .pitch-3d-surface {
+        box-shadow:
+            0 20px 40px -10px rgba(2, 44, 34, 0.2),
+            0 40px 80px -20px rgba(2, 44, 34, 0.1);
+        background: linear-gradient(to bottom, #22c55e, #16a34a) !important;
+    }
+
+    /* Fix slots when 3D is applied */
+    .pitch-3d-surface .player-slot {
+        transform: rotateX(-25deg);
+        /* Counter-rotation to keep players vertical */
+        transform-style: preserve-3d;
     }
 
     #pitch svg line,
     #pitch svg rect,
     #pitch svg circle {
-        stroke: rgba(255, 255, 255, 0.3);
+        stroke: rgba(255, 255, 255, 0.4);
+        stroke-width: 1;
+        filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
     }
 
     .light #pitch svg line,
     .light #pitch svg rect,
     .light #pitch svg circle {
-        stroke: rgba(255, 255, 255, 0.5);
+        stroke: rgba(255, 255, 255, 0.8);
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     }
 
     /* FIFA Style Tactic Buttons */
@@ -2485,15 +2665,15 @@
                     <span id="fifaPosition" class="text-2xl font-bold text-white/90 uppercase mt-[-5px]">CM</span>
                     <div class="w-10 h-[1px] bg-white/30 my-2"></div>
                     <div class="flex flex-col items-center">
-                        <img src="{{ url_for('static', filename='img/club_logo.png') }}"
-                            class="w-10 h-10 object-contain" alt="Club"
-                            onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed={{ selected_team_id }}'">
+                        <img src="{{ url_for('static', filename='img/club_logo.svg') }}"
+                            class="w-10 h-10 object-contain dark:invert dark:brightness-200 transition-all duration-300"
+                            alt="Club" onerror="this.src='/static/img/logo_dark.png'">
                     </div>
                 </div>
 
                 <!-- Player Image (Placeholder if none) -->
                 <div class="absolute top-[60px] right-[-20px] w-[220px] h-[220px]">
-                    <img id="fifaFace" src="{{ url_for('static', filename='img/default_player.png') }}"
+                    <img id="fifaFace" src="{{ url_for('static', filename='img/default_player.svg') }}"
                         class="w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]" alt="Player"
                         onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=default'">
                 </div>
@@ -2563,6 +2743,18 @@
 </div>
 
 <script>
+    function toggleThemePreview() {
+        const html = document.documentElement;
+        if (html.classList.contains('light')) {
+            html.classList.remove('light');
+            localStorage.setItem('color-theme', 'dark');
+            console.log("Mode: DARK [Simulated]");
+        } else {
+            html.classList.add('light');
+            localStorage.setItem('color-theme', 'light');
+            console.log("Mode: LIGHT [Simulated]");
+        }
+    }
     // ============================================================
     // STATE
     // ============================================================
@@ -3043,7 +3235,14 @@
 
     function onDropPitch(e) {
         e.preventDefault();
-        // Only handle if not dropped on a specific slot (that's handled by onDropSlot)
+        // If player is dropped on the pitch but NOT on a slot, 
+        // we can either add them to the bench (to free the card)
+        // or just ignore. In this case, "replacants" means bench.
+        const playerId = e.dataTransfer.getData('text/plain') || draggedPlayerId;
+        if (playerId && !draggedFromSlot && !draggedFromBench) {
+            // From available list to pitch (background) -> assume move to bench
+            onDropBench(e);
+        }
     }
 
     function onDragOverBench(e) {
@@ -3360,6 +3559,8 @@
                 formation: formation,
                 starters: assignment,
                 substitutes: substitutes,
+                captains: captains,
+                set_pieces: setPieces,
                 team_id: '{{ selected_team_id }}'
             })
         })
@@ -3505,47 +3706,37 @@
     // Calculate and update tactical metrics based on current formation
     function calculateTacticalMetrics() {
         const formation = document.getElementById('formationSelect').value;
-
-        // Simulate metric calculations based on formation
-        let metrics = {
-            defWidth: 85,
-            attackDepth: 75,
-            compactness: 78,
-            balance: 65
-        };
-
         const z1 = document.getElementById('heatZone1');
         const z2 = document.getElementById('heatZone2');
         const z3 = document.getElementById('heatZone3');
 
-        // Adjust based on formation
-        if (formation === '5-4-1' || formation === '5-3-2') {
-            metrics.defWidth = 95;
-            metrics.attackDepth = 55;
-            metrics.balance = 40;
-            // DEFENSIVE HEATMAP
-            if (z1) { z1.setAttribute('cx', '30'); z1.setAttribute('r', '20'); }
-            if (z2) { z2.setAttribute('cx', '20'); z2.setAttribute('cy', '45'); z2.setAttribute('r', '15'); }
-            if (z3) { z3.setAttribute('cx', '20'); z3.setAttribute('cy', '23'); z3.setAttribute('r', '15'); }
-        } else if (formation === '3-4-3' || formation === '4-5-1' || formation === '3-5-2') {
-            metrics.defWidth = 75;
-            metrics.attackDepth = 85;
-            metrics.balance = 80;
-            // ATTACKING HEATMAP
-            if (z1) { z1.setAttribute('cx', '70'); z1.setAttribute('r', '22'); }
-            if (z2) { z2.setAttribute('cx', '85'); z2.setAttribute('cy', '50'); z2.setAttribute('r', '18'); }
-            if (z3) { z3.setAttribute('cx', '85'); z3.setAttribute('cy', '18'); z3.setAttribute('r', '18'); }
+        // Simulate metric calculations and spatial weighting based on formation
+        let metrics = { defWidth: 85, attackDepth: 75, compactness: 78, balance: 65 };
+
+        if (formation.startsWith('5-')) {
+            metrics = { defWidth: 96, attackDepth: 55, compactness: 92, balance: 42 };
+            if (z1) { z1.setAttribute('cx', '35'); z1.setAttribute('r', '22'); }
+            if (z2) { z2.setAttribute('cx', '20'); z2.setAttribute('cy', '48'); z2.setAttribute('r', '18'); }
+            if (z3) { z3.setAttribute('cx', '20'); z3.setAttribute('cy', '20'); z3.setAttribute('r', '18'); }
+        } else if (formation.startsWith('3-')) {
+            metrics = { defWidth: 72, attackDepth: 94, compactness: 65, balance: 88 };
+            if (z1) { z1.setAttribute('cx', '75'); z1.setAttribute('r', '28'); }
+            if (z2) { z2.setAttribute('cx', '88'); z2.setAttribute('cy', '52'); z2.setAttribute('r', '22'); }
+            if (z3) { z3.setAttribute('cx', '88'); z3.setAttribute('cy', '16'); z3.setAttribute('r', '22'); }
+        } else if (formation === '4-2-3-1' || formation === '4-1-2-1-2') {
+            metrics = { defWidth: 82, attackDepth: 82, compactness: 85, balance: 75 };
+            if (z1) { z1.setAttribute('cx', '55'); z1.setAttribute('r', '26'); }
+            if (z2) { z2.setAttribute('cx', '50'); z2.setAttribute('cy', '15'); z2.setAttribute('r', '16'); }
+            if (z3) { z3.setAttribute('cx', '50'); z3.setAttribute('cy', '53'); z3.setAttribute('r', '16'); }
         } else {
-            // BALANCED (4-3-3, 4-4-2)
-            metrics.defWidth = 85;
-            metrics.attackDepth = 72;
-            metrics.balance = 65;
-            if (z1) { z1.setAttribute('cx', '52.5'); z1.setAttribute('r', '25'); }
-            if (z2) { z2.setAttribute('cx', '40'); z2.setAttribute('cy', '15'); z2.setAttribute('r', '15'); }
-            if (z3) { z3.setAttribute('cx', '40'); z3.setAttribute('cy', '53'); z3.setAttribute('r', '15'); }
+            // Default 4-4-2 / 4-3-3
+            metrics = { defWidth: 88, attackDepth: 78, compactness: 80, balance: 68 };
+            if (z1) { z1.setAttribute('cx', '52.5'); z1.setAttribute('r', '24'); }
+            if (z2) { z2.setAttribute('cx', '42'); z2.setAttribute('cy', '12'); z2.setAttribute('r', '14'); }
+            if (z3) { z3.setAttribute('cx', '42'); z3.setAttribute('cy', '56'); z3.setAttribute('r', '14'); }
         }
 
-        // Update UI
+        // Update UI with animated counter (simple update for now)
         document.getElementById('metricDefWidth').textContent = metrics.defWidth + '%';
         document.getElementById('metricAttackDepth').textContent = metrics.attackDepth + '%';
         document.getElementById('metricCompactness').textContent = metrics.compactness + '%';
@@ -3571,8 +3762,22 @@
 
     function setCounterPressing(checked) {
         tacticalConfig.counter_pressing = checked;
-        document.getElementById('cpToggleBg').classList.toggle('on', checked);
-        document.getElementById('cpToggleDot').classList.toggle('on', checked);
+        const bg = document.getElementById('cpToggleBg');
+        const dot = document.getElementById('cpToggleDot');
+        const card = document.getElementById('counterPressingToggle');
+
+        if (checked) {
+            bg.classList.add('on');
+            dot.classList.add('on');
+            card.classList.add('ring-2', 'ring-amber-500/50', 'bg-amber-500/5');
+            card.classList.remove('bg-slate-50', 'dark:bg-white/[0.03]');
+        } else {
+            bg.classList.remove('on');
+            dot.classList.remove('on');
+            card.classList.remove('ring-2', 'ring-amber-500/50', 'bg-amber-500/5');
+            card.classList.add('bg-slate-50', 'dark:bg-white/[0.03]');
+        }
+
         updatePreview();
         updateSummary();
         triggerAutoSave();
@@ -3600,12 +3805,8 @@
     }
 
     // Toggle counter pressing on label click
-    document.getElementById('counterPressingToggle').addEventListener('click', function (e) {
-        if (e.target.tagName === 'INPUT') return;
-        const cb = document.getElementById('counterPressing');
-        cb.checked = !cb.checked;
-        setCounterPressing(cb.checked);
-    });
+    // Standard label behavior handles checkbox toggle. 
+    // The onchange event on the #counterPressing input will trigger the UI update.
 
     function updatePreview() {
         // Space zones
@@ -3698,33 +3899,55 @@
 
     function updateSummary() {
         const summary = document.getElementById('configSummary');
+        let html = '';
+        let hasConfig = false;
+
         const labels = {
-            passing: { label: 'Passes', courte: 'Courtes', direct: 'Directes', long: 'Longues', mixte: 'Mixtes' },
-            space: { label: 'Espace', couloir_gauche: 'Couloir G', couloir_droit: 'Couloir D', axe: 'Axe', deux_couloirs: '2 Couloirs', mixte: 'Mixte' },
-            defensive: { label: 'Défense', bloc_bas: 'Bloc bas', bloc_median: 'Bloc médian', bloc_haut: 'Bloc haut' },
-            pressing: { label: 'Pressing', haut: 'Haut', median: 'Médian', bas: 'Bas', tout_terrain: 'Total' },
-            marking: { label: 'Marquage', individuel: 'Individuel', zone: 'En zone' },
-            goalkeeper_distribution: { label: 'Relance', courte: 'Courte', longue: 'Longue', rapide: 'Rapide' }
+            passing: { icon: 'fa-arrow-right-arrow-left', label: 'Passes', courte: 'Courtes', direct: 'Directes', long: 'Longues', mixte: 'Mixtes' },
+            space: { icon: 'fa-expand', label: 'Zone', couloir_gauche: 'C. Gauche', couloir_droit: 'C. Droit', axe: 'Axe', deux_couloirs: 'Couloirs', mixte: 'Ligne' },
+            defensive: { icon: 'fa-shield-halved', label: 'Ligne', bloc_bas: 'Bloc bas', bloc_median: 'Médian', bloc_haut: 'Bloc haut' },
+            pressing: { icon: 'fa-gauge-high', label: 'Intensité', haut: 'Haut', median: 'Médian', bas: 'Bas', tout_terrain: 'Total' },
+            marking: { icon: 'fa-crosshairs', label: 'Marquage', individuel: 'Indiv', zone: 'Zone' },
+            goalkeeper_distribution: { icon: 'fa-hand-holding-hand', label: 'Relance', courte: 'Courte', longue: 'Longue', rapide: 'Rapide' }
         };
 
         Object.entries(labels).forEach(([key, data]) => {
             const val = tacticalConfig[key];
             if (val) {
                 hasConfig = true;
-                html += `<div class="summary-item flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-2">
-                            <span class="text-[10px] text-slate-400 dark:text-white/30 font-bold uppercase tracking-widest">${data.label}</span>
-                            <span class="text-[10px] text-amber-500 dark:text-amber-400 font-extrabold uppercase tracking-tight">${data[val] || val}</span>
-                         </div>`;
+                html += `
+                    <div class="summary-item flex items-center justify-between py-2 group/item">
+                        <div class="flex items-center gap-2">
+                             <div class="w-5 h-5 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center">
+                                <i class="fa-solid ${data.icon} text-[8px] text-slate-400 dark:text-white/30"></i>
+                             </div>
+                             <span class="text-[9px] text-slate-400 dark:text-white/40 font-black uppercase tracking-widest">${data.label}</span>
+                        </div>
+                        <span class="text-[9px] text-slate-900 dark:text-white font-black uppercase tracking-tight bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-md border border-slate-200 dark:border-white/5">${data[val] || val}</span>
+                    </div>`;
             }
         });
+
         if (tacticalConfig.counter_pressing) {
             hasConfig = true;
-            html += `<div class="summary-item flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-2">
-                        <span class="text-[10px] text-slate-400 dark:text-white/30 font-bold uppercase tracking-widest">Transition</span>
-                        <span class="text-[10px] text-amber-500 dark:text-amber-400 font-extrabold uppercase tracking-tight">CONTRE-PRESSING</span>
-                     </div>`;
+            html += `
+                <div class="summary-item flex items-center justify-between py-2 border-t border-amber-500/10 mt-2">
+                    <div class="flex items-center gap-2">
+                         <div class="w-5 h-5 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                            <i class="fa-solid fa-bolt text-[8px] text-amber-500"></i>
+                         </div>
+                         <span class="text-[9px] text-amber-500/70 font-black uppercase tracking-widest">Transition</span>
+                    </div>
+                    <span class="text-[9px] text-amber-500 font-black uppercase tracking-tight px-2 py-1 rounded-md bg-amber-500/10">CONTRE-PRESSING</span>
+                </div>`;
         }
-        summary.innerHTML = hasConfig ? html : '<div class="flex items-center justify-center py-4"><p class="text-[10px] text-slate-300 dark:text-white/20 italic">Configuration vierge...</p></div>';
+
+        summary.innerHTML = hasConfig ? html : `
+            <div class="flex flex-col items-center justify-center py-10 opacity-40">
+                <i class="fa-solid fa-ghost text-2xl mb-3 text-slate-300"></i>
+                <p class="text-[9px] text-slate-400 font-black uppercase tracking-[0.3em]">Configuration vierge</p>
+                <p class="text-[8px] text-slate-500 mt-1 font-bold italic tracking-tighter">Définissez votre style de jeu ci-dessus</p>
+            </div>`;
     }
 
     function resetTacticalConfig() {

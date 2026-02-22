@@ -190,11 +190,11 @@ class PlayerService:
 
         update_data = {
             'formation': formation,
-            'starters': starters,
-            'substitutes': substitutes or [],
+            'starters': {pos: ObjectId(pid) for pos, pid in starters.items() if pid},
+            'substitutes': [ObjectId(s) for s in (substitutes or []) if s],
             'team_id': ObjectId(team_id) if team_id else None,
-            'captains': [ObjectId(p) for p in (captains or [])],
-            'set_pieces': {k: [ObjectId(p) for p in (v or [])] for k, v in (set_pieces or {}).items()},
+            'captains': [ObjectId(p) for p in (captains or []) if p],
+            'set_pieces': {k: [ObjectId(p) for p in (v or []) if p] for k, v in (set_pieces or {}).items()},
             'updated_at': datetime.utcnow()
         }
         if name:

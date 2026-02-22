@@ -365,8 +365,9 @@ def tactics():
     active_lineup = player_service.get_active_lineup(club_id, team_id=selected_team_id)
     players = player_service.get_by_club(club_id, team_id=selected_team_id)
     
+    from app.models import serialize_doc
     return render_template('coach/tactics.html', 
-        lineup=active_lineup,
+        lineup=serialize_doc(active_lineup),
         players=players,
         teams=teams,
         selected_team_id=selected_team_id

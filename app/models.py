@@ -4,10 +4,30 @@ from datetime import datetime
 from bson import ObjectId
 
 def serialize_doc(doc):
-    """Convert MongoDB document to JSON-serializable dict"""
+    """Convert MongoDB document to JSON-serializable dict recursively"""
     if doc is None:
         return None
-    doc['_id'] = str(doc['_id'])
+    
+    if isinstance(doc, list):
+        return [serialize_doc(item) for item in doc]
+    
+    if isinstance(doc, dict):
+        new_doc = {}
+        for k, v in doc.items():
+            if isinstance(v, ObjectId):
+                new_doc[k] = str(v)
+            elif isinstance(v, datetime):
+                new_doc[k] = v.isoformat()
+            else:
+                new_doc[k] = serialize_doc(v)
+        return new_doc
+        
+    if isinstance(doc, ObjectId):
+        return str(doc)
+    
+    if isinstance(doc, datetime):
+        return doc.isoformat()
+        
     return doc
 
 def serialize_docs(docs):
