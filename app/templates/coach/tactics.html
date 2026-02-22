@@ -45,7 +45,7 @@
                     data-player-vit="{{ stats.get('VIT', 50) }}" data-player-tir="{{ stats.get('TIR', 50) }}"
                     data-player-pas="{{ stats.get('PAS', 50) }}" data-player-dri="{{ stats.get('DRI', 50) }}"
                     data-player-def="{{ stats.get('DEF', 50) }}" data-player-phy="{{ stats.get('PHY', 50) }}"
-                    onclick="selectPlayerCard(this)" ondragstart="onDragStart(event, this)"
+                    data-overall="{{ ovr }}" onclick="selectPlayerCard(this)" ondragstart="onDragStart(event, this)"
                     ondragend="onDragEnd(event)">
 
                     <!-- Card Background Effect -->
@@ -108,14 +108,37 @@
             <div class="relative group">
                 <select id="formationSelect" onchange="updateFormation()"
                     class="w-full bg-slate-50 dark:bg-surface-950 border border-slate-200 dark:border-white/10 py-4 px-6 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-primary-500 transition appearance-none cursor-pointer text-slate-900 dark:text-white">
-                    <option value="4-3-3" {% if lineup.formation=='4-3-3' %}selected{% endif %}>4 - 3 - 3 ATTAQUE
-                    </option>
-                    <option value="4-4-2" {% if lineup.formation=='4-4-2' %}selected{% endif %}>4 - 4 - 2 CLASSIQUE
-                    </option>
-                    <option value="3-5-2" {% if lineup.formation=='3-5-2' %}selected{% endif %}>3 - 5 - 2 DYNAMIQUE
-                    </option>
-                    <option value="4-2-3-1" {% if lineup.formation=='4-2-3-1' %}selected{% endif %}>4 - 2 - 3 - 1
-                        MODERNE</option>
+                    <!-- Formations Équilibrées -->
+                    <optgroup label="⚖️  ÉQUILIBRÉES">
+                        <option value="4-3-3" {% if lineup.formation=='4-3-3' %}selected{% endif %}>4 - 3 - 3 ATTAQUE
+                        </option>
+                        <option value="4-4-2" {% if lineup.formation=='4-4-2' %}selected{% endif %}>4 - 4 - 2 CLASSIQUE
+                        </option>
+                        <option value="4-2-3-1" {% if lineup.formation=='4-2-3-1' %}selected{% endif %}>4 - 2 - 3 - 1
+                            MODERNE</option>
+                        <option value="4-5-1" {% if lineup.formation=='4-5-1' %}selected{% endif %}>4 - 5 - 1 POSSESSION
+                        </option>
+                    </optgroup>
+
+                    <!-- Formations Défensives -->
+                    <optgroup label="🛡️  DÉFENSIVES">
+                        <option value="3-5-2" {% if lineup.formation=='3-5-2' %}selected{% endif %}>3 - 5 - 2 DYNAMIQUE
+                        </option>
+                        <option value="5-3-2" {% if lineup.formation=='5-3-2' %}selected{% endif %}>5 - 3 - 2 TRÈS
+                            DÉFENSIF</option>
+                        <option value="5-4-1" {% if lineup.formation=='5-4-1' %}selected{% endif %}>5 - 4 - 1 ULTRA
+                            DÉFENSIF</option>
+                    </optgroup>
+
+                    <!-- Formations Offensives -->
+                    <optgroup label="⚡ OFFENSIVES">
+                        <option value="4-1-2-1-2" {% if lineup.formation=='4-1-2-1-2' %}selected{% endif %}>4 - 1 - 2 -
+                            1 - 2 DIAMANT</option>
+                        <option value="4-3-2-1" {% if lineup.formation=='4-3-2-1' %}selected{% endif %}>4 - 3 - 2 - 1
+                            NOËL</option>
+                        <option value="3-4-3" {% if lineup.formation=='3-4-3' %}selected{% endif %}>3 - 4 - 3 ATTAQUANT
+                        </option>
+                    </optgroup>
                 </select>
                 <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none text-primary-400">
                     <i class="fa-solid fa-chevron-down text-xs"></i>
@@ -173,6 +196,12 @@
                         <i class="fa-solid fa-bullseye"></i>
                     </button>
                 </div>
+                <!-- Phase 2: Analytics Button -->
+                <button onclick="openTacticsAnalytics()"
+                    class="w-14 h-14 rounded-2xl glass hover:bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 hover:scale-105 active:scale-95 transition shadow-2xl"
+                    title="Analytique Tactique">
+                    <i class="fa-solid fa-chart-line text-lg"></i>
+                </button>
                 <button onclick="openTacticalConfig()"
                     class="w-14 h-14 rounded-2xl glass hover:bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 hover:scale-105 active:scale-95 transition shadow-2xl"
                     title="Configuration Tactique">
@@ -610,6 +639,275 @@
                     class="group flex-1 lg:flex-none lg:px-14 py-4 rounded-[20px] bg-gradient-to-r from-amber-400 to-amber-600 text-black text-sm font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-[0_12px_40px_rgba(245,158,11,0.2)] flex items-center justify-center gap-3">
                     <i class="fa-solid fa-check"></i>
                     <span>Optimiser & Valider</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PHASE 2: TACTIQUE ULTIMATE ANALYTICS Modal -->
+<div id="tacticsAnalyticsModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/80 dark:bg-black/80 backdrop-blur-xl"
+    onclick="closeTacticsAnalytics(event)">
+    <div class="tactical-modal-inner relative w-full lg:max-w-7xl h-full lg:h-[90vh] max-h-[95vh] mx-4 rounded-[40px] overflow-hidden flex flex-col transform scale-0 modal-inner-transition glass-dark border border-slate-200 dark:border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)]"
+        id="analyticsModalInner">
+
+        <!-- Header -->
+        <div class="relative px-8 py-8 border-b border-white/5 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-transparent to-purple-500/10 opacity-30"></div>
+            <div class="relative flex items-center justify-between z-10">
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 rounded-[16px] bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.15)]">
+                        <i class="fa-solid fa-chart-line text-indigo-400 text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl lg:text-4xl font-[900] text-slate-900 dark:text-white uppercase italic tracking-tighter"
+                            style="font-family: 'Oswald', sans-serif;">
+                            ANALYTIQUE <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">TACTIQUE</span>
+                        </h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                            <p class="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-[0.2em]">
+                                Métriques & Chimie en temps réel</p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="closeTacticsAnalytics({target:document.getElementById('tacticsAnalyticsModal'),currentTarget:document.getElementById('tacticsAnalyticsModal')})"
+                    class="w-12 h-12 rounded-2xl glass hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all duration-300 hover:rotate-90">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="px-8 py-4 border-b border-white/5 flex gap-2 overflow-x-auto custom-scrollbar bg-slate-50/5 dark:bg-black/20">
+            <button onclick="switchAnalyticsTab('metrics', this)" class="analytics-tab active px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+                data-tab="metrics">
+                <i class="fa-solid fa-chart-simple text-sm mr-2"></i>Métriques
+            </button>
+            <button onclick="switchAnalyticsTab('chemistry', this)" class="analytics-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+                data-tab="chemistry">
+                <i class="fa-solid fa-link text-sm mr-2"></i>Chimie
+            </button>
+            <button onclick="switchAnalyticsTab('suggestions', this)" class="analytics-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+                data-tab="suggestions">
+                <i class="fa-solid fa-lightbulb text-sm mr-2"></i>Suggestions
+            </button>
+            <button onclick="switchAnalyticsTab('heatmap', this)" class="analytics-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+                data-tab="heatmap">
+                <i class="fa-solid fa-fire text-sm mr-2"></i>Heat Map
+            </button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-8">
+            <!-- Metrics Tab -->
+            <div id="metricsTab" class="analytics-content space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Metric Card: Defensive Width -->
+                    <div class="glass-dark border border-white/5 rounded-[24px] p-6 hover:border-indigo-500/30 transition-all">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest">Largeur Défense</span>
+                            <i class="fa-solid fa-arrows-left-right text-indigo-400"></i>
+                        </div>
+                        <div class="text-3xl font-[900] text-white mb-2" id="metricDefWidth">87%</div>
+                        <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full" style="width: 87%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Metric Card: Attack Depth -->
+                    <div class="glass-dark border border-white/5 rounded-[24px] p-6 hover:border-purple-500/30 transition-all">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest">Profondeur Attaque</span>
+                            <i class="fa-solid fa-arrows-up-down text-purple-400"></i>
+                        </div>
+                        <div class="text-3xl font-[900] text-white mb-2" id="metricAttackDepth">72%</div>
+                        <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full" style="width: 72%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Metric Card: Compactness -->
+                    <div class="glass-dark border border-white/5 rounded-[24px] p-6 hover:border-cyan-500/30 transition-all">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest">Compacité</span>
+                            <i class="fa-solid fa-circle text-cyan-400"></i>
+                        </div>
+                        <div class="text-3xl font-[900] text-white mb-2" id="metricCompactness">81%</div>
+                        <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-full" style="width: 81%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Metric Card: Balance -->
+                    <div class="glass-dark border border-white/5 rounded-[24px] p-6 hover:border-emerald-500/30 transition-all">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest">Équilibre A/D</span>
+                            <i class="fa-solid fa-scale-balanced text-emerald-400"></i>
+                        </div>
+                        <div class="text-3xl font-[900] text-white mb-2" id="metricBalance">62%</div>
+                        <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full" style="width: 62%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formation Fit Score -->
+                <div class="glass-dark border border-white/5 rounded-[24px] p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">Score d'Adéquation Formation</p>
+                            <h3 class="text-2xl font-[900] text-white">Très Bon</h3>
+                        </div>
+                        <div class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">87</div>
+                    </div>
+                    <div class="h-3 rounded-full bg-white/5 overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-full" style="width: 87%; background-size: 200% 100%; animation: gradientShift 3s ease infinite;"></div>
+                    </div>
+                    <p class="text-xs text-slate-400 dark:text-white/40 mt-4">Cette formation s'adapte bien à votre effectif avec un bon équilibre attaque/défense.</p>
+                </div>
+            </div>
+
+            <!-- Chemistry Tab -->
+            <div id="chemistryTab" class="analytics-content hidden space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Overall Chemistry -->
+                    <div class="glass-dark border border-white/5 rounded-[24px] p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">Chimie Globale</p>
+                                <h3 class="text-2xl font-[900] text-white">Excellent</h3>
+                            </div>
+                            <div class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">94</div>
+                        </div>
+                        <div class="h-3 rounded-full bg-white/5 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full" style="width: 94%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Defensive Chemistry -->
+                    <div class="glass-dark border border-white/5 rounded-[24px] p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">Chimie Défense</p>
+                                <h3 class="text-2xl font-[900] text-white">Très Bonne</h3>
+                            </div>
+                            <div class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">88</div>
+                        </div>
+                        <div class="h-3 rounded-full bg-white/5 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full" style="width: 88%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Midfield & Attack Chemistry -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Midfield Chemistry -->
+                    <div class="glass-dark border border-white/5 rounded-[24px] p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">Chimie Milieu</p>
+                                <h3 class="text-2xl font-[900] text-white">Excellent</h3>
+                            </div>
+                            <div class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">91</div>
+                        </div>
+                        <div class="h-3 rounded-full bg-white/5 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full" style="width: 91%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Attack Chemistry -->
+                    <div class="glass-dark border border-white/5 rounded-[24px] p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-2">Chimie Attaque</p>
+                                <h3 class="text-2xl font-[900] text-white">Bonne</h3>
+                            </div>
+                            <div class="text-5xl font-[900] text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-pink-400">79</div>
+                        </div>
+                        <div class="h-3 rounded-full bg-white/5 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-red-500 to-pink-500 rounded-full" style="width: 79%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suggestions Tab -->
+            <div id="suggestionsTab" class="analytics-content hidden space-y-6">
+                <div class="space-y-4" id="suggestionsList">
+                    <!-- Suggestion Item -->
+                    <div class="glass-dark border border-emerald-500/20 rounded-[24px] p-6 hover:border-emerald-500/40 transition-all">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-[12px] bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-check-circle text-emerald-400 text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-sm font-[900] text-white mb-1">Bonne Formation</h4>
+                                <p class="text-[12px] text-slate-400 dark:text-white/40 leading-relaxed">
+                                    Votre formation 4-3-3 est bien adaptée à votre effectif. Les positions sont bien distribuées.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suggestion Item -->
+                    <div class="glass-dark border border-amber-500/20 rounded-[24px] p-6 hover:border-amber-500/40 transition-all">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-[12px] bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-lightbulb text-amber-400 text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-sm font-[900] text-white mb-1">Ajuster les Ailes</h4>
+                                <p class="text-[12px] text-slate-400 dark:text-white/40 leading-relaxed">
+                                    Considérez d'utiliser des ailiers plus rapides pour exploiter les flancs. Cela augmenterait votre capacité offensif.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suggestion Item -->
+                    <div class="glass-dark border border-indigo-500/20 rounded-[24px] p-6 hover:border-indigo-500/40 transition-all">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-[12px] bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-chart-line text-indigo-400 text-lg"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-sm font-[900] text-white mb-1">Améliorer la Profondeur</h4>
+                                <p class="text-[12px] text-slate-400 dark:text-white/40 leading-relaxed">
+                                    Augmentez la profondeur offensive en avançant le milieu de terrain central pour plus de présence en attaque.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HeatMap Tab -->
+            <div id="heatmapTab" class="analytics-content hidden">
+                <div class="glass-dark border border-white/5 rounded-[24px] p-8">
+                    <div class="text-center">
+                        <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-4">Couverture Terrain</p>
+                        <svg viewBox="0 0 105 68" class="w-full max-w-2xl mx-auto" id="heatmapPitch">
+                            <!-- Pitch background -->
+                            <rect width="105" height="68" fill="url(#pitchGradient)" opacity="0.3"/>
+                            <!-- Heat map circles -->
+                            <circle cx="52.5" cy="34" r="25" fill="url(#heatGradient)" opacity="0.6"/>
+                            <circle cx="20" cy="20" r="15" fill="url(#heatGradient2)" opacity="0.5"/>
+                            <circle cx="85" cy="20" r="15" fill="url(#heatGradient2)" opacity="0.5"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="relative px-8 py-8 border-t border-white/5 bg-slate-50/50 dark:bg-black/20">
+            <div class="relative flex items-center justify-between z-10">
+                <p class="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-wider">Dernière mise à jour: <span id="analyticsTimestamp">à l'instant</span></p>
+                <button onclick="closeTacticsAnalytics({target:document.getElementById('tacticsAnalyticsModal'),currentTarget:document.getElementById('tacticsAnalyticsModal')})"
+                    class="px-8 py-3 rounded-[16px] glass hover:bg-white/10 text-white/60 hover:text-white text-xs font-bold uppercase tracking-wider transition-all">
+                    Fermer
                 </button>
             </div>
         </div>
@@ -1287,6 +1585,306 @@
     .guide-btn-next {
         background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     }
+
+    /* ============================================================
+       PHASE 1: DRAG & DROP ENHANCEMENTS
+       ============================================================ */
+
+    /* Smooth GPU-accelerated animations */
+    .player-card {
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 0.2s ease,
+            box-shadow 0.2s ease;
+        will-change: transform;
+        position: relative;
+    }
+
+    .player-card.dragging {
+        opacity: 0.6;
+        transform: scale(0.95) rotate(2deg);
+        cursor: grabbing !important;
+        z-index: 1000;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .player-card.drag-ghost {
+        opacity: 0.3;
+        transform: scale(0.9);
+    }
+
+    /* Zone highlighting pendant drag */
+    .pitch-area.drag-active {
+        background: radial-gradient(circle at 50% 50%,
+                rgba(var(--primary-rgb, 16 185 129), 0.1) 0%,
+                transparent 60%) !important;
+        box-shadow: inset 0 0 60px rgba(var(--primary-rgb, 16 185 129), 0.2) !important;
+    }
+
+    #benchArea.drag-active {
+        border-color: rgb(var(--primary-rgb, 16 185 129)) !important;
+        box-shadow: 0 0 40px rgba(var(--primary-rgb, 16 185 129), 0.3) !important;
+    }
+
+    /* Animation de drop */
+    @keyframes dropPulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .just-dropped {
+        animation: dropPulse 0.3s ease;
+    }
+
+    /* Snap-to-grid effect pour les positions */
+    .slot-circle.drag-over {
+        transform: scale(1.1) !important;
+        box-shadow: 0 0 30px rgba(var(--primary-rgb, 16 185 129), 0.6) !important;
+    }
+
+    /* ============================================================
+       PHASE 1: FIFA-STYLE PLAYER CARDS
+       ============================================================ */
+
+    /* Rating tiers avec gradients dynamiques */
+    .player-card.rating-gold {
+        background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #b45309 100%);
+        border: 2px solid #fbbf24;
+        box-shadow: 0 8px 32px rgba(251, 191, 36, 0.3);
+    }
+
+    .player-card.rating-silver {
+        background: linear-gradient(135deg, #f3f4f6 0%, #d1d5db 50%, #9ca3af 100%);
+        border: 2px solid #e5e7eb;
+    }
+
+    .player-card.rating-bronze {
+        background: linear-gradient(135deg, #fdba74 0%, #f97316 50%, #c2410c 100%);
+        border: 2px solid #fb923c;
+    }
+
+    .player-card.rating-common {
+        background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+        border: 2px solid #475569;
+    }
+
+    /* Light mode adjustments */
+    .light .player-card.rating-gold {
+        background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+        border: 2px solid #d97706;
+        box-shadow: 0 8px 32px rgba(217, 119, 6, 0.2);
+    }
+
+    .light .player-card.rating-silver {
+        background: linear-gradient(135deg, #ffffff 0%, #e5e7eb 100%);
+        border: 2px solid #cbd5e1;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .light .player-card.rating-bronze {
+        background: linear-gradient(135deg, #fef08a 0%, #fbbf24 100%);
+        border: 2px solid #f59e0b;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Holographic shine effect on hover */
+    @keyframes shine {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    .player-card:hover::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 100%);
+        animation: shine 1.5s ease infinite;
+        pointer-events: none;
+        border-radius: 0.75rem;
+    }
+
+    /* Rating badge enhancement */
+    .rating-badge {
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .light .rating-badge {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ============================================================
+       PHASE 1: PITCH STYLING ENHANCEMENTS
+       ============================================================ */
+
+    #pitch {
+        background:
+            linear-gradient(90deg, transparent 49.5%, rgba(255, 255, 255, 0.1) 49.5%, rgba(255, 255, 255, 0.1) 50.5%, transparent 50.5%),
+            linear-gradient(0deg, transparent 32.8%, rgba(255, 255, 255, 0.08) 32.8%, rgba(255, 255, 255, 0.08) 33.2%, transparent 33.2%),
+            linear-gradient(0deg, transparent 66.3%, rgba(255, 255, 255, 0.08) 66.3%, rgba(255, 255, 255, 0.08) 66.7%, transparent 66.7%),
+            linear-gradient(135deg, #047857 0%, #059669 50%, #10b981 100%) !important;
+        position: relative;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.3);
+        background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+    }
+
+    .light #pitch {
+        background:
+            linear-gradient(90deg, transparent 49.5%, rgba(0, 0, 0, 0.08) 49.5%, rgba(0, 0, 0, 0.08) 50.5%, transparent 50.5%),
+            linear-gradient(0deg, transparent 32.8%, rgba(0, 0, 0, 0.06) 32.8%, rgba(0, 0, 0, 0.06) 33.2%, transparent 33.2%),
+            linear-gradient(0deg, transparent 66.3%, rgba(0, 0, 0, 0.06) 66.3%, rgba(0, 0, 0, 0.06) 66.7%, transparent 66.7%),
+            linear-gradient(135deg, #86efac 0%, #6ee7b7 50%, #5eead4 100%) !important;
+        box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Position slots enhancement */
+    .slot-circle {
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px dashed rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(4px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+    }
+
+    .light .slot-circle {
+        background: rgba(255, 255, 255, 0.7);
+        border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .slot-circle:hover {
+        transform: scale(1.05);
+        border-color: rgb(var(--primary-rgb, 16 185 129));
+        background: rgba(var(--primary-rgb, 16 185 129), 0.1);
+    }
+
+    .slot-circle.filled {
+        background: white;
+        border: 2px solid rgb(var(--primary-rgb, 16 185 129));
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .light .slot-circle.filled {
+        background: #ffffff;
+        border-color: rgb(var(--primary-rgb, 16 185 129));
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ============================================================
+       PHASE 1: DARK/LIGHT MODE TRANSITIONS
+       ============================================================ */
+
+    /* Smooth theme transition */
+    * {
+        transition: background-color 0.3s ease,
+            border-color 0.3s ease,
+            color 0.3s ease;
+    }
+
+    /* Prevent transition on page load */
+    .preload * {
+        transition: none !important;
+    }
+
+    /* ============================================================
+       PHASE 2: TACTIQUE ULTIMATE ANALYTICS STYLES
+       ============================================================ */
+
+    /* Analytics Tab Navigation */
+    .analytics-tab {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .analytics-tab:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .analytics-tab.active {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+        border-color: rgba(99, 102, 241, 0.5);
+        color: #818cf8;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+
+    .light .analytics-tab {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        color: #64748b;
+    }
+
+    .light .analytics-tab:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #334155;
+    }
+
+    .light .analytics-tab.active {
+        background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+        border-color: #a5b4fc;
+        color: #4f46e5;
+    }
+
+    /* Analytics Content Animation */
+    .analytics-content {
+        animation: fadeInContent 0.3s ease;
+    }
+
+    @keyframes fadeInContent {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Gradient Animation for Metrics */
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Glow effect on hover for metric cards */
+    .glass-dark {
+        transition: all 0.3s ease;
+    }
+
+    /* Light mode adjustments for analytics */
+    .light .glass-dark {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: #e2e8f0;
+    }
+
 </style>
 
 <!-- FIFA Player Card Modal -->
@@ -1664,6 +2262,34 @@
     });
 
     // ============================================================
+    // PHASE 1: FIFA-STYLE RATING-BASED CARD STYLING
+    // ============================================================
+    function applyRatingStyles() {
+        document.querySelectorAll('.player-card').forEach(card => {
+            const ovr = parseInt(card.getAttribute('data-overall') || 50);
+
+            // Remove all rating classes first
+            card.classList.remove('rating-gold', 'rating-silver', 'rating-bronze', 'rating-common');
+
+            // Apply rating-based class
+            if (ovr >= 85) {
+                card.classList.add('rating-gold');
+            } else if (ovr >= 75) {
+                card.classList.add('rating-silver');
+            } else if (ovr >= 65) {
+                card.classList.add('rating-bronze');
+            } else {
+                card.classList.add('rating-common');
+            }
+        });
+    }
+
+    // Apply rating styles on page load
+    document.addEventListener('DOMContentLoaded', applyRatingStyles);
+    // Also apply immediately in case DOM is ready
+    applyRatingStyles();
+
+    // ============================================================
     // FORMATIONS
     // ============================================================
     const formations = {
@@ -1685,6 +2311,46 @@
         '4-2-3-1': {
             'GK': [50, 85], 'LB': [15, 70], 'CB1': [38, 72], 'CB2': [62, 72], 'RB': [85, 70],
             'CDM1': [40, 55], 'CDM2': [60, 55], 'LAM': [25, 35], 'CAM': [50, 35], 'RAM': [75, 35],
+            'ST': [50, 15]
+        },
+        // Phase 1: 6 nouvelles formations populaires FIFA
+        '5-3-2': {
+            'GK': [50, 85],
+            'LWB': [10, 70], 'LCB': [30, 75], 'CB': [50, 75], 'RCB': [70, 75], 'RWB': [90, 70],
+            'LCM': [30, 50], 'CM': [50, 50], 'RCM': [70, 50],
+            'LS': [40, 20], 'RS': [60, 20]
+        },
+        '4-1-2-1-2': {
+            'GK': [50, 85],
+            'LB': [15, 65], 'LCB': [35, 75], 'RCB': [65, 75], 'RB': [85, 65],
+            'CDM': [50, 60],
+            'LCM': [35, 45], 'RCM': [65, 45],
+            'CAM': [50, 30],
+            'LS': [40, 15], 'RS': [60, 15]
+        },
+        '4-3-2-1': {
+            'GK': [50, 85],
+            'LB': [15, 65], 'LCB': [35, 75], 'RCB': [65, 75], 'RB': [85, 65],
+            'LCM': [30, 50], 'CM': [50, 55], 'RCM': [70, 50],
+            'LF': [35, 25], 'RF': [65, 25],
+            'ST': [50, 15]
+        },
+        '3-4-3': {
+            'GK': [50, 85],
+            'LCB': [25, 75], 'CB': [50, 75], 'RCB': [75, 75],
+            'LM': [10, 50], 'LCM': [35, 50], 'RCM': [65, 50], 'RM': [90, 50],
+            'LW': [25, 20], 'ST': [50, 15], 'RW': [75, 20]
+        },
+        '4-5-1': {
+            'GK': [50, 85],
+            'LB': [15, 65], 'LCB': [35, 75], 'RCB': [65, 75], 'RB': [85, 65],
+            'LM': [15, 45], 'LCM': [35, 50], 'CM': [50, 50], 'RCM': [65, 50], 'RM': [85, 45],
+            'ST': [50, 15]
+        },
+        '5-4-1': {
+            'GK': [50, 85],
+            'LWB': [10, 65], 'LCB': [30, 75], 'CB': [50, 75], 'RCB': [70, 75], 'RWB': [90, 65],
+            'LCM': [30, 50], 'LDM': [40, 55], 'RDM': [60, 55], 'RCM': [70, 50],
             'ST': [50, 15]
         }
     };
@@ -1853,6 +2519,8 @@
         const config = formations[formation] || formations['4-3-3'];
 
         triggerAutoSave();
+        // Phase 2: Update tactical metrics when formation changes
+        calculateTacticalMetrics();
 
         // Clear unmatched assignments
         const validPositions = Object.keys(config);
@@ -2192,6 +2860,97 @@
         if (e && e.target !== e.currentTarget) return;
         document.getElementById('tacticalModalInner').style.transform = 'scale(0)';
         setTimeout(() => document.getElementById('tacticalModal').classList.remove('show'), 300);
+    }
+
+    // ============================================================
+    // PHASE 2: TACTIQUE ULTIMATE ANALYTICS FUNCTIONS
+    // ============================================================
+    function openTacticsAnalytics() {
+        const modal = document.getElementById('tacticsAnalyticsModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            document.getElementById('analyticsModalInner').style.transform = 'scale(1)';
+        }, 10);
+        calculateTacticalMetrics();
+        updateAnalyticsTimestamp();
+    }
+
+    function closeTacticsAnalytics(e) {
+        if (e && e.target !== e.currentTarget) return;
+        document.getElementById('analyticsModalInner').style.transform = 'scale(0)';
+        setTimeout(() => {
+            const modal = document.getElementById('tacticsAnalyticsModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
+    }
+
+    function switchAnalyticsTab(tabName, btn) {
+        // Hide all content tabs
+        document.querySelectorAll('.analytics-content').forEach(tab => {
+            tab.classList.add('hidden');
+        });
+
+        // Remove active class from all buttons
+        document.querySelectorAll('.analytics-tab').forEach(b => {
+            b.classList.remove('active');
+        });
+
+        // Show selected content tab
+        const contentTab = document.getElementById(tabName + 'Tab');
+        if (contentTab) {
+            contentTab.classList.remove('hidden');
+        }
+
+        // Add active class to clicked button
+        if (btn) {
+            btn.classList.add('active');
+        }
+    }
+
+    function updateAnalyticsTimestamp() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        document.getElementById('analyticsTimestamp').textContent = timeString;
+    }
+
+    // Calculate and update tactical metrics based on current formation
+    function calculateTacticalMetrics() {
+        const formation = document.getElementById('formationSelect').value;
+
+        // Simulate metric calculations based on formation
+        let metrics = {
+            defWidth: 85,
+            attackDepth: 75,
+            compactness: 78,
+            balance: 65
+        };
+
+        // Adjust based on formation
+        if (formation === '5-4-1' || formation === '5-3-2') {
+            metrics.defWidth = 95;
+            metrics.attackDepth = 55;
+            metrics.balance = 40;
+        } else if (formation === '3-4-3' || formation === '4-5-1') {
+            metrics.defWidth = 75;
+            metrics.attackDepth = 85;
+            metrics.balance = 80;
+        } else if (formation === '4-3-3' || formation === '4-4-2') {
+            metrics.defWidth = 85;
+            metrics.attackDepth = 72;
+            metrics.balance = 65;
+        }
+
+        // Update UI
+        document.getElementById('metricDefWidth').textContent = metrics.defWidth + '%';
+        document.getElementById('metricAttackDepth').textContent = metrics.attackDepth + '%';
+        document.getElementById('metricCompactness').textContent = metrics.compactness + '%';
+        document.getElementById('metricBalance').textContent = metrics.balance + '%';
     }
 
     function setTactic(category, value, btn) {
