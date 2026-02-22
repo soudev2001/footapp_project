@@ -421,27 +421,35 @@ def save_tactical_config():
 @role_required('coach', 'admin')
 def save_tactic_preset():
     """Save current lineup as a preset"""
-    data = request.json
-    club_id = session.get('club_id')
-    team_id = data.get('team_id')
-    
-    from app.services import get_player_service
-    player_service = get_player_service()
-    
-    preset_id = player_service.save_tactic_preset(
-        club_id=club_id,
-        team_id=team_id,
-        name=data.get('name'),
-        description=data.get('description', ''),
-        formation=data.get('formation'),
-        starters=data.get('starters'),
-        substitutes=data.get('substitutes'),
-        instructions=data.get('instructions'),
-        captains=data.get('captains'),
-        set_pieces=data.get('set_pieces')
-    )
-    
-    return {"status": "success", "preset_id": preset_id}
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"status": "error", "message": "No data received"}), 400
+
+        club_id = session.get('club_id')
+        team_id = data.get('team_id')
+
+        from app.services import get_player_service
+        player_service = get_player_service()
+
+        preset_id = player_service.save_tactic_preset(
+            club_id=club_id,
+            team_id=team_id,
+            name=data.get('name'),
+            description=data.get('description', ''),
+            formation=data.get('formation'),
+            starters=data.get('starters'),
+            substitutes=data.get('substitutes'),
+            instructions=data.get('instructions'),
+            captains=data.get('captains'),
+            set_pieces=data.get('set_pieces')
+        )
+
+        return jsonify({"status": "success", "preset_id": str(preset_id)})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @coach_bp.route('/tactics/presets')
 @login_required
@@ -474,13 +482,21 @@ def load_tactic_preset():
     preset = player_service.get_tactic_preset(preset_id)
     if not preset:
         return {"error": "Preset not found"}, 404
-        
+    
+    # starters can be a dict {pos: ObjectId} or a list (legacy)
+    raw_starters = preset.get('starters', {})
+    if isinstance(raw_starters, dict):
+        starters_dict = {pos: str(pid) for pos, pid in raw_starters.items()}
+    else:
+        # Legacy: was stored as a list, convert to empty dict
+        starters_dict = {}
+
     # Apply to active lineup (one single save call)
     player_service.save_lineup(
         club_id=club_id,
         team_id=team_id,
         formation=preset.get('formation'),
-        starters=[str(s) for s in preset.get('starters', [])],
+        starters=starters_dict,
         substitutes=[str(s) for s in preset.get('substitutes', [])],
         name=preset.get('name'),
         captains=[str(c) for c in preset.get('captains', [])],
@@ -495,7 +511,7 @@ def load_tactic_preset():
             config=preset.get('instructions')
         )
     
-    return {"status": "success"}
+    return jsonify({"status": "success"})
 
 @coach_bp.route('/tactics/preset/<preset_id>', methods=['DELETE'])
 @login_required

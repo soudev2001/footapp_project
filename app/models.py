@@ -384,20 +384,51 @@ def create_message(sender_id, content, receiver_id=None, team_id=None, msg_type=
 def create_saved_tactic(club_id, team_id, name, formation, starters, substitutes, instructions=None, description='', captains=None, set_pieces=None):
     """Create a new saved tactic document"""
     now = datetime.utcnow()
+
+    # starters is a dict: {position_key: player_id_string}
+    # We store it as a dict with ObjectId values
+    def safe_objectid(val):
+        try:
+            return ObjectId(val)
+        except Exception:
+            return None
+
+    starters_dict = {}
+    if isinstance(starters, dict):
+        for pos, pid in starters.items():
+            oid = safe_objectid(pid)
+            if oid:
+                starters_dict[pos] = oid
+    
+    # substitutes is a list of player_id strings
+    substitutes_list = []
+    if isinstance(substitutes, list):
+        for pid in substitutes:
+            oid = safe_objectid(pid)
+            if oid:
+                substitutes_list.append(oid)
+
+    captains_list = []
+    for pid in (captains or []):
+        oid = safe_objectid(pid)
+        if oid:
+            captains_list.append(oid)
+
+    set_pieces_dict = {}
+    for k, v in (set_pieces or {}).items():
+        set_pieces_dict[k] = [oid for pid in (v or []) if (oid := safe_objectid(pid))]
+
     return {
         'club_id': ObjectId(club_id),
         'team_id': ObjectId(team_id) if team_id else None,
         'name': name,
         'description': description,
         'formation': formation,
-        'starters': [ObjectId(p) for p in starters],
-        'substitutes': [ObjectId(p) for p in substitutes],
+        'starters': starters_dict,
+        'substitutes': substitutes_list,
         'instructions': instructions or {},
-        'captains': [ObjectId(p) for p in (captains or [])],
-        'set_pieces': {
-            k: [ObjectId(p) for p in (v or [])] 
-            for k, v in (set_pieces or {}).items()
-        },
+        'captains': captains_list,
+        'set_pieces': set_pieces_dict,
         'created_at': now,
         'updated_at': now
     }
