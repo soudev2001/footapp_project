@@ -210,7 +210,7 @@
                 </button>
                 <button onclick="openTacticalConfig()"
                     class="w-14 h-14 rounded-2xl glass hover:bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 hover:scale-105 active:scale-95 transition shadow-2xl"
-                    title="Configuration Tactique">
+                    title="Tactiques Avancées">
                     <i class="fa-solid fa-chess text-lg"></i>
                 </button>
                 <button onclick="resetPitch()"
@@ -276,8 +276,8 @@
                     <div>
                         <h2 class="text-3xl lg:text-4xl font-[900] text-slate-900 dark:text-white uppercase italic tracking-tighter"
                             style="font-family: 'Oswald', sans-serif;">
-                            TACTIQUE <span
-                                class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">ULTIMATE</span>
+                            TACTIQUES <span
+                                class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">AVANCÉES</span>
                         </h2>
                         <div class="flex items-center gap-2 mt-1">
                             <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
@@ -959,12 +959,33 @@
                             class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-4">
                             Couverture Terrain</p>
                         <svg viewBox="0 0 105 68" class="w-full max-w-2xl mx-auto" id="heatmapPitch">
+                            <defs>
+                                <radialGradient id="pitchGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                    <stop offset="0%" stop-color="#065f46" />
+                                    <stop offset="100%" stop-color="#022c22" />
+                                </radialGradient>
+                                <radialGradient id="heatGradient">
+                                    <stop offset="0%" stop-color="#fbbf24" />
+                                    <stop offset="40%" stop-color="#f59e0b" stop-opacity="0.6" />
+                                    <stop offset="100%" stop-color="#b45309" stop-opacity="0" />
+                                </radialGradient>
+                                <radialGradient id="heatGradient2">
+                                    <stop offset="0%" stop-color="#34d399" />
+                                    <stop offset="40%" stop-color="#10b981" stop-opacity="0.6" />
+                                    <stop offset="100%" stop-color="#065f46" stop-opacity="0" />
+                                </radialGradient>
+                                <radialGradient id="heatGradient3">
+                                    <stop offset="0%" stop-color="#6366f1" />
+                                    <stop offset="40%" stop-color="#4f46e5" stop-opacity="0.6" />
+                                    <stop offset="100%" stop-color="#312e81" stop-opacity="0" />
+                                </radialGradient>
+                            </defs>
                             <!-- Pitch background -->
                             <rect width="105" height="68" fill="url(#pitchGradient)" opacity="0.3" />
                             <!-- Heat map circles -->
-                            <circle cx="52.5" cy="34" r="25" fill="url(#heatGradient)" opacity="0.6" />
-                            <circle cx="20" cy="20" r="15" fill="url(#heatGradient2)" opacity="0.5" />
-                            <circle cx="85" cy="20" r="15" fill="url(#heatGradient2)" opacity="0.5" />
+                            <circle id="heatZone1" cx="52.5" cy="34" r="25" fill="url(#heatGradient)" opacity="0.6" />
+                            <circle id="heatZone2" cx="20" cy="20" r="15" fill="url(#heatGradient2)" opacity="0.5" />
+                            <circle id="heatZone3" cx="85" cy="20" r="15" fill="url(#heatGradient2)" opacity="0.5" />
                         </svg>
                     </div>
                 </div>
@@ -995,25 +1016,30 @@
 
         <!-- Header -->
         <div class="relative px-8 py-8 border-b border-white/5 overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-r from-rose-500/10 via-transparent to-pink-500/10 opacity-30"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-rose-500/10 via-transparent to-pink-500/10 opacity-30">
+            </div>
             <div class="relative flex items-center justify-between z-10">
                 <div class="flex items-center gap-6">
-                    <div class="w-16 h-16 rounded-[16px] bg-gradient-to-br from-rose-500/20 to-pink-500/20 border border-rose-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.15)]">
+                    <div
+                        class="w-16 h-16 rounded-[16px] bg-gradient-to-br from-rose-500/20 to-pink-500/20 border border-rose-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.15)]">
                         <i class="fa-solid fa-play text-rose-400 text-2xl"></i>
                     </div>
                     <div>
                         <h2 class="text-3xl lg:text-4xl font-[900] text-slate-900 dark:text-white uppercase italic tracking-tighter"
                             style="font-family: 'Oswald', sans-serif;">
-                            VISUALISEUR <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-pink-400">TACTIQUE</span>
+                            VISUALISEUR <span
+                                class="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-pink-400">TACTIQUE</span>
                         </h2>
                         <div class="flex items-center gap-2 mt-1">
                             <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                            <p class="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-[0.2em]">
+                            <p
+                                class="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-[0.2em]">
                                 Prévisualisation en temps réel</p>
                         </div>
                     </div>
                 </div>
-                <button onclick="closeVisualiser({target:document.getElementById('visualiserModal'),currentTarget:document.getElementById('visualiserModal')})"
+                <button
+                    onclick="closeVisualiser({target:document.getElementById('visualiserModal'),currentTarget:document.getElementById('visualiserModal')})"
                     class="w-12 h-12 rounded-2xl glass hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all duration-300 hover:rotate-90">
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
@@ -1021,20 +1047,25 @@
         </div>
 
         <!-- Visualization Tabs -->
-        <div class="px-8 py-4 border-b border-white/5 flex gap-2 overflow-x-auto custom-scrollbar bg-slate-50/5 dark:bg-black/20">
-            <button onclick="switchVisualiserTab('pitch', this)" class="visualiser-tab active px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+        <div
+            class="px-8 py-4 border-b border-white/5 flex gap-2 overflow-x-auto custom-scrollbar bg-slate-50/5 dark:bg-black/20">
+            <button onclick="switchVisualiserTab('pitch', this)"
+                class="visualiser-tab active px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
                 data-tab="pitch">
                 <i class="fa-solid fa-futbol text-sm mr-2"></i>Terrain
             </button>
-            <button onclick="switchVisualiserTab('coverage', this)" class="visualiser-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+            <button onclick="switchVisualiserTab('coverage', this)"
+                class="visualiser-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
                 data-tab="coverage">
                 <i class="fa-solid fa-fire text-sm mr-2"></i>Couverture
             </button>
-            <button onclick="switchVisualiserTab('passing', this)" class="visualiser-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+            <button onclick="switchVisualiserTab('passing', this)"
+                class="visualiser-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
                 data-tab="passing">
                 <i class="fa-solid fa-arrows text-sm mr-2"></i>Passes
             </button>
-            <button onclick="switchVisualiserTab('phases', this)" class="visualiser-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
+            <button onclick="switchVisualiserTab('phases', this)"
+                class="visualiser-tab px-6 py-3 rounded-[16px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300"
                 data-tab="phases">
                 <i class="fa-solid fa-circle-play text-sm mr-2"></i>Phases
             </button>
@@ -1045,47 +1076,58 @@
             <!-- Pitch Tab -->
             <div id="pitchTab" class="visualiser-content space-y-6">
                 <div class="glass-dark border border-white/5 rounded-[24px] p-8">
-                    <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-6">Visualisation Terrain</p>
-                    <svg viewBox="0 0 105 68" class="w-full max-w-4xl mx-auto" id="mainPitch" style="min-height: 300px;">
+                    <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-6">
+                        Visualisation Terrain</p>
+                    <svg viewBox="0 0 105 68" class="w-full max-w-4xl mx-auto" id="mainPitch"
+                        style="min-height: 300px;">
                         <!-- Pitch background -->
-                        <rect width="105" height="68" fill="#047857" opacity="0.6"/>
+                        <rect width="105" height="68" fill="#047857" opacity="0.6" />
                         <!-- Pitch lines -->
-                        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="white" stroke-width="0.5" opacity="0.4"/>
-                        <line x1="0" y1="34" x2="105" y2="34" stroke="white" stroke-width="0.5" opacity="0.4"/>
-                        <rect x="0" y="13.6" width="16.5" height="40.8" fill="none" stroke="white" stroke-width="0.3" opacity="0.3"/>
-                        <rect x="88.5" y="13.6" width="16.5" height="40.8" fill="none" stroke="white" stroke-width="0.3" opacity="0.3"/>
+                        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="white" stroke-width="0.5" opacity="0.4" />
+                        <line x1="0" y1="34" x2="105" y2="34" stroke="white" stroke-width="0.5" opacity="0.4" />
+                        <rect x="0" y="13.6" width="16.5" height="40.8" fill="none" stroke="white" stroke-width="0.3"
+                            opacity="0.3" />
+                        <rect x="88.5" y="13.6" width="16.5" height="40.8" fill="none" stroke="white" stroke-width="0.3"
+                            opacity="0.3" />
                         <!-- Center circle -->
-                        <circle cx="52.5" cy="34" r="9.15" fill="none" stroke="white" stroke-width="0.3" opacity="0.3"/>
+                        <circle cx="52.5" cy="34" r="9.15" fill="none" stroke="white" stroke-width="0.3"
+                            opacity="0.3" />
                         <!-- Animated player positions -->
                         <g id="playerPositions"></g>
                     </svg>
-                    <p class="text-xs text-white/40 text-center mt-4">Formation actuelle avec positionnement des joueurs</p>
+                    <p class="text-xs text-white/40 text-center mt-4">Formation actuelle avec positionnement des joueurs
+                    </p>
                 </div>
             </div>
 
             <!-- Coverage Tab -->
             <div id="coverageTab" class="visualiser-content hidden space-y-6">
                 <div class="glass-dark border border-white/5 rounded-[24px] p-8">
-                    <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-6">Zones de Couverture</p>
-                    <svg viewBox="0 0 105 68" class="w-full max-w-4xl mx-auto" id="coveragePitch" style="min-height: 300px;">
-                        <rect width="105" height="68" fill="#047857" opacity="0.6"/>
-                        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="white" stroke-width="0.5" opacity="0.4"/>
-                        <line x1="0" y1="34" x2="105" y2="34" stroke="white" stroke-width="0.5" opacity="0.4"/>
+                    <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-6">
+                        Zones de Couverture</p>
+                    <svg viewBox="0 0 105 68" class="w-full max-w-4xl mx-auto" id="coveragePitch"
+                        style="min-height: 300px;">
+                        <rect width="105" height="68" fill="#047857" opacity="0.6" />
+                        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="white" stroke-width="0.5" opacity="0.4" />
+                        <line x1="0" y1="34" x2="105" y2="34" stroke="white" stroke-width="0.5" opacity="0.4" />
                         <!-- Coverage zones -->
                         <g id="coverageZones" opacity="0.5"></g>
                     </svg>
-                    <p class="text-xs text-white/40 text-center mt-4">Zones de couverture par ligne (Défense, Milieu, Attaque)</p>
+                    <p class="text-xs text-white/40 text-center mt-4">Zones de couverture par ligne (Défense, Milieu,
+                        Attaque)</p>
                 </div>
             </div>
 
             <!-- Passing Lines Tab -->
             <div id="passingTab" class="visualiser-content hidden space-y-6">
                 <div class="glass-dark border border-white/5 rounded-[24px] p-8">
-                    <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-6">Lignes de Passe</p>
-                    <svg viewBox="0 0 105 68" class="w-full max-w-4xl mx-auto" id="passingPitch" style="min-height: 300px;">
-                        <rect width="105" height="68" fill="#047857" opacity="0.6"/>
-                        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="white" stroke-width="0.5" opacity="0.4"/>
-                        <line x1="0" y1="34" x2="105" y2="34" stroke="white" stroke-width="0.5" opacity="0.4"/>
+                    <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-6">
+                        Lignes de Passe</p>
+                    <svg viewBox="0 0 105 68" class="w-full max-w-4xl mx-auto" id="passingPitch"
+                        style="min-height: 300px;">
+                        <rect width="105" height="68" fill="#047857" opacity="0.6" />
+                        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="white" stroke-width="0.5" opacity="0.4" />
+                        <line x1="0" y1="34" x2="105" y2="34" stroke="white" stroke-width="0.5" opacity="0.4" />
                         <!-- Passing lines -->
                         <g id="passingLines" opacity="0.6"></g>
                     </svg>
@@ -1096,26 +1138,31 @@
             <!-- Game Phases Tab -->
             <div id="phasesTab" class="visualiser-content hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <button onclick="switchPhase('defense')" class="phase-btn active px-6 py-4 rounded-[16px] text-sm font-bold uppercase tracking-wider transition-all"
+                    <button onclick="switchPhase('defense')"
+                        class="phase-btn active px-6 py-4 rounded-[16px] text-sm font-bold uppercase tracking-wider transition-all"
                         data-phase="defense">
                         <i class="fa-solid fa-shield text-lg mb-2 block"></i>DÉFENSE
                     </button>
-                    <button onclick="switchPhase('transition')" class="phase-btn px-6 py-4 rounded-[16px] text-sm font-bold uppercase tracking-wider transition-all"
+                    <button onclick="switchPhase('transition')"
+                        class="phase-btn px-6 py-4 rounded-[16px] text-sm font-bold uppercase tracking-wider transition-all"
                         data-phase="transition">
                         <i class="fa-solid fa-arrows-rotate text-lg mb-2 block"></i>TRANSITION
                     </button>
-                    <button onclick="switchPhase('attack')" class="phase-btn px-6 py-4 rounded-[16px] text-sm font-bold uppercase tracking-wider transition-all"
+                    <button onclick="switchPhase('attack')"
+                        class="phase-btn px-6 py-4 rounded-[16px] text-sm font-bold uppercase tracking-wider transition-all"
                         data-phase="attack">
                         <i class="fa-solid fa-triangle-exclamation text-lg mb-2 block"></i>ATTAQUE
                     </button>
                 </div>
 
                 <div class="glass-dark border border-white/5 rounded-[24px] p-8">
-                    <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-6" id="phaseTitle">Phase Défensive</p>
-                    <svg viewBox="0 0 105 68" class="w-full max-w-4xl mx-auto" id="phasesPitch" style="min-height: 300px;">
-                        <rect width="105" height="68" fill="#047857" opacity="0.6"/>
-                        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="white" stroke-width="0.5" opacity="0.4"/>
-                        <line x1="0" y1="34" x2="105" y2="34" stroke="white" stroke-width="0.5" opacity="0.4"/>
+                    <p class="text-[10px] text-slate-400 dark:text-white/40 font-bold uppercase tracking-widest mb-6"
+                        id="phaseTitle">Phase Défensive</p>
+                    <svg viewBox="0 0 105 68" class="w-full max-w-4xl mx-auto" id="phasesPitch"
+                        style="min-height: 300px;">
+                        <rect width="105" height="68" fill="#047857" opacity="0.6" />
+                        <line x1="52.5" y1="0" x2="52.5" y2="68" stroke="white" stroke-width="0.5" opacity="0.4" />
+                        <line x1="0" y1="34" x2="105" y2="34" stroke="white" stroke-width="0.5" opacity="0.4" />
                         <!-- Phase visualization -->
                         <g id="phaseContent"></g>
                     </svg>
@@ -1123,15 +1170,18 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="glass-dark border border-indigo-500/20 rounded-[16px] p-4">
-                        <p class="text-[9px] text-indigo-400 font-bold uppercase tracking-wider mb-2"><i class="fa-solid fa-shield mr-1"></i>Bloc Défensif</p>
+                        <p class="text-[9px] text-indigo-400 font-bold uppercase tracking-wider mb-2"><i
+                                class="fa-solid fa-shield mr-1"></i>Bloc Défensif</p>
                         <p class="text-xs text-white/60" id="defenseInfo">Haut</p>
                     </div>
                     <div class="glass-dark border border-purple-500/20 rounded-[16px] p-4">
-                        <p class="text-[9px] text-purple-400 font-bold uppercase tracking-wider mb-2"><i class="fa-solid fa-person mr-1"></i>Pressing</p>
+                        <p class="text-[9px] text-purple-400 font-bold uppercase tracking-wider mb-2"><i
+                                class="fa-solid fa-person mr-1"></i>Pressing</p>
                         <p class="text-xs text-white/60" id="pressingInfo">Median</p>
                     </div>
                     <div class="glass-dark border border-rose-500/20 rounded-[16px] p-4">
-                        <p class="text-[9px] text-rose-400 font-bold uppercase tracking-wider mb-2"><i class="fa-solid fa-forward mr-1"></i>Attaque</p>
+                        <p class="text-[9px] text-rose-400 font-bold uppercase tracking-wider mb-2"><i
+                                class="fa-solid fa-forward mr-1"></i>Attaque</p>
                         <p class="text-xs text-white/60" id="attackInfo">Profonde</p>
                     </div>
                 </div>
@@ -1141,11 +1191,13 @@
         <!-- Footer -->
         <div class="relative px-8 py-8 border-t border-white/5 bg-slate-50/50 dark:bg-black/20 overflow-hidden">
             <div class="relative flex items-center justify-between z-10 gap-6">
-                <button onclick="playVisualisationAnimation()" class="group flex items-center gap-3 px-8 py-4 rounded-[20px] glass hover:bg-white/10 border border-white/10 text-white/60 hover:text-white text-xs font-bold uppercase tracking-wider transition-all duration-300">
+                <button onclick="playVisualisationAnimation()"
+                    class="group flex items-center gap-3 px-8 py-4 rounded-[20px] glass hover:bg-white/10 border border-white/10 text-white/60 hover:text-white text-xs font-bold uppercase tracking-wider transition-all duration-300">
                     <i class="fa-solid fa-play group-hover:scale-125 transition-transform"></i>
                     <span>Animer</span>
                 </button>
-                <button onclick="closeVisualiser({target:document.getElementById('visualiserModal'),currentTarget:document.getElementById('visualiserModal')})"
+                <button
+                    onclick="closeVisualiser({target:document.getElementById('visualiserModal'),currentTarget:document.getElementById('visualiserModal')})"
                     class="px-8 py-3 rounded-[16px] glass hover:bg-white/10 text-white/60 hover:text-white text-xs font-bold uppercase tracking-wider transition-all">
                     Fermer
                 </button>
@@ -1154,180 +1206,115 @@
     </div>
 </div>
 
-<!-- FIFA Player Card Modal -->
-<div id="fifaModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm"
-    onclick="closeFifaModal(event)">
-    <div class="fifa-card relative w-80 rounded-3xl overflow-hidden transform scale-0 transition-transform duration-300"
-        id="fifaCardInner">
-        <!-- Gold gradient top -->
-        <div class="bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 p-1 rounded-3xl">
-            <div class="bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 rounded-[22px] overflow-hidden">
-                <!-- Header with overall rating -->
-                <div class="bg-gradient-to-r from-amber-500/20 to-transparent p-6 pb-4">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <div class="text-5xl font-black text-amber-400" id="fifaOverall">85</div>
-                            <div class="text-xs font-bold text-amber-400/60 uppercase tracking-widest mt-1"
-                                id="fifaPosition">ST</div>
-                        </div>
-                        <div
-                            class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400/20 to-amber-600/10 border-2 border-amber-500/30 flex items-center justify-center">
-                            <span class="text-3xl font-black text-white" id="fifaNumber">9</span>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Player Name -->
-                <div class="px-6 py-3 border-t border-amber-500/20">
-                    <h2 class="text-xl font-black text-white uppercase tracking-wider" id="fifaName">JOUEUR</h2>
-                    <p class="text-[10px] text-amber-400/50 font-bold uppercase tracking-widest mt-1" id="fifaClub">
-                        FootLogic Elite</p>
-                </div>
 
-                <!-- Stats Grid -->
-                <div class="px-6 pb-6 pt-2">
-                    <div class="grid grid-cols-3 gap-3">
-                        <div
-                            class="fifa-stat text-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition">
-                            <div class="text-xl font-black text-white" id="fifaVIT">50</div>
-                            <div class="text-[8px] font-bold text-amber-400/60 uppercase tracking-widest">VIT</div>
-                        </div>
-                        <div
-                            class="fifa-stat text-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition">
-                            <div class="text-xl font-black text-white" id="fifaTIR">50</div>
-                            <div class="text-[8px] font-bold text-amber-400/60 uppercase tracking-widest">TIR</div>
-                        </div>
-                        <div
-                            class="fifa-stat text-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition">
-                            <div class="text-xl font-black text-white" id="fifaPAS">50</div>
-                            <div class="text-[8px] font-bold text-amber-400/60 uppercase tracking-widest">PAS</div>
-                        </div>
-                        <div
-                            class="fifa-stat text-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition">
-                            <div class="text-xl font-black text-white" id="fifaDRI">50</div>
-                            <div class="text-[8px] font-bold text-amber-400/60 uppercase tracking-widest">DRI</div>
-                        </div>
-                        <div
-                            class="fifa-stat text-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition">
-                            <div class="text-xl font-black text-white" id="fifaDEF">50</div>
-                            <div class="text-[8px] font-bold text-amber-400/60 uppercase tracking-widest">DEF</div>
-                        </div>
-                        <div
-                            class="fifa-stat text-center p-3 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition">
-                            <div class="text-xl font-black text-white" id="fifaPHY">50</div>
-                            <div class="text-[8px] font-bold text-amber-400/60 uppercase tracking-widest">PHY</div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Action Button -->
-                <div class="px-6 pb-6">
-                    <button onclick="removePlayerFromSlot()"
-                        class="w-full py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold uppercase tracking-wider hover:bg-red-500/20 transition">
-                        <i class="fa-solid fa-xmark mr-2"></i>Retirer du terrain
-                    </button>
-                </div>
+
+</div>
+</div>
+
+<!-- Save Preset Modal -->
+<div id="savePresetModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/80 dark:bg-black/80 backdrop-blur-sm"
+    onclick="closeSavePresetModal(event)">
+    <div class="w-full max-w-md bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-3xl p-8 shadow-2xl modal-inner-transition transform scale-0 relative"
+        id="savePresetModalInner">
+        <button onclick="closeSavePresetModal({target:this, currentTarget:this})"
+            class="absolute top-4 right-4 text-slate-400 dark:text-white/20 hover:text-slate-900 dark:hover:text-white transition">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+            <i class="fa-solid fa-bookmark text-primary-400"></i>
+            Sauvegarder la Tactique
+        </h3>
+
+        <div class="space-y-4">
+            <div>
+                <label
+                    class="block text-xs font-bold text-slate-500 dark:text-white/40 uppercase tracking-wider mb-2">Nom
+                    de la
+                    tactique</label>
+                <input type="text" id="presetName" placeholder="ex: 4-3-3 Attaque Total"
+                    class="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-primary-500 transition">
             </div>
-        </div>
-
-        <!-- Save Preset Modal -->
-        <div id="savePresetModal"
-            class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/80 dark:bg-black/80 backdrop-blur-sm"
-            onclick="closeSavePresetModal(event)">
-            <div class="w-full max-w-md bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-3xl p-8 shadow-2xl modal-inner-transition transform scale-0 relative"
-                id="savePresetModalInner">
-                <button onclick="closeSavePresetModal({target:this, currentTarget:this})"
-                    class="absolute top-4 right-4 text-slate-400 dark:text-white/20 hover:text-slate-900 dark:hover:text-white transition">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
-                    <i class="fa-solid fa-bookmark text-primary-400"></i>
-                    Sauvegarder la Tactique
-                </h3>
-
-                <div class="space-y-4">
-                    <div>
-                        <label
-                            class="block text-xs font-bold text-slate-500 dark:text-white/40 uppercase tracking-wider mb-2">Nom
-                            de la
-                            tactique</label>
-                        <input type="text" id="presetName" placeholder="ex: 4-3-3 Attaque Total"
-                            class="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-primary-500 transition">
-                    </div>
-                    <div>
-                        <label
-                            class="block text-xs font-bold text-slate-500 dark:text-white/40 uppercase tracking-wider mb-2">Description
-                            (Optionnel)</label>
-                        <textarea id="presetDesc" placeholder="Utiliser contre les équipes défensives..." rows="3"
-                            class="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-primary-500 transition"></textarea>
-                    </div>
-
-                    <button onclick="submitSavePreset()" id="btnSavePreset"
-                        class="w-full py-4 rounded-xl gradient-primary text-white font-bold uppercase tracking-wider hover:opacity-90 transition shadow-lg shadow-primary-500/20 mt-2">
-                        Enregistrer
-                    </button>
-                </div>
+            <div>
+                <label
+                    class="block text-xs font-bold text-slate-500 dark:text-white/40 uppercase tracking-wider mb-2">Description
+                    (Optionnel)</label>
+                <textarea id="presetDesc" placeholder="Utiliser contre les équipes défensives..." rows="3"
+                    class="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-primary-500 transition"></textarea>
             </div>
-        </div>
 
-        <!-- Load Preset Modal - SIMPLIFIED & INTERACTIVE -->
-        <div id="loadPresetModal"
-            class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/80 dark:bg-black/80 backdrop-blur-xl"
-            onclick="closeLoadPresetModal(event)">
-            <div class="w-full max-w-4xl mx-4 bg-white dark:bg-gradient-to-br dark:from-[#0f172a] dark:to-[#1a1f3a] border border-slate-200 dark:border-white/10 rounded-[32px] shadow-2xl modal-inner-transition transform scale-0 relative overflow-hidden"
-                id="loadPresetModalInner">
-
-                <!-- Header with gradient -->
-                <div class="relative px-8 py-8 border-b border-slate-200 dark:border-white/5 bg-gradient-to-r from-amber-50 dark:from-amber-500/5 to-transparent">
-                    <button onclick="closeLoadPresetModal({target:this, currentTarget:this})"
-                        class="absolute top-6 right-6 w-10 h-10 rounded-xl glass hover:bg-white/10 flex items-center justify-center text-slate-400 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition">
-                        <i class="fa-solid fa-xmark text-lg"></i>
-                    </button>
-
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 rounded-[16px] bg-gradient-to-br from-amber-400/20 to-amber-600/20 border border-amber-500/30 flex items-center justify-center">
-                            <i class="fa-solid fa-bookmark text-amber-500 text-2xl"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-3xl font-[900] text-slate-900 dark:text-white uppercase italic tracking-tighter"
-                                style="font-family: 'Oswald', sans-serif;">
-                                MES TACTIQUES <span class="text-amber-500">(MAX 5)</span>
-                            </h2>
-                            <p class="text-xs text-slate-500 dark:text-white/40 font-bold uppercase tracking-[0.2em] mt-1">
-                                <i class="fa-solid fa-play text-green-500 mr-1"></i>Cliquez pour charger
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Presets Grid -->
-                <div class="p-8 max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="presetList">
-                        <!-- Loading state -->
-                        <div class="col-span-full text-center py-16">
-                            <div class="inline-block">
-                                <i class="fa-solid fa-spinner fa-spin text-amber-400 text-4xl mb-4 block"></i>
-                                <p class="text-white/40 text-sm font-bold uppercase tracking-wider">Chargement des tactiques...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer Info -->
-                <div class="px-8 py-6 border-t border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex items-center justify-between">
-                    <p class="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-wider">
-                        <i class="fa-solid fa-circle text-emerald-500 mr-2"></i>
-                        <span id="presetCount">0</span> tactique(s) sauvegardée(s)
-                    </p>
-                    <button onclick="closeLoadPresetModal({target:this, currentTarget:this})"
-                        class="px-6 py-2 rounded-lg glass hover:bg-white/10 text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white text-xs font-bold uppercase tracking-wider transition">
-                        Fermer
-                    </button>
-                </div>
-            </div>
+            <button onclick="submitSavePreset()" id="btnSavePreset"
+                class="w-full py-4 rounded-xl gradient-primary text-white font-bold uppercase tracking-wider hover:opacity-90 transition shadow-lg shadow-primary-500/20 mt-2">
+                Enregistrer
+            </button>
         </div>
     </div>
+</div>
+
+<!-- Load Preset Modal - SIMPLIFIED & INTERACTIVE -->
+<div id="loadPresetModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/80 dark:bg-black/80 backdrop-blur-xl"
+    onclick="closeLoadPresetModal(event)">
+    <div class="w-full max-w-4xl mx-4 bg-white dark:bg-gradient-to-br dark:from-[#0f172a] dark:to-[#1a1f3a] border border-slate-200 dark:border-white/10 rounded-[32px] shadow-2xl modal-inner-transition transform scale-0 relative overflow-hidden"
+        id="loadPresetModalInner">
+
+        <!-- Header with gradient -->
+        <div
+            class="relative px-8 py-8 border-b border-slate-200 dark:border-white/5 bg-gradient-to-r from-amber-50 dark:from-amber-500/5 to-transparent">
+            <button onclick="closeLoadPresetModal({target:this, currentTarget:this})"
+                class="absolute top-6 right-6 w-10 h-10 rounded-xl glass hover:bg-white/10 flex items-center justify-center text-slate-400 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="flex items-center gap-4">
+                <div
+                    class="w-14 h-14 rounded-[16px] bg-gradient-to-br from-amber-400/20 to-amber-600/20 border border-amber-500/30 flex items-center justify-center">
+                    <i class="fa-solid fa-bookmark text-amber-500 text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-[900] text-slate-900 dark:text-white uppercase italic tracking-tighter"
+                        style="font-family: 'Oswald', sans-serif;">
+                        MES TACTIQUES <span class="text-amber-500">(MAX 5)</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-white/40 font-bold uppercase tracking-[0.2em] mt-1">
+                        <i class="fa-solid fa-play text-green-500 mr-1"></i>Cliquez pour charger
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Presets Grid -->
+        <div class="p-8 max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="presetList">
+                <!-- Loading state -->
+                <div class="col-span-full text-center py-16">
+                    <div class="inline-block">
+                        <i class="fa-solid fa-spinner fa-spin text-amber-400 text-4xl mb-4 block"></i>
+                        <p class="text-white/40 text-sm font-bold uppercase tracking-wider">Chargement des tactiques...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div
+            class="px-8 py-6 border-t border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex items-center justify-between">
+            <p class="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-wider">
+                <i class="fa-solid fa-circle text-emerald-500 mr-2"></i>
+                <span id="presetCount">0</span> tactique(s) sauvegardée(s)
+            </p>
+            <button onclick="closeLoadPresetModal({target:this, currentTarget:this})"
+                class="px-6 py-2 rounded-lg glass hover:bg-white/10 text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white text-xs font-bold uppercase tracking-wider transition">
+                Fermer
+            </button>
+        </div>
+    </div>
+</div>
+</div>
 </div>
 
 <!-- Captains Management Modal -->
@@ -2192,6 +2179,7 @@
             opacity: 0;
             transform: translateY(20px) scale(0.95);
         }
+
         to {
             opacity: 1;
             transform: translateY(0) scale(1);
@@ -2203,17 +2191,32 @@
             opacity: 1;
             transform: translateX(0) scale(1);
         }
+
         to {
             opacity: 0;
             transform: translateX(-20px) scale(0.9);
         }
     }
 
-    .tactique-card:nth-child(1) { animation-delay: 0.1s; }
-    .tactique-card:nth-child(2) { animation-delay: 0.15s; }
-    .tactique-card:nth-child(3) { animation-delay: 0.2s; }
-    .tactique-card:nth-child(4) { animation-delay: 0.25s; }
-    .tactique-card:nth-child(5) { animation-delay: 0.3s; }
+    .tactique-card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .tactique-card:nth-child(2) {
+        animation-delay: 0.15s;
+    }
+
+    .tactique-card:nth-child(3) {
+        animation-delay: 0.2s;
+    }
+
+    .tactique-card:nth-child(4) {
+        animation-delay: 0.25s;
+    }
+
+    .tactique-card:nth-child(5) {
+        animation-delay: 0.3s;
+    }
 
     .tactique-card:hover {
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
@@ -2269,9 +2272,17 @@
 
     /* Load Button Animation */
     @keyframes loadingPulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
     }
 
     .tactique-card.loading {
@@ -2332,9 +2343,17 @@
 
     /* Success Animation */
     @keyframes successPulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.08); }
-        100% { transform: scale(1); }
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.08);
+        }
+
+        100% {
+            transform: scale(1);
+        }
     }
 
     .tactique-card.success {
@@ -2439,7 +2458,6 @@
         border-color: #818cf8;
         color: #4f46e5;
     }
-
 </style>
 
 <!-- FIFA Player Card Modal -->
@@ -2467,16 +2485,17 @@
                     <span id="fifaPosition" class="text-2xl font-bold text-white/90 uppercase mt-[-5px]">CM</span>
                     <div class="w-10 h-[1px] bg-white/30 my-2"></div>
                     <div class="flex flex-col items-center">
-                        <img src="{{ url_for('static', filename='img/club_logo.png') }}" class="w-8 h-8 object-contain"
-                            alt="Club" onerror="this.style.display='none'">
-                        <!-- <span class="text-[10px] uppercase font-bold text-white/50 mt-1">CLUB</span> -->
+                        <img src="{{ url_for('static', filename='img/club_logo.png') }}"
+                            class="w-10 h-10 object-contain" alt="Club"
+                            onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed={{ selected_team_id }}'">
                     </div>
                 </div>
 
                 <!-- Player Image (Placeholder if none) -->
                 <div class="absolute top-[60px] right-[-20px] w-[220px] h-[220px]">
                     <img id="fifaFace" src="{{ url_for('static', filename='img/default_player.png') }}"
-                        class="w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]" alt="Player">
+                        class="w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]" alt="Player"
+                        onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=default'">
                 </div>
 
                 <!-- Name & Stats -->
@@ -2531,8 +2550,12 @@
                     <div class="text-white/60 text-sm">Interceptions: <span
                             class="text-white font-bold ml-1">Normales</span></div>
                 </div>
+                <button onclick="removePlayerFromSlot()"
+                    class="mt-6 w-full py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 font-bold hover:bg-red-500/20 transition">
+                    <i class="fa-solid fa-xmark mr-2"></i>Retirer du terrain
+                </button>
                 <button onclick="closeFifaModal()"
-                    class="mt-6 w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition">Fermer</button>
+                    class="mt-3 w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition">Fermer</button>
             </div>
         </div>
 
@@ -3289,9 +3312,10 @@
         // Color stats based on value
         document.querySelectorAll('.fifa-stat .text-xl').forEach(el => {
             const val = parseInt(el.textContent);
+            el.classList.remove('text-white', 'text-green-400', 'text-amber-400', 'text-red-400');
             if (val >= 80) el.classList.add('text-green-400');
-            else if (val >= 60) el.className = el.className.replace('text-white', '') + ' text-amber-400';
-            else el.className = el.className.replace('text-white', '') + ' text-red-400';
+            else if (val >= 70) el.classList.add('text-amber-400');
+            else el.classList.add('text-red-400');
         });
 
         const modal = document.getElementById('fifaModal');
@@ -3490,19 +3514,35 @@
             balance: 65
         };
 
+        const z1 = document.getElementById('heatZone1');
+        const z2 = document.getElementById('heatZone2');
+        const z3 = document.getElementById('heatZone3');
+
         // Adjust based on formation
         if (formation === '5-4-1' || formation === '5-3-2') {
             metrics.defWidth = 95;
             metrics.attackDepth = 55;
             metrics.balance = 40;
-        } else if (formation === '3-4-3' || formation === '4-5-1') {
+            // DEFENSIVE HEATMAP
+            if (z1) { z1.setAttribute('cx', '30'); z1.setAttribute('r', '20'); }
+            if (z2) { z2.setAttribute('cx', '20'); z2.setAttribute('cy', '45'); z2.setAttribute('r', '15'); }
+            if (z3) { z3.setAttribute('cx', '20'); z3.setAttribute('cy', '23'); z3.setAttribute('r', '15'); }
+        } else if (formation === '3-4-3' || formation === '4-5-1' || formation === '3-5-2') {
             metrics.defWidth = 75;
             metrics.attackDepth = 85;
             metrics.balance = 80;
-        } else if (formation === '4-3-3' || formation === '4-4-2') {
+            // ATTACKING HEATMAP
+            if (z1) { z1.setAttribute('cx', '70'); z1.setAttribute('r', '22'); }
+            if (z2) { z2.setAttribute('cx', '85'); z2.setAttribute('cy', '50'); z2.setAttribute('r', '18'); }
+            if (z3) { z3.setAttribute('cx', '85'); z3.setAttribute('cy', '18'); z3.setAttribute('r', '18'); }
+        } else {
+            // BALANCED (4-3-3, 4-4-2)
             metrics.defWidth = 85;
             metrics.attackDepth = 72;
             metrics.balance = 65;
+            if (z1) { z1.setAttribute('cx', '52.5'); z1.setAttribute('r', '25'); }
+            if (z2) { z2.setAttribute('cx', '40'); z2.setAttribute('cy', '15'); z2.setAttribute('r', '15'); }
+            if (z3) { z3.setAttribute('cx', '40'); z3.setAttribute('cy', '53'); z3.setAttribute('r', '15'); }
         }
 
         // Update UI
