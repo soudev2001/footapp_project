@@ -41,8 +41,10 @@
         // Check for saved theme or default to dark
         if (localStorage.getItem('color-theme') === 'light' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
             document.documentElement.classList.add('light');
+            document.documentElement.classList.remove('dark');
         } else {
             document.documentElement.classList.remove('light');
+            document.documentElement.classList.add('dark');
         }
 
         // Theme Data from Server
@@ -221,13 +223,6 @@
                 {
                 % endif %
             }
-
-            --primary-rgb: 16,
-            185,
-            129;
-            --secondary-rgb: 15,
-            23,
-            42;
         }
 
         .gradient-primary {
@@ -267,28 +262,32 @@
 
         <div class="relative h-full max-w-7xl mx-auto px-6 flex items-center justify-between gap-10">
             <!-- Brand Logo -->
-            <a href="/" class="flex items-center gap-3 group shrink-0">
-                <div class="relative w-10 h-10">
+            <a href="/" class="flex items-center gap-4 group shrink-0">
+                <div class="relative w-11 h-11">
                     <div
-                        class="absolute -inset-1 bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl blur-[6px] opacity-20 group-hover:opacity-40 transition-all duration-500">
+                        class="absolute -inset-1.5 bg-gradient-to-tr from-primary-500/20 to-primary-600/30 rounded-xl blur-[8px] opacity-0 group-hover:opacity-100 transition-all duration-700">
                     </div>
                     <div
-                        class="relative h-full w-full bg-surface-950 rounded-xl border border-white/10 flex items-center justify-center p-2 shadow-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                        class="relative h-full w-full bg-slate-900/40 dark:bg-surface-950/40 backdrop-blur-md rounded-xl border border-slate-200/20 dark:border-white/10 flex items-center justify-center p-2.5 shadow-2xl overflow-hidden group-hover:scale-105 group-hover:rotate-3 transition-all duration-500">
                         {% if club and club.logo %}
-                        <img src="{{ club.logo }}" class="w-full h-full object-contain">
+                        <img src="{{ club.logo }}" class="w-full h-full object-contain filter drop-shadow-lg">
                         {% else %}
                         <img src="{{ url_for('static', filename='img/logo_dark.png') }}"
-                            class="w-full h-full object-contain dark-logo">
+                            class="w-full h-full object-contain dark-logo filter drop-shadow-lg">
                         <img src="{{ url_for('static', filename='img/logo_light.png') }}"
-                            class="w-full h-full object-contain light-logo">
+                            class="w-full h-full object-contain light-logo filter drop-shadow-lg">
                         {% endif %}
                     </div>
                 </div>
                 <div class="flex flex-col">
-                    <span class="text-lg font-extrabold uppercase tracking-tight leading-none">Foot<span
-                            class="text-primary-500">Logic</span></span>
-                    <span class="text-[7px] font-semibold uppercase tracking-[0.25em] text-white/25 mt-0.5">Sports
-                        Platform</span>
+                    <h1 class="text-xl font-black uppercase tracking-tighter leading-none dark:text-white text-slate-900"
+                        style="font-family: 'Outfit', sans-serif;">
+                        Foot<span class="text-primary-500">Logic</span>
+                    </h1>
+                    <span
+                        class="text-[8px] font-black uppercase tracking-[0.4em] text-slate-400 dark:text-white/30 mt-1 transition-colors group-hover:text-primary-500">
+                        Elite Platform
+                    </span>
                 </div>
             </a>
 
@@ -445,9 +444,11 @@
             const html = document.documentElement;
             if (html.classList.contains('light')) {
                 html.classList.remove('light');
+                html.classList.add('dark');
                 localStorage.setItem('color-theme', 'dark');
             } else {
                 html.classList.add('light');
+                html.classList.remove('dark');
                 localStorage.setItem('color-theme', 'light');
             }
         }

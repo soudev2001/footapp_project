@@ -5,20 +5,31 @@
 <aside id="sidebar" class="sidebar">
     <!-- Sidebar Header -->
     <div class="sidebar-header">
-        <a href="/" class="sidebar-logo">
-            {% if club and club.logo %}
-            <img src="{{ club.logo }}" class="w-8 h-8 rounded-lg object-contain border border-white/10 p-1 bg-white/5">
-            {% else %}
-            <div class="sidebar-logo-icon gradient-primary">
-                <i class="fa-solid fa-futbol text-white"></i>
+        <a href="/" class="sidebar-logo flex items-center gap-3">
+            <div class="relative w-9 h-9">
+                <div class="absolute inset-0 bg-primary-500/20 blur-sm rounded-lg"></div>
+                {% if club and club.logo %}
+                <div
+                    class="relative h-full w-full bg-slate-900/40 dark:bg-surface-950/40 backdrop-blur-md rounded-lg border border-slate-200/20 dark:border-white/10 flex items-center justify-center p-1.5 shadow-xl overflow-hidden">
+                    <img src="{{ club.logo }}" class="w-full h-full object-contain filter drop-shadow-sm">
+                </div>
+                {% else %}
+                <div
+                    class="relative h-full w-full gradient-primary rounded-lg flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-futbol text-white text-sm"></i>
+                </div>
+                {% endif %}
             </div>
-            {% endif %}
-            <div class="sidebar-logo-text">
-                <span class="sidebar-logo-title">
+            <div class="sidebar-logo-text flex flex-col">
+                <span
+                    class="sidebar-logo-title text-sm font-black uppercase tracking-tighter dark:text-white text-slate-900"
+                    style="font-family: 'Outfit', sans-serif;">
                     {% if club %}{{ club.name }}{% else %}Foot<span class="text-primary-500">Logic</span>{% endif %}
                 </span>
-                <span class="sidebar-logo-subtitle">{% if club %}{{ club.city }}{% else %}Sports Platform{% endif
-                    %}</span>
+                <span
+                    class="sidebar-logo-subtitle text-[7px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-white/30 truncate max-w-[120px]">
+                    {% if club %}{{ club.city }}{% else %}Elite Platform{% endif %}
+                </span>
             </div>
         </a>
         <button id="sidebar-close" class="sidebar-close-btn" aria-label="Fermer">
