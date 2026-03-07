@@ -1,0 +1,13 @@
+#!/bin/bash
+# deploy_preprod.sh
+echo "Connecting to Server to Deploy Pre-Prod..."
+ssh root@82.112.255.193 << 'EOF'
+  echo "Pulling latest code for preprod branch..."
+  cd /root/footapp_project || exit 1
+  git checkout pre-prod
+  git pull origin pre-prod
+  echo "Restarting Docker containers for preprod..."
+  docker-compose -f docker-compose.preprod.yml down
+  docker-compose -f docker-compose.preprod.yml up -d --build
+  echo "Pre-prod deployment completed!"
+EOF
