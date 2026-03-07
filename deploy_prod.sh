@@ -3,13 +3,13 @@
 
 echo "Connecting to Server to Deploy Prod..."
 ssh root@82.112.255.193 << 'EOF'
-  echo "Pulling latest code for main branch..."
+  echo "Pulling latest code for prod (from main branch)..."
   cd /root/footapp_project || { echo "Failed to enter /root/footapp_project"; exit 1; }
   
   # Stash any local changes on the server to avoid merge conflicts during pull
   git stash
   
-  # Ensure we are on main and pulling the latest
+  # Ensure we are on main and pulling the latest 
   git fetch origin
   git checkout main
   git pull origin main
