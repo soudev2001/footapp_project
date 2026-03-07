@@ -13,3 +13,4 @@ env/
 *.tmp
 *.log
 mongodb_data/
+.agent
