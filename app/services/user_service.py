@@ -149,14 +149,13 @@ def get_nav_for_role(role):
         ],
         'coach': [
             {'name': 'Dashboard', 'url': '/coach/dashboard', 'icon': 'fa-gauge'},
-            {'name': 'Isy HUB', 'url': '/isy/hub', 'icon': 'fa-rocket'},
+            {'name': 'Calendrier', 'url': '/calendar', 'icon': 'fa-calendar-days'},
+            {'name': 'Convocation', 'url': '/coach/convocation', 'icon': 'fa-clipboard-list'},
             {'name': 'Effectif', 'url': '/coach/roster', 'icon': 'fa-users'},
             {'name': 'Tactiques', 'url': '/coach/tactics', 'icon': 'fa-chess-board'},
             {'name': 'Match Center', 'url': '/coach/match-center', 'icon': 'fa-gamepad'},
             {'name': 'Boutique', 'url': '/shop', 'icon': 'fa-bag-shopping'},
-            {'name': 'Scouting', 'url': '/coach/scouting', 'icon': 'fa-binoculars'},
             {'name': 'Messages', 'url': '/messages', 'icon': 'fa-comments'},
-            {'name': 'Social', 'url': '/feed', 'icon': 'fa-rss'},
         ],
         'player': [
             {'name': 'Accueil', 'url': '/player/home', 'icon': 'fa-house'},

@@ -214,11 +214,26 @@ def calendar():
     if not club_id:
         return redirect(url_for('main.app_home')) or redirect(url_for('main.index'))
     
-    from app.services import get_event_service
+    from app.services import get_event_service, get_team_service
+    from app.models import serialize_docs
     event_service = get_event_service()
-    events = event_service.get_upcoming(club_id, limit=30)
+    team_service = get_team_service()
     
-    return render_template('app/calendar.html', events=events)
+    upcoming = event_service.get_upcoming(club_id, limit=50)
+    past = event_service.get_past(club_id, limit=20)
+    all_events = event_service.get_by_club(club_id)
+    teams = team_service.get_by_club(club_id)
+    
+    # Serialize for JSON usage in calendar JS
+    import json
+    events_json = json.dumps(serialize_docs(all_events), default=str)
+    
+    return render_template('app/calendar.html', 
+                         events=all_events,
+                         upcoming=upcoming,
+                         past=past,
+                         teams=teams,
+                         events_json=events_json)
 
 @main_bp.route('/roster')
 def roster():

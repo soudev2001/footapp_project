@@ -2,267 +2,511 @@
 {% block title %}Calendrier - FootLogic Elite{% endblock %}
 
 {% block content %}
-<div class="page-enter max-w-6xl mx-auto px-4 py-8">
+<div class="page-enter max-w-7xl mx-auto px-4 py-8">
     <!-- Header Hero -->
-    <div class="glass p-10 rounded-3xl border-white/5 mb-10 relative overflow-hidden">
+    <div class="glass p-8 lg:p-10 rounded-3xl border-white/5 mb-8 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-amber-500/10"></div>
-        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
-            <div class="flex items-center gap-6">
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-5">
                 <div
-                    class="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary-500/20">
-                    <i class="fa-solid fa-calendar-days text-white text-2xl"></i>
+                    class="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary-500/20">
+                    <i class="fa-solid fa-calendar-days text-white text-xl"></i>
                 </div>
                 <div>
-                    <h1
-                        class="text-4xl font-bold uppercase tracking-tight leading-none mb-2 light:text-slate-900">
-                        Agenda Elite</h1>
-                    <p class="text-white/40 light:text-slate-500 text-sm font-medium">Ne manquez aucune séance,
-                        aucun match, aucune victoire.</p>
+                    <h1 class="text-3xl lg:text-4xl font-black uppercase tracking-tight leading-none mb-1">
+                        <span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-600">Agenda</span>
+                        Elite
+                    </h1>
+                    <p class="text-white/40 light:text-slate-500 text-xs font-medium">Ne manquez aucune séance, aucun
+                        match, aucune victoire.</p>
                 </div>
             </div>
-            {% if roles.is_coach %}
-            <a href="/coach/create-event"
-                class="gradient-primary px-8 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-wider flex items-center gap-3 shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all text-black">
-                <i class="fa-solid fa-plus text-lg"></i> NOUVEL ÉVÉNEMENT
-            </a>
-            {% endif %}
+            <div class="flex items-center gap-3">
+                <!-- Stats Summary -->
+                <div class="hidden lg:flex items-center gap-4 mr-4">
+                    <div class="text-center px-4 py-2 rounded-xl bg-white/5 border border-white/5">
+                        <span class="text-xl font-black text-primary-400" id="totalEventsCount">{{ events|length
+                            }}</span>
+                        <p class="text-[8px] text-white/20 font-bold uppercase tracking-wider mt-0.5">Événements</p>
+                    </div>
+                    <div class="text-center px-4 py-2 rounded-xl bg-white/5 border border-white/5">
+                        <span class="text-xl font-black text-red-400" id="matchesCount">{{ events|selectattr('type',
+                            'equalto', 'match')|list|length }}</span>
+                        <p class="text-[8px] text-white/20 font-bold uppercase tracking-wider mt-0.5">Matchs</p>
+                    </div>
+                    <div class="text-center px-4 py-2 rounded-xl bg-white/5 border border-white/5">
+                        <span class="text-xl font-black text-green-400" id="trainingsCount">{{ events|selectattr('type',
+                            'equalto', 'training')|list|length }}</span>
+                        <p class="text-[8px] text-white/20 font-bold uppercase tracking-wider mt-0.5">Entraîn.</p>
+                    </div>
+                </div>
+                {% if roles.is_coach %}
+                <a href="/coach/create-event"
+                    class="gradient-primary px-6 py-3.5 rounded-2xl font-bold text-[10px] uppercase tracking-wider flex items-center gap-2.5 shadow-xl shadow-primary-500/20 hover:scale-[1.02] active:scale-95 transition-all text-black">
+                    <i class="fa-solid fa-plus text-sm"></i> Nouvel Événement
+                </a>
+                {% endif %}
+            </div>
         </div>
     </div>
 
-    <div class="grid lg:grid-cols-12 gap-10">
-        <!-- Calendar Grid Column -->
-        <div class="lg:col-span-12 xl:col-span-12">
-            <div class="glass p-10 rounded-3xl border-white/5">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
-                    <div class="flex items-center gap-4">
-                        <h2 class="text-4xl font-bold uppercase tracking-tighter light:text-slate-900"
-                            id="currentMonth">Février 2026</h2>
-                        <div class="h-10 w-px bg-white/10 hidden md:block"></div>
-                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/20 light:text-slate-400">
-                            PLANNING DE LA SAISON</p>
-                    </div>
-
-                    <div class="flex gap-4">
+    <div class="grid lg:grid-cols-12 gap-6">
+        <!-- ===== LEFT: Calendar Grid ===== -->
+        <div class="lg:col-span-8">
+            <div class="glass p-6 lg:p-8 rounded-3xl border-white/5">
+                <!-- Month Navigation -->
+                <div class="flex items-center justify-between gap-4 mb-8">
+                    <div class="flex items-center gap-3">
                         <button onclick="prevMonth()"
-                            class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all group">
-                            <i class="fa-solid fa-chevron-left group-hover:-translate-x-1 transition-transform"></i>
+                            class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all">
+                            <i class="fa-solid fa-chevron-left text-xs"></i>
                         </button>
+                        <h2 class="text-2xl lg:text-3xl font-black uppercase tracking-tighter" id="currentMonth">Mars
+                            2026</h2>
                         <button onclick="nextMonth()"
-                            class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all group">
-                            <i class="fa-solid fa-chevron-right group-hover:translate-x-1 transition-transform"></i>
+                            class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all">
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
                         </button>
                     </div>
+                    <button onclick="goToToday()"
+                        class="text-[9px] font-bold uppercase tracking-wider text-primary-400 hover:text-primary-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-primary-500/10">
+                        <i class="fa-solid fa-crosshairs mr-1"></i>Aujourd'hui
+                    </button>
                 </div>
 
-                <!-- Calendar Content -->
-                <div class="space-y-4">
-                    <!-- Days Labels -->
-                    <div class="grid grid-cols-7 gap-4 mb-4">
-                        {% for day in ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'] %}
-                        <div
-                            class="text-[10px] font-bold uppercase tracking-[0.3em] text-center {% if day in ['Sam', 'Dim'] %}text-amber-500/60{% else %}text-white/20{% endif %}">
-                            {{ day }}
-                        </div>
-                        {% endfor %}
+                <!-- Days Header -->
+                <div class="grid grid-cols-7 gap-1.5 mb-2">
+                    {% for day in ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM'] %}
+                    <div
+                        class="text-[9px] font-bold uppercase tracking-[0.3em] text-center py-2 {% if day in ['SAM', 'DIM'] %}text-amber-500/50{% else %}text-white/15{% endif %}">
+                        {{ day }}
                     </div>
-
-                    <!-- Date Grid -->
-                    <div class="grid grid-cols-7 gap-4" id="calendarGrid">
-                        <!-- Placeholder static grid for design, dynamic JS would populate this usually -->
-                        {% for i in range(1, 29) %}
-                        {% set is_today = (i == 2) %}
-                        {% set has_match = (i in [1, 8, 15, 22]) %}
-                        {% set has_training = (i in [3, 6, 10, 13, 17, 20, 24, 27]) %}
-
-                        <div
-                            class="day-v2 group relative h-32 glass border-white/5 rounded-2xl p-4 flex flex-col justify-between hover:bg-white/5 transition-all cursor-pointer {% if is_today %}border-primary-500/50 bg-primary-500/5 shadow-2xl shadow-primary-500/10{% endif %}">
-                            <span
-                                class="text-xl font-bold {% if is_today %}text-primary-400{% else %}text-white/20 group-hover:text-white/60{% endif %} transition-colors">{{
-                                i }}</span>
-
-                            <div class="space-y-1.5">
-                                {% if has_match %}
-                                <div class="h-1.5 w-full bg-red-500/40 rounded-full blur-[1px]"></div>
-                                <span
-                                    class="text-[7px] font-bold text-red-400 uppercase tracking-wider block">MATCH</span>
-                                {% endif %}
-                                {% if has_training %}
-                                <div class="h-1.5 w-full bg-green-500/40 rounded-full blur-[1px]"></div>
-                                <span
-                                    class="text-[7px] font-bold text-green-400 uppercase tracking-wider block">TRAIN</span>
-                                {% endif %}
-                            </div>
-
-                            {% if is_today %}
-                            <div
-                                class="absolute -top-2 -right-2 px-2 py-0.5 bg-primary-500 text-black text-[7px] font-bold uppercase tracking-wider rounded-lg shadow-lg">
-                                AUJOURD'HUI</div>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-
-                        <!-- Padding for next month -->
-                        {% for i in range(1, 8) %}
-                        <div
-                            class="day-v2 h-32 rounded-2xl border border-white/5 border-dashed flex items-center justify-center opacity-10">
-                            <span class="text-xl font-bold">{{ i }}</span>
-                        </div>
-                        {% endfor %}
-                    </div>
+                    {% endfor %}
                 </div>
 
-                <!-- Strategic Legend -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12 pt-12 border-t border-white/5">
-                    <div class="flex items-center gap-4">
-                        <div class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.5)]"></div>
-                        <span class="text-[9px] font-bold uppercase tracking-wider text-white/40">Match
-                            Officiel</span>
+                <!-- Calendar Grid (Dynamic) -->
+                <div class="grid grid-cols-7 gap-1.5" id="calendarGrid">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Legend -->
+                <div class="flex flex-wrap gap-6 mt-8 pt-6 border-t border-white/5">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]"></div>
+                        <span class="text-[8px] font-bold uppercase tracking-wider text-white/30">Match</span>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <div class="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.5)]"></div>
-                        <span class="text-[9px] font-bold uppercase tracking-wider text-white/40">Entraînement</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]">
+                        </div>
+                        <span class="text-[8px] font-bold uppercase tracking-wider text-white/30">Entraînement</span>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <div class="w-3 h-3 rounded-full bg-primary-500 shadow-[0_0_12px_rgba(132,204,22,0.5)]"></div>
-                        <span class="text-[9px] font-bold uppercase tracking-wider text-white/40">Réunion /
-                            Autre</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.4)]"></div>
+                        <span class="text-[8px] font-bold uppercase tracking-wider text-white/30">Réunion</span>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <div class="w-3 h-3 rounded-full bg-white/10"></div>
-                        <span class="text-[9px] font-bold uppercase tracking-wider text-white/40">Libre / Repos</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]"></div>
+                        <span class="text-[8px] font-bold uppercase tracking-wider text-white/30">Autre</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Events Breakdown -->
-        <div class="lg:col-span-12 space-y-10">
-            <div class="flex items-center gap-4 px-6">
-                <h3 class="text-2xl font-bold uppercase tracking-tight light:text-slate-900 leading-none">Focus
-                    Hebdomadaire</h3>
-                <div class="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent"></div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Event 1 (Match) -->
-                <div
-                    class="glass p-8 rounded-3xl border-white/5 hover:border-red-500/30 transition-all duration-500 group relative overflow-hidden h-full flex flex-col">
-                    <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <i class="fa-solid fa-trophy text-6xl"></i>
-                    </div>
-
-                    <div class="flex items-center gap-4 mb-8">
-                        <div
-                            class="w-14 h-14 bg-red-500/10 rounded-2xl flex flex-col items-center justify-center text-red-400 group-hover:scale-110 transition-transform">
-                            <span class="text-[10px] font-bold uppercase mb-1 leading-none tracking-wider">Dim</span>
-                            <span class="text-2xl font-bold leading-none">08</span>
-                        </div>
-                        <div>
-                            <span class="text-[9px] font-bold text-red-500/60 uppercase tracking-[.2em]">CHAMPIONNAT •
-                                J15</span>
-                            <h3 class="font-bold text-lg uppercase light:text-slate-900">FC Elite vs Racing</h3>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4 mb-10 flex-1">
-                        <div
-                            class="flex items-center gap-3 text-white/40 text-[10px] font-bold uppercase tracking-wider">
-                            <i class="fa-solid fa-clock text-red-500/40"></i> 15:00 • COUP D'ENVOI
-                        </div>
-                        <div
-                            class="flex items-center gap-3 text-white/40 text-[10px] font-bold uppercase tracking-wider">
-                            <i class="fa-solid fa-location-dot text-red-500/40"></i> STADE MUNICIPAL, PARIS
-                        </div>
-                    </div>
-
-                    <a href="/coach/match-center"
-                        class="w-full py-4 rounded-2xl bg-red-500/5 border border-red-500/10 group-hover:bg-red-500/10 group-hover:border-red-500/40 text-center text-[9px] font-bold uppercase tracking-wider text-red-400 transition-all">
-                        CENTRE DE MATCH
-                    </a>
+        <!-- ===== RIGHT: Upcoming Events ===== -->
+        <div class="lg:col-span-4 space-y-6">
+            <!-- Upcoming Events -->
+            <div class="glass p-6 rounded-3xl border-white/5">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-xs font-black uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-clock text-primary-400 text-[10px]"></i>
+                        Prochains Événements
+                    </h3>
+                    <span class="text-[9px] text-white/20 font-bold">{{ upcoming|length }} à venir</span>
                 </div>
-
-                <!-- Event 2 (Training) -->
-                <div
-                    class="glass p-8 rounded-3xl border-white/5 hover:border-green-500/30 transition-all duration-500 group relative overflow-hidden h-full flex flex-col">
-                    <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <i class="fa-solid fa-stopwatch text-6xl"></i>
-                    </div>
-
-                    <div class="flex items-center gap-4 mb-8">
+                <div class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar" id="upcomingList">
+                    {% if upcoming %}
+                    {% for event in upcoming[:8] %}
+                    <div class="flex items-start gap-3 p-3 rounded-2xl bg-white/[0.02] hover:bg-white/5 border border-white/5 hover:border-{% if event.type == 'match' %}red{% elif event.type == 'training' %}emerald{% else %}blue{% endif %}-500/20 transition-all cursor-pointer group"
+                        onclick="showEventDetail('{{ event._id }}')">
+                        <!-- Date Badge -->
                         <div
-                            class="w-14 h-14 bg-green-500/10 rounded-2xl flex flex-col items-center justify-center text-green-400 group-hover:scale-110 transition-transform">
-                            <span class="text-[10px] font-bold uppercase mb-1 leading-none tracking-wider">Mar</span>
-                            <span class="text-2xl font-bold leading-none">10</span>
-                        </div>
-                        <div>
+                            class="w-12 h-12 rounded-xl bg-{% if event.type == 'match' %}red{% elif event.type == 'training' %}emerald{% else %}blue{% endif %}-500/10 flex flex-col items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                             <span
-                                class="text-[9px] font-bold text-green-500/60 uppercase tracking-[.2em]">ENTRAÎNEMENT</span>
-                            <h3 class="font-bold text-lg uppercase light:text-slate-900">SÉANCE TACTIQUE</h3>
+                                class="text-[8px] font-bold uppercase text-{% if event.type == 'match' %}red{% elif event.type == 'training' %}emerald{% else %}blue{% endif %}-400">
+                                {{ event.date.strftime('%b') if event.date else '--' }}
+                            </span>
+                            <span class="text-lg font-black text-white leading-none">
+                                {{ event.date.strftime('%d') if event.date else '--' }}
+                            </span>
                         </div>
+                        <!-- Event Info -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="text-[7px] font-bold uppercase tracking-wider text-{% if event.type == 'match' %}red{% elif event.type == 'training' %}emerald{% else %}blue{% endif %}-400/60">
+                                    {{ event.type|upper }}
+                                </span>
+                            </div>
+                            <p
+                                class="text-xs font-bold text-white truncate mt-0.5 group-hover:text-{% if event.type == 'match' %}red{% elif event.type == 'training' %}emerald{% else %}blue{% endif %}-400 transition-colors">
+                                {{ event.title }}</p>
+                            <div class="flex items-center gap-2 mt-1.5 text-[9px] text-white/20 font-medium">
+                                <i class="fa-solid fa-clock text-[7px]"></i>
+                                {{ event.date.strftime('%H:%M') if event.date else '--:--' }}
+                                {% if event.location %}
+                                <span class="w-0.5 h-0.5 rounded-full bg-white/10"></span>
+                                <i class="fa-solid fa-location-dot text-[7px]"></i>
+                                <span class="truncate max-w-[100px]">{{ event.location }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- Actions -->
+                        {% if roles.is_coach %}
+                        <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                                onclick="event.stopPropagation(); openEditModal('{{ event._id }}', '{{ event.title }}', '{{ event.type }}', '{{ event.date.strftime('%Y-%m-%d') if event.date else '' }}', '{{ event.date.strftime('%H:%M') if event.date else '' }}', '{{ event.location or '' }}', '{{ event.description or '' }}')"
+                                class="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-white/20 hover:text-amber-400 hover:bg-amber-500/10 transition-all">
+                                <i class="fa-solid fa-pen text-[8px]"></i>
+                            </button>
+                            <button onclick="event.stopPropagation(); deleteEvent('{{ event._id }}')"
+                                class="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-all">
+                                <i class="fa-solid fa-trash text-[8px]"></i>
+                            </button>
+                        </div>
+                        {% endif %}
                     </div>
-
-                    <div class="space-y-4 mb-10 flex-1">
-                        <div
-                            class="flex items-center gap-3 text-white/40 text-[10px] font-bold uppercase tracking-wider">
-                            <i class="fa-solid fa-clock text-green-500/40"></i> 18:30 • DÉBUT SÉANCE
-                        </div>
-                        <div
-                            class="flex items-center gap-3 text-white/40 text-[10px] font-bold uppercase tracking-wider">
-                            <i class="fa-solid fa-shirt text-green-500/40"></i> TERRAIN B - CLUB HOUSE
-                        </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center py-10">
+                        <i class="fa-solid fa-calendar-xmark text-white/5 text-4xl mb-3"></i>
+                        <p class="text-[10px] text-white/15 font-bold uppercase tracking-wider">Aucun événement à venir
+                        </p>
+                        {% if roles.is_coach %}
+                        <a href="/coach/create-event" class="inline-flex mt-3 text-[9px] text-primary-400 font-bold">
+                            <i class="fa-solid fa-plus mr-1"></i>Créer un événement
+                        </a>
+                        {% endif %}
                     </div>
-
-                    <a href="#"
-                        class="w-full py-4 rounded-2xl bg-green-500/5 border border-green-500/10 group-hover:bg-green-500/10 group-hover:border-green-500/40 text-center text-[9px] font-bold uppercase tracking-wider text-green-400 transition-all">
-                        LISTE PRÉSENCES
-                    </a>
-                </div>
-
-                <!-- Event 3 (Match) -->
-                <div
-                    class="glass p-8 rounded-3xl border-white/5 hover:border-amber-500/30 transition-all duration-500 group relative overflow-hidden h-full flex flex-col">
-                    <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <i class="fa-solid fa-bus text-6xl"></i>
-                    </div>
-
-                    <div class="flex items-center gap-4 mb-8">
-                        <div
-                            class="w-14 h-14 bg-amber-500/10 rounded-2xl flex flex-col items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
-                            <span class="text-[10px] font-bold uppercase mb-1 leading-none tracking-wider">Sam</span>
-                            <span class="text-2xl font-bold leading-none">15</span>
-                        </div>
-                        <div>
-                            <span class="text-[9px] font-bold text-amber-500/60 uppercase tracking-[.2em]">EXTÉRIEUR •
-                                J16</span>
-                            <h3 class="font-bold text-lg uppercase light:text-slate-900">Lyon FC vs Elite</h3>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4 mb-10 flex-1">
-                        <div
-                            class="flex items-center gap-3 text-white/40 text-[10px] font-bold uppercase tracking-wider">
-                            <i class="fa-solid fa-clock text-amber-500/40"></i> 19:00 • DÉPLACEMENT
-                        </div>
-                        <div
-                            class="flex items-center gap-3 text-white/40 text-[10px] font-bold uppercase tracking-wider">
-                            <i class="fa-solid fa-location-dot text-amber-500/40"></i> PARC DES SPORTS, LYON
-                        </div>
-                    </div>
-
-                    <div
-                        class="w-full py-4 rounded-2xl bg-amber-500/5 border border-amber-500/10 text-center text-[9px] font-bold uppercase tracking-wider text-amber-500/40">
-                        CONVOCATION BIENTÔT
-                    </div>
+                    {% endif %}
                 </div>
             </div>
+
+            <!-- Past Events -->
+            {% if past %}
+            <div class="glass p-6 rounded-3xl border-white/5">
+                <h3 class="text-xs font-black uppercase tracking-wider flex items-center gap-2 mb-5">
+                    <i class="fa-solid fa-history text-white/20 text-[10px]"></i>
+                    <span class="text-white/40">Événements Passés</span>
+                </h3>
+                <div class="space-y-2 max-h-[250px] overflow-y-auto custom-scrollbar">
+                    {% for event in past[:5] %}
+                    <div
+                        class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/[0.03] transition-all opacity-50 hover:opacity-80">
+                        <div class="w-9 h-9 rounded-lg bg-white/5 flex flex-col items-center justify-center shrink-0">
+                            <span class="text-[7px] font-bold uppercase text-white/20">{{ event.date.strftime('%b') if
+                                event.date else '' }}</span>
+                            <span class="text-sm font-black text-white/30 leading-none">{{ event.date.strftime('%d') if
+                                event.date else '' }}</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[10px] font-bold text-white/40 truncate">{{ event.title }}</p>
+                            <span class="text-[8px] text-white/15 font-medium">{{ event.type|capitalize }} • {{
+                                event.date.strftime('%H:%M') if event.date else '' }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ===== Edit Event Modal ===== -->
+<div id="editEventModal" class="fixed inset-0 z-[200] hidden items-center justify-center" style="display:none;">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeEditModal()"></div>
+    <div class="relative glass rounded-3xl border border-white/10 p-8 w-full max-w-lg mx-4 shadow-2xl">
+        <button onclick="closeEditModal()"
+            class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/30 hover:text-white transition-colors">
+            <i class="fa-solid fa-times text-xs"></i>
+        </button>
+        <h3 class="text-lg font-bold uppercase tracking-tight mb-6 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                <i class="fa-solid fa-pen text-amber-400"></i>
+            </div>
+            Modifier l'Événement
+        </h3>
+        <form id="editEventForm" method="POST" class="space-y-5">
+            <div>
+                <label class="text-[9px] font-bold text-white/20 uppercase tracking-wider block mb-1.5">Titre</label>
+                <input type="text" name="title" id="editTitle" required
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder:text-white/10 focus:outline-none focus:border-primary-500/40">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[9px] font-bold text-white/20 uppercase tracking-wider block mb-1.5">Type</label>
+                    <select name="type" id="editType"
+                        class="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white focus:outline-none focus:border-primary-500/40 appearance-none">
+                        <option value="match" class="bg-[#0f172a] text-white">Match</option>
+                        <option value="training" class="bg-[#0f172a] text-white">Entraînement</option>
+                        <option value="meeting" class="bg-[#0f172a] text-white">Réunion</option>
+                        <option value="other" class="bg-[#0f172a] text-white">Autre</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[9px] font-bold text-white/20 uppercase tracking-wider block mb-1.5">Lieu</label>
+                    <input type="text" name="location" id="editLocation"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder:text-white/10 focus:outline-none focus:border-primary-500/40">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[9px] font-bold text-white/20 uppercase tracking-wider block mb-1.5">Date</label>
+                    <input type="date" name="date" id="editDate" required
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white focus:outline-none focus:border-primary-500/40">
+                </div>
+                <div>
+                    <label
+                        class="text-[9px] font-bold text-white/20 uppercase tracking-wider block mb-1.5">Heure</label>
+                    <input type="time" name="time" id="editTime"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white focus:outline-none focus:border-primary-500/40">
+                </div>
+            </div>
+            <div>
+                <label
+                    class="text-[9px] font-bold text-white/20 uppercase tracking-wider block mb-1.5">Description</label>
+                <textarea name="description" id="editDescription" rows="2"
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder:text-white/10 focus:outline-none focus:border-primary-500/40 resize-none"></textarea>
+            </div>
+            <button type="submit"
+                class="w-full gradient-primary py-4 rounded-xl font-bold text-xs text-black uppercase tracking-wider hover:scale-[1.02] active:scale-95 transition-all">
+                <i class="fa-solid fa-check mr-2"></i>Sauvegarder les Modifications
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ===== Event Detail Modal ===== -->
+<div id="eventDetailModal" class="fixed inset-0 z-[200] hidden items-center justify-center" style="display:none;">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeDetailModal()"></div>
+    <div class="relative glass rounded-3xl border border-white/10 p-8 w-full max-w-md mx-4 shadow-2xl">
+        <button onclick="closeDetailModal()"
+            class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/30 hover:text-white transition-colors">
+            <i class="fa-solid fa-times text-xs"></i>
+        </button>
+        <div id="eventDetailContent">
+            <!-- Populated by JS -->
         </div>
     </div>
 </div>
 
 <style>
-    .day-v2:hover {
-        transform: translateY(-5px);
-        border-color: rgba(132, 204, 22, 0.3);
+    .cal-day {
+        transition: all 0.2s;
+    }
+
+    .cal-day:hover {
+        transform: translateY(-3px);
+        border-color: rgba(var(--primary-rgb), 0.3);
+    }
+
+    .cal-day.is-today {
+        border-color: rgba(var(--primary-rgb), 0.5);
+        background: rgba(var(--primary-rgb), 0.05);
     }
 </style>
+
+<script>
+    // Events data from server
+    const allEvents = {{ events_json| safe }};
+
+    const MONTHS_FR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    const DAYS_SHORT_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth();
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        const monthLabel = document.getElementById('currentMonth');
+        monthLabel.textContent = `${MONTHS_FR[currentMonth]} ${currentYear}`;
+
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const startDayOfWeek = (firstDay.getDay() + 6) % 7; // Monday=0
+        const totalDays = lastDay.getDate();
+        const today = new Date();
+
+        // Map events to their dates
+        const eventsByDate = {};
+        allEvents.forEach(ev => {
+            if (!ev.date) return;
+            const d = new Date(ev.date);
+            const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+            if (!eventsByDate[key]) eventsByDate[key] = [];
+            eventsByDate[key].push(ev);
+        });
+
+        let html = '';
+
+        // Previous month padding
+        const prevMonth = new Date(currentYear, currentMonth, 0);
+        for (let i = startDayOfWeek - 1; i >= 0; i--) {
+            const d = prevMonth.getDate() - i;
+            html += `<div class="cal-day h-24 rounded-xl border border-white/[0.03] border-dashed p-2 opacity-20">
+                <span class="text-sm font-bold text-white/30">${d}</span>
+            </div>`;
+        }
+
+        // Current month days
+        for (let day = 1; day <= totalDays; day++) {
+            const key = `${currentYear}-${currentMonth}-${day}`;
+            const dayEvents = eventsByDate[key] || [];
+            const isToday = today.getDate() === day && today.getMonth() === currentMonth && today.getFullYear() === currentYear;
+
+            let eventDots = '';
+            const matchEvents = dayEvents.filter(e => e.type === 'match');
+            const trainEvents = dayEvents.filter(e => e.type === 'training');
+            const otherEvents = dayEvents.filter(e => e.type !== 'match' && e.type !== 'training');
+
+            if (matchEvents.length) eventDots += `<div class="h-1 w-full bg-red-500/50 rounded-full" title="${matchEvents.length} match(s)"></div>
+                <span class="text-[7px] font-bold text-red-400/80 uppercase tracking-wider truncate block">${matchEvents[0].title.substring(0, 12)}</span>`;
+            if (trainEvents.length) eventDots += `<div class="h-1 w-full bg-emerald-500/50 rounded-full" title="${trainEvents.length} entraînement(s)"></div>`;
+            if (otherEvents.length) eventDots += `<div class="h-1 w-full bg-blue-500/40 rounded-full"></div>`;
+
+            html += `<div class="cal-day h-24 rounded-xl border border-white/5 p-2 flex flex-col justify-between cursor-pointer hover:bg-white/[0.03] ${isToday ? 'is-today' : ''}"
+                          onclick="showDayEvents(${currentYear}, ${currentMonth}, ${day})">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-bold ${isToday ? 'text-primary-400' : 'text-white/25'}">${day}</span>
+                    ${dayEvents.length ? `<span class="text-[7px] font-bold text-white/10 bg-white/5 px-1.5 py-0.5 rounded-full">${dayEvents.length}</span>` : ''}
+                </div>
+                <div class="space-y-0.5 mt-auto">${eventDots}</div>
+                ${isToday ? '<div class="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 bg-primary-500 text-black text-[6px] font-bold uppercase tracking-wider rounded-md shadow-lg">Auj.</div>' : ''}
+            </div>`;
+        }
+
+        // Next month padding
+        const remaining = (7 - ((startDayOfWeek + totalDays) % 7)) % 7;
+        for (let i = 1; i <= remaining; i++) {
+            html += `<div class="cal-day h-24 rounded-xl border border-white/[0.03] border-dashed p-2 opacity-20">
+                <span class="text-sm font-bold text-white/30">${i}</span>
+            </div>`;
+        }
+
+        grid.innerHTML = html;
+    }
+
+    function prevMonth() {
+        currentMonth--;
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        renderCalendar();
+    }
+    function nextMonth() {
+        currentMonth++;
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+        renderCalendar();
+    }
+    function goToToday() {
+        currentYear = new Date().getFullYear();
+        currentMonth = new Date().getMonth();
+        renderCalendar();
+    }
+
+    function showDayEvents(year, month, day) {
+        const key = `${year}-${month}-${day}`;
+        const dayEvents = allEvents.filter(ev => {
+            if (!ev.date) return false;
+            const d = new Date(ev.date);
+            return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+        });
+
+        if (!dayEvents.length) return;
+
+        const dateStr = `${day} ${MONTHS_FR[month]} ${year}`;
+        const colors = { match: 'red', training: 'emerald', meeting: 'blue', other: 'amber' };
+        const icons = { match: 'fa-trophy', training: 'fa-stopwatch', meeting: 'fa-handshake', other: 'fa-calendar' };
+
+        let html = `<h3 class="text-lg font-bold mb-5 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary-500/10 flex items-center justify-center">
+                <i class="fa-solid fa-calendar-day text-primary-400"></i>
+            </div>
+            ${dateStr}
+        </h3>
+        <div class="space-y-3">`;
+
+        dayEvents.forEach(ev => {
+            const c = colors[ev.type] || 'blue';
+            const ic = icons[ev.type] || 'fa-calendar';
+            const time = ev.date ? new Date(ev.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+            html += `<div class="p-4 rounded-2xl bg-${c}-500/5 border border-${c}-500/10">
+                <div class="flex items-center gap-2 mb-1">
+                    <i class="fa-solid ${ic} text-${c}-400 text-xs"></i>
+                    <span class="text-[8px] font-bold uppercase tracking-wider text-${c}-400">${ev.type}</span>
+                    <span class="text-[8px] text-white/20 font-medium ml-auto">${time}</span>
+                </div>
+                <p class="font-bold text-sm">${ev.title}</p>
+                ${ev.location ? `<p class="text-[9px] text-white/30 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>${ev.location}</p>` : ''}
+                ${ev.description ? `<p class="text-[9px] text-white/20 mt-1">${ev.description}</p>` : ''}
+            </div>`;
+        });
+
+        html += '</div>';
+
+        document.getElementById('eventDetailContent').innerHTML = html;
+        const modal = document.getElementById('eventDetailModal');
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+    }
+
+    function showEventDetail(eventId) {
+        const ev = allEvents.find(e => e._id === eventId);
+        if (!ev) return;
+        const d = ev.date ? new Date(ev.date) : null;
+        if (d) showDayEvents(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+
+    function closeDetailModal() {
+        const modal = document.getElementById('eventDetailModal');
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+    }
+
+    // Edit Modal
+    function openEditModal(id, title, type, date, time, location, description) {
+        document.getElementById('editTitle').value = title;
+        document.getElementById('editType').value = type;
+        document.getElementById('editDate').value = date;
+        document.getElementById('editTime').value = time;
+        document.getElementById('editLocation').value = location;
+        document.getElementById('editDescription').value = description;
+        document.getElementById('editEventForm').action = `/coach/event/${id}/edit`;
+
+        const modal = document.getElementById('editEventModal');
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+    }
+    function closeEditModal() {
+        const modal = document.getElementById('editEventModal');
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+    }
+
+    // Delete Event
+    async function deleteEvent(eventId) {
+        if (!confirm('Supprimer cet événement ?')) return;
+        try {
+            const resp = await fetch(`/coach/event/${eventId}/delete`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (resp.ok) window.location.reload();
+        } catch (e) {
+            alert('Erreur lors de la suppression');
+        }
+    }
+
+    // Init
+    renderCalendar();
+</script>
 {% endblock %}

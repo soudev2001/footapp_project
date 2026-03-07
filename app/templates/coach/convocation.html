@@ -53,43 +53,93 @@
 
             <!-- Tactic Config Bar -->
             <div class="glass rounded-2xl border border-white/5 p-4">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                    <div class="flex items-center gap-2 flex-1">
-                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-chess text-emerald-400 text-sm"></i>
+                <div class="flex flex-col gap-3">
+                    <!-- Row 1: Tactic name + Saved Tactics Loader -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                            <div
+                                class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 flex items-center justify-center shrink-0 border border-emerald-500/10">
+                                <i class="fa-solid fa-chess text-emerald-400 text-sm"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <label
+                                    class="text-[8px] text-white/25 uppercase tracking-[0.2em] font-bold block mb-0.5">Tactique</label>
+                                <input type="text" id="tacticName" value="Formation Standard"
+                                    placeholder="Nom de la tactique..."
+                                    class="bg-transparent border-none text-white text-sm font-bold focus:outline-none w-full placeholder:text-white/15"
+                                    style="padding:0;">
+                            </div>
                         </div>
-                        <div>
-                            <label
-                                class="text-[9px] text-white/30 uppercase tracking-wider font-bold block">Tactique</label>
-                            <input type="text" id="tacticName" value="Formation Standard"
-                                placeholder="Nom de la tactique..."
-                                class="bg-transparent border-none text-white text-sm font-bold focus:outline-none w-full"
-                                style="padding:0;">
+                        <!-- Saved Tactics Selector -->
+                        <div class="flex items-center gap-2">
+                            <select id="savedTacticSelect" onchange="applySavedTactic(this.value)"
+                                class="bg-[#0f172a] border border-white/10 rounded-xl px-4 py-2 text-white text-[10px] font-bold focus:outline-none focus:border-amber-500/40 appearance-none cursor-pointer min-w-[160px]">
+                                <option value="" class="bg-[#0f172a] text-white">📂 Charger tactique...</option>
+                                {% if saved_tactics %}
+                                {% for tactic in saved_tactics %}
+                                <option value="{{ loop.index0 }}" class="bg-[#0f172a] text-white">
+                                    {{ tactic.name or 'Sans titre' }} ({{ tactic.formation or '?' }})
+                                </option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <label
-                            class="text-[9px] text-white/30 uppercase tracking-wider font-bold shrink-0">Système</label>
-                        <select id="formationSelect" onchange="changeFormation()"
-                            class="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs font-bold focus:outline-none focus:border-primary-500 appearance-none cursor-pointer">
-                            <option value="4-3-3" selected>4-3-3</option>
-                            <option value="4-4-2">4-4-2</option>
-                            <option value="3-5-2">3-5-2</option>
-                            <option value="4-2-3-1">4-2-3-1</option>
-                            <option value="3-4-3">3-4-3</option>
-                            <option value="5-3-2">5-3-2</option>
-                            <option value="4-1-4-1">4-1-4-1</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label
-                            class="text-[9px] text-white/30 uppercase tracking-wider font-bold shrink-0">Remplaçants</label>
-                        <select id="maxSubsSelect" onchange="updateMaxSubs()"
-                            class="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs font-bold focus:outline-none focus:border-primary-500 appearance-none cursor-pointer">
-                            <option value="3">3 (classique)</option>
-                            <option value="5" selected>5 (FIFA)</option>
-                            <option value="7">7 max</option>
-                        </select>
+                    <!-- Divider -->
+                    <div class="h-px bg-white/5"></div>
+                    <!-- Row 2: Formation + Subs -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0 border border-emerald-500/10">
+                                <i class="fa-solid fa-chess-knight text-emerald-400 text-sm"></i>
+                            </div>
+                            <div>
+                                <label
+                                    class="text-[8px] text-white/25 uppercase tracking-[0.2em] font-bold block mb-0.5">Système
+                                    de jeu</label>
+                                <div class="relative">
+                                    <select id="formationSelect" onchange="changeFormation()"
+                                        class="bg-[#0f172a] border border-white/10 rounded-xl px-4 py-2 pr-8 text-white text-xs font-bold focus:outline-none focus:border-emerald-500/40 appearance-none cursor-pointer min-w-[120px]">
+                                        <option value="4-3-3" selected class="bg-[#0f172a] text-white">4-3-3</option>
+                                        <option value="4-4-2" class="bg-[#0f172a] text-white">4-4-2</option>
+                                        <option value="3-5-2" class="bg-[#0f172a] text-white">3-5-2</option>
+                                        <option value="4-2-3-1" class="bg-[#0f172a] text-white">4-2-3-1</option>
+                                        <option value="3-4-3" class="bg-[#0f172a] text-white">3-4-3</option>
+                                        <option value="5-3-2" class="bg-[#0f172a] text-white">5-3-2</option>
+                                        <option value="4-1-4-1" class="bg-[#0f172a] text-white">4-1-4-1</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-chevron-down text-[8px] text-emerald-400/40"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <label
+                                    class="text-[8px] text-white/25 uppercase tracking-[0.2em] font-bold block mb-0.5">Remplaçants</label>
+                                <div class="relative">
+                                    <select id="maxSubsSelect" onchange="updateMaxSubs()"
+                                        class="bg-[#0f172a] border border-white/10 rounded-xl px-4 py-2 pr-8 text-white text-xs font-bold focus:outline-none focus:border-emerald-500/40 appearance-none cursor-pointer">
+                                        <option value="3" class="bg-[#0f172a] text-white">3 (classique)</option>
+                                        <option value="5" selected class="bg-[#0f172a] text-white">5 (FIFA)</option>
+                                        <option value="7" class="bg-[#0f172a] text-white">7 max</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-chevron-down text-[8px] text-white/20"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% if saved_tactics %}
+                        <div
+                            class="ml-auto hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/5 border border-amber-500/10">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-400 text-[9px]"></i>
+                            <span class="text-[8px] text-amber-400/70 font-bold uppercase tracking-wider"
+                                id="appliedTacticLabel">Auto-chargé</span>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -416,10 +466,78 @@
     let currentFormation = '4-3-3';
     const pitchSlots = []; // [{posData, playerId, el}]
 
+    // Saved tactics from backend
+    const savedTacticsData = {{ saved_tactics_json| safe }};
+
     // ========== INIT ==========
     function init() {
-        changeFormation();
+        // Auto-apply first saved tactic if available
+        if (savedTacticsData && savedTacticsData.length > 0) {
+            applySavedTactic(0);
+            document.getElementById('savedTacticSelect').value = '0';
+        } else {
+            changeFormation();
+        }
         updateMaxSubs();
+    }
+
+    // ========== APPLY SAVED TACTIC ==========
+    function applySavedTactic(index) {
+        if (index === '' || index === null) {
+            changeFormation();
+            return;
+        }
+        const tactic = savedTacticsData[parseInt(index)];
+        if (!tactic) return;
+
+        // Set tactic name
+        document.getElementById('tacticName').value = tactic.name || 'Formation Standard';
+        document.getElementById('pitchTacticLabel').textContent = tactic.name || 'Formation Standard';
+
+        // Set formation
+        const formation = tactic.formation || '4-3-3';
+        const formSelect = document.getElementById('formationSelect');
+        if (FORMATIONS[formation]) {
+            formSelect.value = formation;
+            changeFormation();
+        } else {
+            changeFormation();
+        }
+
+        // Apply starters to pitch positions
+        if (tactic.starters) {
+            setTimeout(() => {
+                const starterEntries = Object.entries(tactic.starters);
+                starterEntries.forEach(([posKey, playerId]) => {
+                    if (!playerId) return;
+                    const idx = parseInt(posKey);
+                    if (isNaN(idx) || idx >= pitchSlots.length) return;
+
+                    // Find the player card in the effectif panel
+                    const playerCard = document.querySelector(`.player-card[data-player-id="${playerId}"]`);
+                    if (playerCard && !playerCard.dataset.assigned) {
+                        assignPlayerToSlot(playerId, idx, playerCard);
+                    }
+                });
+            }, 200);
+        }
+
+        // Apply substitutes
+        if (tactic.substitutes && tactic.substitutes.length) {
+            setTimeout(() => {
+                tactic.substitutes.forEach(playerId => {
+                    if (!playerId) return;
+                    const playerCard = document.querySelector(`.player-card[data-player-id="${playerId}"]`);
+                    if (playerCard && !playerCard.dataset.assigned) {
+                        addToSubs(playerId, playerCard);
+                    }
+                });
+            }, 400);
+        }
+
+        // Update label
+        const label = document.getElementById('appliedTacticLabel');
+        if (label) label.textContent = `${tactic.name || 'Tactique'} appliquée`;
     }
 
     // ========== FORMATION ==========

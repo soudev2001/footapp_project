@@ -555,13 +555,89 @@ def create_event():
             created_by=user_id
         )
         
-        flash('Evenement cree.', 'success')
+        # Send notification to team players
+        try:
+            from app.services import get_notification_service, get_player_service
+            notification_service = get_notification_service()
+            player_service = get_player_service()
+            team_id = request.form.get('team_id')
+            if team_id:
+                players = player_service.get_by_team(team_id)
+                for player in players:
+                    if player.get('user_id'):
+                        notification_service.create(
+                            user_id=str(player['user_id']),
+                            title=f"Nouvel événement: {request.form.get('title')}",
+                            message=f"{request.form.get('type', '').capitalize()} le {date_str} à {time_str}",
+                            notification_type='event',
+                            link=url_for('main.calendar')
+                        )
+        except Exception as e:
+            print(f"[Notification] Error sending event notifications: {e}")
+        
+        flash('Événement créé avec succès !', 'success')
         return redirect(url_for('main.calendar'))
     
     teams = team_service.get_by_club(club_id)
     selected_team_id = request.args.get('team_id')
     
     return render_template('coach/create_event.html', teams=teams, selected_team_id=selected_team_id)
+
+@coach_bp.route('/event/<event_id>/edit', methods=['POST'])
+@login_required
+@role_required('coach', 'admin')
+def edit_event(event_id):
+    """Edit an existing event"""
+    from app.services import get_event_service
+    from datetime import datetime
+    event_service = get_event_service()
+    
+    date_str = request.form.get('date')
+    time_str = request.form.get('time', '18:00')
+    
+    update_data = {
+        'title': request.form.get('title'),
+        'type': request.form.get('type'),
+        'location': request.form.get('location', ''),
+        'description': request.form.get('description', ''),
+    }
+    
+    if date_str:
+        update_data['date'] = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+    
+    if request.form.get('team_id'):
+        from bson import ObjectId
+        update_data['team_id'] = ObjectId(request.form.get('team_id'))
+    
+    event_service.update(event_id, update_data)
+    flash('Événement mis à jour !', 'success')
+    return redirect(url_for('main.calendar'))
+
+@coach_bp.route('/event/<event_id>/delete', methods=['POST', 'DELETE'])
+@login_required
+@role_required('coach', 'admin')
+def delete_event(event_id):
+    """Delete an event"""
+    from app.services import get_event_service
+    event_service = get_event_service()
+    event_service.delete(event_id)
+    
+    if request.is_json:
+        return jsonify({"status": "success"})
+    flash('Événement supprimé.', 'success')
+    return redirect(url_for('main.calendar'))
+
+@coach_bp.route('/events/api')
+@login_required
+@role_required('coach', 'admin')
+def events_api():
+    """API: Get all events as JSON for calendar"""
+    from app.services import get_event_service
+    from app.models import serialize_docs
+    club_id = session.get('club_id')
+    event_service = get_event_service()
+    events = event_service.get_by_club(club_id)
+    return jsonify(serialize_docs(events))
 
 @coach_bp.route('/match-center')
 @coach_bp.route('/match-center/<match_id>')
@@ -765,13 +841,21 @@ def convocation():
         'ATT': [p for p in players if p.get('position') == 'ATT'],
     }
     
+    # Get saved tactics presets
+    from app.models import serialize_docs
+    import json
+    saved_tactics = player_service.get_tactic_presets(club_id, selected_team_id)
+    saved_tactics_json = json.dumps(serialize_docs(saved_tactics), default=str)
+    
     return render_template('coach/convocation.html', 
         events=events,
         upcoming_matches=upcoming_matches,
         players=players,
         by_position=by_position,
         teams=teams,
-        selected_team_id=selected_team_id
+        selected_team_id=selected_team_id,
+        saved_tactics=saved_tactics,
+        saved_tactics_json=saved_tactics_json
     )
 
 @coach_bp.route('/convocation/send', methods=['POST'])
