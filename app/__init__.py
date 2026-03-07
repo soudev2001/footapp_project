@@ -10,9 +10,17 @@ def create_app(config_name='default'):
     from app.config import config
     app.config.from_object(config[config_name])
     
-    # Initialize MongoDB
+    # Initialize Extensions (MongoDB & Mail)
     from app.services.db import init_db
     init_db(app)
+
+    try:
+        from flask_mail import Mail
+        global _mail  # Basic injection module-level
+        _mail = Mail(app)
+        app.extensions['mail'] = _mail
+    except ImportError:
+        pass
     
     # Register all blueprints
     from app.routes import main_bp, api_bp, auth_bp, admin_bp, coach_bp, player_bp, isy_bp, superadmin_bp

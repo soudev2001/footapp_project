@@ -52,11 +52,23 @@
         <!-- Register Form -->
         <div class="glass p-8 lg:p-10 rounded-3xl shadow-2xl relative overflow-hidden border-white/5">
             <div class="text-center lg:text-left mb-6">
-                <h2 class="text-2xl font-extrabold light:text-slate-900">Compte Fan</h2>
+                {% if pending_user %}
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/15 border border-primary-500/20 text-[10px] font-bold text-primary-400 uppercase tracking-wider mb-4">
+                    <i class="fa-solid fa-envelope-open-text"></i> Invitation reçue
+                </div>
+                <h2 class="text-2xl font-extrabold text-white light:text-slate-900">Bienvenue sur FootLogic</h2>
+                <p class="text-white/60 mt-2 text-sm">Vous avez été invité(e) à rejoindre le club <strong
+                        class="text-white">{{ club_name }}</strong> en tant que <strong>{{ pending_user.role|title
+                        }}</strong>. Complétez votre profil.</p>
+                {% else %}
+                <h2 class="text-2xl font-extrabold text-white light:text-slate-900">Compte Fan</h2>
                 <p class="text-white/40 mt-1.5 text-sm">Rejoignez la communauté FootLogic.</p>
+                {% endif %}
             </div>
 
-            <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-4">
+            <form action="{{ url_for('auth.register', token=request.args.get('token')) }}" method="POST"
+                class="space-y-4">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-white/35 mb-1.5 ml-1">Prénom</label>
@@ -75,8 +87,10 @@
                     <div class="relative group">
                         <i
                             class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-400 transition text-sm"></i>
-                        <input type="email" name="email" required placeholder="jean@club.com"
-                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium">
+                        <input type="email" name="email" required
+                            value="{{ pending_user.email if pending_user else '' }}" {% if pending_user %}readonly{%
+                            endif %} placeholder="jean@club.com"
+                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium {% if pending_user %}opacity-50 cursor-not-allowed{% endif %}">
                     </div>
                 </div>
 
@@ -101,6 +115,7 @@
                     </div>
                 </div>
 
+                {% if not pending_user %}
                 <div>
                     <label class="block text-xs font-semibold text-white/35 mb-2 ml-1">Rôles
                         (Sélectionnez au moins un)</label>
@@ -109,22 +124,23 @@
                             class="flex items-center space-x-3 bg-white/[0.04] border border-white/8 rounded-xl p-3 cursor-pointer hover:bg-white/8 transition">
                             <input type="checkbox" name="roles" value="player"
                                 class="form-checkbox h-4 w-4 text-primary-500 rounded border-gray-600 focus:ring-primary-500">
-                            <span class="text-sm font-semibold">Joueur</span>
+                            <span class="text-sm font-semibold text-white">Joueur</span>
                         </label>
                         <label
                             class="flex items-center space-x-3 bg-white/[0.04] border border-white/8 rounded-xl p-3 cursor-pointer hover:bg-white/8 transition">
                             <input type="checkbox" name="roles" value="coach"
                                 class="form-checkbox h-4 w-4 text-primary-500 rounded border-gray-600 focus:ring-primary-500">
-                            <span class="text-sm font-semibold">Coach</span>
+                            <span class="text-sm font-semibold text-white">Coach</span>
                         </label>
                         <label
                             class="flex items-center space-x-3 bg-white/[0.04] border border-white/8 rounded-xl p-3 cursor-pointer hover:bg-white/8 transition">
                             <input type="checkbox" name="roles" value="fan"
                                 class="form-checkbox h-4 w-4 text-primary-500 rounded border-gray-600 focus:ring-primary-500">
-                            <span class="text-sm font-semibold">Fan</span>
+                            <span class="text-sm font-semibold text-white">Fan</span>
                         </label>
                     </div>
                 </div>
+                {% endif %}
 
                 <button type="submit"
                     class="w-full gradient-primary py-3.5 rounded-xl text-white font-bold text-sm shadow-lg shadow-primary-500/15 hover:scale-[1.01] active:scale-[0.99] transition-all">

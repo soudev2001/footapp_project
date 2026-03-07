@@ -9,15 +9,24 @@ class NotificationService:
 
     def send_invitation(self, user):
         """
-        Simulate sending an invitation email.
-        In a real app, this would use Flask-Mail or an external API.
+        Envoie un email d'invitation avec un Token pour créer le profil de l'utilisateur.
         """
         email = user.get('email')
         token = user.get('invitation_token')
+        role = user.get('role')
+        club_id = user.get('club_id')
         
-        # Log the invitation (for demo purposes)
-        print(f"DEBUG: Sending invitation to {email}")
-        print(f"DEBUG: Invitation Link: /complete-profile/{token}")
+        # Récupération du club pour l'affichage du nom
+        club_name = "votre club"
+        if club_id:
+            from bson import ObjectId
+            club = self.db.clubs.find_one({'_id': ObjectId(club_id)})
+            if club and 'name' in club:
+                club_name = club['name']
+        
+        # Envoi de l'email réel
+        from app.services.email_service import send_invitation_email
+        success = send_invitation_email(email, token, role, club_name)
         
         # Create a notification record in DB
         notification = {
@@ -25,10 +34,10 @@ class NotificationService:
             'type': 'invitation',
             'email': email,
             'sent_at': datetime.utcnow(),
-            'status': 'sent'
+            'status': 'sent' if success else 'failed'
         }
         self.collection.insert_one(notification)
-        return True
+        return success
 
     def notify_coach_player_added(self, coach_id, player_name):
         """Notify a coach that a player has been added to their team"""

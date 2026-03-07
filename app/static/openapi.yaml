@@ -145,3 +145,266 @@ paths:
       responses:
         '200':
           description: Token enregistré.
+  /players:
+    get:
+      summary: Get all players
+      tags:
+        - Players
+      responses:
+        '200':
+          description: List of players
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+  /players/{playerId}:
+    get:
+      summary: Get player by ID
+      tags:
+        - Players
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Player details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+        '404':
+          description: Player not found
+  /clubs:
+    get:
+      summary: Get all clubs
+      tags:
+        - Clubs
+      responses:
+        '200':
+          description: List of clubs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+  /clubs/{clubId}:
+    get:
+      summary: Get club by ID
+      tags:
+        - Clubs
+      parameters:
+        - name: clubId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Club details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+        '404':
+          description: Club not found
+  /clubs/{clubId}/players:
+    get:
+      summary: Get all players of a club
+      tags:
+        - Clubs
+      parameters:
+        - name: clubId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of players in a club
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+  /clubs/{clubId}/events:
+    get:
+      summary: Get events for a specific club
+      tags:
+        - Calendrier
+      parameters:
+        - name: clubId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of events for the club
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+  /matches:
+    get:
+      summary: Get all matches
+      tags:
+        - Matches
+      responses:
+        '200':
+          description: List of matches
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+  /clubs/{clubId}/matches:
+    get:
+      summary: Get matches for a specific club
+      tags:
+        - Matches
+      parameters:
+        - name: clubId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of matches for the club
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+  /posts:
+    get:
+      summary: Get all posts
+      tags:
+        - Posts
+      responses:
+        '200':
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+  /seed:
+    post:
+      summary: Seed database with demo data (Development only)
+      tags:
+        - System
+      responses:
+        '200':
+          description: Database seeded successfully
+        '500':
+          description: Error seeding database
+  /stats:
+    get:
+      summary: Get database statistics
+      tags:
+        - System
+      responses:
+        '200':
+          description: Database statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+  /health:
+    get:
+      summary: API health check
+      tags:
+        - System
+      responses:
+        '200':
+          description: System health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status:
+                    type: string
+                  version:
+                    type: string
+                  app:
+                    type: string

@@ -24,6 +24,15 @@ class Config:
     MONGO_URI = os.environ.get('MONGO_URI', 'mongodb+srv://soufiane:gogo@cluster0.05omqhe.mongodb.net/FootClubApp')
     ADMIN_CONFIG = load_admin_config()
     
+    # Flask-Mail (Gmail SMTP) Config
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_USERNAME', 'noreply@footlogic.com')
+    
 class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True

@@ -122,11 +122,7 @@
                 <div class="flex gap-3">
                     <button onclick="toggleModal('inviteModal')"
                         class="bg-white/[0.04] hover:bg-white/8 border border-white/8 px-4 py-2.5 rounded-xl text-xs font-bold transition-all">
-                        <i class="fa-solid fa-envelope mr-2 text-white/30"></i> Inviter
-                    </button>
-                    <button onclick="toggleModal('addMemberModal')"
-                        class="gradient-primary px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-primary-500/15 hover:scale-[1.01] active:scale-[0.99] transition-all">
-                        <i class="fa-solid fa-plus mr-2"></i> Ajouter membre
+                        <i class="fa-solid fa-envelope mr-2 text-white/30"></i> Envoyer une invitation
                     </button>
                 </div>
             </div>
@@ -155,12 +151,82 @@
             </div>
 
             <div class="grid lg:grid-cols-3 gap-8">
-                <!-- Member Summary Card -->
+                <!-- Formulaire + Summary (1/3) -->
                 <div class="lg:col-span-1 space-y-6">
+                    <!-- ADD MEMBER FORM -->
                     <div class="glass p-7 rounded-2xl border-white/5 relative overflow-hidden">
                         <div
                             class="absolute -right-12 -top-12 w-36 h-36 bg-primary-500/8 rounded-full blur-[60px] pointer-events-none">
                         </div>
+                        <h3 class="text-lg font-extrabold mb-5 flex items-center gap-2">
+                            Nouveau <span class="text-gradient">Membre</span>
+                        </h3>
+                        <form action="{{ url_for('admin.add_member') }}" method="POST" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label
+                                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Prénom</label>
+                                    <input type="text" name="first_name" required
+                                        class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Nom</label>
+                                    <input type="text" name="last_name" required
+                                        class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium">
+                                </div>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Email</label>
+                                <input type="email" name="email" required
+                                    class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Équipe
+                                    / Catégorie</label>
+                                <div class="relative">
+                                    <select name="team_id"
+                                        class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium appearance-none pr-10">
+                                        <option value="">Aucune / À définir</option>
+                                        {% for team in teams %}
+                                        <option value="{{ team._id|string }}" class="bg-slate-900">{{ team.name }} ({{
+                                            team.category }})</option>
+                                        {% endfor %}
+                                    </select>
+                                    <i
+                                        class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-white/20 text-[10px] pointer-events-none"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Rôle</label>
+                                <div class="relative">
+                                    <select name="role"
+                                        class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium appearance-none pr-10">
+                                        <option value="player" class="bg-slate-900">Joueur</option>
+                                        <option value="coach" class="bg-slate-900">Coach</option>
+                                        <option value="parent" class="bg-slate-900">Parent</option>
+                                        <option value="fan" class="bg-slate-900">Fan / Supporter</option>
+                                    </select>
+                                    <i
+                                        class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-white/20 text-[10px] pointer-events-none"></i>
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <button type="submit"
+                                    class="gradient-primary w-full py-3.5 rounded-xl text-xs font-bold shadow-lg shadow-primary-500/15 hover:scale-[1.005] active:scale-[0.99] transition-all">
+                                    <i class="fa-solid fa-plus mr-2"></i> Créer le compte
+                                </button>
+                                <p class="text-center mt-3 text-[9px] text-white/20 light:text-slate-400 font-medium">Un
+                                    mot de passe par défaut sera généré.</p>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Member Summary Card -->
+                    <div class="glass p-7 rounded-2xl border-white/5">
                         <h3
                             class="text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-5 flex items-center gap-2">
                             <span class="w-1 h-1 bg-primary-500 rounded-full"></span>
@@ -238,7 +304,7 @@
                     </div>
                 </div>
 
-                <!-- Member List -->
+                <!-- Member List (2/3) -->
                 <div class="lg:col-span-2 space-y-4">
                     <div class="glass rounded-2xl border-white/5 overflow-x-auto custom-scrollbar">
                         <table class="w-full text-left" id="memberTable">
@@ -354,72 +420,141 @@
                     <p class="text-white/40 light:text-slate-500 text-sm mt-1.5 font-medium">Gérez les différentes
                         catégories et équipes de votre club.</p>
                 </div>
-                <button onclick="toggleModal('addTeamModal')"
-                    class="gradient-primary px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-primary-500/15 hover:scale-[1.01] active:scale-[0.99] transition-all">
-                    <i class="fa-solid fa-plus mr-2"></i> Créer une équipe
-                </button>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {% for team in teams %}
-                <div
-                    class="glass p-6 rounded-2xl border border-white/5 group hover:border-primary-500/20 transition-all duration-300 relative overflow-hidden">
-                    <div
-                        class="absolute -right-8 -top-8 w-24 h-24 bg-primary-500/5 rounded-full blur-[40px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    </div>
-                    <div class="flex justify-between items-start mb-5">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
-                            style="background: linear-gradient(135deg, {{ team.colors.primary if team.colors else '#10b981' }} 0%, {{ team.colors.secondary if team.colors else '#059669' }} 100%);">
-                            <i class="fa-solid fa-shield-halved text-sm"></i>
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Formulaire Création d'Équipe (1/3) -->
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="glass p-7 rounded-2xl border-white/5 relative overflow-hidden">
+                        <div
+                            class="absolute -right-12 -top-12 w-36 h-36 bg-primary-500/8 rounded-full blur-[60px] pointer-events-none">
                         </div>
-                        <div class="flex gap-2">
-                            <button type="button" data-id="{{ team._id|string }}" data-name="{{ team.name }}"
-                                data-primary="{{ team.colors.primary if team.colors else '#10b981' }}"
-                                data-secondary="{{ team.colors.secondary if team.colors else '#0f172a' }}"
-                                onclick="openPersonalizeModal(this)"
-                                class="w-7 h-7 rounded-lg bg-white/[0.03] hover:bg-primary-500/10 flex items-center justify-center text-white/10 hover:text-primary-400 transition-all font-medium"
-                                title="Personnaliser">
-                                <i class="fa-solid fa-palette text-xs"></i>
-                            </button>
-                            <form action="{{ url_for('admin.delete_team', team_id=team._id|string) }}" method="POST"
-                                onsubmit="return confirm('Supprimer cette équipe ?')">
-                                <button type="submit"
-                                    class="w-7 h-7 rounded-lg bg-white/[0.03] hover:bg-red-500/10 flex items-center justify-center text-white/10 hover:text-red-400 transition-all">
-                                    <i class="fa-solid fa-trash-can text-xs"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    <h3 class="text-lg font-extrabold mb-0.5">{{ team.name }}</h3>
-                    <p class="text-primary-400/80 text-[10px] font-semibold uppercase tracking-wider mb-3">{{
-                        team.category
-                        }}</p>
-                    <p class="text-white/30 text-xs mb-5 h-10 overflow-hidden font-medium leading-relaxed">{{
-                        team.description or
-                        'Aucune description.' }}</p>
+                        <h3 class="text-lg font-extrabold mb-5 flex items-center gap-2">
+                            Nouvelle <span class="text-gradient">Équipe</span>
+                        </h3>
 
-                    <div class="flex items-center justify-between pt-4 border-t border-white/5">
-                        <div class="flex items-center gap-2">
-                            <div
-                                class="w-7 h-7 rounded-lg bg-primary-500/10 flex items-center justify-center text-primary-400">
-                                <i class="fa-solid fa-whistle text-[10px]"></i>
+                        <form action="{{ url_for('admin.add_team') }}" method="POST" class="space-y-4">
+                            <div>
+                                <label
+                                    class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Nom
+                                    de l'équipe</label>
+                                <input type="text" name="name" placeholder="ex: Seniors A, U17 G" required
+                                    class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium placeholder:text-white/15">
                             </div>
-                            <span class="text-xs font-bold">
-                                {{ (team.coach_ids|length) if team.coach_ids else 0 }}
+                            <div>
+                                <label
+                                    class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Catégorie</label>
+                                <div class="relative">
+                                    <select name="category"
+                                        class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium appearance-none pr-10">
+                                        <option value="Senior" class="bg-slate-900">Sénior</option>
+                                        <option value="U19" class="bg-slate-900">U19 / U18</option>
+                                        <option value="U17" class="bg-slate-900">U17 / U16</option>
+                                        <option value="U15" class="bg-slate-900">U15 / U14</option>
+                                        <option value="Academy" class="bg-slate-900">École de Foot</option>
+                                        <option value="Feminine" class="bg-slate-900">Féminine</option>
+                                    </select>
+                                    <i
+                                        class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-white/20 text-[10px] pointer-events-none"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Description
+                                    (Optionnel)</label>
+                                <textarea name="description" rows="2"
+                                    class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium"></textarea>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label
+                                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-1.5 ml-0.5">Primaire</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="color" name="primary_color" value="#10b981"
+                                            class="w-8 h-8 rounded-lg border-none bg-transparent cursor-pointer">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-1.5 ml-0.5">Secondaire</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="color" name="secondary_color" value="#0f172a"
+                                            class="w-8 h-8 rounded-lg border-none bg-transparent cursor-pointer">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <button type="submit"
+                                    class="gradient-primary w-full py-3.5 rounded-xl text-xs font-bold shadow-lg shadow-primary-500/15 hover:scale-[1.005] active:scale-[0.99] transition-all">
+                                    <i class="fa-solid fa-plus mr-2"></i> Créer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Liste des Équipes (2/3) -->
+                <div class="lg:col-span-2 grid sm:grid-cols-2 gap-5 h-fit">
+                    {% for team in teams %}
+                    <div
+                        class="glass p-6 rounded-2xl border border-white/5 group hover:border-primary-500/20 transition-all duration-300 relative overflow-hidden">
+                        <div
+                            class="absolute -right-8 -top-8 w-24 h-24 bg-primary-500/5 rounded-full blur-[40px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        </div>
+                        <div class="flex justify-between items-start mb-5">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
+                                style="background: linear-gradient(135deg, {{ team.colors.primary if team.colors else '#10b981' }} 0%, {{ team.colors.secondary if team.colors else '#059669' }} 100%);">
+                                <i class="fa-solid fa-shield-halved text-sm"></i>
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="button" data-id="{{ team._id|string }}" data-name="{{ team.name }}"
+                                    data-primary="{{ team.colors.primary if team.colors else '#10b981' }}"
+                                    data-secondary="{{ team.colors.secondary if team.colors else '#0f172a' }}"
+                                    onclick="openPersonalizeModal(this)"
+                                    class="w-7 h-7 rounded-lg bg-white/[0.03] hover:bg-primary-500/10 flex items-center justify-center text-white/10 hover:text-primary-400 transition-all font-medium"
+                                    title="Personnaliser">
+                                    <i class="fa-solid fa-palette text-xs"></i>
+                                </button>
+                                <form action="{{ url_for('admin.delete_team', team_id=team._id|string) }}" method="POST"
+                                    onsubmit="return confirm('Supprimer cette équipe ?')">
+                                    <button type="submit"
+                                        class="w-7 h-7 rounded-lg bg-white/[0.03] hover:bg-red-500/10 flex items-center justify-center text-white/10 hover:text-red-400 transition-all">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-extrabold mb-0.5">{{ team.name }}</h3>
+                        <p class="text-primary-400/80 text-[10px] font-semibold uppercase tracking-wider mb-3">{{
+                            team.category
+                            }}</p>
+                        <p class="text-white/30 text-xs mb-5 h-10 overflow-hidden font-medium leading-relaxed">{{
+                            team.description or
+                            'Aucune description.' }}</p>
+
+                        <div class="flex items-center justify-between pt-4 border-t border-white/5">
+                            <div class="flex items-center gap-2">
+                                <div
+                                    class="w-7 h-7 rounded-lg bg-primary-500/10 flex items-center justify-center text-primary-400">
+                                    <i class="fa-solid fa-whistle text-[10px]"></i>
+                                </div>
+                                <span class="text-xs font-bold">
+                                    {{ (team.coach_ids|length) if team.coach_ids else 0 }}
+                                </span>
+                            </div>
+                            <span
+                                class="text-[9px] font-semibold uppercase tracking-wider text-white/20 flex items-center gap-1.5">
+                                <span class="w-1 h-1 bg-primary-500/40 rounded-full"></span> Coachs
                             </span>
                         </div>
-                        <span
-                            class="text-[9px] font-semibold uppercase tracking-wider text-white/20 flex items-center gap-1.5">
-                            <span class="w-1 h-1 bg-primary-500/40 rounded-full"></span> Coachs
-                        </span>
                     </div>
+                    {% else %}
+                    <div class="col-span-full py-16 text-center glass rounded-2xl border border-dashed border-white/8">
+                        <i class="fa-solid fa-layer-group text-3xl text-white/8 mb-3"></i>
+                        <p class="text-white/25 text-sm font-medium">Aucune équipe configurée pour le moment.</p>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% else %}
-                <div class="col-span-full py-16 text-center glass rounded-2xl border border-dashed border-white/8">
-                    <i class="fa-solid fa-layer-group text-3xl text-white/8 mb-3"></i>
-                    <p class="text-white/25 text-sm font-medium">Aucune équipe configurée pour le moment.</p>
-                </div>
-                {% endfor %}
             </div>
         </div>
 
@@ -1070,161 +1205,9 @@
     </main>
 </div>
 
-<!-- Modal: Add Member -->
-<div id="addMemberModal"
-    class="fixed inset-0 z-[100] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass max-w-lg w-full rounded-2xl border border-white/8 overflow-hidden animate-slide-up">
-        <div class="p-7 lg:p-8">
-            <div class="flex justify-between items-center mb-7">
-                <h3 class="text-xl font-extrabold">Nouveau <span class="text-gradient">Membre</span></h3>
-                <button onclick="toggleModal('addMemberModal')"
-                    class="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center hover:bg-white/8 transition-all text-white/30 hover:text-white/60">
-                    <i class="fa-solid fa-xmark text-xs"></i>
-                </button>
-            </div>
 
-            <form action="{{ url_for('admin.add_member') }}" method="POST" class="space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label
-                            class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Prénom</label>
-                        <input type="text" name="first_name" required
-                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium">
-                    </div>
-                    <div>
-                        <label
-                            class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Nom</label>
-                        <input type="text" name="last_name" required
-                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium">
-                    </div>
-                </div>
-                <div>
-                    <label
-                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Email</label>
-                    <input type="email" name="email" required
-                        class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium">
-                </div>
-                <div>
-                    <label
-                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Équipe
-                        (pour les joueurs)</label>
-                    <div class="relative">
-                        <select name="team_id"
-                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium appearance-none pr-10">
-                            <option value="">Aucune / À définir</option>
-                            {% for team in teams %}
-                            <option value="{{ team._id|string }}" class="bg-slate-900">{{ team.name }} ({{ team.category
-                                }})
-                            </option>
-                            {% endfor %}
-                        </select>
-                        <i
-                            class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-white/20 text-[10px] pointer-events-none"></i>
-                    </div>
-                </div>
-                <div>
-                    <label
-                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Rôle</label>
-                    <div class="relative">
-                        <select name="role"
-                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium appearance-none pr-10">
-                            <option value="player" class="bg-slate-900">Joueur</option>
-                            <option value="coach" class="bg-slate-900">Coach</option>
-                            <option value="parent" class="bg-slate-900">Parent</option>
-                            <option value="fan" class="bg-slate-900">Fan / Supporter</option>
-                        </select>
-                        <i
-                            class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-white/20 text-[10px] pointer-events-none"></i>
-                    </div>
-                </div>
-                <div class="pt-3">
-                    <button type="submit"
-                        class="gradient-primary w-full py-4 rounded-xl text-sm font-bold shadow-lg shadow-primary-500/15 hover:scale-[1.005] active:scale-[0.99] transition-all">Créer
-                        le compte</button>
-                    <p class="text-center mt-4 text-[10px] text-white/20 light:text-slate-400 font-medium">
-                        Un mot de passe par défaut sera généré.</p>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
-<!-- Modal: Add Team -->
-<div id="addTeamModal"
-    class="fixed inset-0 z-[100] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass max-w-lg w-full rounded-2xl border border-white/8 overflow-hidden animate-slide-up">
-        <div class="p-7 lg:p-8">
-            <div class="flex justify-between items-center mb-7">
-                <h3 class="text-xl font-extrabold">Nouvelle <span class="text-gradient">Équipe</span></h3>
-                <button onclick="toggleModal('addTeamModal')"
-                    class="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center hover:bg-white/8 transition-all text-white/30 hover:text-white/60">
-                    <i class="fa-solid fa-xmark text-xs"></i>
-                </button>
-            </div>
 
-            <form action="{{ url_for('admin.add_team') }}" method="POST" class="space-y-4">
-                <div>
-                    <label
-                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Nom
-                        de l'équipe</label>
-                    <input type="text" name="name" placeholder="ex: Seniors A, U17 G" required
-                        class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium placeholder:text-white/15">
-                </div>
-                <div>
-                    <label
-                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Catégorie</label>
-                    <div class="relative">
-                        <select name="category"
-                            class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium appearance-none pr-10">
-                            <option value="Senior" class="bg-slate-900">Sénior</option>
-                            <option value="U19" class="bg-slate-900">U19 / U18</option>
-                            <option value="U17" class="bg-slate-900">U17 / U16</option>
-                            <option value="U15" class="bg-slate-900">U15 / U14</option>
-                            <option value="Academy" class="bg-slate-900">École de Foot</option>
-                            <option value="Feminine" class="bg-slate-900">Féminine</option>
-                        </select>
-                        <i
-                            class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-white/20 text-[10px] pointer-events-none"></i>
-                    </div>
-                </div>
-                <div>
-                    <label
-                        class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 light:text-slate-400 mb-1.5 ml-0.5">Description
-                        (Optionnel)</label>
-                    <textarea name="description" rows="1"
-                        class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 transition-all font-medium"></textarea>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label
-                            class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-1.5 ml-0.5">Couleur
-                            Primaire</label>
-                        <div class="flex items-center gap-2">
-                            <input type="color" name="primary_color" value="#10b981"
-                                class="w-10 h-10 border-none bg-transparent cursor-pointer">
-                            <span class="text-[10px] text-white/40 font-mono">#10b981</span>
-                        </div>
-                    </div>
-                    <div>
-                        <label
-                            class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-1.5 ml-0.5">Couleur
-                            Secondaire</label>
-                        <div class="flex items-center gap-2">
-                            <input type="color" name="secondary_color" value="#0f172a"
-                                class="w-10 h-10 border-none bg-transparent cursor-pointer">
-                            <span class="text-[10px] text-white/40 font-mono">#0f172a</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="pt-3">
-                    <button type="submit"
-                        class="gradient-primary w-full py-4 rounded-xl text-sm font-bold shadow-lg shadow-primary-500/15 hover:scale-[1.005] active:scale-[0.99] transition-all">Créer
-                        l'équipe</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <!-- Modal: Invite -->
 <div id="inviteModal"

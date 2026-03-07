@@ -145,7 +145,22 @@ def register_club():
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    """User registration page (Default for Fans/Players)"""
+    """User registration page (Supports Invitation Token)"""
+    token = request.args.get('token')
+    
+    from app.services import get_user_service, get_club_service
+    user_service = get_user_service()
+    club_service = get_club_service()
+    
+    pending_user = None
+    club_name = None
+    if token:
+        pending_user = user_service.collection.find_one({'invitation_token': token})
+        if pending_user and pending_user.get('club_id'):
+            club = club_service.get_by_id(pending_user['club_id'])
+            if club:
+                club_name = club.get('name')
+                
     if request.method == 'POST':
         email = request.form.get('email', '').lower()
         password = request.form.get('password')
@@ -160,29 +175,72 @@ def register():
         from app.services import get_user_service
         user_service = get_user_service()
         
-        # Check if email exists
-        if user_service.get_by_email(email):
+        # Check if email exists in active users
+        existing_user = user_service.get_by_email(email)
+        if existing_user and existing_user.get('account_status') == 'active':
             flash('Cet email est deja utilise.', 'error')
-            return render_template('auth/register.html')
+            return render_template('auth/register.html', pending_user=pending_user, club_name=club_name)
         
-        # Create user
-        profile = {
-            'first_name': first_name,
-            'last_name': last_name,
-            'avatar': '',
-            'phone': ''
-        }
-        # Get roles from form
-        roles = request.form.getlist('roles')
-        if not roles:
-            roles = ['fan'] # Default if nothing selected
+        if pending_user:
+            # Complete registration for invited user
+            from werkzeug.security import generate_password_hash
+            from datetime import datetime
             
-        user = user_service.create(email, password, roles=roles, profile=profile)
-        
-        flash('Inscription reussie! Connectez-vous.', 'success')
-        return redirect(url_for('auth.login'))
+            user_service.collection.update_one(
+                {'_id': pending_user['_id']},
+                {'$set': {
+                    'password_hash': generate_password_hash(password),
+                    'account_status': 'active',
+                    'profile.first_name': first_name,
+                    'profile.last_name': last_name,
+                    'last_login': datetime.utcnow()
+                }, '$unset': {'invitation_token': ''}}
+            )
+            
+            # If player, update player profile name
+            if pending_user.get('role') == 'player':
+                from app.services import get_player_service
+                player_service = get_player_service()
+                player_profile = player_service.collection.find_one({'user_id': pending_user['_id']})
+                if player_profile:
+                    player_service.collection.update_one(
+                        {'_id': player_profile['_id']},
+                        {'$set': {'name': f"{first_name} {last_name}"}}
+                    )
+            
+            # Auto-login the completed user
+            updated_user = user_service.get_by_id(pending_user['_id'])
+            session['user_id'] = str(updated_user['_id'])
+            session['user_role'] = updated_user['role']
+            session['user_email'] = updated_user['email']
+            session['user_profile'] = updated_user.get('profile', {})
+            session['club_id'] = str(updated_user['club_id']) if updated_user.get('club_id') else None
+            
+            flash('Inscription complétée avec succès !', 'success')
+            if updated_user['role'] == 'admin':
+                return redirect(url_for('admin.admin_panel'))
+            elif updated_user['role'] == 'coach':
+                return redirect(url_for('main.dashboard'))
+            else:
+                return redirect(url_for('main.app_home'))
+                
+        else:
+            # Create standard user
+            profile = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'avatar': '',
+                'phone': ''
+            }
+            roles = request.form.getlist('roles')
+            if not roles:
+                roles = ['fan']
+                
+            user = user_service.create(email, password, roles=roles, profile=profile)
+            flash('Inscription reussie! Connectez-vous.', 'success')
+            return redirect(url_for('auth.login'))
     
-    return render_template('auth/register.html')
+    return render_template('auth/register.html', pending_user=pending_user, club_name=club_name)
 
 @auth_bp.route('/logout')
 def logout():

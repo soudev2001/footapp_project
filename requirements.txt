@@ -6,3 +6,5 @@ gunicorn==21.2.0
 python-dotenv==1.0.0
 pytest>=8.0.0
 pytest-playwright>=0.7.0
+
+Flask-Mail==0.10.0
