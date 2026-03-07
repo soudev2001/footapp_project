@@ -901,23 +901,54 @@
                         <!-- Live Preview -->
                         <div class="p-5 rounded-xl border border-white/5 bg-white/[0.02]">
                             <p class="text-[9px] font-semibold uppercase tracking-wider text-white/25 mb-3"><i
-                                    class="fa-solid fa-eye mr-1"></i>Aperçu en direct</p>
-                            <div class="flex items-center gap-3" id="persoPreviewSwatches">
-                                <div class="w-16 h-16 rounded-xl shadow-lg" id="previewPrimary"
-                                    style="background: {{ club.colors.primary if club and club.colors else '#10b981' }};">
+                                    class="fa-solid fa-eye mr-1"></i>Aperçu en direct UI</p>
+                            <div class="flex flex-col gap-4" id="persoPreviewSwatches">
+                                <!-- Mini Navbar Mockup -->
+                                <div class="w-full h-12 rounded-xl flex items-center justify-between px-4"
+                                    id="previewNavbar"
+                                    style="background: {{ club.colors.secondary if club and club.colors else '#0f172a' }}; border-bottom: 2px solid {{ club.colors.primary if club and club.colors else '#10b981' }};">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 rounded-md flex items-center justify-center font-bold text-[8px] text-white"
+                                            id="previewNavLogo"
+                                            style="background: {{ club.colors.primary if club and club.colors else '#10b981' }};">
+                                            FL
+                                        </div>
+                                        <div class="h-2 w-16 rounded"
+                                            style="background: {{ club.colors.primary if club and club.colors else '#10b981' }}30">
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <div class="h-2 w-8 rounded bg-white/10"></div>
+                                        <div class="h-2 w-8 rounded bg-white/10"></div>
+                                    </div>
                                 </div>
-                                <div class="w-16 h-16 rounded-xl shadow-lg" id="previewSecondary"
-                                    style="background: {{ club.colors.secondary if club and club.colors else '#0f172a' }};">
-                                </div>
-                                <div class="w-16 h-16 rounded-xl shadow-lg" id="previewAccent"
-                                    style="background: {{ club.colors.accent if club and club.colors and club.colors.accent else '#8b5cf6' }};">
-                                </div>
-                                <div class="flex-1 p-3 rounded-xl" id="previewCard"
+
+                                <!-- Mini Card Mockup -->
+                                <div class="w-full p-4 rounded-xl flex flex-col gap-3" id="previewCard"
                                     style="background: {{ club.colors.primary if club and club.colors else '#10b981' }}15; border: 1px solid {{ club.colors.primary if club and club.colors else '#10b981' }}30;">
-                                    <p class="text-xs font-bold" id="previewCardText"
-                                        style="color: {{ club.colors.primary if club and club.colors else '#10b981' }};">
-                                        {{ club.name if club else 'Mon Club' }}</p>
-                                    <p class="text-[9px] text-white/40">Exemple de carte avec vos couleurs</p>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+                                            id="previewAvatar"
+                                            style="background: linear-gradient(135deg, {{ club.colors.primary if club and club.colors else '#10b981' }}, {{ club.colors.secondary if club and club.colors else '#0f172a' }});">
+                                            <i class="fa-solid fa-user text-white text-xs"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold" id="previewCardText"
+                                                style="color: {{ club.colors.primary if club and club.colors else '#10b981' }};">
+                                                {{ club.name if club else 'Mon Club' }}</p>
+                                            <p class="text-[9px] text-white/40">Exemple de composant avec UI</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2 mt-2">
+                                        <button type="button"
+                                            class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-white shadow-lg border border-white/10 hover:opacity-90"
+                                            id="previewBtnPrimary"
+                                            style="background: {{ club.colors.primary if club and club.colors else '#10b981' }};">Primaire</button>
+                                        <button type="button"
+                                            class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-white shadow-lg border border-white/10 hover:opacity-90"
+                                            id="previewBtnAccent"
+                                            style="background: {{ club.colors.accent if club and club.colors and club.colors.accent else '#f59e0b' }}; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Accent</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -970,14 +1001,35 @@
 
                         <!-- Extracted Colors Result -->
                         <div id="extractedColorsResult"
-                            class="hidden mt-4 p-4 rounded-xl bg-white/[0.03] border border-white/5">
-                            <p class="text-[9px] font-semibold uppercase tracking-wider text-white/20 mb-3">Couleurs
-                                extraites</p>
-                            <div class="flex gap-2 flex-wrap" id="extractedSwatches"></div>
-                            <button type="button" onclick="applyExtractedColors()"
-                                class="mt-4 w-full py-3 rounded-xl gradient-primary text-xs font-bold transition-all hover:scale-[1.01]">
-                                <i class="fa-solid fa-check mr-1"></i>Appliquer ces couleurs
-                            </button>
+                            class="hidden mt-4 p-4 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5">
+                            <p
+                                class="text-[9px] font-semibold uppercase tracking-wider text-slate-500 dark:text-white/20 mb-3">
+                                Couleurs extraites</p>
+
+                            <!-- Custom Dropdown Container -->
+                            <div class="relative w-full mb-3" id="colorDropdownContainer">
+                                <button type="button"
+                                    onclick="document.getElementById('colorDropdownMenu').classList.toggle('hidden')"
+                                    class="w-full flex items-center justify-between bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-white/8 rounded-xl py-3 px-4 focus:outline-none transition-all hover:bg-slate-50 dark:hover:bg-white/5">
+                                    <span class="text-slate-600 dark:text-white text-xs font-semibold"
+                                        id="colorDropdownLabel">Sélectionnez une couleur...</span>
+                                    <i class="fa-solid fa-chevron-down text-slate-400 dark:text-white/50 text-xs"></i>
+                                </button>
+                                <div id="colorDropdownMenu"
+                                    class="hidden absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-xl z-50 flex flex-col gap-1 max-h-48 overflow-y-auto">
+                                    <!-- JS dynamically fills this -->
+                                </div>
+                            </div>
+
+                            <!-- Application Actions -->
+                            <div class="flex gap-2 w-full hidden" id="colorApplyActions">
+                                <button type="button" onclick="applyExtractedColor('persoClubPrimary')"
+                                    class="flex-1 py-2 rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-500 hover:bg-primary-500 hover:text-white text-[10px] font-bold transition-all border border-primary-500/20">Primaire</button>
+                                <button type="button" onclick="applyExtractedColor('persoClubSecondary')"
+                                    class="flex-1 py-2 rounded-lg bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-white hover:bg-slate-300 dark:hover:bg-white/20 text-[10px] font-bold transition-all border border-slate-300 dark:border-white/10">Secondaire</button>
+                                <button type="button" onclick="applyExtractedColor('persoClubAccent')"
+                                    class="flex-1 py-2 rounded-lg bg-accent-500/10 text-accent-600 dark:text-accent-500 hover:bg-accent-500 hover:text-white text-[10px] font-bold transition-all border border-accent-500/20">Accent</button>
+                            </div>
                         </div>
                     </div>
 
@@ -1281,13 +1333,55 @@
         document.getElementById('persoClubPrimaryHex').textContent = p;
         document.getElementById('persoClubSecondaryHex').textContent = s;
         document.getElementById('persoClubAccentHex').textContent = a;
-        document.getElementById('previewPrimary').style.background = p;
-        document.getElementById('previewSecondary').style.background = s;
-        document.getElementById('previewAccent').style.background = a;
-        document.getElementById('previewCard').style.background = p + '15';
-        document.getElementById('previewCard').style.borderColor = p + '30';
-        document.getElementById('previewCardText').style.color = p;
+
+        // Update local mini preview elements
+        const navbar = document.getElementById('previewNavbar');
+        if (navbar) {
+            navbar.style.background = s;
+            navbar.style.borderBottomColor = p;
+            document.getElementById('previewNavLogo').style.background = p;
+            navbar.querySelector('div.flex > div:nth-child(2)').style.background = p + '30';
+        }
+
+        const card = document.getElementById('previewCard');
+        if (card) {
+            card.style.background = p + '15';
+            card.style.borderColor = p + '30';
+            document.getElementById('previewAvatar').style.background = `linear-gradient(135deg, ${p}, ${s})`;
+            document.getElementById('previewCardText').style.color = p;
+            document.getElementById('previewBtnPrimary').style.background = p;
+            document.getElementById('previewBtnAccent').style.background = a;
+        }
+
+        // Apply dynamically to the whole page via CSS Variables!
+        if (typeof getColorRGB === 'function') {
+            const root = document.documentElement;
+            root.style.setProperty('--primary-rgb', getColorRGB(p));
+            root.style.setProperty('--secondary-rgb', getColorRGB(s));
+            root.style.setProperty('--accent-rgb', getColorRGB(a));
+
+            if (typeof getContrastYIQ === 'function') {
+                root.style.setProperty('--primary-fg-rgb', getContrastYIQ(p));
+                root.style.setProperty('--secondary-fg-rgb', getContrastYIQ(s));
+                root.style.setProperty('--accent-fg-rgb', getContrastYIQ(a));
+
+                // Also update local mockups
+                const btnP = document.getElementById('previewBtnPrimary');
+                const btnA = document.getElementById('previewBtnAccent');
+                const logo = document.getElementById('previewNavLogo');
+                if (btnP) btnP.style.color = `rgb(${getContrastYIQ(p)})`;
+                if (btnA) btnA.style.color = `rgb(${getContrastYIQ(a)})`;
+                if (logo) logo.style.color = `rgb(${getContrastYIQ(p)})`;
+            }
+
+            // Re-apply to custom inline properties defined in :root
+            root.style.setProperty('--primary-color', p);
+            root.style.setProperty('--secondary-color', s);
+            root.style.setProperty('--accent-color', a);
+        }
     }
+
+    let selectedExtractedColor = null;
 
     // Auto-extract colors from logo using Canvas API
     function extractLogoColors() {
@@ -1315,28 +1409,30 @@
                 const [r, g, b] = k.split(',').map(Number);
                 return '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('');
             });
-            const container = document.getElementById('extractedSwatches');
+            const container = document.getElementById('colorDropdownMenu');
             container.innerHTML = extractedColors.map((c, i) =>
-                `<div class="w-12 h-12 rounded-xl cursor-pointer border-2 ${i === 0 ? 'border-white' : 'border-transparent'} hover:border-white/50 transition-all shadow-lg" style="background:${c};" title="${c}" onclick="selectExtracted(${i})"></div>`
+                `<button type="button" onclick="selectExtractedColor('${c}', ${i})" class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-left transition-colors cursor-pointer">
+                    <div class="w-6 h-6 rounded-md shadow-inner border border-slate-200 dark:border-white/20" style="background:${c};"></div>
+                    <span class="text-xs font-mono text-slate-700 dark:text-white/80">${c}</span>
+                </button>`
             ).join('');
             document.getElementById('extractedColorsResult').classList.remove('hidden');
         } catch (e) {
             alert('Impossible d\'extraire les couleurs. Le logo doit être hébergé sur le même domaine ou autoriser CORS.');
         }
     }
-    function selectExtracted(idx) {
-        document.querySelectorAll('#extractedSwatches > div').forEach((d, i) => {
-            d.classList.toggle('border-white', i === idx);
-            d.classList.toggle('border-transparent', i !== idx);
-        });
+
+    function selectExtractedColor(colorHex, idx) {
+        selectedExtractedColor = colorHex;
+        document.getElementById('colorDropdownLabel').innerHTML = `<div class="flex items-center gap-2"><div class="w-4 h-4 rounded shadow-inner" style="background:${colorHex}"></div><span class="font-mono text-slate-800 dark:text-white font-semibold">${colorHex}</span></div>`;
+        document.getElementById('colorDropdownMenu').classList.add('hidden');
+        document.getElementById('colorApplyActions').classList.remove('hidden');
     }
-    function applyExtractedColors() {
-        if (extractedColors.length >= 2) {
-            document.getElementById('persoClubPrimary').value = extractedColors[0];
-            document.getElementById('persoClubSecondary').value = extractedColors[1];
-            if (extractedColors.length >= 3) document.getElementById('persoClubAccent').value = extractedColors[2];
-            updatePersoPreview();
-        }
+
+    function applyExtractedColor(targetId) {
+        if (!selectedExtractedColor) return;
+        document.getElementById(targetId).value = selectedExtractedColor;
+        updatePersoPreview();
     }
 
     // Member filtering

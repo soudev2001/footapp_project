@@ -190,3 +190,40 @@ def api_login():
         })
     return jsonify({'success': False, 'error': 'User not found'}), 404
 
+# ============================================================
+# NEW: SWAGGER DOCS & MOBILE SPECIFIC ENDPOINTS
+# ============================================================
+
+from flask import render_template
+
+@api_bp.route('/docs')
+def swagger_ui():
+    """Serve Swagger UI for API Documentation"""
+    return render_template('api/docs.html')
+
+@api_bp.route('/events/convocations', methods=['GET'])
+def get_convocations():
+    """Mock endpoint for getting convocations"""
+    return jsonify({
+        'success': True,
+        'data': []
+    })
+
+@api_bp.route('/events/<event_id>/rsvp', methods=['POST'])
+def update_rsvp(event_id):
+    """Mock endpoint for RSVP to events"""
+    data = request.json
+    status = data.get('status')
+    if status in ['present', 'absent', 'uncertain']:
+        return jsonify({'success': True, 'message': f'RSVP updated to {status}'})
+    return jsonify({'success': False, 'error': 'Invalid status'}), 400
+
+@api_bp.route('/notifications/token', methods=['POST'])
+def register_device_token():
+    """Mock endpoint to register Firebase push notification token"""
+    data = request.json
+    fcm_token = data.get('fcmToken')
+    if fcm_token:
+        return jsonify({'success': True, 'message': 'Firebase token registered successfully'})
+    return jsonify({'success': False, 'error': 'Missing fcmToken'}), 400
+

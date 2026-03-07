@@ -1,0 +1,147 @@
+openapi: 3.0.3
+info:
+  title: FootLogic API
+  description: Documentation interactive des APIs de FootLogic pour les équipes Front-End et Mobile
+  version: 2.0.0
+servers:
+  - url: /api
+    description: Serveur principal
+tags:
+  - name: Auth
+    description: Authentification
+  - name: Convocations
+    description: Gestion des convocations
+  - name: Calendrier
+    description: Gestion des événements
+  - name: RSVP
+    description: Réponses aux convocations
+  - name: Notifications
+    description: Firebase push notifications
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - BearerAuth: []
+paths:
+  /auth/login:
+    post:
+      summary: Connexion pour récupérer le Token Bearer (JWT)
+      security: []
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: admin@footlogic.fr
+                password:
+                  type: string
+                  example: admin123
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Succès de la connexion.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsIn...
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      role:
+                        type: string
+                      email:
+                        type: string
+        '401':
+          description: Identifiants invalides.
+  /events:
+    get:
+      summary: Récupérer tous les événements (Calendrier)
+      tags:
+        - Calendrier
+      responses:
+        '200':
+          description: Succès.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+  /events/convocations:
+    get:
+      summary: Récupérer les convocations au match ou à l'entrainement.
+      tags:
+        - Convocations
+      responses:
+        '200':
+          description: Liste des convocations
+  /events/{eventId}/rsvp:
+    post:
+      summary: Envoyer sa présence ou absence à un événement
+      tags:
+        - RSVP
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [present, absent, uncertain]
+      responses:
+        '200':
+          description: Statut mis à jour avec succès
+  /notifications/token:
+    post:
+      summary: Enregistrer le Firebase Token lié à un appareil mobile
+      tags:
+        - Notifications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fcmToken:
+                  type: string
+                deviceId:
+                  type: string
+      responses:
+        '200':
+          description: Token enregistré.

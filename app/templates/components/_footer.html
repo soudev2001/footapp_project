@@ -1,0 +1,112 @@
+<!-- _footer.html -->
+<footer class="relative z-10 py-12 border-t border-white/5 bg-[#020617]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 lg:gap-12">
+            <!-- Brand -->
+            <div class="space-y-4">
+                <a href="{{ url_for('main.index') }}" class="flex items-center gap-3">
+                    <div
+                        class="w-8 h-8 rounded-xl gradient-primary flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                        FL
+                    </div>
+                    <div>
+                        <span class="text-white font-extrabold text-lg tracking-tight font-outfit">FOOTLOGIC</span>
+                        <span class="text-primary-400 font-bold text-[10px] uppercase tracking-widest block -mt-1">Elite
+                            Platform</span>
+                    </div>
+                </a>
+                <p class="text-white/40 text-sm leading-relaxed">
+                    La plateforme ultime pour la gestion professionnelle et tactique des clubs de football amateur.
+                </p>
+                <div class="flex items-center gap-4 mt-4">
+                    <a href="#"
+                        class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-colors">
+                        <i class="fa-brands fa-twitter"></i>
+                    </a>
+                    <a href="#"
+                        class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-colors">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="#"
+                        class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-colors">
+                        <i class="fa-brands fa-linkedin-in"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Navigation Rapide -->
+            <div>
+                <h4 class="text-white font-bold mb-4">Navigation</h4>
+                <ul class="space-y-2">
+                    <li><a href="{{ url_for('main.index') }}"
+                            class="text-white/40 hover:text-primary-400 transition-colors text-sm">Accueil</a></li>
+                    <li><a href="{{ url_for('main.feed') }}"
+                            class="text-white/40 hover:text-primary-400 transition-colors text-sm">Actualités</a></li>
+                    <li><a href="{{ url_for('main.public_club') }}"
+                            class="text-white/40 hover:text-primary-400 transition-colors text-sm">Annuaire Clubs</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Ressources (Conditionnel) -->
+            <div>
+                <h4 class="text-white font-bold mb-4">Espace Membre</h4>
+                <ul class="space-y-2">
+                    {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'admin' %}
+                    <li><a href="#" class="text-white/40 hover:text-primary-400 transition-colors text-sm"><i
+                                class="fa-solid fa-file-invoice-dollar w-5"></i> Facturation</a></li>
+                    <li><a href="#" class="text-white/40 hover:text-primary-400 transition-colors text-sm"><i
+                                class="fa-solid fa-server w-5"></i> Architecture</a></li>
+                    <li><a href="#" class="text-white/40 hover:text-primary-400 transition-colors text-sm"><i
+                                class="fa-solid fa-headset w-5"></i> Support VIP</a></li>
+                    {% elif current_user.role == 'coach' %}
+                    <li><a href="#" class="text-white/40 hover:text-primary-400 transition-colors text-sm"><i
+                                class="fa-solid fa-book-open w-5"></i> Base d'exercices</a></li>
+                    <li><a href="#" class="text-white/40 hover:text-primary-400 transition-colors text-sm"><i
+                                class="fa-solid fa-bug w-5"></i> Signaler un bug</a></li>
+                    {% elif current_user.role in ['player', 'parent'] %}
+                    <li><a href="#" class="text-white/40 hover:text-primary-400 transition-colors text-sm"><i
+                                class="fa-solid fa-scale-balanced w-5"></i> Charte du club</a></li>
+                    <li><a href="#" class="text-white/40 hover:text-primary-400 transition-colors text-sm"><i
+                                class="fa-regular fa-comment-dots w-5"></i> Contact dirigeants</a></li>
+                    <li><a href="#" class="text-white/40 hover:text-primary-400 transition-colors text-sm"><i
+                                class="fa-solid fa-circle-question w-5"></i> FAQ</a></li>
+                    {% endif %}
+                    {% else %}
+                    <li><a href="{{ url_for('auth.register') }}"
+                            class="text-white/40 hover:text-primary-400 transition-colors text-sm"><i
+                                class="fa-solid fa-user-plus w-5"></i> Devenir membre</a></li>
+                    <li><a href="#" class="text-white/40 hover:text-primary-400 transition-colors text-sm"><i
+                                class="fa-solid fa-store w-5"></i> Boutique</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <!-- Juridique -->
+            <div>
+                <h4 class="text-white font-bold mb-4">Juridique</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-white/40 hover:text-primary-400 transition-colors text-sm">CGU &
+                            Confidentialité</a></li>
+                    <li><a href="#" class="text-white/40 hover:text-primary-400 transition-colors text-sm">Mentions
+                            Légales</a></li>
+                    <li><a href="#" class="text-white/40 hover:text-primary-400 transition-colors text-sm">Cookies</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div
+            class="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row shadow-sm justify-between items-center gap-4">
+            <p class="text-white/30 text-xs">
+                &copy; {{ current_year|default('2026') }} FootLogic Elite Platform. Tous droits réservés.
+            </p>
+            <div class="flex items-center gap-2">
+                <span class="text-white/20 text-xs">Propulsé par</span>
+                <img src="/static/img/brand/logo.svg" alt="FL"
+                    class="h-4 opacity-50 grayscale hover:opacity-100 hover:grayscale-0 transition-all rounded">
+            </div>
+        </div>
+    </div>
+</footer>
