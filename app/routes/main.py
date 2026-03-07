@@ -127,16 +127,55 @@ def app_home():
         return redirect(url_for('player.home'))
     else:
         # Fan or other stays on the main app home
-        from app.services import get_team_service, get_event_service, get_post_service, get_player_service
+        from app.services import get_team_service, get_event_service, get_post_service, get_player_service, get_match_service
         team_service = get_team_service()
         event_service = get_event_service()
         post_service = get_post_service()
+        player_service = get_player_service()
+        match_service = get_match_service()
         club_id = session.get('club_id')
         
         teams = []
         upcoming_events = []
+        recent_posts = []
+        player_count = 0
+        next_match = None
+        match_stats = {'wins': 0, 'draws': 0, 'losses': 0, 'total': 0}
+        
         if club_id:
             teams = team_service.get_by_club(club_id)
+            
+            # Player count
+            all_players = player_service.get_by_club(club_id)
+            player_count = len(all_players) if all_players else 0
+            
+            # Recent posts
+            try:
+                recent_posts = post_service.get_by_club(club_id)[:3]
+            except Exception:
+                recent_posts = []
+            
+            # Matches data
+            try:
+                all_matches = match_service.get_by_club(club_id)
+                for m in all_matches:
+                    if m.get('status') == 'completed':
+                        match_stats['total'] += 1
+                        score = m.get('score', {})
+                        home = score.get('home', 0)
+                        away = score.get('away', 0)
+                        if m.get('is_home', True):
+                            if home > away: match_stats['wins'] += 1
+                            elif home < away: match_stats['losses'] += 1
+                            else: match_stats['draws'] += 1
+                        else:
+                            if away > home: match_stats['wins'] += 1
+                            elif away < home: match_stats['losses'] += 1
+                            else: match_stats['draws'] += 1
+                    elif m.get('status') == 'scheduled' and not next_match:
+                        next_match = m
+            except Exception:
+                pass
             
         # Selected team for fan (could be stored in session or query)
         selected_team_id = request.args.get('team_id')
@@ -150,7 +189,11 @@ def app_home():
         return render_template('app/home.html', 
             teams=teams, 
             selected_team_id=selected_team_id,
-            upcoming_events=upcoming_events
+            upcoming_events=upcoming_events,
+            recent_posts=recent_posts,
+            player_count=player_count,
+            next_match=next_match,
+            match_stats=match_stats
         )
 
 @main_bp.route('/dashboard')
@@ -180,7 +223,22 @@ def calendar():
 @main_bp.route('/roster')
 def roster():
     """Team roster"""
-    return render_template('app/roster.html')
+    from app.services import get_player_service, get_user_service
+    club_id = session.get('club_id')
+    players = []
+    if club_id:
+        player_service = get_player_service()
+        user_service = get_user_service()
+        raw_players = player_service.get_by_club(club_id)
+        for p in raw_players:
+            # Enrich with user profile if available
+            if not p.get('profile'):
+                user = user_service.get_by_id(str(p.get('user_id'))) if p.get('user_id') else None
+                p['profile'] = user.get('profile', {'first_name': '', 'last_name': ''}) if user else {'first_name': p.get('name', ''), 'last_name': ''}
+            if not p.get('stats'):
+                p['stats'] = {'goals': 0, 'assists': 0, 'matches_played': 0, 'yellow_cards': 0, 'red_cards': 0}
+            players.append(p)
+    return render_template('app/roster.html', players=players)
 
 @main_bp.route('/profile')
 def profile():

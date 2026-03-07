@@ -2,7 +2,14 @@
 
 import os
 import json
+from dotenv import load_dotenv
 
+# Load .env.dev for development
+env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env.dev')
+if os.path.exists(env_path):
+    load_dotenv(env_path)
+else:
+    load_dotenv()  # fallback to .env
 def load_admin_config():
     """Load admin configuration from admin_config.json"""
     config_path = os.path.join(os.path.dirname(__file__), 'admin_config.json')

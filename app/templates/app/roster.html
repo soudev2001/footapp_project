@@ -45,11 +45,11 @@
     </div>
 
     <!-- Players Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="playersGrid">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="playersGrid">
         {% for player in players %}
         <div class="player-card glass group rounded-3xl border-white/5 overflow-hidden hover:bg-white/5 transition-all duration-500 cursor-pointer"
             data-position="{{ player.position }}" data-name="{{ player.name or player.profile.first_name }}">
-            <div class="relative h-64 overflow-hidden">
+            <div class="relative h-80 overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
                 {% if player.photo %}
                 <img src="{{ player.photo }}"
@@ -66,28 +66,28 @@
                         player.position == 'MID' %}MILIEU{% elif player.position == 'ATT' %}ATTAQUANT{% else %}JOUEUR{%
                         endif %}
                     </p>
-                    <h3 class="text-2xl font-bold leading-none">{{ player.name or (player.profile.first_name + '
+                    <h3 class="text-3xl font-extrabold leading-none">{{ player.name or (player.profile.first_name + '
                         ' + player.profile.last_name) }}</h3>
                 </div>
                 <div
-                    class="absolute top-6 right-6 z-20 w-12 h-12 glass rounded-2xl flex items-center justify-center text-xl font-bold border-white/10">
+                    class="absolute top-6 right-6 z-20 w-14 h-14 glass rounded-2xl flex items-center justify-center text-2xl font-extrabold border-white/10 shadow-lg">
                     {{ player.jersey_number or '--' }}
                 </div>
             </div>
-            <div class="p-8">
+            <div class="p-10">
                 <div class="flex justify-between items-center mb-6">
                     <div class="text-center">
-                        <p class="text-2xl font-bold">{{ player.stats.goals or 0 }}</p>
+                        <p class="text-3xl font-extrabold">{{ player.stats.goals or 0 }}</p>
                         <p class="text-[8px] font-bold text-white/20 uppercase tracking-wider">Buts</p>
                     </div>
                     <div class="w-px h-8 bg-white/10"></div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold">{{ player.stats.assists or 0 }}</p>
+                        <p class="text-3xl font-extrabold">{{ player.stats.assists or 0 }}</p>
                         <p class="text-[8px] font-bold text-white/20 uppercase tracking-wider">Assists</p>
                     </div>
                     <div class="w-px h-8 bg-white/10"></div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold text-primary-400">{{ player.stats.matches_played or 0 }}
+                        <p class="text-3xl font-extrabold text-primary-400">{{ player.stats.matches_played or 0 }}
                         </p>
                         <p class="text-[8px] font-bold text-white/20 uppercase tracking-wider">Matchs</p>
                     </div>

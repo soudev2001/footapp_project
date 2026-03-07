@@ -6,46 +6,58 @@
     <!-- Chat Sidebar -->
     <aside class="w-full md:w-80 lg:w-96 glass-dark border-r border-white/5 flex flex-col z-20" id="chatSidebar">
         <!-- Header -->
-        <div class="p-6 border-b border-white/5">
-            <h2 class="text-xl font-black tracking-tight text-white mb-4">
-                MESSAGES <span class="text-primary-500">.</span>
-            </h2>
+        <div class="p-5 border-b border-white/5">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-black tracking-tight text-white">
+                    MESSAGES <span class="text-primary-500">.</span>
+                </h2>
+                <div class="flex items-center gap-2">
+                    {% if is_admin %}
+                    <button onclick="openCreateChannelModal()" title="Créer un canal"
+                        class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/30 hover:text-primary-400 hover:border-primary-500/30 transition-all">
+                        <i class="fa-solid fa-hashtag text-xs"></i>
+                    </button>
+                    {% endif %}
+                    <button onclick="openNewMessageModal()" title="Nouveau message"
+                        class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white hover:shadow-lg hover:shadow-primary-500/20 hover:scale-105 active:scale-95 transition-all">
+                        <i class="fa-solid fa-pen-to-square text-xs"></i>
+                    </button>
+                </div>
+            </div>
             <div class="relative group">
                 <i
-                    class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-500 transition-colors"></i>
-                <input type="text" id="userSearch" placeholder="Rechercher une conversation..."
-                    class="w-full bg-white/5 border border-white/5 rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-primary-500/50 focus:bg-white/10 transition-all"
+                    class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary-500 transition-colors text-xs"></i>
+                <input type="text" id="userSearch" placeholder="Rechercher..."
+                    class="w-full bg-white/5 border border-white/5 rounded-xl py-2.5 pl-9 pr-4 text-xs text-white placeholder-white/20 focus:outline-none focus:border-primary-500/50 focus:bg-white/10 transition-all"
                     onkeyup="filterConversations()">
             </div>
         </div>
 
         <!-- Conversations List -->
-        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6">
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-5">
 
-            <!-- Teams Section -->
-            {% if teams %}
+            <!-- Custom Channels -->
+            {% if channels %}
             <div>
-                <h3 class="text-[10px] font-bold uppercase tracking-widest text-white/20 px-2 mb-3">Équipes</h3>
-                <div class="space-y-1">
-                    {% for team in teams %}
-                    <button onclick="loadChat('team', '{{ team._id|string }}', '{{ team.name }}')"
-                        class="chat-item w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 transition-all text-left group border border-transparent hover:border-white/5 relative overflow-hidden"
-                        data-name="{{ team.name|lower }}" data-type="team" data-id="{{ team._id }}">
-
+                <h3
+                    class="text-[9px] font-bold uppercase tracking-widest text-white/20 px-2 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-hashtag text-[7px]"></i>Canaux
+                </h3>
+                <div class="space-y-0.5">
+                    {% for channel in channels %}
+                    <button onclick="loadChat('channel', '{{ channel._id|string }}', '{{ channel.name }}')"
+                        class="chat-item w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-all text-left group border border-transparent hover:border-white/5"
+                        data-name="{{ channel.name|lower }}" data-type="channel" data-id="{{ channel._id }}">
                         <div
-                            class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
-                            <i class="fa-solid fa-people-group text-sm"></i>
+                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+                            <i class="fa-solid fa-{{ channel.icon or 'hashtag' }} text-sm"></i>
                         </div>
-
                         <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-center mb-0.5">
-                                <p
-                                    class="text-sm font-bold text-white group-hover:text-primary-400 transition-colors truncate">
-                                    {{ team.name }}</p>
-                                <span class="text-[10px] text-white/20">--:--</span>
-                            </div>
-                            <p class="text-xs text-white/40 truncate group-hover:text-white/60 transition-colors">
-                                Discussion d'équipe</p>
+                            <p
+                                class="text-xs font-bold text-white group-hover:text-primary-400 transition-colors truncate">
+                                # {{ channel.name }}</p>
+                            <p class="text-[10px] text-white/30 truncate">{{ channel.description or
+                                (channel.members|length|string + ' membres') }}</p>
                         </div>
                     </button>
                     {% endfor %}
@@ -53,34 +65,60 @@
             </div>
             {% endif %}
 
-            <!-- Direct Messages Section -->
+            <!-- Teams Section -->
+            {% if teams %}
+            <div>
+                <h3
+                    class="text-[9px] font-bold uppercase tracking-widest text-white/20 px-2 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-people-group text-[7px]"></i>Équipes
+                </h3>
+                <div class="space-y-0.5">
+                    {% for team in teams %}
+                    <button onclick="loadChat('team', '{{ team._id|string }}', '{{ team.name }}')"
+                        class="chat-item w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-all text-left group border border-transparent hover:border-white/5"
+                        data-name="{{ team.name|lower }}" data-type="team" data-id="{{ team._id }}">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+                            <i class="fa-solid fa-people-group text-sm"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p
+                                class="text-xs font-bold text-white group-hover:text-primary-400 transition-colors truncate">
+                                {{ team.name }}</p>
+                            <p class="text-[10px] text-white/30 truncate">Discussion d'équipe</p>
+                        </div>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Direct Messages -->
             {% if members %}
             <div>
-                <h3 class="text-[10px] font-bold uppercase tracking-widest text-white/20 px-2 mb-3">Direct</h3>
-                <div class="space-y-1">
+                <h3
+                    class="text-[9px] font-bold uppercase tracking-widest text-white/20 px-2 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-user text-[7px]"></i>Direct
+                </h3>
+                <div class="space-y-0.5">
                     {% for member in members if member._id|string != current_user.id %}
                     <button
                         onclick="loadChat('direct', '{{ member._id|string }}', '{{ member.profile.first_name }} {{ member.profile.last_name }}')"
-                        class="chat-item w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 transition-all text-left group border border-transparent hover:border-white/5 relative overflow-hidden"
-                        data-name="{{ member.profile.first_name|lower }} {{ member.profile.last_name|lower }}"
+                        class="chat-item w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-all text-left group border border-transparent hover:border-white/5"
+                        data-name="{{ member.profile.first_name|lower }} {{ member.profile.last_name|lower }} {{ member.role|lower }}"
                         data-type="direct" data-id="{{ member._id }}">
-
                         <div
-                            class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white font-bold text-sm shadow-inner group-hover:border-primary-500/30 transition-colors">
+                            class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white font-bold text-xs shadow-inner group-hover:border-primary-500/30 transition-colors relative">
                             {{ member.profile.first_name[:1] }}{{ member.profile.last_name[:1] }}
+                            <span
+                                class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0f172a]"></span>
                         </div>
-
                         <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-center mb-0.5">
-                                <p
-                                    class="text-sm font-bold text-white group-hover:text-primary-400 transition-colors truncate">
-                                    {{ member.profile.first_name }} {{ member.profile.last_name }}
-                                </p>
-                                <span class="text-[10px] text-white/20">--:--</span>
-                            </div>
                             <p
-                                class="text-xs text-white/40 truncate group-hover:text-white/60 transition-colors capitalize">
-                                {{ member.role }}</p>
+                                class="text-xs font-bold text-white group-hover:text-primary-400 transition-colors truncate">
+                                {{ member.profile.first_name }} {{ member.profile.last_name }}
+                            </p>
+                            <p class="text-[10px] text-white/30 capitalize truncate">{{ member.role }}</p>
                         </div>
                     </button>
                     {% endfor %}
@@ -99,202 +137,276 @@
                 <i class="fa-solid fa-comments text-4xl text-white/20"></i>
             </div>
             <h3 class="text-2xl font-black text-white mb-2 uppercase tracking-tight">FootLogic Chat</h3>
-            <p class="text-white/30 text-sm max-w-xs text-center">Sélectionnez une conversation pour commencer à
-                échanger avec votre équipe.</p>
+            <p class="text-white/30 text-sm max-w-xs text-center">Sélectionnez une conversation ou cliquez <span
+                    class="text-primary-400 font-bold">✏️ Nouveau</span> pour démarrer.</p>
         </div>
 
         <!-- Active Chat -->
         <div id="activeChat" class="flex flex-col h-full hidden opacity-0 transition-opacity duration-500">
             <!-- Header -->
             <div
-                class="h-20 border-b border-white/5 px-8 flex items-center justify-between bg-[#0f172a]/80 backdrop-blur-md z-10">
-                <div class="flex items-center gap-5">
+                class="h-16 border-b border-white/5 px-6 flex items-center justify-between bg-[#0f172a]/80 backdrop-blur-md z-10">
+                <div class="flex items-center gap-4">
                     <button class="md:hidden text-white/50 hover:text-white" onclick="toggleSidebar()">
                         <i class="fa-solid fa-arrow-left"></i>
                     </button>
                     <div id="activeChatAvatar"
-                        class="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-primary-500/20">
-                        ?
-                    </div>
+                        class="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-primary-500/20">
+                        ?</div>
                     <div>
-                        <h3 id="activeChatName" class="text-base font-bold text-white leading-tight">...</h3>
-                        <div class="flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                            <p id="activeChatStatus"
-                                class="text-[10px] text-white/40 font-bold uppercase tracking-wider">En ligne</p>
-                        </div>
+                        <h3 id="activeChatName" class="text-sm font-bold text-white leading-tight">...</h3>
+                        <p id="activeChatStatus"
+                            class="text-[9px] text-white/30 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>En ligne
+                        </p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1">
                     <button
-                        class="w-10 h-10 rounded-xl hover:bg-white/5 text-white/20 hover:text-white transition flex items-center justify-center">
-                        <i class="fa-solid fa-phone"></i>
-                    </button>
+                        class="w-9 h-9 rounded-lg hover:bg-white/5 text-white/20 hover:text-white transition flex items-center justify-center"><i
+                            class="fa-solid fa-phone text-xs"></i></button>
                     <button
-                        class="w-10 h-10 rounded-xl hover:bg-white/5 text-white/20 hover:text-white transition flex items-center justify-center">
-                        <i class="fa-solid fa-video"></i>
-                    </button>
+                        class="w-9 h-9 rounded-lg hover:bg-white/5 text-white/20 hover:text-white transition flex items-center justify-center"><i
+                            class="fa-solid fa-video text-xs"></i></button>
                     <button
-                        class="w-10 h-10 rounded-xl hover:bg-white/5 text-white/20 hover:text-white transition flex items-center justify-center">
-                        <i class="fa-solid fa-circle-info"></i>
-                    </button>
+                        class="w-9 h-9 rounded-lg hover:bg-white/5 text-white/20 hover:text-white transition flex items-center justify-center"><i
+                            class="fa-solid fa-circle-info text-xs"></i></button>
                 </div>
             </div>
 
             <!-- Messages Area -->
             <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar scroll-smooth relative">
-                <!-- Messages will be injected here -->
             </div>
 
             <!-- Input Area -->
-            <div class="p-6 bg-[#0f172a] border-t border-white/5">
-                <div class="relative flex items-end gap-4 max-w-5xl mx-auto">
+            <div class="p-4 bg-[#0f172a] border-t border-white/5">
+                <div class="relative flex items-end gap-3 max-w-4xl mx-auto">
                     <button
-                        class="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 text-white/30 hover:text-white hover:bg-white/10 transition flex-shrink-0 flex items-center justify-center">
-                        <i class="fa-solid fa-plus text-lg"></i>
+                        class="w-10 h-10 rounded-xl bg-white/5 border border-white/5 text-white/30 hover:text-white hover:bg-white/10 transition flex-shrink-0 flex items-center justify-center">
+                        <i class="fa-solid fa-plus text-sm"></i>
                     </button>
                     <div class="flex-1 relative">
                         <textarea id="messageInput" rows="1" placeholder="Écrivez votre message..."
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-6 pr-14 text-sm text-white placeholder-white/20 focus:outline-none focus:border-primary-500/50 focus:bg-white/10 transition-all resize-none custom-scrollbar"
-                            style="min-height: 50px; max-height: 150px;"></textarea>
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-5 pr-14 text-sm text-white placeholder-white/20 focus:outline-none focus:border-primary-500/50 focus:bg-white/10 transition-all resize-none custom-scrollbar"
+                            style="min-height: 46px; max-height: 150px;"></textarea>
                         <button onclick="sendMessage()" id="sendBtn"
-                            class="absolute right-2 bottom-2 w-10 h-9 rounded-xl gradient-primary flex items-center justify-center text-white shadow-lg hover:shadow-primary-500/20 hover:scale-105 active:scale-95 transition-all">
+                            class="absolute right-2 bottom-1.5 w-9 h-8 rounded-xl gradient-primary flex items-center justify-center text-white shadow-lg hover:shadow-primary-500/20 hover:scale-105 active:scale-95 transition-all">
                             <i class="fa-solid fa-paper-plane text-xs"></i>
                         </button>
                     </div>
                 </div>
-                <p class="text-center text-[10px] text-white/10 mt-3 font-medium">Appuyez sur Entrée pour envoyer</p>
             </div>
         </div>
     </main>
 </div>
 
+<!-- ========== NEW MESSAGE MODAL ========== -->
+<div id="newMessageModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div class="glass rounded-3xl border border-white/10 w-full max-w-md mx-4 shadow-2xl overflow-hidden">
+        <div class="p-6 border-b border-white/5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold uppercase tracking-tight">Nouveau Message</h3>
+                <button onclick="closeNewMessageModal()"
+                    class="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-white/30 hover:text-white transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="relative">
+                <i
+                    class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-white/20 text-xs"></i>
+                <input type="text" id="newMsgSearch" placeholder="Rechercher un membre (nom ou rôle)..."
+                    class="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-9 pr-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-primary-500/50 transition-all"
+                    oninput="searchNewMsgUsers()">
+            </div>
+            <!-- Role Filter Pills -->
+            <div class="flex gap-2 mt-3 flex-wrap" id="roleFilterPills">
+                <button onclick="filterByRole('')"
+                    class="role-pill px-3 py-1 rounded-lg text-[10px] uppercase font-bold tracking-wider border border-primary-500 bg-primary-500/20 text-primary-400 transition-all"
+                    data-role="">Tous</button>
+                {% for role in roles %}
+                <button onclick="filterByRole('{{ role }}')"
+                    class="role-pill px-3 py-1 rounded-lg text-[10px] uppercase font-bold tracking-wider border border-white/10 text-white/40 hover:border-primary-500/30 hover:text-primary-400 transition-all"
+                    data-role="{{ role }}">{{ role }}</button>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="max-h-[50vh] overflow-y-auto custom-scrollbar p-3" id="newMsgUserList">
+            <div class="text-center py-8 text-white/20">
+                <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i>
+                <p class="text-xs font-medium">Chargement...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== CREATE CHANNEL MODAL (ADMIN) ========== -->
+<div id="createChannelModal"
+    class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div class="glass rounded-3xl border border-white/10 w-full max-w-lg mx-4 shadow-2xl overflow-hidden">
+        <div class="p-6 border-b border-white/5">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center">
+                        <i class="fa-solid fa-hashtag text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold uppercase tracking-tight">Créer un Canal</h3>
+                        <p class="text-[10px] text-white/30">Ajouter un canal de discussion</p>
+                    </div>
+                </div>
+                <button onclick="closeCreateChannelModal()"
+                    class="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-white/30 hover:text-white transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div class="p-6 space-y-5">
+            <div>
+                <label class="block text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">Nom du
+                    canal</label>
+                <input type="text" id="channelName" placeholder="ex: Annonces, Staff technique..."
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-primary-500/50 transition-all">
+            </div>
+            <div>
+                <label
+                    class="block text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">Description</label>
+                <input type="text" id="channelDescription" placeholder="Brève description..."
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-primary-500/50 transition-all">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">Ajouter par
+                    rôle</label>
+                <div class="flex gap-2 flex-wrap" id="channelRolesSelector">
+                    {% for role in roles %}
+                    <label class="channel-role-label cursor-pointer">
+                        <input type="checkbox" value="{{ role }}" class="sr-only channel-role-cb">
+                        <span
+                            class="px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold tracking-wider border border-white/10 text-white/40 hover:border-primary-500/30 transition-all inline-block">{{
+                            role }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-white/30 uppercase tracking-wider mb-2">Ou ajouter
+                    individuellement</label>
+                <input type="text" id="channelMemberSearch" placeholder="Rechercher..."
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-primary-500/50 transition-all"
+                    oninput="searchChannelMembers()">
+                <div id="channelMemberResults" class="mt-2 max-h-32 overflow-y-auto custom-scrollbar space-y-1"></div>
+                <div id="channelSelectedMembers" class="mt-2 flex flex-wrap gap-1"></div>
+            </div>
+        </div>
+        <div class="p-6 border-t border-white/5 flex gap-3">
+            <button onclick="closeCreateChannelModal()"
+                class="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-bold uppercase tracking-wider hover:bg-white/10 transition-all">Annuler</button>
+            <button onclick="createChannel()"
+                class="flex-1 py-3 rounded-xl gradient-primary text-white text-xs font-bold uppercase tracking-wider hover:shadow-lg transition-all">
+                <i class="fa-solid fa-plus mr-1"></i>Créer</button>
+        </div>
+    </div>
+</div>
+
 <template id="messageTemplate">
-    <div class="message-row flex w-full mb-6">
+    <div class="message-row flex w-full mb-4">
         <div class="message-content flex flex-col max-w-[75%] md:max-w-[60%]">
-            <span class="sender-name text-[10px] text-white/30 ml-3 mb-1 font-bold hidden"></span>
+            <span class="sender-name text-[9px] text-white/30 ml-3 mb-0.5 font-bold hidden"></span>
             <div
-                class="message-bubble px-5 py-3 rounded-[20px] text-sm leading-relaxed shadow-sm break-words relative group">
+                class="message-bubble px-4 py-2.5 rounded-[18px] text-sm leading-relaxed shadow-sm break-words relative group">
                 <p class="text-content"></p>
                 <span
-                    class="time-read absolute bottom-1 right-3 text-[9px] opacity-0 group-hover:opacity-60 transition-opacity font-medium"></span>
+                    class="time-read absolute bottom-0.5 right-3 text-[8px] opacity-0 group-hover:opacity-60 transition-opacity font-medium"></span>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    let currentChat = {
-        type: null,
-        id: null,
-        name: null
-    };
+    let currentChat = { type: null, id: null, name: null };
     let pollingInterval = null;
-    let lastMessageId = null;
+    let selectedChannelMembers = new Set();
+    let currentRoleFilter = '';
 
     // Auto-resize textarea
     const tx = document.getElementById('messageInput');
     tx.setAttribute('style', 'height:' + (tx.scrollHeight) + 'px;overflow-y:hidden;');
-    tx.addEventListener("input", OnInput, false);
-    function OnInput() {
+    tx.addEventListener("input", function () {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
-        if (this.value === '') this.style.height = '50px';
-    }
+        if (this.value === '') this.style.height = '46px';
+    }, false);
 
-    // Toggle Sidebar on mobile
     function toggleSidebar() {
-        const sidebar = document.getElementById('chatSidebar');
-        sidebar.classList.toggle('hidden');
-        sidebar.classList.toggle('absolute');
-        sidebar.classList.toggle('inset-0');
+        const sb = document.getElementById('chatSidebar');
+        sb.classList.toggle('hidden');
+        sb.classList.toggle('absolute');
+        sb.classList.toggle('inset-0');
     }
 
     function filterConversations() {
-        const query = document.getElementById('userSearch').value.toLowerCase();
+        const q = document.getElementById('userSearch').value.toLowerCase();
         document.querySelectorAll('.chat-item').forEach(item => {
-            const name = item.getAttribute('data-name');
-            item.style.display = name.includes(query) ? 'flex' : 'none';
+            item.style.display = item.getAttribute('data-name').includes(q) ? 'flex' : 'none';
         });
     }
 
+    // ========== LOAD CHAT ==========
     async function loadChat(type, id, name) {
-        // Debounce if clicking same chat
         if (currentChat.id === id && currentChat.type === type) return;
-
         currentChat = { type, id, name };
-        lastMessageId = null;
 
-        // UI Updates
         document.querySelectorAll('.chat-item').forEach(b => {
             b.classList.remove('bg-white/10', 'border-primary-500/30');
-            if (b.getAttribute('data-id') === id) {
-                b.classList.add('bg-white/10', 'border-primary-500/30');
-            }
+            if (b.getAttribute('data-id') === id) b.classList.add('bg-white/10', 'border-primary-500/30');
         });
 
         const activeChat = document.getElementById('activeChat');
-        const noChat = document.getElementById('noChatState');
-
-        noChat.style.display = 'none';
+        document.getElementById('noChatState').style.display = 'none';
         activeChat.classList.remove('hidden');
-        // Trigger reflow/animation
         setTimeout(() => activeChat.classList.remove('opacity-0'), 10);
 
-        document.getElementById('activeChatName').innerText = name;
+        document.getElementById('activeChatName').innerText = type === 'channel' ? `# ${name}` : name;
         document.getElementById('activeChatAvatar').innerText = name.charAt(0).toUpperCase();
-
-        // Clear messages
         document.getElementById('chatMessages').innerHTML = '<div class="flex items-center justify-center h-full"><i class="fa-solid fa-spinner fa-spin text-white/20 text-2xl"></i></div>';
 
-        // Stop previous polling
         if (pollingInterval) clearInterval(pollingInterval);
-
         await fetchMessages();
-
-        // Start polling
         pollingInterval = setInterval(fetchMessages, 5000);
 
-        // Sidebar mobile logic
-        if (window.innerWidth < 768) {
-            document.getElementById('chatSidebar').classList.add('hidden');
-        }
+        if (window.innerWidth < 768) document.getElementById('chatSidebar').classList.add('hidden');
+
+        // Close new message modal if open
+        closeNewMessageModal();
     }
 
     async function fetchMessages() {
         if (!currentChat.id) return;
-
-        const endpoint = currentChat.type === 'team' ? `/messages/history/team/${currentChat.id}` : `/messages/history/direct/${currentChat.id}`;
+        let endpoint;
+        if (currentChat.type === 'team') endpoint = `/messages/history/team/${currentChat.id}`;
+        else if (currentChat.type === 'channel') endpoint = `/messages/history/channel/${currentChat.id}`;
+        else endpoint = `/messages/history/direct/${currentChat.id}`;
 
         try {
-            const response = await fetch(endpoint);
-            const data = await response.json();
+            const r = await fetch(endpoint);
+            const data = await r.json();
             renderMessages(data.history);
-        } catch (err) {
-            console.error('Failed to sync messages:', err);
-        }
+        } catch (err) { console.error('Sync error:', err); }
     }
 
     function renderMessages(history) {
         const container = document.getElementById('chatMessages');
-        // Only clear if loading first time (spinner present) or significant refresh strategy (MVP: clear all is safer to avoid dupes without complex differential logic)
-        // Ideally: check last ID and append only new ones. For now, simple re-render but preserve scroll if near bottom.
-
-        const wasAtBottom = container.scrollHeight - container.scrollTop === container.clientHeight;
-
-        // For smoother UX, we might want to diff. But let's just re-render cleanly.
         container.innerHTML = '';
 
-        if (history.length === 0) {
+        if (!history || history.length === 0) {
             container.innerHTML = `
                 <div class="flex-1 flex flex-col items-center justify-center text-center opacity-30 mt-20">
-                     <div class="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+                    <div class="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
                         <i class="fa-solid fa-comment-dots text-2xl"></i>
                     </div>
                     <p class="text-sm font-medium">Démarrez la conversation !</p>
                     <p class="text-xs mt-1">Envoyez un message pour briser la glace.</p>
-                </div>
-            `;
+                </div>`;
             return;
         }
 
@@ -310,7 +422,6 @@
             const sender = clone.querySelector('.sender-name');
             const time = clone.querySelector('.time-read');
 
-            // Alignment
             if (isMe) {
                 row.classList.add('justify-end');
                 bubble.classList.add('gradient-primary', 'text-white', 'rounded-tr-sm');
@@ -319,83 +430,223 @@
                 bubble.classList.add('bg-[#1e293b]', 'text-white/90', 'border', 'border-white/5', 'rounded-tl-sm');
             }
 
-            // Sender Name (in team chat, if changed sender)
-            if (!isMe && currentChat.type === 'team' && msg.sender_id !== lastSenderId) {
+            if (!isMe && (currentChat.type === 'team' || currentChat.type === 'channel') && msg.sender_id !== lastSenderId) {
                 sender.innerText = msg.sender_name;
                 sender.classList.remove('hidden');
             }
             lastSenderId = msg.sender_id;
-
-            // Content
             content.innerText = msg.content;
-
-            // Time (format ISO to HH:MM)
-            const date = new Date(msg.created_at);
-            time.innerText = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            // Styling tweak for consecutive messages
-            if (isMe) {
-                bubble.style.boxShadow = '0 4px 15px rgba(37, 99, 235, 0.1)';
-            }
-
+            const d = new Date(msg.created_at);
+            time.innerText = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             container.appendChild(clone);
         });
 
-        // Scroll to bottom
         container.scrollTop = container.scrollHeight;
     }
 
     async function sendMessage() {
         const input = document.getElementById('messageInput');
         const content = input.value.trim();
-        const btn = document.getElementById('sendBtn');
-
         if (!content || !currentChat.id) return;
 
         input.disabled = true;
-        btn.disabled = true;
-
-        const payload = {
-            content: content,
-            type: currentChat.type
-        };
+        const payload = { content, type: currentChat.type };
 
         if (currentChat.type === 'team') payload.team_id = currentChat.id;
+        else if (currentChat.type === 'channel') payload.channel_id = currentChat.id;
         else payload.receiver_id = currentChat.id;
 
         try {
-            const response = await fetch('/messages/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (response.ok) {
-                input.value = '';
-                input.style.height = '50px'; // Reset height
-                await fetchMessages(); // Immediate refresh
-            }
-        } catch (err) {
-            console.error('Failed to send message:', err);
-            alert('Erreur lors de l\'envoi');
-        } finally {
-            input.disabled = false;
-            btn.disabled = false;
-            input.focus();
-        }
+            const r = await fetch('/messages/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (r.ok) { input.value = ''; input.style.height = '46px'; await fetchMessages(); }
+        } catch (err) { console.error(err); alert('Erreur'); }
+        finally { input.disabled = false; input.focus(); }
     }
 
-    // Enter key to send (Shift+Enter for new line)
     document.getElementById('messageInput').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
     });
+
+    // ========== NEW MESSAGE MODAL ==========
+    function openNewMessageModal() {
+        document.getElementById('newMessageModal').classList.remove('hidden');
+        document.getElementById('newMessageModal').classList.add('flex');
+        document.getElementById('newMsgSearch').value = '';
+        currentRoleFilter = '';
+        highlightRolePill('');
+        searchNewMsgUsers();
+        setTimeout(() => document.getElementById('newMsgSearch').focus(), 100);
+    }
+
+    function closeNewMessageModal() {
+        document.getElementById('newMessageModal').classList.add('hidden');
+        document.getElementById('newMessageModal').classList.remove('flex');
+    }
+
+    function highlightRolePill(role) {
+        document.querySelectorAll('.role-pill').forEach(p => {
+            if (p.dataset.role === role) {
+                p.classList.add('border-primary-500', 'bg-primary-500/20', 'text-primary-400');
+                p.classList.remove('border-white/10', 'text-white/40');
+            } else {
+                p.classList.remove('border-primary-500', 'bg-primary-500/20', 'text-primary-400');
+                p.classList.add('border-white/10', 'text-white/40');
+            }
+        });
+    }
+
+    function filterByRole(role) {
+        currentRoleFilter = role;
+        highlightRolePill(role);
+        searchNewMsgUsers();
+    }
+
+    async function searchNewMsgUsers() {
+        const q = document.getElementById('newMsgSearch').value;
+        const searchQ = currentRoleFilter ? (q + ' ' + currentRoleFilter).trim() : q;
+        try {
+            const r = await fetch(`/messages/members/search?q=${encodeURIComponent(searchQ)}`);
+            const users = await r.json();
+            const container = document.getElementById('newMsgUserList');
+
+            if (!users.length) {
+                container.innerHTML = '<div class="text-center py-8 text-white/20 text-xs">Aucun résultat</div>';
+                return;
+            }
+
+            // Group by role
+            const byRole = {};
+            users.forEach(u => {
+                if (!byRole[u.role]) byRole[u.role] = [];
+                byRole[u.role].push(u);
+            });
+
+            let html = '';
+            for (const [role, members] of Object.entries(byRole)) {
+                html += `<div class="text-[9px] font-bold uppercase tracking-widest text-white/15 px-2 py-1 mt-2">${role}</div>`;
+                members.forEach(u => {
+                    const roleColor = role === 'admin' ? 'from-red-500 to-orange-500' : role === 'coach' ? 'from-blue-500 to-cyan-500' : role === 'player' ? 'from-emerald-500 to-green-500' : 'from-gray-500 to-slate-500';
+                    html += `
+                    <button onclick="startNewDM('${u.id}', '${u.name}')"
+                        class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-all text-left group">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br ${roleColor} flex items-center justify-center text-white font-bold text-xs shadow-lg group-hover:scale-105 transition-transform">
+                            ${u.initials}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-bold text-white group-hover:text-primary-400 transition-colors truncate">${u.name}</p>
+                            <p class="text-[10px] text-white/30 capitalize">${u.role}</p>
+                        </div>
+                        <i class="fa-solid fa-paper-plane text-white/10 group-hover:text-primary-400 transition-colors text-xs"></i>
+                    </button>`;
+                });
+            }
+            container.innerHTML = html;
+        } catch (err) { console.error(err); }
+    }
+
+    function startNewDM(userId, name) {
+        closeNewMessageModal();
+        loadChat('direct', userId, name);
+    }
+
+    // ========== CREATE CHANNEL MODAL ==========
+    function openCreateChannelModal() {
+        selectedChannelMembers.clear();
+        renderSelectedChannelMembers();
+        document.getElementById('channelName').value = '';
+        document.getElementById('channelDescription').value = '';
+        document.getElementById('channelMemberSearch').value = '';
+        document.getElementById('channelMemberResults').innerHTML = '';
+        document.querySelectorAll('.channel-role-cb').forEach(cb => cb.checked = false);
+        updateChannelRoleLabels();
+        document.getElementById('createChannelModal').classList.remove('hidden');
+        document.getElementById('createChannelModal').classList.add('flex');
+    }
+
+    function closeCreateChannelModal() {
+        document.getElementById('createChannelModal').classList.add('hidden');
+        document.getElementById('createChannelModal').classList.remove('flex');
+    }
+
+    // Style role checkboxes
+    document.querySelectorAll('.channel-role-cb').forEach(cb => {
+        cb.addEventListener('change', updateChannelRoleLabels);
+    });
+
+    function updateChannelRoleLabels() {
+        document.querySelectorAll('.channel-role-label').forEach(label => {
+            const cb = label.querySelector('.channel-role-cb');
+            const span = label.querySelector('span');
+            if (cb.checked) {
+                span.classList.add('border-primary-500', 'bg-primary-500/20', 'text-primary-400');
+                span.classList.remove('border-white/10', 'text-white/40');
+            } else {
+                span.classList.remove('border-primary-500', 'bg-primary-500/20', 'text-primary-400');
+                span.classList.add('border-white/10', 'text-white/40');
+            }
+        });
+    }
+
+    async function searchChannelMembers() {
+        const q = document.getElementById('channelMemberSearch').value;
+        try {
+            const r = await fetch(`/messages/members/search?q=${encodeURIComponent(q)}`);
+            const users = await r.json();
+            const container = document.getElementById('channelMemberResults');
+            container.innerHTML = users.map(u => `
+                <button onclick="toggleChannelMember('${u.id}', '${u.name}')"
+                    class="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-all text-left text-xs ${selectedChannelMembers.has(u.id) ? 'bg-primary-500/10 border border-primary-500/20' : ''}">
+                    <div class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-[10px] font-bold">${u.initials}</div>
+                    <span class="font-medium text-white flex-1">${u.name}</span>
+                    <span class="text-[9px] text-white/20 uppercase">${u.role}</span>
+                    <i class="fa-solid ${selectedChannelMembers.has(u.id) ? 'fa-check text-primary-400' : 'fa-plus text-white/10'} text-[10px]"></i>
+                </button>
+            `).join('');
+        } catch (err) { console.error(err); }
+    }
+
+    function toggleChannelMember(id, name) {
+        if (selectedChannelMembers.has(id)) selectedChannelMembers.delete(id);
+        else selectedChannelMembers.add(id);
+        searchChannelMembers();
+        renderSelectedChannelMembers();
+    }
+
+    function renderSelectedChannelMembers() {
+        const cont = document.getElementById('channelSelectedMembers');
+        if (selectedChannelMembers.size === 0) { cont.innerHTML = ''; return; }
+        cont.innerHTML = Array.from(selectedChannelMembers).map(id => `
+            <span class="px-2 py-1 rounded-lg bg-primary-500/10 border border-primary-500/20 text-[9px] font-bold text-primary-400 flex items-center gap-1">
+                ID:${id.slice(-4)}
+                <button onclick="toggleChannelMember('${id}', '')" class="hover:text-red-400 transition-colors"><i class="fa-solid fa-xmark text-[8px]"></i></button>
+            </span>
+        `).join('');
+    }
+
+    async function createChannel() {
+        const name = document.getElementById('channelName').value.trim();
+        const desc = document.getElementById('channelDescription').value.trim();
+        if (!name) { alert('Veuillez entrer un nom de canal.'); return; }
+
+        const roles = Array.from(document.querySelectorAll('.channel-role-cb:checked')).map(cb => cb.value);
+        const memberIds = Array.from(selectedChannelMembers);
+
+        try {
+            const r = await fetch('/messages/channels/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, description: desc, roles, member_ids: memberIds })
+            });
+            const data = await r.json();
+            if (data.status === 'success') {
+                closeCreateChannelModal();
+                window.location.reload();
+            }
+        } catch (err) { console.error(err); alert('Erreur'); }
+    }
 </script>
 
 <style>
-    /* Styling scrollbar */
     .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
     }

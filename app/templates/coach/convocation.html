@@ -1,231 +1,851 @@
 {% extends "base.html" %}
-{% block title %}Convocation Match - FootLogic{% endblock %}
+{% block title %}Convocation Composition — FootLogic{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-6 py-8" id="convocation-app">
+<div class="container mx-auto px-3 lg:px-6 py-6" id="convocation-app">
     <!-- Header -->
-    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-10">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-3xl font-black text-white uppercase tracking-tighter mb-2">
+            <h1 class="text-2xl lg:text-3xl font-black text-white uppercase tracking-tighter">
                 <span
                     class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-600">Convocation</span>
-                Match
+                Composition
             </h1>
-            <p class="text-white/40 text-sm font-medium">Sélectionnez les joueurs pour le prochain match</p>
+            <p class="text-white/40 text-xs font-medium mt-1">Tactique, titulaires sur le terrain, remplaçants sur le
+                banc</p>
         </div>
-
-        <div class="flex items-center gap-4">
-            <div class="px-6 py-3 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3">
+        <div class="flex items-center gap-2 flex-wrap">
+            {% if teams|length > 1 %}
+            <form method="GET" class="inline">
+                <select name="team_id" onchange="this.form.submit()"
+                    class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-[10px] font-semibold uppercase tracking-wider focus:outline-none focus:border-primary-500 appearance-none cursor-pointer">
+                    {% for team in teams %}
+                    <option value="{{ team._id|string }}" {% if selected_team_id==team._id|string %}selected{% endif %}
+                        class="bg-slate-900">{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+            {% endif %}
+            <select id="eventSelect"
+                class="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-[10px] font-semibold uppercase tracking-wider focus:outline-none focus:border-primary-500 appearance-none cursor-pointer max-w-[200px]">
+                <option value="" disabled selected>Match / Événement...</option>
+                {% for event in events %}
+                <option value="{{ event._id }}">{{ event.title }} — {{ event.date.strftime('%d/%m') if event.date else
+                    'TBD' }}</option>
+                {% endfor %}
+            </select>
+            <div class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
                 <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                <span class="text-white text-xs font-bold uppercase tracking-wider" id="selectedCount">0 Joueurs
-                    sélectionnés</span>
+                <span class="text-white text-[10px] font-bold uppercase tracking-wider" id="selectedCount">0 / 18</span>
             </div>
-
             <button onclick="sendConvocation()" id="sendBtn"
-                class="px-8 py-3 rounded-xl gradient-primary text-white font-bold uppercase tracking-wider hover:shadow-lg hover:shadow-primary-500/20 hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-                <i class="fa-solid fa-paper-plane mr-2"></i>
-                Envoyer
+                class="px-5 py-2 rounded-xl gradient-primary text-white text-[10px] font-bold uppercase tracking-wider hover:shadow-lg hover:scale-105 active:scale-95 transition-all">
+                <i class="fa-solid fa-paper-plane mr-1"></i>Envoyer
             </button>
         </div>
     </div>
 
-    <!-- Match Selection (If needed) -->
-    <!-- Ideally here we selector the match from upcoming matches -->
-    <div class="mb-8 p-6 rounded-3xl glass border border-white/5">
-        <label class="block text-xs font-bold text-white/40 uppercase tracking-wider mb-3">Sélectionner un
-            événement</label>
-        <select id="eventSelect"
-            class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary-500 transition appearance-none cursor-pointer">
-            <option value="" disabled selected>Choisir un match ou entraînement...</option>
-            {% for event in events %}
-            <option value="{{ event._id }}">
-                {{ event.type|upper }} - {{ event.title }} ({{ event.start.strftime('%d/%m %H:%M') }})
-            </option>
-            {% endfor %}
-        </select>
-    </div>
+    <!-- Main Layout -->
+    <div class="grid lg:grid-cols-12 gap-4">
 
-    <!-- Filters & List -->
-    <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Sidebar Filters -->
-        <div class="w-full lg:w-64 space-y-6">
-            <div class="glass p-6 rounded-2xl border border-white/5">
-                <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-4">Postes</h3>
-                <div class="space-y-3">
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox"
-                            class="form-checkbox bg-white/10 border-white/20 text-primary-500 rounded focus:ring-0 focus:ring-offset-0"
-                            checked onchange="filterPlayers('GK')">
-                        <span class="text-sm text-white/60 group-hover:text-white transition">Gardiens</span>
-                    </label>
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox"
-                            class="form-checkbox bg-white/10 border-white/20 text-primary-500 rounded focus:ring-0 focus:ring-offset-0"
-                            checked onchange="filterPlayers('DEF')">
-                        <span class="text-sm text-white/60 group-hover:text-white transition">Défenseurs</span>
-                    </label>
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox"
-                            class="form-checkbox bg-white/10 border-white/20 text-primary-500 rounded focus:ring-0 focus:ring-offset-0"
-                            checked onchange="filterPlayers('MID')">
-                        <span class="text-sm text-white/60 group-hover:text-white transition">Milieux</span>
-                    </label>
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox"
-                            class="form-checkbox bg-white/10 border-white/20 text-primary-500 rounded focus:ring-0 focus:ring-offset-0"
-                            checked onchange="filterPlayers('ATT')">
-                        <span class="text-sm text-white/60 group-hover:text-white transition">Attaquants</span>
-                    </label>
+        <!-- ========== LEFT: PITCH + BENCH ========== -->
+        <div class="lg:col-span-7 xl:col-span-8 space-y-4">
+
+            <!-- Tactic Config Bar -->
+            <div class="glass rounded-2xl border border-white/5 p-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <div class="flex items-center gap-2 flex-1">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-chess text-emerald-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <label
+                                class="text-[9px] text-white/30 uppercase tracking-wider font-bold block">Tactique</label>
+                            <input type="text" id="tacticName" value="Formation Standard"
+                                placeholder="Nom de la tactique..."
+                                class="bg-transparent border-none text-white text-sm font-bold focus:outline-none w-full"
+                                style="padding:0;">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label
+                            class="text-[9px] text-white/30 uppercase tracking-wider font-bold shrink-0">Système</label>
+                        <select id="formationSelect" onchange="changeFormation()"
+                            class="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs font-bold focus:outline-none focus:border-primary-500 appearance-none cursor-pointer">
+                            <option value="4-3-3" selected>4-3-3</option>
+                            <option value="4-4-2">4-4-2</option>
+                            <option value="3-5-2">3-5-2</option>
+                            <option value="4-2-3-1">4-2-3-1</option>
+                            <option value="3-4-3">3-4-3</option>
+                            <option value="5-3-2">5-3-2</option>
+                            <option value="4-1-4-1">4-1-4-1</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label
+                            class="text-[9px] text-white/30 uppercase tracking-wider font-bold shrink-0">Remplaçants</label>
+                        <select id="maxSubsSelect" onchange="updateMaxSubs()"
+                            class="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs font-bold focus:outline-none focus:border-primary-500 appearance-none cursor-pointer">
+                            <option value="3">3 (classique)</option>
+                            <option value="5" selected>5 (FIFA)</option>
+                            <option value="7">7 max</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Football Pitch -->
+            <div class="relative rounded-2xl overflow-hidden border border-white/10" id="pitchContainer"
+                style="aspect-ratio: 3/4; max-height: 600px;">
+                <!-- Pitch Background -->
+                <div class="absolute inset-0 bg-gradient-to-b from-[#1a7a3a] to-[#156b31]">
+                    <!-- Field Lines -->
+                    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 550"
+                        preserveAspectRatio="xMidYMid meet">
+                        <!-- Outer border -->
+                        <rect x="20" y="20" width="360" height="510" rx="4" fill="none" stroke="rgba(255,255,255,0.25)"
+                            stroke-width="2" />
+                        <!-- Center line -->
+                        <line x1="20" y1="275" x2="380" y2="275" stroke="rgba(255,255,255,0.25)" stroke-width="2" />
+                        <!-- Center circle -->
+                        <circle cx="200" cy="275" r="55" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2" />
+                        <circle cx="200" cy="275" r="3" fill="rgba(255,255,255,0.3)" />
+                        <!-- Top penalty area -->
+                        <rect x="105" y="20" width="190" height="80" fill="none" stroke="rgba(255,255,255,0.25)"
+                            stroke-width="2" />
+                        <rect x="145" y="20" width="110" height="35" fill="none" stroke="rgba(255,255,255,0.25)"
+                            stroke-width="2" />
+                        <!-- Top penalty arc -->
+                        <path d="M 155 100 Q 200 130 245 100" fill="none" stroke="rgba(255,255,255,0.25)"
+                            stroke-width="2" />
+                        <!-- Bottom penalty area -->
+                        <rect x="105" y="450" width="190" height="80" fill="none" stroke="rgba(255,255,255,0.25)"
+                            stroke-width="2" />
+                        <rect x="145" y="495" width="110" height="35" fill="none" stroke="rgba(255,255,255,0.25)"
+                            stroke-width="2" />
+                        <!-- Bottom penalty arc -->
+                        <path d="M 155 450 Q 200 420 245 450" fill="none" stroke="rgba(255,255,255,0.25)"
+                            stroke-width="2" />
+                        <!-- Corner arcs -->
+                        <path d="M 20 30 Q 30 20 30 20" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
+                        <path d="M 370 20 Q 380 20 380 30" fill="none" stroke="rgba(255,255,255,0.2)"
+                            stroke-width="2" />
+                        <path d="M 20 520 Q 20 530 30 530" fill="none" stroke="rgba(255,255,255,0.2)"
+                            stroke-width="2" />
+                        <path d="M 380 520 Q 380 530 370 530" fill="none" stroke="rgba(255,255,255,0.2)"
+                            stroke-width="2" />
+                    </svg>
+                    <!-- Grass stripes -->
+                    <div class="absolute inset-0">
+                        <div class="h-1/6 bg-white/[0.02]"></div>
+                        <div class="h-1/6"></div>
+                        <div class="h-1/6 bg-white/[0.02]"></div>
+                        <div class="h-1/6"></div>
+                        <div class="h-1/6 bg-white/[0.02]"></div>
+                        <div class="h-1/6"></div>
+                    </div>
+                </div>
+
+                <!-- Tactic info overlay -->
+                <div class="absolute top-3 left-3 z-20 flex flex-col gap-1">
+                    <span
+                        class="px-2 py-1 rounded-md bg-black/50 text-[9px] text-white font-bold uppercase tracking-wider backdrop-blur-sm"
+                        id="pitchTacticLabel">Formation Standard</span>
+                    <span
+                        class="px-2 py-1 rounded-md bg-black/50 text-[9px] text-emerald-400 font-bold uppercase tracking-wider backdrop-blur-sm"
+                        id="pitchSystemLabel">4-3-3</span>
+                </div>
+                <div class="absolute top-3 right-3 z-20">
+                    <span class="px-2 py-1 rounded-md bg-black/50 text-[9px] text-white/50 font-bold backdrop-blur-sm"
+                        id="pitchStarterCount">0/11</span>
+                </div>
+
+                <!-- Player positions on pitch (drop targets) -->
+                <div class="absolute inset-0 z-10" id="pitchPositions">
+                    <!-- Positions will be generated by JS based on formation -->
+                </div>
+            </div>
+
+            <!-- Substitute Bench -->
+            <div class="glass rounded-2xl border border-white/5 overflow-hidden">
+                <div class="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-chair text-amber-400 text-xs"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm uppercase tracking-tight">Banc de Remplaçants</h3>
+                            <p class="text-[9px] text-white/25"><span id="subCount">0</span> / <span
+                                    id="maxSubsLabel">7</span> — FIFA max <span id="subChangesLabel">5</span>
+                                changements</p>
+                        </div>
+                    </div>
+                    <button onclick="clearZone('subs')"
+                        class="text-[9px] text-white/20 hover:text-red-400 uppercase tracking-wider font-semibold transition-colors">
+                        <i class="fa-solid fa-xmark mr-1"></i>Vider
+                    </button>
+                </div>
+                <div class="p-3 min-h-[80px] flex flex-wrap gap-2 drop-zone" id="subs-zone" data-zone="subs"
+                    ondragover="dragOver(event)" ondrop="dropPlayer(event, 'subs')">
+                    <div class="w-full flex items-center justify-center py-6 text-white/10 drop-placeholder"
+                        id="subs-placeholder">
+                        <p class="text-[10px] font-semibold uppercase tracking-wider"><i
+                                class="fa-solid fa-arrow-down mr-1"></i>Glissez les remplaçants ici</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Captain Section -->
+            <div class="glass rounded-2xl border border-white/5 p-4">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                        <i class="fa-solid fa-crown text-amber-400 text-xs"></i>
+                    </div>
+                    <span class="font-bold text-xs uppercase tracking-tight">Capitaines</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label
+                            class="block text-[9px] font-bold text-white/30 uppercase tracking-wider mb-1">Capitaine</label>
+                        <select id="captainSelect" onchange="updateCaptains()"
+                            class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500 appearance-none cursor-pointer">
+                            <option value="">— Sélectionner —</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-[9px] font-bold text-white/30 uppercase tracking-wider mb-1">Vice-Capitaine</label>
+                        <select id="viceCaptainSelect" onchange="updateCaptains()"
+                            class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500 appearance-none cursor-pointer">
+                            <option value="">— Sélectionner —</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Player Grid -->
-        <div class="flex-1">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="playersGrid">
-                {% for player in players %}
-                <div class="player-card glass p-4 rounded-2xl border border-white/5 cursor-pointer relative group transition-all duration-300 hover:bg-white/5 hover:-translate-y-1"
-                    data-id="{{ player._id }}" data-pos="{{ player.position }}"
-                    onclick="togglePlayer('{{ player._id }}')">
+        <!-- ========== RIGHT: EFFECTIF CLUB ========== -->
+        <div class="lg:col-span-5 xl:col-span-4 space-y-3">
+            <div class="flex items-center justify-between px-1">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-white/50">
+                    <i class="fa-solid fa-users mr-1 text-white/20"></i>Effectif Club
+                </h3>
+                <input type="text" id="searchPlayer" placeholder="Rechercher..."
+                    class="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[10px] text-white placeholder-white/20 focus:outline-none focus:border-primary-500 w-28"
+                    oninput="filterAvailablePlayers()">
+            </div>
 
-                    <!-- Selection Indicator -->
-                    <div
-                        class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-white/20 flex items-center justify-center transition-all duration-300 selection-indicator">
-                        <i class="fa-solid fa-check text-[10px] text-transparent transition-all duration-300"></i>
+            <div class="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar pr-1">
+                {% for pos_key, pos_label, pos_color in [('GK', 'Gardiens', 'amber'), ('DEF', 'Défenseurs', 'blue'),
+                ('MID', 'Milieux', 'emerald'), ('ATT', 'Attaquants', 'red')] %}
+                {% if by_position.get(pos_key) %}
+                <div class="glass rounded-xl border border-white/5 overflow-hidden">
+                    <div class="px-3 py-2 border-b border-white/5 flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-{{ pos_color }}-500"></div>
+                        <span class="text-[9px] font-bold text-white/50 uppercase tracking-wider">{{ pos_label }}</span>
+                        <span class="text-[8px] text-white/20 ml-auto">{{ by_position[pos_key]|length }}</span>
                     </div>
-
-                    <div class="flex items-start gap-4 mb-4">
-                        <div
-                            class="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center font-bold text-white shadow-lg">
-                            {{ player.jersey_number }}
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-white text-sm">{{ player.name }}</h4>
-                            <p class="text-xs text-white/40 font-bold uppercase tracking-wider">{{ player.position }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="text-white/30">Forme</span>
-                            <div class="flex gap-1">
-                                {% for i in range(5) %}
-                                <div
-                                    class="w-1.5 h-1.5 rounded-full {% if i < 4 %}bg-green-500{% else %}bg-white/10{% endif %}">
-                                </div>
-                                {% endfor %}
+                    <div class="p-1.5 space-y-0.5" id="pool-{{ pos_key }}">
+                        {% for player in by_position[pos_key] %}
+                        <div class="player-draggable flex items-center gap-2 p-2 rounded-lg cursor-grab active:cursor-grabbing hover:bg-white/5 transition-all group"
+                            draggable="true" data-id="{{ player._id }}" data-name="{{ player.name }}"
+                            data-position="{{ player.position }}" data-jersey="{{ player.jersey_number }}"
+                            data-status="{{ player.status or 'active' }}" ondragstart="dragStart(event)"
+                            ondragend="dragEnd(event)">
+                            <div
+                                class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-[10px] font-bold shadow shrink-0">
+                                {{ player.jersey_number }}
                             </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-bold text-xs text-white truncate">{{ player.name }}</p>
+                                <p class="text-[8px] text-white/25 uppercase font-semibold tracking-wider">{{
+                                    player.position }}</p>
+                            </div>
+                            {% if player.status == 'injured' %}
+                            <span
+                                class="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 text-[7px] font-bold uppercase">Blessé</span>
+                            {% endif %}
+                            <i
+                                class="fa-solid fa-grip-vertical text-white/10 group-hover:text-white/30 transition-colors text-[10px]"></i>
                         </div>
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="text-white/30">Note Moy.</span>
-                            <span class="font-bold text-amber-400">7.2</span>
-                        </div>
-
-                        <!-- Status Badge (e.g., Injured, Suspended) -->
-                        {% if player.status == 'injured' %}
-                        <div
-                            class="mt-2 py-1 px-2 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] uppercase font-bold text-center">
-                            Blessé
-                        </div>
-                        {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
+                {% endif %}
                 {% endfor %}
             </div>
         </div>
     </div>
 </div>
 
+<!-- Captain Popup (PT-20) -->
+<div id="captainPopup" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div class="glass rounded-3xl border border-white/10 p-8 max-w-md w-full mx-4 shadow-2xl">
+        <div class="text-center mb-6">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-amber-500/20 flex items-center justify-center">
+                <i class="fa-solid fa-crown text-amber-400 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold uppercase tracking-tight">Changement de Capitaine</h3>
+            <p class="text-sm text-white/40 mt-2" id="captainPopupMsg"></p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="closeCaptainPopup()"
+                class="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-bold uppercase hover:bg-white/10 transition-all">Annuler</button>
+            <button onclick="confirmNewCaptain()"
+                class="flex-1 py-3 rounded-xl gradient-primary text-white text-xs font-bold uppercase hover:shadow-lg transition-all">Confirmer</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    const selectedPlayers = new Set();
+    // ========== STATE ==========
+    const starters = new Map();
+    const subs = new Map();
+    let captainId = '', viceCaptainId = '', pendingCaptainChoice = null;
+    let maxSubs = 7, maxSubChanges = 5;
 
-    function togglePlayer(playerId) {
-        const card = document.querySelector(`.player-card[data-id="${playerId}"]`);
-        const indicator = card.querySelector('.selection-indicator');
-        const checkIcon = indicator.querySelector('i');
-
-        if (selectedPlayers.has(playerId)) {
-            selectedPlayers.delete(playerId);
-            card.classList.remove('border-primary-500', 'bg-primary-500/5');
-            card.classList.add('border-white/5');
-            indicator.classList.remove('bg-primary-500', 'border-primary-500');
-            indicator.classList.add('border-white/20');
-            checkIcon.classList.remove('text-white');
-            checkIcon.classList.add('text-transparent');
-        } else {
-            selectedPlayers.add(playerId);
-            card.classList.remove('border-white/5');
-            card.classList.add('border-primary-500', 'bg-primary-500/5');
-            indicator.classList.remove('border-white/20');
-            indicator.classList.add('bg-primary-500', 'border-primary-500');
-            checkIcon.classList.remove('text-transparent');
-            checkIcon.classList.add('text-white');
+    // ========== FORMATIONS ==========
+    const FORMATIONS = {
+        '4-3-3': {
+            positions: [
+                { role: 'GK', x: 50, y: 90, label: 'GK' },
+                { role: 'DEF', x: 15, y: 72, label: 'LB' },
+                { role: 'DEF', x: 38, y: 75, label: 'CB' },
+                { role: 'DEF', x: 62, y: 75, label: 'CB' },
+                { role: 'DEF', x: 85, y: 72, label: 'RB' },
+                { role: 'MID', x: 25, y: 50, label: 'CM' },
+                { role: 'MID', x: 50, y: 52, label: 'CM' },
+                { role: 'MID', x: 75, y: 50, label: 'CM' },
+                { role: 'ATT', x: 15, y: 25, label: 'LW' },
+                { role: 'ATT', x: 50, y: 22, label: 'ST' },
+                { role: 'ATT', x: 85, y: 25, label: 'RW' }
+            ]
+        },
+        '4-4-2': {
+            positions: [
+                { role: 'GK', x: 50, y: 90, label: 'GK' },
+                { role: 'DEF', x: 15, y: 72, label: 'LB' },
+                { role: 'DEF', x: 38, y: 75, label: 'CB' },
+                { role: 'DEF', x: 62, y: 75, label: 'CB' },
+                { role: 'DEF', x: 85, y: 72, label: 'RB' },
+                { role: 'MID', x: 15, y: 50, label: 'LM' },
+                { role: 'MID', x: 38, y: 52, label: 'CM' },
+                { role: 'MID', x: 62, y: 52, label: 'CM' },
+                { role: 'MID', x: 85, y: 50, label: 'RM' },
+                { role: 'ATT', x: 35, y: 25, label: 'ST' },
+                { role: 'ATT', x: 65, y: 25, label: 'ST' }
+            ]
+        },
+        '3-5-2': {
+            positions: [
+                { role: 'GK', x: 50, y: 90, label: 'GK' },
+                { role: 'DEF', x: 25, y: 75, label: 'CB' },
+                { role: 'DEF', x: 50, y: 77, label: 'CB' },
+                { role: 'DEF', x: 75, y: 75, label: 'CB' },
+                { role: 'MID', x: 10, y: 50, label: 'LWB' },
+                { role: 'MID', x: 35, y: 55, label: 'CM' },
+                { role: 'MID', x: 50, y: 45, label: 'CAM' },
+                { role: 'MID', x: 65, y: 55, label: 'CM' },
+                { role: 'MID', x: 90, y: 50, label: 'RWB' },
+                { role: 'ATT', x: 35, y: 22, label: 'ST' },
+                { role: 'ATT', x: 65, y: 22, label: 'ST' }
+            ]
+        },
+        '4-2-3-1': {
+            positions: [
+                { role: 'GK', x: 50, y: 90, label: 'GK' },
+                { role: 'DEF', x: 15, y: 72, label: 'LB' },
+                { role: 'DEF', x: 38, y: 75, label: 'CB' },
+                { role: 'DEF', x: 62, y: 75, label: 'CB' },
+                { role: 'DEF', x: 85, y: 72, label: 'RB' },
+                { role: 'MID', x: 35, y: 58, label: 'CDM' },
+                { role: 'MID', x: 65, y: 58, label: 'CDM' },
+                { role: 'MID', x: 15, y: 40, label: 'LAM' },
+                { role: 'MID', x: 50, y: 38, label: 'CAM' },
+                { role: 'MID', x: 85, y: 40, label: 'RAM' },
+                { role: 'ATT', x: 50, y: 18, label: 'ST' }
+            ]
+        },
+        '3-4-3': {
+            positions: [
+                { role: 'GK', x: 50, y: 90, label: 'GK' },
+                { role: 'DEF', x: 25, y: 75, label: 'CB' },
+                { role: 'DEF', x: 50, y: 77, label: 'CB' },
+                { role: 'DEF', x: 75, y: 75, label: 'CB' },
+                { role: 'MID', x: 15, y: 52, label: 'LM' },
+                { role: 'MID', x: 38, y: 55, label: 'CM' },
+                { role: 'MID', x: 62, y: 55, label: 'CM' },
+                { role: 'MID', x: 85, y: 52, label: 'RM' },
+                { role: 'ATT', x: 15, y: 25, label: 'LW' },
+                { role: 'ATT', x: 50, y: 20, label: 'ST' },
+                { role: 'ATT', x: 85, y: 25, label: 'RW' }
+            ]
+        },
+        '5-3-2': {
+            positions: [
+                { role: 'GK', x: 50, y: 90, label: 'GK' },
+                { role: 'DEF', x: 10, y: 70, label: 'LWB' },
+                { role: 'DEF', x: 30, y: 75, label: 'CB' },
+                { role: 'DEF', x: 50, y: 77, label: 'CB' },
+                { role: 'DEF', x: 70, y: 75, label: 'CB' },
+                { role: 'DEF', x: 90, y: 70, label: 'RWB' },
+                { role: 'MID', x: 25, y: 50, label: 'CM' },
+                { role: 'MID', x: 50, y: 48, label: 'CM' },
+                { role: 'MID', x: 75, y: 50, label: 'CM' },
+                { role: 'ATT', x: 35, y: 22, label: 'ST' },
+                { role: 'ATT', x: 65, y: 22, label: 'ST' }
+            ]
+        },
+        '4-1-4-1': {
+            positions: [
+                { role: 'GK', x: 50, y: 90, label: 'GK' },
+                { role: 'DEF', x: 15, y: 72, label: 'LB' },
+                { role: 'DEF', x: 38, y: 75, label: 'CB' },
+                { role: 'DEF', x: 62, y: 75, label: 'CB' },
+                { role: 'DEF', x: 85, y: 72, label: 'RB' },
+                { role: 'MID', x: 50, y: 60, label: 'CDM' },
+                { role: 'MID', x: 15, y: 42, label: 'LM' },
+                { role: 'MID', x: 38, y: 45, label: 'CM' },
+                { role: 'MID', x: 62, y: 45, label: 'CM' },
+                { role: 'MID', x: 85, y: 42, label: 'RM' },
+                { role: 'ATT', x: 50, y: 18, label: 'ST' }
+            ]
         }
+    };
 
-        updateCount();
+    let currentFormation = '4-3-3';
+    const pitchSlots = []; // [{posData, playerId, el}]
+
+    // ========== INIT ==========
+    function init() {
+        changeFormation();
+        updateMaxSubs();
     }
 
-    function updateCount() {
-        document.getElementById('selectedCount').textContent = `${selectedPlayers.size} Joueur${selectedPlayers.size > 1 ? 's' : ''} sélectionné${selectedPlayers.size > 1 ? 's' : ''}`;
+    // ========== FORMATION ==========
+    function changeFormation() {
+        currentFormation = document.getElementById('formationSelect').value;
+        document.getElementById('pitchSystemLabel').textContent = currentFormation;
+
+        const container = document.getElementById('pitchPositions');
+        container.innerHTML = '';
+        pitchSlots.length = 0;
+
+        const positions = FORMATIONS[currentFormation].positions;
+        positions.forEach((pos, idx) => {
+            const slot = document.createElement('div');
+            slot.className = 'pitch-slot absolute flex flex-col items-center cursor-pointer transition-all duration-300';
+            slot.style.left = `${pos.x}%`;
+            slot.style.top = `${pos.y}%`;
+            slot.style.transform = 'translate(-50%, -50%)';
+            slot.dataset.index = idx;
+            slot.dataset.role = pos.role;
+
+            slot.innerHTML = `
+                <div class="slot-circle w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center text-white/30 text-[10px] font-bold transition-all hover:border-white/40 hover:bg-white/5 relative"
+                    ondragover="event.preventDefault()" ondrop="dropOnPitch(event, ${idx})">
+                    <span class="slot-label">${pos.label}</span>
+                </div>
+            `;
+
+            container.appendChild(slot);
+            pitchSlots.push({ posData: pos, playerId: null, el: slot });
+        });
+
+        // Re-assign existing starters to slots
+        reassignStartersToSlots();
     }
 
-    function filterPlayers(category) {
-        // Implementation for filtering grid based on position categories
-        // Simple client-side filtering
-        const cards = document.querySelectorAll('.player-card');
-        cards.forEach(card => {
-            const pos = card.getAttribute('data-pos');
-            let show = true;
+    function reassignStartersToSlots() {
+        // Clear all slots first
+        pitchSlots.forEach(s => { s.playerId = null; renderSlot(s); });
 
-            // Simplified logic: map specific positions to categories (GK, DEF, MID, ATT)
-            let cat = 'MID';
-            if (pos === 'GK') cat = 'GK';
-            else if (['CB', 'LB', 'RB', 'LWB', 'RWB'].includes(pos)) cat = 'DEF';
-            else if (['CDM', 'CM', 'CAM', 'LM', 'RM'].includes(pos)) cat = 'MID';
-            else if (['ST', 'CF', 'LW', 'RW'].includes(pos)) cat = 'ATT';
+        // Try to assign starters to matching position slots
+        const starterArr = Array.from(starters.entries());
+        const usedSlots = new Set();
 
-            // Allow checking checkbox state... (omitted for brevity, assume "category" arg matches simplified logic or pass active filters)
-            // Ideally we'd scan all checkboxes state and filter accordingly.
+        starterArr.forEach(([id, data]) => {
+            const posMap = { 'GK': 'GK', 'DEF': 'DEF', 'MID': 'MID', 'ATT': 'ATT' };
+            const role = posMap[data.position] || 'MID';
+            const slotIdx = pitchSlots.findIndex((s, i) => s.posData.role === role && !usedSlots.has(i));
+            if (slotIdx >= 0) {
+                pitchSlots[slotIdx].playerId = id;
+                usedSlots.add(slotIdx);
+                renderSlot(pitchSlots[slotIdx]);
+            }
         });
     }
 
+    function renderSlot(slot) {
+        const circle = slot.el.querySelector('.slot-circle');
+        const id = slot.playerId;
+
+        if (!id) {
+            circle.className = 'slot-circle w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center text-white/30 text-[10px] font-bold transition-all hover:border-white/40 hover:bg-white/5 relative';
+            circle.innerHTML = `<span class="slot-label">${slot.posData.label}</span>`;
+            circle.ondragover = (e) => e.preventDefault();
+            circle.ondrop = (e) => dropOnPitch(e, parseInt(slot.el.dataset.index));
+            return;
+        }
+
+        const data = starters.get(id);
+        if (!data) return;
+        const isCaptain = id === captainId;
+        const isVice = id === viceCaptainId;
+
+        circle.className = 'slot-circle w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white shadow-lg shadow-black/30 flex items-center justify-center text-xs font-black transition-all relative cursor-grab';
+        circle.draggable = true;
+        circle.innerHTML = `
+            <span class="text-slate-900">${data.jersey}</span>
+            ${isCaptain ? '<span class="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center text-[7px] text-white font-bold">C</span>' : ''}
+            ${isVice ? '<span class="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[7px] text-white font-bold">V</span>' : ''}
+        `;
+
+        // Add name label below
+        let nameEl = slot.el.querySelector('.player-name-label');
+        if (!nameEl) {
+            nameEl = document.createElement('span');
+            nameEl.className = 'player-name-label text-[8px] sm:text-[9px] text-white font-bold mt-0.5 text-center leading-tight drop-shadow-md max-w-[70px] truncate';
+            slot.el.appendChild(nameEl);
+        }
+        nameEl.textContent = data.name.split(' ').pop(); // Last name
+
+        // Click to remove
+        circle.onclick = () => removeFromPitch(parseInt(slot.el.dataset.index));
+
+        // Drag from pitch
+        circle.ondragstart = (e) => {
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+                id, name: data.name, position: data.position, jersey: data.jersey, fromZone: 'starters'
+            }));
+            circle.classList.add('opacity-30');
+        };
+        circle.ondragend = () => circle.classList.remove('opacity-30');
+    }
+
+    function removeFromPitch(slotIdx) {
+        const slot = pitchSlots[slotIdx];
+        if (!slot || !slot.playerId) return;
+        const id = slot.playerId;
+
+        if (id === captainId && viceCaptainId) {
+            showCaptainPopup(`Le capitaine est retiré. ${getPlayerName(viceCaptainId)} devient capitaine.`, id);
+            return;
+        }
+        if (id === captainId) { captainId = ''; document.getElementById('captainSelect').value = ''; }
+        if (id === viceCaptainId) { viceCaptainId = ''; document.getElementById('viceCaptainSelect').value = ''; }
+
+        slot.playerId = null;
+        starters.delete(id);
+        renderSlot(slot);
+        showInPool(id);
+        updateCounts();
+        updateCaptainOptions();
+
+        const nameEl = slot.el.querySelector('.player-name-label');
+        if (nameEl) nameEl.remove();
+    }
+
+    function dropOnPitch(e, slotIdx) {
+        e.preventDefault();
+        e.stopPropagation();
+        const raw = e.dataTransfer.getData('text/plain');
+        if (!raw) return;
+        const data = JSON.parse(raw);
+
+        // Remove from previous zone
+        if (data.fromZone === 'starters') {
+            const oldSlot = pitchSlots.find(s => s.playerId === data.id);
+            if (oldSlot) { oldSlot.playerId = null; renderSlot(oldSlot); }
+            starters.delete(data.id);
+        } else if (data.fromZone === 'subs') {
+            subs.delete(data.id);
+            renderBench();
+        }
+
+        if (starters.has(data.id) || subs.has(data.id)) return;
+
+        const slot = pitchSlots[slotIdx];
+        // If slot is occupied, swap
+        if (slot.playerId) {
+            const oldId = slot.playerId;
+            showInPool(oldId);
+            starters.delete(oldId);
+        }
+
+        slot.playerId = data.id;
+        starters.set(data.id, data);
+        renderSlot(slot);
+        hideFromPool(data.id);
+        updateCounts();
+        updateCaptainOptions();
+    }
+
+    // ========== BENCH (SUBS) ==========
+    function renderBench() {
+        const container = document.getElementById('subs-zone');
+        const placeholder = document.getElementById('subs-placeholder');
+        container.querySelectorAll('.zone-card').forEach(c => c.remove());
+
+        if (subs.size > 0 && placeholder) placeholder.style.display = 'none';
+        else if (placeholder) placeholder.style.display = 'flex';
+
+        subs.forEach((data, id) => {
+            const card = document.createElement('div');
+            card.className = 'zone-card flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/8 cursor-grab active:cursor-grabbing group hover:border-primary-500/30 transition-all';
+            card.draggable = true;
+            card.dataset.id = id;
+            card.dataset.name = data.name;
+            card.dataset.position = data.position;
+            card.dataset.jersey = data.jersey;
+            card.dataset.fromZone = 'subs';
+            card.ondragstart = (ev) => dragStart(ev);
+            card.ondragend = (ev) => dragEnd(ev);
+
+            card.innerHTML = `
+                <div class="w-7 h-7 rounded-lg gradient-primary flex items-center justify-center text-white text-[10px] font-bold shadow shrink-0">${data.jersey}</div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-bold text-[10px] text-white truncate">${data.name}</p>
+                    <p class="text-[7px] text-white/25 uppercase font-semibold tracking-wider">${data.position}</p>
+                </div>
+                <button onclick="removeSub('${id}')" class="w-6 h-6 rounded hover:bg-red-500/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                    <i class="fa-solid fa-xmark text-red-400 text-[9px]"></i>
+                </button>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function removeSub(id) {
+        subs.delete(id);
+        showInPool(id);
+        renderBench();
+        updateCounts();
+    }
+
+    // ========== DRAG & DROP ==========
+    function dragStart(e) {
+        const el = e.target.closest('.player-draggable') || e.target.closest('.zone-card');
+        if (!el) return;
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+            id: el.dataset.id, name: el.dataset.name, position: el.dataset.position,
+            jersey: el.dataset.jersey, fromZone: el.dataset.fromZone || ''
+        }));
+        el.classList.add('opacity-30', 'scale-95');
+        document.querySelectorAll('.drop-zone').forEach(z => z.classList.add('ring-2', 'ring-primary-500/20', 'ring-dashed'));
+        document.querySelectorAll('.slot-circle').forEach(c => c.classList.add('ring-2', 'ring-white/30'));
+    }
+
+    function dragEnd(e) {
+        const el = e.target.closest('.player-draggable') || e.target.closest('.zone-card');
+        if (el) el.classList.remove('opacity-30', 'scale-95');
+        document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('ring-2', 'ring-primary-500/20', 'ring-dashed'));
+        document.querySelectorAll('.slot-circle').forEach(c => c.classList.remove('ring-2', 'ring-white/30'));
+    }
+
+    function dragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+
+    function dropPlayer(e, zone) {
+        e.preventDefault();
+        const raw = e.dataTransfer.getData('text/plain');
+        if (!raw) return;
+        const data = JSON.parse(raw);
+
+        if (data.fromZone === 'starters') {
+            const oldSlot = pitchSlots.find(s => s.playerId === data.id);
+            if (oldSlot) { oldSlot.playerId = null; renderSlot(oldSlot); const nameEl = oldSlot.el.querySelector('.player-name-label'); if (nameEl) nameEl.remove(); }
+            starters.delete(data.id);
+        } else if (data.fromZone === 'subs') {
+            subs.delete(data.id);
+        }
+
+        if (starters.has(data.id) || subs.has(data.id)) return;
+
+        if (zone === 'subs' && subs.size < maxSubs) {
+            subs.set(data.id, data);
+            renderBench();
+            hideFromPool(data.id);
+        }
+        updateCounts();
+        updateCaptainOptions();
+    }
+
+    function clearZone(zone) {
+        if (zone === 'subs') {
+            subs.forEach((_, id) => showInPool(id));
+            subs.clear();
+            renderBench();
+        } else {
+            starters.forEach((_, id) => showInPool(id));
+            starters.clear();
+            captainId = ''; viceCaptainId = '';
+            pitchSlots.forEach(s => { s.playerId = null; renderSlot(s); const n = s.el.querySelector('.player-name-label'); if (n) n.remove(); });
+        }
+        updateCounts();
+        updateCaptainOptions();
+    }
+
+    // ========== POOL ==========
+    function hideFromPool(id) { const el = document.querySelector(`.player-draggable[data-id="${id}"]`); if (el) el.style.display = 'none'; }
+    function showInPool(id) { const el = document.querySelector(`.player-draggable[data-id="${id}"]`); if (el) el.style.display = 'flex'; }
+
+    // ========== COUNTS ==========
+    function updateCounts() {
+        const total = starters.size + subs.size;
+        document.getElementById('selectedCount').textContent = `${total} / ${11 + maxSubs}`;
+        document.getElementById('subCount').textContent = subs.size;
+        document.getElementById('pitchStarterCount').textContent = `${starters.size}/11`;
+    }
+
+    function updateMaxSubs() {
+        const val = parseInt(document.getElementById('maxSubsSelect').value);
+        maxSubChanges = val;
+        maxSubs = val === 3 ? 5 : 7;
+        document.getElementById('maxSubsLabel').textContent = maxSubs;
+        document.getElementById('subChangesLabel').textContent = maxSubChanges;
+        updateCounts();
+    }
+
+    // ========== TACTIC NAME SYNC ==========
+    document.getElementById('tacticName').addEventListener('input', function () {
+        document.getElementById('pitchTacticLabel').textContent = this.value || 'Sans nom';
+    });
+
+    // ========== CAPTAINS ==========
+    function updateCaptainOptions() {
+        const capSel = document.getElementById('captainSelect');
+        const viceSel = document.getElementById('viceCaptainSelect');
+        capSel.innerHTML = '<option value="">— Sélectionner —</option>';
+        viceSel.innerHTML = '<option value="">— Sélectionner —</option>';
+        starters.forEach((data, id) => {
+            capSel.innerHTML += `<option value="${id}" ${id === captainId ? 'selected' : ''}>#${data.jersey} ${data.name}</option>`;
+            viceSel.innerHTML += `<option value="${id}" ${id === viceCaptainId ? 'selected' : ''}>#${data.jersey} ${data.name}</option>`;
+        });
+    }
+
+    function updateCaptains() {
+        captainId = document.getElementById('captainSelect').value;
+        viceCaptainId = document.getElementById('viceCaptainSelect').value;
+        pitchSlots.forEach(s => { if (s.playerId) renderSlot(s); });
+    }
+
+    function getPlayerName(id) { const d = starters.get(id) || subs.get(id); return d ? d.name : 'Joueur'; }
+
+    function showCaptainPopup(msg, removedId) {
+        pendingCaptainChoice = removedId;
+        document.getElementById('captainPopupMsg').textContent = msg;
+        document.getElementById('captainPopup').classList.remove('hidden');
+        document.getElementById('captainPopup').classList.add('flex');
+    }
+    function closeCaptainPopup() {
+        document.getElementById('captainPopup').classList.add('hidden');
+        document.getElementById('captainPopup').classList.remove('flex');
+        pendingCaptainChoice = null;
+    }
+    function confirmNewCaptain() {
+        if (!pendingCaptainChoice) return;
+        captainId = viceCaptainId; viceCaptainId = '';
+        document.getElementById('captainSelect').value = captainId;
+        document.getElementById('viceCaptainSelect').value = '';
+        // Remove from pitch
+        const slotIdx = pitchSlots.findIndex(s => s.playerId === pendingCaptainChoice);
+        if (slotIdx >= 0) removeFromPitch(slotIdx);
+        else { starters.delete(pendingCaptainChoice); showInPool(pendingCaptainChoice); }
+        pitchSlots.forEach(s => { if (s.playerId) renderSlot(s); });
+        closeCaptainPopup();
+    }
+
+    // ========== SEARCH ==========
+    function filterAvailablePlayers() {
+        const q = document.getElementById('searchPlayer').value.toLowerCase();
+        document.querySelectorAll('.player-draggable').forEach(el => {
+            if (starters.has(el.dataset.id) || subs.has(el.dataset.id)) return;
+            const name = el.dataset.name.toLowerCase();
+            el.style.display = name.includes(q) ? 'flex' : 'none';
+        });
+    }
+
+    // ========== SEND ==========
     function sendConvocation() {
         const eventId = document.getElementById('eventSelect').value;
         const btn = document.getElementById('sendBtn');
-
-        if (!eventId) {
-            alert("Veuillez sélectionner un événement.");
-            return;
-        }
-
-        if (selectedPlayers.size === 0) {
-            alert("Veuillez sélectionner au moins un joueur.");
-            return;
-        }
+        if (!eventId) { alert("Veuillez sélectionner un événement."); return; }
+        if (starters.size === 0) { alert("Sélectionnez au moins les titulaires."); return; }
 
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Envoi...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Envoi...';
 
         fetch('/coach/convocation/send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 event_id: eventId,
-                player_ids: Array.from(selectedPlayers)
+                player_ids: [...starters.keys(), ...subs.keys()],
+                starters: Array.from(starters.keys()),
+                substitutes: Array.from(subs.keys()),
+                captain: captainId,
+                vice_captain: viceCaptainId,
+                formation: currentFormation,
+                tactic_name: document.getElementById('tacticName').value
             })
         })
             .then(r => r.json())
-            .then(data => {
-                alert("Convocation envoyée avec succès !");
-                window.location.reload();
-            })
+            .then(() => { alert('Convocation envoyée !'); window.location.reload(); })
             .catch(err => {
-                console.error(err);
-                alert("Erreur lors de l'envoi.");
+                console.error(err); alert("Erreur.");
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i>Envoyer';
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1"></i>Envoyer';
             });
     }
+
+    // ========== START ==========
+    init();
 </script>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    .pitch-slot .player-name-label {
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    @media (max-width: 1023px) {
+        #pitchContainer {
+            max-height: 450px;
+        }
+
+        .pitch-slot .slot-circle {
+            width: 36px !important;
+            height: 36px !important;
+            font-size: 9px !important;
+        }
+    }
+
+    @media (max-width: 640px) {
+        #pitchContainer {
+            max-height: 380px;
+        }
+
+        .pitch-slot .slot-circle {
+            width: 30px !important;
+            height: 30px !important;
+            font-size: 8px !important;
+        }
+
+        .pitch-slot .player-name-label {
+            font-size: 7px !important;
+        }
+    }
+</style>
 {% endblock %}

@@ -737,22 +737,41 @@ def offer_contract():
 @role_required('coach', 'admin')
 def convocation():
     """Convocation interface"""
-    from app.services import get_player_service, get_event_service, get_team_service
+    from app.services import get_player_service, get_event_service, get_team_service, get_match_service
     
     player_service = get_player_service()
     event_service = get_event_service()
+    team_service = get_team_service()
+    match_service = get_match_service()
     
     club_id = session.get('club_id')
     
-    # Get upcoming events
-    events = event_service.get_upcoming(club_id)
+    teams = team_service.get_by_club(club_id)
+    selected_team_id = request.args.get('team_id')
+    if not selected_team_id and teams:
+        selected_team_id = str(teams[0]['_id'])
     
-    # Get players
-    players = player_service.get_players_by_club(club_id)
+    # Get upcoming events and matches
+    events = event_service.get_upcoming(club_id, team_id=selected_team_id)
+    upcoming_matches = match_service.get_upcoming(club_id, team_id=selected_team_id)
+    
+    # Get players grouped by position
+    players = player_service.get_by_club(club_id, team_id=selected_team_id)
+    
+    by_position = {
+        'GK': [p for p in players if p.get('position') == 'GK'],
+        'DEF': [p for p in players if p.get('position') == 'DEF'],
+        'MID': [p for p in players if p.get('position') == 'MID'],
+        'ATT': [p for p in players if p.get('position') == 'ATT'],
+    }
     
     return render_template('coach/convocation.html', 
         events=events,
-        players=players
+        upcoming_matches=upcoming_matches,
+        players=players,
+        by_position=by_position,
+        teams=teams,
+        selected_team_id=selected_team_id
     )
 
 @coach_bp.route('/convocation/send', methods=['POST'])

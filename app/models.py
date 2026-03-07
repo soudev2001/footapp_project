@@ -245,7 +245,7 @@ SAVED_TACTIC_SCHEMA = {
 # MODEL HELPER FUNCTIONS
 # ============================================================
 
-def create_user(email, password_hash, role='player', club_id=None, profile=None, roles=None):
+def create_user(email, password_hash, role='player', club_id=None, profile=None, roles=None, **kwargs):
     """Create a new user document"""
     if roles is None:
         roles = [role]
