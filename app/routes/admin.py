@@ -194,6 +194,7 @@ def update_club():
     logo = request.form.get('logo')
     primary_color = request.form.get('primary_color')
     secondary_color = request.form.get('secondary_color')
+    accent_color = request.form.get('accent_color')
     
     update_data = {
         'name': name,
@@ -207,12 +208,13 @@ def update_club():
     if primary_color and secondary_color:
         update_data['colors'] = {
             'primary': primary_color,
-            'secondary': secondary_color
+            'secondary': secondary_color,
+            'accent': accent_color or '#8b5cf6'
         }
     
     club_service.update(club_id, update_data)
     
-    flash(f'Configuration du club mise à jour ! (Couleur : {primary_color})', 'success')
+    flash(f'Configuration du club mise à jour !', 'success')
     return redirect(url_for('admin.admin_panel'))
 
 @admin_bp.route('/users')
@@ -233,7 +235,7 @@ def change_role(user_id):
     """Change user role"""
     from bson import ObjectId
     new_role = request.form.get('role')
-    if new_role in ['admin', 'coach', 'player', 'fan']:
+    if new_role in ['admin', 'coach', 'player', 'parent', 'fan']:
         from app.services import get_user_service
         user_service = get_user_service()
         user_service.collection.update_one(
