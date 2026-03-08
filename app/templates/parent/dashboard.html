@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Espace Parent - FootLogic{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-0">Mon Espace Parent</h2>
+        <p class="text-muted">Gérez vos enfants et suivez leur activité sportive.</p>
+    </div>
+</div>
+
+<!-- Lier un enfant -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-primary text-white border-0 py-3">
+                <h5 class="card-title mb-0"><i class="fa-solid fa-link me-2"></i>Lier un enfant</h5>
+            </div>
+            <div class="card-body">
+                <p>Entrez le code d'association (6 lettres/chiffres) fourni par le club ou l'entraîneur pour vous lier à
+                    la fiche de votre enfant.</p>
+                <form action="{{ url_for('parent.link_child') }}" method="POST">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control form-control-lg text-center fw-bold"
+                            name="association_code" placeholder="EX: A1B2C3" maxlength="6" style="letter-spacing: 2px;"
+                            required>
+                        <button class="btn btn-primary" type="submit">Associer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mes enfants -->
+    <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0"><i class="fa-solid fa-children text-primary me-2"></i>Mes Enfants</h5>
+                <span class="badge bg-primary rounded-pill">{{ children|length }}</span>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for child in children %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-sm me-3">
+                                {% if child.photo %}
+                                <img src="{{ url_for('static', filename='uploads/avatars/' + child.photo) }}"
+                                    class="img-fluid rounded-circle"
+                                    style="width: 48px; height: 48px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 48px; height: 48px;">
+                                    <strong>{{ child.name[:2]|upper }}</strong>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h6 class="mb-0">{{ child.name }}</h6>
+                                <small class="text-muted">{{ child.position }} | N°{{ child.jersey_number }}</small>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ url_for('parent.calendar') }}"><i
+                                            class="fa-solid fa-calendar me-2 text-muted"></i> Son Calendrier</a></li>
+                                <li><a class="dropdown-item"
+                                        href="{{ url_for('parent.child_roster', player_id=child._id) }}"><i
+                                            class="fa-solid fa-users me-2 text-muted"></i> Son Équipe</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item p-4 text-center text-muted">
+                        <i class="fa-solid fa-person-circle-exclamation fs-3 mb-2 opacity-50"></i>
+                        <p class="mb-0">Aucun enfant n'est lié à votre compte actuellement.</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mini planning combiné -->
+{% if children %}
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0"><i class="fa-solid fa-bolt text-warning me-2"></i>Actions Rapides</h5>
+                <a href="{{ url_for('parent.calendar') }}" class="btn btn-sm btn-outline-primary">Voir tout le
+                    planning</a>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info border-0 bg-info bg-opacity-10 d-flex align-items-center">
+                    <i class="fa-solid fa-circle-info fs-4 me-3 text-info"></i>
+                    <div>
+                        <h6 class="mb-1">Centralisation des événements</h6>
+                        <p class="mb-0 small">Retrouvez tous les entraînements et matchs concernant vos enfants dans la
+                            rubrique <strong>Planning Enfant</strong> du menu latéral.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

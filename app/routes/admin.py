@@ -3,26 +3,22 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.routes.auth import login_required, role_required
 
-admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+admin_bp = Blueprint('superadmin', __name__, url_prefix='/superadmin')
 
 # ============================================================
 # ADMIN ROUTES
 # ============================================================
 
+@admin_bp.route('/')
 @admin_bp.route('/dashboard')
 @login_required
 @role_required('admin')
 def dashboard():
-    """Alias for admin_panel to prevent BuildError"""
-    return redirect(url_for('admin.admin_panel'))
-
-@admin_bp.route('/')
-@admin_bp.route('/panel')
-@login_required
-@role_required('admin')
-def admin_panel():
-    """Club Admin Dashboard (SaaS)"""
-    from app.services import get_club_service, get_user_service
+    """Mega Dashboard Centralisé (Club + Platform)"""
+    from app.services import get_club_service, get_user_service, get_project_service
+    user_service = get_user_service()
+    club_service = get_club_service()
+    project_service = get_project_service()
     user_service = get_user_service()
     club_service = get_club_service()
     
@@ -52,13 +48,22 @@ def admin_panel():
         'mrr': subscription['billing']['total_monthly'] if subscription and subscription.get('billing') else "0.00"
     }
     
+    # --- Platform Stats (SuperAdmin) ---
+    projects = project_service.get_all_projects()
+    active_tickets_count = project_service.tickets_collection.count_documents({'status': {'$ne': 'done'}})
+    superadmin_count = user_service.collection.count_documents({'role': 'admin', 'club_id': None})
+    
     return render_template('admin/panel.html', 
         club=club, 
         members=members, 
         teams=teams, 
         stats=stats,
         subscription=subscription,
-        plans=subscription_service.get_plans()
+        plans=subscription_service.get_plans(),
+        projects=projects,
+        total_projects=len(projects),
+        active_tickets=active_tickets_count,
+        superadmin_count=superadmin_count
     )
 
 @admin_bp.route('/add-member', methods=['POST'])
@@ -228,22 +233,61 @@ def users():
     users = user_service.collection.find().limit(100)
     return render_template('admin/users.html', users=list(users))
 
-@admin_bp.route('/users/<user_id>/role', methods=['POST'])
+@admin_bp.route('/users/<user_id>/edit', methods=['POST'])
 @login_required
 @role_required('admin')
-def change_role(user_id):
-    """Change user role"""
+def edit_member(user_id):
+    """Edit Member (Role, Name, Team)"""
     from bson import ObjectId
-    new_role = request.form.get('role')
-    if new_role in ['admin', 'coach', 'player', 'parent', 'fan']:
-        from app.services import get_user_service
-        user_service = get_user_service()
+    from app.services import get_user_service
+    user_service = get_user_service()
+    
+    admin_user = user_service.get_by_id(session.get('user_id'))
+    
+    first_name = request.form.get('first_name')
+    last_name = request.form.get('last_name')
+    role = request.form.get('role')
+    
+    update_data = {}
+    if role in ['admin', 'coach', 'player', 'parent', 'fan']:
+        update_data['role'] = role
+    if first_name or last_name:
+        user = user_service.get_by_id(user_id)
+        profile = user.get('profile', {})
+        if first_name: profile['first_name'] = first_name
+        if last_name: profile['last_name'] = last_name
+        update_data['profile'] = profile
+        
+    if update_data:
         user_service.collection.update_one(
-            {'_id': ObjectId(user_id)},
-            {'$set': {'role': new_role}}
+            {'_id': ObjectId(user_id), 'club_id': admin_user.get('club_id')},
+            {'$set': update_data}
         )
-        flash(f'Role modifie en {new_role}.', 'success')
-    return redirect(url_for('admin.users'))
+        flash(f'Membre mis à jour avec succès.', 'success')
+        
+    return redirect(url_for('admin.admin_panel') + '#members')
+
+@admin_bp.route('/users/<user_id>/delete', methods=['POST'])
+@login_required
+@role_required('admin')
+def delete_member(user_id):
+    """Delete a Member"""
+    from bson import ObjectId
+    from app.services import get_user_service, get_player_service
+    user_service = get_user_service()
+    player_service = get_player_service()
+    
+    # Simple hard-delete or status change, for this version we do hard-delete
+    user = user_service.get_by_id(user_id)
+    if user:
+        if user.get('role') == 'player':
+            player = player_service.collection.find_one({'user_id': ObjectId(user_id)})
+            if player:
+                player_service.delete(player['_id'])
+        user_service.collection.delete_one({'_id': ObjectId(user_id)})
+        flash('Membre supprimé définitivement.', 'success')
+        
+    return redirect(url_for('admin.admin_panel') + '#members')
 
 @admin_bp.route('/clubs')
 @login_required
@@ -350,6 +394,29 @@ def update_team_colors(team_id):
     flash('Couleurs de l\'équipe mises à jour !', 'success')
     return redirect(url_for('admin.admin_panel'))
 
+@admin_bp.route('/teams/<team_id>/edit', methods=['POST'])
+@login_required
+@role_required('admin')
+def edit_team(team_id):
+    """Edit team details (name, category, description)"""
+    from app.services import get_team_service
+    team_service = get_team_service()
+    
+    name = request.form.get('name')
+    category = request.form.get('category')
+    description = request.form.get('description')
+    
+    update_data = {}
+    if name: update_data['name'] = name
+    if category: update_data['category'] = category
+    if description is not None: update_data['description'] = description
+    
+    if update_data:
+        team_service.update(team_id, update_data)
+        flash('Détails de l\'équipe mis à jour !', 'success')
+        
+    return redirect(url_for('admin.admin_panel') + '#teams')
+
 @admin_bp.route('/teams/<team_id>/delete', methods=['POST'])
 @login_required
 @role_required('admin')
@@ -360,4 +427,72 @@ def delete_team(team_id):
     team_service.delete(team_id)
     flash('Équipe supprimée avec succès.', 'success')
     return redirect(url_for('admin.admin_panel'))
+
+# --- PLATFORM / PROJECT MANAGEMENT (SuperAdmin) ---
+
+@admin_bp.route('/projects')
+@login_required
+@role_required('admin')
+def project_list():
+    from app.services import get_project_service
+    project_service = get_project_service()
+    projects = project_service.get_all_projects()
+    return render_template('superadmin/projects.html', projects=projects)
+
+@admin_bp.route('/projects/create', methods=['POST'])
+@login_required
+@role_required('admin')
+def create_project():
+    name = request.form.get('name')
+    description = request.form.get('description')
+    owner_id = session.get('user_id')
+    
+    from app.services import get_project_service
+    project_service = get_project_service()
+    project_service.create_project(name, description, owner_id)
+    
+    flash('Projet créé avec succès.', 'success')
+    return redirect(url_for('admin.admin_panel'))
+
+@admin_bp.route('/projects/<project_id>')
+@login_required
+@role_required('admin')
+def project_detail(project_id):
+    from app.services import get_project_service
+    project_service = get_project_service()
+    project = project_service.get_project(project_id)
+    tickets = project_service.get_project_tickets(project_id)
+    return render_template('superadmin/project_detail.html', project=project, tickets=tickets)
+
+@admin_bp.route('/projects/<project_id>/tickets/create', methods=['POST'])
+@login_required
+@role_required('admin')
+def create_ticket(project_id):
+    title = request.form.get('title')
+    description = request.form.get('description')
+    ticket_type = request.form.get('type', 'task')
+    priority = request.form.get('priority', 'medium')
+    reporter_id = session.get('user_id')
+    
+    from app.services import get_project_service
+    project_service = get_project_service()
+    project_service.create_ticket(project_id, title, description, reporter_id, ticket_type, priority)
+    
+    flash('Ticket créé avec succès.', 'success')
+    return redirect(url_for('admin.project_detail', project_id=project_id))
+
+@admin_bp.route('/tickets/<ticket_id>/update-status', methods=['POST'])
+@login_required
+@role_required('admin')
+def update_ticket_status(ticket_id):
+    new_status = request.form.get('status')
+    project_id = request.form.get('project_id')
+    
+    from app.services import get_project_service
+    project_service = get_project_service()
+    project_service.update_ticket(ticket_id, {'status': new_status})
+    
+    flash('Statut du ticket mis à jour.', 'success')
+    return redirect(url_for('admin.project_detail', project_id=project_id))
+
 

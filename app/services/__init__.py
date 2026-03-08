@@ -55,6 +55,10 @@ def get_notification_service():
     from .notification_service import NotificationService
     return NotificationService(mongo.db)
 
+def get_parent_link_service():
+    from .parent_link_service import ParentLinkService
+    return ParentLinkService(mongo.db)
+
 # Role helpers
 from .user_service import has_permission, get_nav_for_role, ROLE_PERMISSIONS
 

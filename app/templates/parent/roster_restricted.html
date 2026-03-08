@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Effectif - {{ child.name }} (Parent) {% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0">Effectif - Coéquipiers</h2>
+        <p class="text-muted">Équipe de <strong>{{ child.name }}</strong></p>
+    </div>
+    <a href="{{ url_for('parent.dashboard') }}" class="btn btn-outline-secondary">
+        <i class="fa-solid fa-arrow-left me-2"></i>Retour Espace
+    </a>
+</div>
+
+<div class="alert alert-warning border-0 bg-warning bg-opacity-10 d-flex align-items-center mb-4">
+    <i class="fa-solid fa-lock fs-4 me-3 text-warning"></i>
+    <div>
+        <h6 class="mb-1">Vue Restreinte</h6>
+        <p class="mb-0 small">Pour des raisons de confidentialité, seules les informations publiques (nom, poste,
+            numéro) des coéquipiers sont affichées.</p>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+    {% for mate in teammates %}
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm text-center {% if mate.is_child %}border-primary border-2{% endif %}">
+            <div class="card-body py-4">
+                <div class="position-relative d-inline-block mb-3">
+                    {% if mate.photo %}
+                    <img src="{{ url_for('static', filename='uploads/avatars/' + mate.photo) }}"
+                        class="rounded-circle img-thumbnail shadow-sm"
+                        style="width: 100px; height: 100px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                        style="width: 100px; height: 100px; font-size: 2.5rem;">
+                        <strong>{{ mate.name[:2]|upper }}</strong>
+                    </div>
+                    {% endif %}
+
+                    {% if mate.jersey_number %}
+                    <span
+                        class="position-absolute bottom-0 start-50 translate-middle-x badge bg-primary border border-2 border-white rounded-pill px-3 py-2"
+                        style="transform: translateY(50%)!important;">
+                        {{ mate.jersey_number }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <h5 class="card-title fw-bold mt-3 mb-1">
+                    {{ mate.name }}
+                    {% if mate.is_child %}
+                    <i class="fa-solid fa-star text-warning ms-1" title="Votre enfant"></i>
+                    {% endif %}
+                </h5>
+                <span class="badge bg-secondary opacity-75">{{ mate.position }}</span>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <p class="text-muted mb-0">Aucun coéquipier trouvé dans cette équipe.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

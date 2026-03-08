@@ -125,6 +125,7 @@ ROLE_PERMISSIONS = {
               'create_event', 'create_post', 'feed', 'chat', 'profile', 'settings'],
     'player': ['calendar', 'roster', 'attendance', 'feed', 'chat', 'profile', 'settings', 
                'documents', 'notifications'],
+    'parent': ['parent_dashboard', 'calendar', 'roster', 'feed', 'chat', 'profile', 'settings'],
     'fan': ['public_club', 'ranking', 'feed', 'profile', 'settings']
 }
 
@@ -168,6 +169,13 @@ def get_nav_for_role(role):
             {'name': 'Documents', 'url': '/player/documents', 'icon': 'fa-file-invoice'},
             {'name': 'Offres Privées', 'url': '/isy/partners', 'icon': 'fa-crown'},
             {'name': 'Social', 'url': '/feed', 'icon': 'fa-rss'},
+        ],
+        'parent': [
+            {'name': 'Espace Parent', 'url': '/parent/dashboard', 'icon': 'fa-users'},
+            {'name': 'Planning Enfant', 'url': '/parent/calendar', 'icon': 'fa-calendar-days'},
+            {'name': 'Social', 'url': '/feed', 'icon': 'fa-rss'},
+            {'name': 'Messages', 'url': '/messages', 'icon': 'fa-comments'},
+            {'name': 'Boutique', 'url': '/shop', 'icon': 'fa-bag-shopping'},
         ],
         'fan': [
             {'name': 'Accueil', 'url': '/', 'icon': 'fa-house'},

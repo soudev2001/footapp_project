@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Planning - Vues Parentales{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0">Planning Réservé</h2>
+        <p class="text-muted">Événements liés aux équipes de vos enfants.</p>
+    </div>
+    <a href="{{ url_for('parent.dashboard') }}" class="btn btn-outline-secondary">
+        <i class="fa-solid fa-arrow-left me-2"></i>Retour Espace
+    </a>
+</div>
+
+{% if not children %}
+<!-- Empty State -->
+<div class="text-center py-5">
+    <div class="display-1 text-muted mb-3"><i class="fa-solid fa-calendar-xmark opacity-25"></i></div>
+    <h4>Calendrier Vide</h4>
+    <p class="text-muted">Vous devez associer un enfant pour voir son équipe et ses entraînements.</p>
+    <a href="{{ url_for('parent.dashboard') }}" class="btn btn-primary mt-2">Lier un compte enfant</a>
+</div>
+{% else %}
+
+<!-- FullCalendar Integration Container -->
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div id="parentCalendar" style="min-height: 600px;"></div>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if children %}
+<!-- FullCalendar Script for Parent -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales/fr.global.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('parentCalendar');
+        if (!calendarEl) return;
+
+        // Parse the events dumped from Jinja
+        var rawEvents = {{ events| tojson | safe if events else '[]'
+    }};
+
+    var formattedEvents = rawEvents.map(function (evt) {
+        var color = '#0d6efd'; // blue for general/training
+        if (evt.event_type === 'match') color = '#198754';
+        if (evt.event_type === 'tournament') color = '#ffc107';
+
+        return {
+            id: evt._id,
+            title: evt.title,
+            start: evt.date,
+            backgroundColor: color,
+            borderColor: color,
+            extendedProps: {
+                location: evt.location,
+                type: evt.event_type,
+                description: evt.description
+            }
+        };
+    });
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+        events: formattedEvents,
+        eventClick: function (info) {
+            // Modale de détails
+            alert('Événement: ' + info.event.title + '\nLieu: ' + (info.event.extendedProps.location || 'Non défini'));
+        }
+    });
+
+    calendar.render();
+});
+</script>
+{% endif %}
+{% endblock %}

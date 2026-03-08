@@ -120,7 +120,7 @@ def app_home():
     """App home - redirects to correct blueprint routes to ensure data loading"""
     role = session.get('user_role', 'fan')
     if role == 'admin':
-        return redirect(url_for('admin.admin_panel'))
+        return redirect(url_for('superadmin.dashboard'))
     elif role == 'coach':
         return redirect(url_for('coach.dashboard'))
     elif role == 'player':

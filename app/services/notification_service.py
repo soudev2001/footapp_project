@@ -52,8 +52,11 @@ class NotificationService:
         self.collection.insert_one(notification)
 
     def create_notification(self, user_id, title, message, type='info', link=None):
-        """Create a generic notification"""
+        """Create a generic notification and forward to linked parents if applicable"""
         from bson import ObjectId
+        from app.services import get_parent_link_service, get_player_service
+        
+        # Insert the primary notification
         notification = {
             'user_id': ObjectId(user_id),
             'title': title,
@@ -64,3 +67,36 @@ class NotificationService:
             'read': False
         }
         self.collection.insert_one(notification)
+        
+        # Check if user_id is actually a player_id (Coach roster sends player_id)
+        # Verify if it's a valid player
+        player_service = get_player_service(self.db) if hasattr(self, 'db') else None
+        
+        # If player_service exists, verify if user_id matches a player
+        is_player = False
+        player_name = ""
+        if player_service:
+            # We must be careful not to crash if user_id is not a player
+            try:
+                player = player_service.get_by_id(user_id)
+                if player:
+                    is_player = True
+                    player_name = player.get('name', 'votre enfant')
+            except Exception:
+                pass
+                
+        if is_player:
+            link_service = get_parent_link_service(self.db) if hasattr(self, 'db') else None
+            if link_service:
+                parents = link_service.get_linked_parents(user_id)
+                for parent in parents:
+                    parent_notif = {
+                        'user_id': parent['_id'],
+                        'title': title,
+                        'message': f"[{player_name}] {message}",
+                        'type': type,
+                        'link': link, # Parent might not have access to the exact link if it's player specific, but we'll try
+                        'sent_at': datetime.utcnow(),
+                        'read': False
+                    }
+                    self.collection.insert_one(parent_notif)

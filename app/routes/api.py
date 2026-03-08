@@ -6,8 +6,29 @@ from app.services import (
     get_player_service, get_club_service, get_event_service, 
     get_match_service, get_post_service
 )
+from functools import wraps
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            auth_header = request.headers['Authorization']
+            if auth_header.startswith('Bearer '):
+                token = auth_header.split(" ")[1]
+        
+        if not token:
+            return jsonify({'success': False, 'message': 'Token is missing!'}), 401
+        
+        # In a real app, you would decode the JWT here
+        # For this setup, we validate the mock token format
+        if not token.startswith('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.'):
+            return jsonify({'success': False, 'message': 'Token is invalid!'}), 401
+            
+        return f(*args, **kwargs)
+    return decorated
 
 # ============================================================
 # PLAYERS API
@@ -202,6 +223,7 @@ def swagger_ui():
     return render_template('api/docs.html')
 
 @api_bp.route('/events/convocations', methods=['GET'])
+@token_required
 def get_convocations():
     """Mock endpoint for getting convocations"""
     return jsonify({
@@ -210,6 +232,7 @@ def get_convocations():
     })
 
 @api_bp.route('/events/<event_id>/rsvp', methods=['POST'])
+@token_required
 def update_rsvp(event_id):
     """Mock endpoint for RSVP to events"""
     data = request.json
@@ -219,6 +242,7 @@ def update_rsvp(event_id):
     return jsonify({'success': False, 'error': 'Invalid status'}), 400
 
 @api_bp.route('/notifications/token', methods=['POST'])
+@token_required
 def register_device_token():
     """Mock endpoint to register Firebase push notification token"""
     data = request.json
