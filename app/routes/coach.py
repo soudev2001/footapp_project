@@ -177,14 +177,16 @@ def add_player():
                 'avatar': '',
                 'phone': ''
             }
-            user = user_service.create(
+            user = user_service.create_pending_user(
                 email=email,
-                password=password,
                 role=player_defaults.get('role', 'player'),
                 club_id=club_id,
                 profile=profile
             )
-            flash(f'Compte créé pour {email} avec le mot de passe défini.', 'success')
+            from app.services import get_notification_service
+            notification_service = get_notification_service()
+            notification_service.send_invitation(user)
+            flash(f'Une invitation a été envoyée à {email}.', 'success')
         else:
             flash(f'Compte existant trouvé pour {email}.', 'info')
 
