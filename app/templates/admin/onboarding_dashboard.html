@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}FootApp - Tableau de Bord Invitations{% endblock %}
+
+{% block content %}
+<div class="sm:flex sm:items-center sm:justify-between mb-8">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Suivi des Invitations</h1>
+        <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">Gérez les membres en cours d'intégration dans votre
+            club.</p>
+    </div>
+    <div class="mt-4 sm:mt-0 flex space-x-3">
+        <a href="{{ url_for('admin.bulk_import') }}"
+            class="inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors">
+            <i class="fas fa-file-csv mr-2 mt-0.5"></i> Importer des Membres (CSV)
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div
+    class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700 mb-6 px-4 py-4 rounded-lg flex flex-col sm:flex-row gap-4 items-center justify-between">
+    <div class="flex space-x-2">
+        <a href="{{ url_for('admin.onboarding') }}"
+            class="px-3 py-1.5 text-sm font-medium rounded-md {% if not status_filter %}bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-white{% else %}text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-700/50{% endif %}">
+            Tous
+        </a>
+        <a href="{{ url_for('admin.onboarding', status='pending') }}"
+            class="px-3 py-1.5 text-sm font-medium rounded-md {% if status_filter == 'pending' %}bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300{% else %}text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-700/50{% endif %}">
+            En Attente
+        </a>
+        <a href="{{ url_for('admin.onboarding', status='expired') }}"
+            class="px-3 py-1.5 text-sm font-medium rounded-md {% if status_filter == 'expired' %}bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300{% else %}text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-700/50{% endif %}">
+            Expirées
+        </a>
+    </div>
+</div>
+
+<form action="{{ url_for('admin.bulk_resend') }}" method="POST" id="resendForm">
+    <!-- Active filters / Bulk Actions bar -->
+    <div class="mb-4 flex items-center justify-between bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-lg border border-emerald-100 dark:border-emerald-800/50 hidden"
+        id="bulk-actions">
+        <div class="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+            <span id="selected-count">1</span> membre(s) sélectionné(s)
+        </div>
+        <div>
+            <button type="submit"
+                class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                <i class="fas fa-paper-plane mr-1.5 mt-0.5"></i> Renvoyer les invitations
+            </button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="flex flex-col">
+        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                <div class="shadow-sm overflow-hidden border-b border-gray-200 dark:border-gray-700 sm:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-800/50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="select-all"
+                                            class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 dark:checked:bg-emerald-600">
+                                    </div>
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Membre</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Rôle / Équipe</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Statut</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Envoyé le</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            {% for u in invitations %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if u.display_status != 'Active' %}
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="member_ids" value="{{ u._id }}"
+                                            class="member-checkbox h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 dark:checked:bg-emerald-600">
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <div
+                                                class="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-700 dark:text-emerald-300 font-bold">
+                                                {{ u.profile.first_name[0] }}{{ u.profile.last_name[0] }}
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white">{{
+                                                u.profile.first_name }} {{ u.profile.last_name }}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ u.email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900 dark:text-white capitalize">{{ u.role }}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ u.team_name }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if u.display_status == 'Active' %}
+                                    <span
+                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">
+                                        Actif
+                                    </span>
+                                    {% elif u.display_status == 'Pending' %}
+                                    <span
+                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+                                        En attente
+                                    </span>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Expire dans {{
+                                        u.days_left }} jours</div>
+                                    {% else %}
+                                    <span
+                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300">
+                                        Expirée
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    {{ u.invite_sent_at.strftime('%d/%m/%Y') if u.invite_sent_at else 'Inconnu' }}
+                                    {% if u.last_reminder_at %}
+                                    <div class="text-xs mt-1 text-emerald-600 dark:text-emerald-400"
+                                        title="Dernier rappel">
+                                        <i class="fas fa-bell mr-1"></i> {{ u.last_reminder_at.strftime('%d/%m/%Y') }}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                                    <i class="fas fa-inbox text-4xl mb-3 text-gray-300 dark:text-gray-600"></i>
+                                    <p>Aucune invitation trouvée.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectAllContent = document.getElementById('select-all');
+        const checkboxes = document.querySelectorAll('.member-checkbox');
+        const bulkActionsBar = document.getElementById('bulk-actions');
+        const selectedCount = document.getElementById('selected-count');
+
+        function updateUI() {
+            const checkedBoxes = document.querySelectorAll('.member-checkbox:checked');
+            const count = checkedBoxes.length;
+
+            if (count > 0) {
+                bulkActionsBar.classList.remove('hidden');
+                selectedCount.textContent = count;
+            } else {
+                bulkActionsBar.classList.add('hidden');
+            }
+
+            if (selectAllContent) {
+                selectAllContent.checked = count === checkboxes.length && checkboxes.length > 0;
+            }
+        }
+
+        if (selectAllContent) {
+            selectAllContent.addEventListener('change', function (e) {
+                checkboxes.forEach(cb => cb.checked = e.target.checked);
+                updateUI();
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateUI);
+        });
+    });
+</script>
+{% endblock %}

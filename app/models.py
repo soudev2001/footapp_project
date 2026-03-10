@@ -49,6 +49,9 @@ USER_SCHEMA = {
     'account_status': str,    # 'pending', 'active'
     'invitation_token': str,  # For joining/confirming account
     'invite_sent_at': datetime,
+    'last_reminder_at': datetime,
+    'invitation_expires_at': datetime,
+    'import_batch_id': str,
     'profile': {
         'first_name': str,
         'last_name': str,
@@ -259,6 +262,9 @@ def create_user(email, password_hash, role='player', club_id=None, profile=None,
         'account_status': kwargs.get('account_status', 'active'),
         'invitation_token': kwargs.get('invitation_token'),
         'invite_sent_at': kwargs.get('invite_sent_at'),
+        'last_reminder_at': kwargs.get('last_reminder_at'),
+        'invitation_expires_at': kwargs.get('invitation_expires_at'),
+        'import_batch_id': kwargs.get('import_batch_id'),
         'profile': profile or {
             'first_name': '',
             'last_name': '',

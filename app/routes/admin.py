@@ -152,6 +152,108 @@ def invite_member():
         
     return redirect(url_for('admin.dashboard'))
 
+# ============================================================
+# MEMBER ONBOARDING ROUTES
+# ============================================================
+
+@admin_bp.route('/onboarding', methods=['GET'])
+@login_required
+@role_required('admin')
+def onboarding():
+    from app.services import get_member_onboarding_service, get_user_service
+    user_service = get_user_service()
+    admin_user = user_service.get_by_id(session.get('user_id'))
+    club_id = admin_user.get('club_id')
+    
+    onboarding_service = get_member_onboarding_service()
+    status_filter = request.args.get('status')
+    invitations = onboarding_service.get_invitation_dashboard(club_id, status_filter)
+    
+    return render_template('admin/onboarding_dashboard.html', invitations=invitations, status_filter=status_filter)
+
+@admin_bp.route('/onboarding/import', methods=['GET', 'POST'])
+@login_required
+@role_required('admin')
+def bulk_import():
+    from app.services import get_member_onboarding_service, get_user_service
+    user_service = get_user_service()
+    admin_user = user_service.get_by_id(session.get('user_id'))
+    club_id = admin_user.get('club_id')
+    
+    if request.method == 'POST':
+        if 'csv_file' not in request.files:
+            flash('Aucun fichier sélectionné', 'error')
+            return redirect(url_for('admin.bulk_import'))
+            
+        file = request.files['csv_file']
+        if file.filename == '':
+            flash('Aucun fichier sélectionné', 'error')
+            return redirect(url_for('admin.bulk_import'))
+            
+        if not file.filename.endswith('.csv'):
+            flash('Le fichier doit être au format CSV', 'error')
+            return redirect(url_for('admin.bulk_import'))
+            
+        onboarding_service = get_member_onboarding_service()
+        file_content = file.read()
+        
+        valid_rows, errors = onboarding_service.validate_csv(file_content, club_id)
+        
+        # Store valid rows in session temporarily for confirmation step
+        session['onboarding_valid_rows'] = valid_rows
+        
+        return render_template('admin/onboarding_import_preview.html', 
+                               valid_rows=valid_rows, 
+                               errors=errors)
+                               
+    return render_template('admin/onboarding_import.html')
+
+@admin_bp.route('/onboarding/import/confirm', methods=['POST'])
+@login_required
+@role_required('admin')
+def confirm_import():
+    from app.services import get_member_onboarding_service, get_user_service
+    user_service = get_user_service()
+    admin_user = user_service.get_by_id(session.get('user_id'))
+    club_id = admin_user.get('club_id')
+    
+    valid_rows = session.get('onboarding_valid_rows')
+    if not valid_rows:
+        flash('Session expirée ou données invalides. Veuillez recommencer.', 'error')
+        return redirect(url_for('admin.bulk_import'))
+        
+    custom_message = request.form.get('custom_message')
+    
+    onboarding_service = get_member_onboarding_service()
+    result = onboarding_service.bulk_import_members(club_id, valid_rows, custom_message)
+    
+    # Clear session data
+    session.pop('onboarding_valid_rows', None)
+    
+    flash(f"{result['created_count']} membre(s) importé(s) avec succès. Les invitations ont été envoyées.", 'success')
+    return redirect(url_for('admin.onboarding'))
+
+@admin_bp.route('/onboarding/resend', methods=['POST'])
+@login_required
+@role_required('admin')
+def bulk_resend():
+    from app.services import get_member_onboarding_service, get_user_service
+    user_service = get_user_service()
+    admin_user = user_service.get_by_id(session.get('user_id'))
+    club_id = admin_user.get('club_id')
+    
+    member_ids = request.form.getlist('member_ids')
+    if not member_ids:
+        flash('Aucun membre sélectionné.', 'error')
+        return redirect(url_for('admin.onboarding'))
+        
+    onboarding_service = get_member_onboarding_service()
+    success_count = onboarding_service.resend_invitations(club_id, member_ids)
+    
+    flash(f'{success_count} invitation(s) renvoyée(s) avec succès.', 'success')
+    return redirect(url_for('admin.onboarding'))
+
+
 @admin_bp.route('/update-subscription', methods=['POST'])
 @login_required
 @role_required('admin')

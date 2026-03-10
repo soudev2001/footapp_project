@@ -59,6 +59,10 @@ def get_parent_link_service():
     from .parent_link_service import ParentLinkService
     return ParentLinkService(mongo.db)
 
+def get_member_onboarding_service():
+    from .member_onboarding_service import MemberOnboardingService
+    return MemberOnboardingService(mongo.db)
+
 # Role helpers
 from .user_service import has_permission, get_nav_for_role, ROLE_PERMISSIONS
 
