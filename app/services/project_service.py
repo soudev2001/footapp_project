@@ -3,7 +3,7 @@
 from bson import ObjectId
 from datetime import datetime
 from app.services.db import get_db
-from app.models import create_project, create_ticket, serialize_doc, serialize_docs
+from app.models import create_project, create_ticket
 
 class ProjectService:
     def __init__(self):
@@ -15,15 +15,15 @@ class ProjectService:
         project = create_project(name, description, owner_id)
         result = self.projects_collection.insert_one(project)
         project['_id'] = result.inserted_id
-        return serialize_doc(project)
+        return project
 
     def get_project(self, project_id):
         project = self.projects_collection.find_one({'_id': ObjectId(project_id)})
-        return serialize_doc(project)
+        return project
 
     def get_all_projects(self):
         projects = self.projects_collection.find().sort('created_at', -1)
-        return serialize_docs(list(projects))
+        return list(projects)
 
     def update_project(self, project_id, data):
         data['updated_at'] = datetime.utcnow()
@@ -43,15 +43,15 @@ class ProjectService:
         ticket = create_ticket(project_id, title, description, reporter_id, ticket_type, priority)
         result = self.tickets_collection.insert_one(ticket)
         ticket['_id'] = result.inserted_id
-        return serialize_doc(ticket)
+        return ticket
 
     def get_ticket(self, ticket_id):
         ticket = self.tickets_collection.find_one({'_id': ObjectId(ticket_id)})
-        return serialize_doc(ticket)
+        return ticket
 
     def get_project_tickets(self, project_id):
         tickets = self.tickets_collection.find({'project_id': ObjectId(project_id)}).sort('created_at', -1)
-        return serialize_docs(list(tickets))
+        return list(tickets)
 
     def update_ticket(self, ticket_id, data):
         data['updated_at'] = datetime.utcnow()

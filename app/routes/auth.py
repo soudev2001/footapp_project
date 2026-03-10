@@ -88,8 +88,8 @@ def login():
             if user['role'] == 'admin':
                 # Superadmins (in this logic) are admins without a club_id
                 if not user.get('club_id'):
-                    return redirect(url_for('superadmin.dashboard'))
-                return redirect(url_for('admin.admin_panel'))
+                    return redirect(url_for('admin.dashboard'))
+                return redirect(url_for('admin.dashboard'))
             elif user['role'] == 'coach':
                 return redirect(url_for('main.dashboard'))
             else:
@@ -139,7 +139,7 @@ def register_club():
         session['club_id'] = str(user['club_id'])
         
         flash(f'Bienvenue ! Le club {club_name} a été créé avec succès.', 'success')
-        return redirect(url_for('admin.admin_panel'))
+        return redirect(url_for('admin.dashboard'))
         
     return render_template('auth/register_club.html')
 
@@ -218,7 +218,7 @@ def register():
             
             flash('Inscription complétée avec succès !', 'success')
             if updated_user['role'] == 'admin':
-                return redirect(url_for('admin.admin_panel'))
+                return redirect(url_for('admin.dashboard'))
             elif updated_user['role'] == 'coach':
                 return redirect(url_for('main.dashboard'))
             else:
@@ -278,10 +278,11 @@ def forgot_password():
                 }}
             )
             
-            # In production, send email with reset link
-            # For demo, we'll just flash the token info
+            # Send email with reset link
+            from app.services.email_service import send_reset_password_email
             reset_url = url_for('auth.reset_password', token=token, _external=True)
             print(f"[DEBUG] Password reset link: {reset_url}")
+            send_reset_password_email(email, reset_url)
         
         # Always show same message for security (don't reveal if email exists)
         flash('Si cet email existe, un lien de reinitialisation a ete envoye.', 'info')

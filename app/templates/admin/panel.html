@@ -66,13 +66,25 @@
                 class="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/20 mb-2 mt-2">
                 Principal</div>
 
-            <button onclick="switchTab('members'); if(window.innerWidth < 1024) toggleAdminSidebar();" id="nav-members"
+            <button onclick="switchTab('dashboard'); if(window.innerWidth < 1024) toggleAdminSidebar();"
+                id="nav-dashboard"
                 class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 active group text-left">
                 <div
                     class="w-8 h-8 rounded-lg bg-primary-500/10 flex items-center justify-center shrink-0 group-hover:bg-primary-500/15 transition-colors">
-                    <i class="fa-solid fa-users text-primary-400 text-xs"></i>
+                    <i class="fa-solid fa-chart-pie text-primary-400 text-xs transition-colors nav-icon"></i>
                 </div>
-                <span class="font-medium text-slate-900 dark:text-white text-sm">Effectif</span>
+                <span class="font-medium text-slate-900 dark:text-white text-sm">Tableau de Bord</span>
+            </button>
+
+            <button onclick="switchTab('members'); if(window.innerWidth < 1024) toggleAdminSidebar();" id="nav-members"
+                class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
+                <div
+                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
+                    <i
+                        class="fa-solid fa-users text-white/40 group-hover:text-primary-400 text-xs nav-icon transition-colors"></i>
+                </div>
+                <span
+                    class="font-medium text-gray-400 group-hover:text-white group-hover:text-slate-900 text-sm">Effectif</span>
             </button>
             <button onclick="switchTab('teams'); if(window.innerWidth < 1024) toggleAdminSidebar();" id="nav-teams"
                 class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
@@ -198,52 +210,12 @@
 
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col h-full w-full">
-        <!-- Top Navbar (Mobile + Desktop Actions) -->
-        <header
-            class="h-16 lg:h-20 bg-surface-950/80 bg-white/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 flex items-center justify-between px-4 lg:px-8 z-20 shrink-0">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleAdminSidebar()"
-                    class="lg:hidden w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-900 dark:text-white transition-colors">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-                <div class="flex flex-col">
-                    <h2 class="text-sm lg:text-lg font-bold text-slate-900 dark:text-white" id="topNavTitle">Effectif
-                    </h2>
-                    <span class="text-[10px] text-slate-500 dark:text-white/40 font-medium hidden sm:block"
-                        id="topNavSubtitle">Gérez les membres de votre club</span>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-3">
-                <button onclick="toggleTheme()"
-                    class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-900 dark:text-white hover:bg-primary-500/20 hover:text-primary-500 transition-colors">
-                    <i class="fa-solid fa-moon dark:block hidden text-sm"></i>
-                    <i class="fa-solid fa-sun dark:hidden block text-sm text-amber-500"></i>
-                </button>
-
-                <a href="{{ url_for('main.index') }}" title="Retour au site public"
-                    class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-900 dark:text-white hover:bg-white/10 transition-colors hidden sm:flex">
-                    <i class="fa-solid fa-globe text-sm"></i>
-                </a>
-
-                <div class="h-8 w-px bg-white/10 lg:mx-2 hidden sm:block"></div>
-
-                <div
-                    class="flex items-center gap-3 bg-slate-100 dark:bg-white/5 pr-3 pl-1.5 py-1.5 rounded-2xl cursor-pointer hover:bg-white/10 transition-colors">
-                    <div
-                        class="w-8 h-8 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center font-bold text-white text-xs shadow-md">
-                        {{ current_user.profile.first_name[:1] if current_user.profile.first_name else 'A' }}
-                    </div>
-                    <div class="flex flex-col items-start hidden sm:flex">
-                        <span class="text-xs font-bold leading-none text-slate-900 dark:text-white">
-                            {{ current_user.profile.first_name or 'Admin' }}
-                        </span>
-                        <span
-                            class="text-[9px] text-primary-400 font-semibold uppercase tracking-wider mt-0.5">Admin</span>
-                    </div>
-                </div>
-            </div>
-        </header>
+        <!-- Top Navbar (Breadcrumbs) -->
+        {% set breadcrumbs = [
+        {'name': 'Administration', 'url': url_for('admin.dashboard')},
+        {'name': 'Panel Central'}
+        ] %}
+        {% include 'components/_breadcrumbs.html' %}
 
         <!-- Scrollable Content -->
         <main
@@ -255,8 +227,135 @@
             </div>
 
             <div class="relative z-10 max-w-7xl mx-auto">
+                <!-- TAB: DASHBOARD -->
+                <div id="tab-dashboard" class="animate-slide-up">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                        <div>
+                            <h2 class="text-2xl font-extrabold tracking-tight">Tableau de <span
+                                    class="text-gradient">Bord</span></h2>
+                            <p class="text-slate-500 dark:text-white/40 text-sm mt-1.5 font-medium">Vue d'ensemble des
+                                performances et statistiques de votre club.</p>
+                        </div>
+                    </div>
+
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+                        <!-- Total Members -->
+                        <div class="glass p-6 rounded-2xl border-white/5 relative overflow-hidden group hover:bg-white/[0.04] transition-all cursor-pointer shadow-sm hover:shadow-md"
+                            onclick="switchTab('members')">
+                            <div
+                                class="absolute right-0 top-0 w-24 h-24 bg-primary-500/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-primary-500/20 transition-all">
+                            </div>
+                            <div class="flex justify-between items-start mb-6">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-500 border border-primary-500/20">
+                                    <i class="fa-solid fa-users text-xl"></i>
+                                </div>
+                                <span
+                                    class="bg-primary-500/10 text-primary-500 text-[10px] font-bold px-2.5 py-1 rounded-lg">+12%</span>
+                            </div>
+                            <div
+                                class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/40 mb-1">
+                                Total Membres</div>
+                            <div class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{{
+                                stats.total_members if stats else 0 }}</div>
+                        </div>
+
+                        <!-- Teams -->
+                        <div class="glass p-6 rounded-2xl border-white/5 relative overflow-hidden group hover:bg-white/[0.04] transition-all cursor-pointer shadow-sm hover:shadow-md"
+                            onclick="switchTab('teams')">
+                            <div
+                                class="absolute right-0 top-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-blue-500/20 transition-all">
+                            </div>
+                            <div class="flex justify-between items-start mb-6">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20">
+                                    <i class="fa-solid fa-layer-group text-xl"></i>
+                                </div>
+                                <span
+                                    class="bg-blue-500/10 text-blue-500 text-[10px] font-bold px-2.5 py-1 rounded-lg">Stable</span>
+                            </div>
+                            <div
+                                class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/40 mb-1">
+                                Équipes Actives</div>
+                            <div class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{{
+                                stats.total_teams if stats else 0 }}</div>
+                        </div>
+
+                        <!-- Coaches -->
+                        <div class="glass p-6 rounded-2xl border-white/5 relative overflow-hidden group hover:bg-white/[0.04] transition-all cursor-pointer shadow-sm hover:shadow-md"
+                            onclick="switchTab('members')">
+                            <div
+                                class="absolute right-0 top-0 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-orange-500/20 transition-all">
+                            </div>
+                            <div class="flex justify-between items-start mb-6">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500 border border-orange-500/20">
+                                    <i class="fa-solid fa-whistle text-xl"></i>
+                                </div>
+                            </div>
+                            <div
+                                class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/40 mb-1">
+                                Entraîneurs</div>
+                            <div class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{{
+                                stats.coaches if stats else 0 }}</div>
+                        </div>
+
+                        <!-- MRR -->
+                        <div
+                            class="glass p-6 rounded-2xl border-white/5 relative overflow-hidden group hover:bg-white/[0.04] transition-all shadow-sm hover:shadow-md">
+                            <div
+                                class="absolute right-0 top-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-emerald-500/20 transition-all">
+                            </div>
+                            <div class="flex justify-between items-start mb-6">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
+                                    <i class="fa-solid fa-euro-sign text-xl"></i>
+                                </div>
+                                <span
+                                    class="bg-emerald-500/10 text-emerald-500 text-[10px] font-bold px-2.5 py-1 rounded-lg">+5%</span>
+                            </div>
+                            <div
+                                class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/40 mb-1">
+                                MRR Abonnement</div>
+                            <div class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{{ stats.mrr
+                                if stats else '0.00' }}€</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Area -->
+                    <div class="grid lg:grid-cols-3 gap-6 mb-8">
+                        <div class="lg:col-span-2 glass p-6 rounded-2xl border-white/5 shadow-sm">
+                            <h3
+                                class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/40 mb-6 flex items-center gap-2">
+                                <i class="fa-solid fa-chart-line text-primary-500"></i> Évolution de l'activité du club
+                            </h3>
+                            <div class="h-64 w-full relative">
+                                <canvas id="adminActivityChart"></canvas>
+                            </div>
+                        </div>
+                        <div
+                            class="glass p-6 rounded-2xl border-white/5 flex flex-col justify-center items-center text-center shadow-sm relative overflow-hidden">
+                            <div
+                                class="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-3xl -mr-16 -mt-16">
+                            </div>
+                            <div
+                                class="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center mb-5 shadow-lg shadow-primary-500/30 transform rotate-3">
+                                <i class="fa-solid fa-rocket text-3xl text-white -rotate-3"></i>
+                            </div>
+                            <h3 class="text-xl font-extrabold text-slate-900 dark:text-white mb-2">Club Performant</h3>
+                            <p class="text-sm font-medium text-slate-500 dark:text-white/50 mb-6 leading-relaxed">Votre
+                                club enregistre une excellente croissance. Continuez d'engager vos licenciés avec
+                                FootLogic !</p>
+                            <button onclick="switchTab('members')"
+                                class="w-full py-3 bg-white hover:bg-slate-50 dark:bg-white/5 dark:hover:bg-white/10 rounded-xl text-xs font-bold text-slate-900 dark:text-white transition-all border border-slate-200 dark:border-white/10 shadow-sm">Gérer
+                                mon effectif</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- TAB: EFFECTIF (Members) -->
-                <div id="tab-members" class="animate-slide-up">
+                <div id="tab-members" class="hidden animate-slide-up">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                         <div>
                             <h2 class="text-2xl font-extrabold tracking-tight">Mon <span
@@ -310,7 +409,7 @@
                                 <h3 class="text-lg font-extrabold mb-5 flex items-center gap-2">
                                     Nouveau <span class="text-gradient">Membre</span>
                                 </h3>
-                                <form action="{{ url_for('superadmin.add_member') }}" method="POST" class="space-y-4">
+                                <form action="{{ url_for('admin.add_member') }}" method="POST" class="space-y-4">
                                     <div class="grid grid-cols-2 gap-3">
                                         <div>
                                             <label
@@ -517,7 +616,7 @@
                                             <td class="p-5 text-right">
                                                 <div class="flex justify-end gap-2">
                                                     {% if member.account_status == 'pending' %}
-                                                    <form action="{{ url_for('superadmin.invite_member') }}" method="POST"
+                                                    <form action="{{ url_for('admin.invite_member') }}" method="POST"
                                                         class="inline">
                                                         <input type="hidden" name="email" value="{{ member.email }}">
                                                         <button type="submit" title="Renvoyer l'invitation"
@@ -540,7 +639,7 @@
                                                     <!-- Delete Member -->
                                                     {% if member._id != current_user._id %}
                                                     <form
-                                                        action="{{ url_for('superadmin.delete_member', user_id=member._id|string) }}"
+                                                        action="{{ url_for('admin.delete_member', user_id=member._id|string) }}"
                                                         method="POST" class="inline"
                                                         onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer définitivement ce membre ?');">
                                                         <button type="submit" title="Supprimer ce membre"
@@ -596,7 +695,7 @@
                                     Nouvelle <span class="text-gradient">Équipe</span>
                                 </h3>
 
-                                <form action="{{ url_for('superadmin.add_team') }}" method="POST" class="space-y-4">
+                                <form action="{{ url_for('admin.add_team') }}" method="POST" class="space-y-4">
                                     <div>
                                         <label
                                             class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 text-slate-400 mb-1.5 ml-0.5">Nom
@@ -689,7 +788,7 @@
                                             title="Modifier l'équipe">
                                             <i class="fa-solid fa-pen text-xs"></i>
                                         </button>
-                                        <form action="{{ url_for('superadmin.delete_team', team_id=team._id|string) }}"
+                                        <form action="{{ url_for('admin.delete_team', team_id=team._id|string) }}"
                                             method="POST"
                                             onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette équipe et détacher ses membres ?')">
                                             <button type="submit"
@@ -869,7 +968,7 @@
 
                                 <!-- Plan Selector Form -->
                                 <div class="pt-8 border-t border-white/5">
-                                    <form action="{{ url_for('superadmin.update_subscription') }}" method="POST"
+                                    <form action="{{ url_for('admin.update_subscription') }}" method="POST"
                                         class="space-y-4">
                                         <div>
                                             <label
@@ -1122,7 +1221,7 @@
                             <div
                                 class="absolute -left-16 -top-16 w-40 h-40 bg-primary-500/5 rounded-full blur-[60px] pointer-events-none">
                             </div>
-                            <form class="space-y-6" action="{{ url_for('superadmin.update_club') }}" method="POST">
+                            <form class="space-y-6" action="{{ url_for('admin.update_club') }}" method="POST">
                                 <div
                                     class="flex flex-col md:flex-row gap-6 items-center mb-8 pb-8 border-b border-white/5">
                                     <div
@@ -1238,7 +1337,7 @@
                                 </div>
                             </div>
 
-                            <form action="{{ url_for('superadmin.update_club') }}" method="POST" class="space-y-5">
+                            <form action="{{ url_for('admin.update_club') }}" method="POST" class="space-y-5">
                                 <input type="hidden" name="name" value="{{ club.name if club else '' }}">
                                 <input type="hidden" name="city" value="{{ club.city if club else '' }}">
                                 <input type="hidden" name="founded_year"
@@ -1459,7 +1558,7 @@
                     </div>
                 </div>
 
-                <!-- TAB: PLATFORM (SuperAdmin) -->
+                <!-- TAB: PLATFORM (admin) -->
                 <div id="tab-platform" class="hidden animate-slide-up">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                         <div>
@@ -1494,9 +1593,9 @@
                         <div class="glass p-6 rounded-2xl border-white/5">
                             <div
                                 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/20 mb-2">
-                                Comptes Superadmin</div>
-                            <div class="text-3xl font-extrabold text-emerald-500">{{ superadmin_count if
-                                superadmin_count is defined else '0' }}</div>
+                                Comptes admin</div>
+                            <div class="text-3xl font-extrabold text-emerald-500">{{ admin_count if
+                                admin_count is defined else '0' }}</div>
                         </div>
                     </div>
 
@@ -1538,7 +1637,7 @@
                                             }}
                                         </td>
                                         <td class="px-6 py-4 text-right">
-                                            <a href="{{ url_for('superadmin.project_detail', project_id=project._id|string) }}"
+                                            <a href="{{ url_for('admin.project_detail', project_id=project._id|string) }}"
                                                 class="text-primary-400 hover:text-primary-300 font-bold text-xs bg-primary-500/10 px-3 py-1.5 rounded-lg transition-colors">Gérer</a>
                                         </td>
                                     </tr>
@@ -1623,7 +1722,7 @@
                     <i class="fa-solid fa-xmark text-xs"></i>
                 </button>
             </div>
-            <form action="{{ url_for('superadmin.invite_member') }}" method="POST" class="space-y-4">
+            <form action="{{ url_for('admin.invite_member') }}" method="POST" class="space-y-4">
                 <input type="email" name="email" required placeholder="email@exemple.com"
                     class="w-full bg-white/[0.04] border border-white/8 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-primary-500/50 placeholder:text-white/15 font-medium transition-all">
                 <button type="submit"
@@ -1729,7 +1828,7 @@
                     <i class="fa-solid fa-xmark text-xs"></i>
                 </button>
             </div>
-            <form action="{{ url_for('superadmin.add_project') }}" method="POST" class="space-y-4">
+            <form action="{{ url_for('admin.create_project') }}" method="POST" class="space-y-4">
                 <div>
                     <label
                         class="block text-[10px] font-semibold uppercase tracking-wider text-white/25 mb-1.5 ml-0.5">Nom
@@ -1780,14 +1879,14 @@
             document.getElementById('persoTeamName').innerText = d.name;
             document.getElementById('persoPrimary').value = d.primary;
             document.getElementById('persoSecondary').value = d.secondary;
-            document.getElementById('personalizeForm').action = '/superadmin/teams/' + d.id + '/update-colors';
+            document.getElementById('personalizeForm').action = '/admin/teams/' + d.id + '/update-colors';
             toggleModal('personalizeTeamModal');
         }
         function toggleModal(id) {
             document.getElementById(id).classList.toggle('hidden');
         }
         function switchTab(tabId) {
-            const tabs = ['members', 'teams', 'subscription', 'metrics', 'settings', 'personalization', 'platform'];
+            const tabs = ['dashboard', 'members', 'teams', 'subscription', 'metrics', 'settings', 'personalization', 'platform'];
             tabs.forEach(t => {
                 const tab = document.getElementById('tab-' + t);
                 const nav = document.getElementById('nav-' + t);
@@ -1795,7 +1894,7 @@
                 if (nav) {
                     nav.classList.remove('active');
                     const span = nav.querySelector('span');
-                    if (span) { span.classList.remove('text-white'); span.classList.add('text-gray-400'); }
+                    if (span) { span.classList.remove('text-slate-900'); span.classList.remove('text-white'); span.classList.add('text-gray-400'); }
                 }
             });
             const activeTab = document.getElementById('tab-' + tabId);
@@ -1804,7 +1903,19 @@
             if (activeNav) {
                 activeNav.classList.add('active');
                 const span = activeNav.querySelector('span');
-                if (span) { span.classList.remove('text-gray-400'); span.classList.add('text-white'); }
+                let tabName = '';
+                if (span) {
+                    span.classList.remove('text-gray-400');
+                    span.classList.add('text-slate-900');
+                    span.classList.add('dark:text-white');
+                    tabName = span.textContent;
+                }
+
+                // Update Breadcrumb dynamically
+                const breadcrumbSpan = document.querySelector('nav[aria-label="Breadcrumb"] span[aria-current="page"]');
+                if (breadcrumbSpan && tabName) {
+                    breadcrumbSpan.textContent = tabName;
+                }
             }
         }
 
@@ -1816,7 +1927,7 @@
             document.getElementById('editMemberRole').value = d.role;
 
             // Update form action dynamically
-            document.getElementById('editMemberForm').action = '/superadmin/users/' + d.id + '/edit';
+            document.getElementById('editMemberForm').action = '/admin/users/' + d.id + '/edit';
 
             toggleModal('editMemberModal');
         }
@@ -1828,14 +1939,69 @@
             document.getElementById('editTeamCategory').value = d.category;
             document.getElementById('editTeamDescription').value = d.description || '';
 
-            document.getElementById('editTeamForm').action = '/superadmin/teams/' + d.id + '/edit';
+            document.getElementById('editTeamForm').action = '/admin/teams/' + d.id + '/edit';
 
             toggleModal('editTeamModal');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const hash = window.location.hash.replace('#', '');
-            switchTab(['members', 'teams', 'subscription', 'metrics', 'settings', 'personalization', 'platform'].includes(hash) ? hash : 'members');
+            switchTab(['dashboard', 'members', 'teams', 'subscription', 'metrics', 'settings', 'personalization', 'platform'].includes(hash) ? hash : 'dashboard');
+
+            // Initialize Admin KPI Chart
+            const ctxActivity = document.getElementById('adminActivityChart');
+            if (ctxActivity) {
+                new Chart(ctxActivity, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+                        datasets: [{
+                            label: 'Activité Globale',
+                            data: [15, 25, 40, 45, 60, 85, 90],
+                            borderColor: getComputedStyle(document.documentElement).getPropertyValue('--primary-color') || '#0ea5e9',
+                            backgroundColor: (context) => {
+                                const ctx = context.chart.ctx;
+                                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                                gradient.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--primary-color') + '40');
+                                gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                                return gradient;
+                            },
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--primary-color') || '#0ea5e9',
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                titleColor: '#fff',
+                                bodyColor: '#cbd5e1',
+                                padding: 10,
+                                cornerRadius: 8,
+                                displayColors: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false, drawBorder: false },
+                                ticks: { color: '#94a3b8', font: { size: 10, weight: '600' } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
+                                ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 20 }
+                            }
+                        }
+                    }
+                });
+            }
         });
 
         // Personalization: live preview

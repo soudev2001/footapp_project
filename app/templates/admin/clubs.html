@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Clubs - FootLogic{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Gestion des Clubs</h1>
+        <button onclick="document.getElementById('newClubModal').classList.remove('hidden')"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+            + Nouveau Club
+        </button>
+    </div>
+
+    <!-- Club List -->
+    <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
+        <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Clubs Enregistrés</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-gray-50 dark:bg-gray-900/50">
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Ville</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Créé le</th>
+                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                    {% for club in clubs %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition duration-150">
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-gray-900 dark:text-white">{{ club.name }}</div>
+                            <div class="text-sm text-gray-500">Membres Actifs: N/A</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            {{ club.city }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            {{ club.created_at.strftime('%d/%m/%Y') if club.created_at else 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button class="text-blue-600 hover:text-blue-800 font-medium">Voir</button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-10 text-center text-gray-500">Aucun club trouvé.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- New Club Modal -->
+<div id="newClubModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
+        <h3 class="text-xl font-bold mb-4 dark:text-white">Créer un Nouveau Club</h3>
+        <form action="{{ url_for('admin.create_club') }}" method="POST">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom du club</label>
+                <input type="text" name="name" required
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ville</label>
+                <input type="text" name="city" required
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email de l'Administrateur
+                    (Invitation)</label>
+                <input type="email" name="admin_email" required
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                <p class="text-xs text-gray-500 mt-1">Un email sera envoyé avec un lien pour configurer le compte Admin.
+                </p>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-6">
+                <button type="button" onclick="document.getElementById('newClubModal').classList.add('hidden')"
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800">Annuler</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Créer et
+                    Inviter</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

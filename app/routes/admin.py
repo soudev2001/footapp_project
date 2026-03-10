@@ -3,7 +3,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.routes.auth import login_required, role_required
 
-admin_bp = Blueprint('superadmin', __name__, url_prefix='/superadmin')
+admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 # ============================================================
 # ADMIN ROUTES
@@ -116,7 +116,7 @@ def add_member():
             
         flash(f'Membre {first_name} ajouté en attente. Une invitation a été envoyée à {email}.', 'success')
         
-    return redirect(url_for('admin.admin_panel'))
+    return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/invite-member', methods=['POST'])
 @login_required
@@ -150,7 +150,7 @@ def invite_member():
     else:
         flash(f'Utilisateur avec l\'email {email} non trouvé.', 'error')
         
-    return redirect(url_for('admin.admin_panel'))
+    return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/update-subscription', methods=['POST'])
 @login_required
@@ -168,12 +168,12 @@ def update_subscription():
     
     if not club_id:
         flash('Erreur: Aucun club associe.', 'error')
-        return redirect(url_for('admin.admin_panel'))
+        return redirect(url_for('admin.dashboard'))
         
     subscription_service.update_subscription(club_id, plan_id)
     
     flash(f'Plan mis a jour vers {plan_id.replace("_", " ").title()}!', 'success')
-    return redirect(url_for('admin.admin_panel'))
+    return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/update-club', methods=['POST'])
 @login_required
@@ -189,7 +189,7 @@ def update_club():
     
     if not club_id:
         flash('Erreur: Aucun club associe.', 'error')
-        return redirect(url_for('admin.admin_panel'))
+        return redirect(url_for('admin.dashboard'))
         
     name = request.form.get('name')
     city = request.form.get('city')
@@ -220,7 +220,7 @@ def update_club():
     club_service.update(club_id, update_data)
     
     flash(f'Configuration du club mise à jour !', 'success')
-    return redirect(url_for('admin.admin_panel'))
+    return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/users')
 @login_required
@@ -265,7 +265,7 @@ def edit_member(user_id):
         )
         flash(f'Membre mis à jour avec succès.', 'success')
         
-    return redirect(url_for('admin.admin_panel') + '#members')
+    return redirect(url_for('admin.dashboard') + '#members')
 
 @admin_bp.route('/users/<user_id>/delete', methods=['POST'])
 @login_required
@@ -287,7 +287,7 @@ def delete_member(user_id):
         user_service.collection.delete_one({'_id': ObjectId(user_id)})
         flash('Membre supprimé définitivement.', 'success')
         
-    return redirect(url_for('admin.admin_panel') + '#members')
+    return redirect(url_for('admin.dashboard') + '#members')
 
 @admin_bp.route('/clubs')
 @login_required
@@ -304,13 +304,28 @@ def clubs():
 @login_required
 @role_required('admin')
 def create_club():
-    """Create new club"""
+    """Create new club and invite its admin"""
     if request.method == 'POST':
-        from app.services import get_club_service
+        from app.services import get_club_service, get_user_service, get_notification_service
         club_service = get_club_service()
+        user_service = get_user_service()
+        notification_service = get_notification_service()
         
+        name = request.form.get('name')
+        admin_email = request.form.get('admin_email', '').lower()
+        
+        # 1. Verification
+        if not admin_email:
+            flash("L'email de l'administrateur est requis.", 'error')
+            return redirect(url_for('admin.create_club'))
+            
+        if user_service.get_by_email(admin_email):
+            flash(f"L'email {admin_email} est déjà utilisé par un autre compte.", 'error')
+            return redirect(url_for('admin.create_club'))
+            
+        # 2. Add Club
         club = club_service.create(
-            name=request.form.get('name'),
+            name=name,
             city=request.form.get('city'),
             colors={
                 'primary': request.form.get('primary_color', '#1e40af'),
@@ -319,7 +334,20 @@ def create_club():
             stadium=request.form.get('stadium', ''),
             description=request.form.get('description', '')
         )
-        flash('Club cree avec succes.', 'success')
+        
+        # 3. Add Pending Admin User
+        profile = {
+            'first_name': 'Admin',
+            'last_name': name,
+            'avatar': '',
+            'phone': ''
+        }
+        new_admin = user_service.create_pending_user(admin_email, role='admin', club_id=club['_id'], profile=profile)
+        
+        # 4. Send Invitation Email
+        notification_service.send_invitation(new_admin)
+        
+        flash(f'Club {name} créé avec succès. Une invitation a été envoyée à {admin_email}.', 'success')
         return redirect(url_for('admin.clubs'))
     
     return render_template('admin/create_club.html')
@@ -342,7 +370,7 @@ def seed_demo():
         flash('Donnees de demo injectees avec succes!', 'success')
     except Exception as e:
         flash(f'Erreur: {str(e)}', 'error')
-    return redirect(url_for('admin.admin_panel'))
+    return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/architecture')
 @login_required
@@ -375,7 +403,7 @@ def add_team():
     
     team_service.create(club_id, name, category, description=description, colors=colors)
     flash(f'Équipe {name} créée avec succès !', 'success')
-    return redirect(url_for('admin.admin_panel'))
+    return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/teams/<team_id>/update-colors', methods=['POST'])
 @login_required
@@ -392,7 +420,7 @@ def update_team_colors(team_id):
     
     team_service.update(team_id, {'colors': colors})
     flash('Couleurs de l\'équipe mises à jour !', 'success')
-    return redirect(url_for('admin.admin_panel'))
+    return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/teams/<team_id>/edit', methods=['POST'])
 @login_required
@@ -415,7 +443,7 @@ def edit_team(team_id):
         team_service.update(team_id, update_data)
         flash('Détails de l\'équipe mis à jour !', 'success')
         
-    return redirect(url_for('admin.admin_panel') + '#teams')
+    return redirect(url_for('admin.dashboard') + '#teams')
 
 @admin_bp.route('/teams/<team_id>/delete', methods=['POST'])
 @login_required
@@ -426,7 +454,7 @@ def delete_team(team_id):
     team_service = get_team_service()
     team_service.delete(team_id)
     flash('Équipe supprimée avec succès.', 'success')
-    return redirect(url_for('admin.admin_panel'))
+    return redirect(url_for('admin.dashboard'))
 
 # --- PLATFORM / PROJECT MANAGEMENT (SuperAdmin) ---
 
@@ -452,7 +480,7 @@ def create_project():
     project_service.create_project(name, description, owner_id)
     
     flash('Projet créé avec succès.', 'success')
-    return redirect(url_for('admin.admin_panel'))
+    return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/projects/<project_id>')
 @login_required

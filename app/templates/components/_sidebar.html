@@ -107,7 +107,7 @@
         {% if current_user.is_authenticated and current_user.role == 'admin' %}
         <div class="sidebar-nav-section">
             <span class="sidebar-nav-title">Administration</span>
-            <a href="{{ url_for('admin.admin_panel') }}" class="sidebar-nav-item">
+            <a href="{{ url_for('admin.dashboard') }}" class="sidebar-nav-item">
                 <i class="fa-solid fa-shield-halved"></i>
                 <span>Admin Dashboard</span>
             </a>

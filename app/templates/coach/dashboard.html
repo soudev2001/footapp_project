@@ -63,7 +63,7 @@
                     <h3 class="font-bold text-white mb-2 uppercase tracking-wide text-xs">Étape 1 : Équipe</h3>
                     <p class="text-white/30 text-xs mb-4">Créez votre première équipe (U15, Séniors, etc.) pour
                         commencer.</p>
-                    <a href="{{ url_for('admin.teams') if current_user.role == 'admin' else '#' }}"
+                    <a href="{{ url_for('admin.dashboard') ~ '#teams' if current_user.role == 'admin' else '#' }}"
                         class="text-primary-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
                         Configurer <i class="fa-solid fa-arrow-right"></i>
                     </a>
