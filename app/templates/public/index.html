@@ -197,6 +197,103 @@
         </div>
     </section>
 
+    <!-- Demo Section -->
+    <section class="py-24 px-6 relative overflow-hidden border-t border-white/5">
+        <div class="absolute inset-0 bg-gradient-to-b from-primary-500/3 via-transparent to-transparent"></div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-16">
+                <span class="text-primary-400 font-bold text-[10px] uppercase tracking-[0.35em] block mb-4">
+                    <i class="fa-solid fa-rocket mr-2"></i>Essayez maintenant
+                </span>
+                <h2 class="text-4xl md:text-6xl font-extrabold uppercase tracking-tighter leading-none">
+                    Démo <span class="text-gradient">Live</span>
+                </h2>
+                <p class="text-white/40 mt-6 max-w-2xl mx-auto font-medium text-base leading-relaxed">
+                    Explorez FootLogic avec nos comptes de démonstration. Découvrez chaque rôle et ses fonctionnalités sans inscription.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 mb-12">
+                <!-- Admin Demo -->
+                <div class="glass p-8 rounded-3xl border border-white/5 hover:border-primary-500/30 group transition-all duration-500 hover:shadow-[0_0_40px_rgba(16,185,129,0.1)]">
+                    <div class="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-shield-halved text-xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold uppercase mb-2">Admin</h3>
+                    <p class="text-white/35 text-sm mb-6 leading-relaxed">Gérez le club, les membres, les équipes et les finances depuis un tableau de bord complet.</p>
+                    <div class="glass rounded-xl p-4 border border-white/5 space-y-2 mb-6">
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-envelope text-primary-400 text-xs w-4"></i>
+                            <span class="text-white/60 font-mono text-xs">admin@footlogic.fr</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-key text-primary-400 text-xs w-4"></i>
+                            <span class="text-white/60 font-mono text-xs">admin123</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('auth.login') }}" class="inline-flex items-center gap-2 text-primary-400 font-bold text-sm uppercase tracking-wider hover:text-primary-300 transition-colors">
+                        <span>Essayer</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+
+                <!-- Coach Demo -->
+                <div class="glass p-8 rounded-3xl border border-white/5 hover:border-accent-500/30 group transition-all duration-500 hover:shadow-[0_0_40px_rgba(245,158,11,0.1)]">
+                    <div class="w-14 h-14 bg-gradient-to-br from-accent-400 to-accent-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-clipboard text-xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold uppercase mb-2">Coach</h3>
+                    <p class="text-white/35 text-sm mb-6 leading-relaxed">Planifiez les entraînements, analysez les performances et préparez vos matchs tactiquement.</p>
+                    <div class="glass rounded-xl p-4 border border-white/5 space-y-2 mb-6">
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-envelope text-accent-400 text-xs w-4"></i>
+                            <span class="text-white/60 font-mono text-xs">coach@fcelite.fr</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-key text-accent-400 text-xs w-4"></i>
+                            <span class="text-white/60 font-mono text-xs">coach123</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('auth.login') }}" class="inline-flex items-center gap-2 text-accent-400 font-bold text-sm uppercase tracking-wider hover:text-accent-300 transition-colors">
+                        <span>Essayer</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+
+                <!-- Player Demo -->
+                <div class="glass p-8 rounded-3xl border border-white/5 hover:border-green-500/30 group transition-all duration-500 hover:shadow-[0_0_40px_rgba(34,197,94,0.1)]">
+                    <div class="w-14 h-14 gradient-success rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-futbol text-xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold uppercase mb-2">Joueur</h3>
+                    <p class="text-white/35 text-sm mb-6 leading-relaxed">Suivez vos stats, consultez le calendrier, communiquez avec le staff et accédez à la boutique.</p>
+                    <div class="glass rounded-xl p-4 border border-white/5 space-y-2 mb-6">
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-envelope text-green-400 text-xs w-4"></i>
+                            <span class="text-white/60 font-mono text-xs">player1@fcelite.fr</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-key text-green-400 text-xs w-4"></i>
+                            <span class="text-white/60 font-mono text-xs">player123</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('auth.login') }}" class="inline-flex items-center gap-2 text-green-400 font-bold text-sm uppercase tracking-wider hover:text-green-300 transition-colors">
+                        <span>Essayer</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <a href="{{ url_for('main.public_club') }}"
+                    class="inline-flex items-center gap-3 px-10 py-5 rounded-2xl glass border border-primary-500/20 hover:bg-primary-500/10 text-white font-bold text-sm uppercase tracking-wider hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(16,185,129,0.1)]">
+                    <i class="fa-solid fa-eye text-primary-400"></i>
+                    <span>Voir la page publique du club</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
     <!-- Value Propositions -->
     <section class="py-24 px-6 border-t border-white/5 bg-gradient-to-b from-surface-950 to-[#060a14]">
         <div class="max-w-7xl mx-auto">

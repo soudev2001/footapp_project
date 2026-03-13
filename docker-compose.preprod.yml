@@ -20,10 +20,14 @@ services:
       - mongodb_preprod
     ports:
       - "5001:5000"
+    env_file:
+      - .env.preprod
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - MONGO_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-secret}@mongodb_preprod:27017/${MONGO_DATABASE:-FootClubApp_PreProd}?authSource=admin
       - FLASK_ENV=development
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
     networks:
       - default
       - root_default

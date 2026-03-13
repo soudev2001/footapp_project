@@ -20,10 +20,14 @@ services:
       - mongodb_prod
     ports:
       - "5000:5000"
+    env_file:
+      - .env.prod
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - MONGO_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-secret}@mongodb_prod:27017/${MONGO_DATABASE:-FootClubApp_Prod}?authSource=admin
       - FLASK_ENV=production
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
     networks:
       - default
       - root_default
