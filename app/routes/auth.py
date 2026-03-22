@@ -19,7 +19,7 @@ def check_api_auth():
             # Valid mock token format
             user_id = parts[1]
             role = parts[2]
-            
+
             # Temporary populate session for this request
             if 'user_id' not in session:
                 session['user_id'] = user_id
@@ -51,7 +51,7 @@ def role_required(*roles):
                     return jsonify({'success': False, 'error': 'Unauthorized'}), 401
                 flash('Acces non autorise.', 'error')
                 return redirect(url_for('auth.login'))
-            
+
             user_role = session.get('user_role')
             if user_role not in roles and 'admin' != user_role:
                 if request.is_json:
@@ -72,18 +72,25 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email', '').lower()
         password = request.form.get('password')
-        
+
         from app.services import get_user_service
         user_service = get_user_service()
         user = user_service.verify_password(email, password)
-        
+
         if user:
             session['user_id'] = str(user['_id'])
             session['user_role'] = user['role']
             session['user_email'] = user['email']
             session['user_profile'] = user.get('profile', {})
             session['club_id'] = str(user['club_id']) if user.get('club_id') else None
-            
+
+            # Track login activity
+            from datetime import datetime
+            user_service.collection.update_one(
+                {'_id': user['_id']},
+                {'$set': {'last_login': datetime.utcnow()}, '$inc': {'login_count': 1}}
+            )
+
             # Redirect based on role
             if user['role'] == 'admin':
                 # Superadmins (in this logic) are admins without a club_id
@@ -96,7 +103,7 @@ def login():
                 return redirect(url_for('main.app_home'))
         else:
             flash('Email ou mot de passe incorrect.', 'error')
-    
+
     return render_template('auth/login.html')
 
 @auth_bp.route('/register-club', methods=['GET', 'POST'])
@@ -107,21 +114,21 @@ def register_club():
         city = request.form.get('city')
         email = request.form.get('email', '').lower()
         password = request.form.get('password')
-        
+
         from app.services import get_user_service, get_club_service
         user_service = get_user_service()
         club_service = get_club_service()
-        
+
         # Check if email exists
         if user_service.get_by_email(email):
             flash('Cet email est deja utilise.', 'error')
             return redirect(url_for('auth.register_club'))
-            
+
         # 1. Create Club
         colors = {'primary': '#84cc16', 'secondary': '#facc15'} # Default Elite colors
         club = club_service.create(club_name, city=city, colors=colors)
         club_id = club['_id']
-        
+
         # 2. Create Admin User
         profile = {
             'first_name': 'Admin',
@@ -130,28 +137,28 @@ def register_club():
             'phone': ''
         }
         user = user_service.create(email, password, role='admin', club_id=club_id, profile=profile)
-        
+
         # 3. Auto-login
         session['user_id'] = str(user['_id'])
         session['user_role'] = user['role']
         session['user_email'] = user['email']
         session['user_profile'] = user.get('profile', {})
         session['club_id'] = str(user['club_id'])
-        
+
         flash(f'Bienvenue ! Le club {club_name} a été créé avec succès.', 'success')
         return redirect(url_for('admin.dashboard'))
-        
+
     return render_template('auth/register_club.html')
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     """User registration page (Supports Invitation Token)"""
     token = request.args.get('token')
-    
+
     from app.services import get_user_service, get_club_service
     user_service = get_user_service()
     club_service = get_club_service()
-    
+
     pending_user = None
     club_name = None
     if token:
@@ -160,32 +167,32 @@ def register():
             club = club_service.get_by_id(pending_user['club_id'])
             if club:
                 club_name = club.get('name')
-                
+
     if request.method == 'POST':
         email = request.form.get('email', '').lower()
         password = request.form.get('password')
         password_confirm = request.form.get('password_confirm')
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
-        
+
         if password != password_confirm:
             flash('Les mots de passe ne correspondent pas.', 'error')
             return render_template('auth/register.html')
-        
+
         from app.services import get_user_service
         user_service = get_user_service()
-        
+
         # Check if email exists in active users
         existing_user = user_service.get_by_email(email)
         if existing_user and existing_user.get('account_status') == 'active':
             flash('Cet email est deja utilise.', 'error')
             return render_template('auth/register.html', pending_user=pending_user, club_name=club_name)
-        
+
         if pending_user:
             # Complete registration for invited user
             from werkzeug.security import generate_password_hash
             from datetime import datetime
-            
+
             user_service.collection.update_one(
                 {'_id': pending_user['_id']},
                 {'$set': {
@@ -196,7 +203,7 @@ def register():
                     'last_login': datetime.utcnow()
                 }, '$unset': {'invitation_token': ''}}
             )
-            
+
             # If player, update player profile name
             if pending_user.get('role') == 'player':
                 from app.services import get_player_service
@@ -207,7 +214,7 @@ def register():
                         {'_id': player_profile['_id']},
                         {'$set': {'name': f"{first_name} {last_name}"}}
                     )
-            
+
             # Auto-login the completed user
             updated_user = user_service.get_by_id(pending_user['_id'])
             session['user_id'] = str(updated_user['_id'])
@@ -215,7 +222,7 @@ def register():
             session['user_email'] = updated_user['email']
             session['user_profile'] = updated_user.get('profile', {})
             session['club_id'] = str(updated_user['club_id']) if updated_user.get('club_id') else None
-            
+
             flash('Inscription complétée avec succès !', 'success')
             if updated_user['role'] == 'admin':
                 return redirect(url_for('admin.dashboard'))
@@ -223,7 +230,7 @@ def register():
                 return redirect(url_for('main.dashboard'))
             else:
                 return redirect(url_for('main.app_home'))
-                
+
         else:
             # Create standard user
             profile = {
@@ -235,11 +242,11 @@ def register():
             roles = request.form.getlist('roles')
             if not roles:
                 roles = ['fan']
-                
+
             user = user_service.create(email, password, roles=roles, profile=profile)
             flash('Inscription reussie! Connectez-vous.', 'success')
             return redirect(url_for('auth.login'))
-    
+
     return render_template('auth/register.html', pending_user=pending_user, club_name=club_name)
 
 @auth_bp.route('/logout')
@@ -254,20 +261,20 @@ def forgot_password():
     """Forgot password page"""
     if request.method == 'POST':
         email = request.form.get('email', '').lower()
-        
+
         from app.services import get_user_service
         from app.services.db import get_db
         import secrets
         from datetime import datetime, timedelta
-        
+
         user_service = get_user_service()
         user = user_service.get_by_email(email)
-        
+
         if user:
             # Generate reset token
             token = secrets.token_urlsafe(32)
             expiry = datetime.utcnow() + timedelta(hours=1)
-            
+
             # Store token in database
             db = get_db()
             db.users.update_one(
@@ -277,16 +284,16 @@ def forgot_password():
                     'reset_token_expiry': expiry
                 }}
             )
-            
+
             # Send email with reset link
             from app.services.email_service import send_reset_password_email
             reset_url = url_for('auth.reset_password', token=token, _external=True)
             print(f"[DEBUG] Password reset link: {reset_url}")
             send_reset_password_email(email, reset_url)
-        
+
         # Always show same message for security (don't reveal if email exists)
         flash('Si cet email existe, un lien de reinitialisation a ete envoye.', 'info')
-    
+
     return render_template('auth/forgot_password.html')
 
 @auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
@@ -295,29 +302,29 @@ def reset_password(token):
     from app.services.db import get_db
     from werkzeug.security import generate_password_hash
     from datetime import datetime
-    
+
     db = get_db()
     user = db.users.find_one({
         'reset_token': token,
         'reset_token_expiry': {'$gt': datetime.utcnow()}
     })
-    
+
     if not user:
         flash('Le lien de reinitialisation est invalide ou a expire.', 'error')
         return redirect(url_for('auth.forgot_password'))
-    
+
     if request.method == 'POST':
         password = request.form.get('password')
         password_confirm = request.form.get('password_confirm')
-        
+
         if password != password_confirm:
             flash('Les mots de passe ne correspondent pas.', 'error')
             return render_template('auth/reset_password.html', token=token)
-        
+
         if len(password) < 6:
             flash('Le mot de passe doit contenir au moins 6 caracteres.', 'error')
             return render_template('auth/reset_password.html', token=token)
-        
+
         # Update password and clear token
         db.users.update_one(
             {'_id': user['_id']},
@@ -326,9 +333,8 @@ def reset_password(token):
                 '$unset': {'reset_token': '', 'reset_token_expiry': ''}
             }
         )
-        
+
         flash('Mot de passe reinitialise avec succes! Connectez-vous.', 'success')
         return redirect(url_for('auth.login'))
-    
-    return render_template('auth/reset_password.html', token=token)
 
+    return render_template('auth/reset_password.html', token=token)

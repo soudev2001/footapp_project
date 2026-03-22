@@ -5,11 +5,11 @@ from bson import ObjectId
 
 class UserService:
     """Service for user-related operations"""
-    
+
     def __init__(self, db):
         self.db = db
         self.collection = db.users
-    
+
     def get_all(self):
         """Get all users"""
         return list(self.collection.find())
@@ -24,22 +24,22 @@ class UserService:
     def get_by_id(self, user_id):
         """Get user by ID"""
         return self.collection.find_one({'_id': ObjectId(user_id)})
-    
+
     def get_by_email(self, email):
         """Get user by email"""
         return self.collection.find_one({'email': email})
-    
+
     def create(self, email, password, role='fan', roles=None, club_id=None, profile=None):
         """Create a new user"""
         from datetime import datetime
-        
+
         # Determine primary role and roles list
         if roles is None:
             roles = [role]
         else:
             # If roles provided, primary role is the first one (or 'fan' if empty)
             role = roles[0] if roles else 'fan'
-            
+
         user = {
             'email': email,
             'password_hash': generate_password_hash(password) if password else None,
@@ -59,17 +59,17 @@ class UserService:
         result = self.collection.insert_one(user)
         user['_id'] = result.inserted_id
         return user
-    
+
     def create_pending_user(self, email, role='player', club_id=None, profile=None):
         """Create a user in pending state (no password yet)"""
         import secrets
         from datetime import datetime
-        
+
         token = secrets.token_urlsafe(32)
         if profile is None:
             profile = {}
         profile['account_status'] = 'pending'
-        
+
         user = self.create(
             email=email,
             password=None, # No password yet
@@ -77,7 +77,7 @@ class UserService:
             club_id=club_id,
             profile=profile
         )
-        
+
         # Add invitation details
         self.collection.update_one(
             {'_id': user['_id']},
@@ -90,40 +90,83 @@ class UserService:
         user['invitation_token'] = token
         user['account_status'] = 'pending'
         return user
-    
+
     def verify_password(self, email, password):
         """Verify user password, return user if valid"""
         user = self.get_by_email(email)
         if user and check_password_hash(user['password_hash'], password):
             return user
         return None
-    
+
     def update_profile(self, user_id, profile_data):
         """Update user profile"""
         return self.collection.update_one(
             {'_id': ObjectId(user_id)},
             {'$set': {'profile': profile_data}}
         )
-    
+
     def get_users_by_club(self, club_id):
         """Get all users for a club"""
         return list(self.collection.find({'club_id': ObjectId(club_id)}))
-    
+
     def get_users_by_role(self, role):
         """Get all users with a specific role"""
         return list(self.collection.find({'role': role}))
-    
+
     def delete(self, user_id):
         """Delete a user"""
         return self.collection.delete_one({'_id': ObjectId(user_id)})
+
+    def search_members(self, club_id, search='', role='', team_id='', status=''):
+        """Search club members with optional filters.
+
+        Parameters
+        ----------
+        club_id : str or ObjectId
+        search  : free-text matched against email, first_name, last_name
+        role    : exact role string ('player', 'coach', …)
+        team_id : ObjectId string — matches users whose player profile belongs to that team
+        status  : 'pending' | 'active'
+        """
+        import re
+        query = {'club_id': ObjectId(club_id) if isinstance(club_id, str) else club_id}
+
+        if search:
+            pattern = re.compile(re.escape(search), re.IGNORECASE)
+            query['$or'] = [
+                {'email': pattern},
+                {'profile.first_name': pattern},
+                {'profile.last_name': pattern},
+            ]
+
+        if role:
+            query['role'] = role
+
+        if status:
+            query['account_status'] = status
+
+        members = list(self.collection.find(query))
+
+        # Filter by team via player profiles when requested
+        if team_id:
+            from bson import ObjectId as OID
+            player_user_ids = {
+                str(p['user_id'])
+                for p in self.db['players'].find(
+                    {'team_id': OID(team_id)}, {'user_id': 1}
+                )
+            }
+            members = [m for m in members if str(m['_id']) in player_user_ids]
+
+        return members
 
 
 # Role-based access helpers
 ROLE_PERMISSIONS = {
     'admin': ['all'],
-    'coach': ['dashboard', 'roster', 'calendar', 'attendance', 'tactics', 'match_center', 
+    'coach': ['dashboard', 'roster', 'calendar', 'attendance', 'tactics', 'match_center',
               'create_event', 'create_post', 'feed', 'chat', 'profile', 'settings'],
-    'player': ['calendar', 'roster', 'attendance', 'feed', 'chat', 'profile', 'settings', 
+    'player': ['calendar', 'roster', 'attendance', 'feed', 'chat', 'profile', 'settings',
                'documents', 'notifications'],
     'parent': ['parent_dashboard', 'calendar', 'roster', 'feed', 'chat', 'profile', 'settings'],
     'fan': ['public_club', 'ranking', 'feed', 'profile', 'settings']
@@ -186,4 +229,3 @@ def get_nav_for_role(role):
         ]
     }
     return all_nav.get(role, all_nav['fan'])
-

@@ -63,6 +63,21 @@ def get_member_onboarding_service():
     from .member_onboarding_service import MemberOnboardingService
     return MemberOnboardingService(mongo.db)
 
+def get_analytics_service():
+    from .analytics_service import AnalyticsService
+    return AnalyticsService(mongo.db)
+
+def get_announcement_service():
+    from .announcement_service import AnnouncementService
+    return AnnouncementService(mongo.db)
+
+def get_billing_service():
+    from .billing_service import BillingService
+    return BillingService(mongo.db)
+
+def get_competition_service():
+    from .competition_service import CompetitionService
+    return CompetitionService(mongo.db)
+
 # Role helpers
 from .user_service import has_permission, get_nav_for_role, ROLE_PERMISSIONS
-

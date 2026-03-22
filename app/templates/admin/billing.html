@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% block title %}Facturation - FootLogic{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 dark:bg-surface-950 p-4 md:p-8">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <a href="{{ url_for('admin.dashboard') }}" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                    <i class="fa fa-arrow-left"></i>
+                </a>
+                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Facturation</h1>
+            </div>
+            <p class="text-slate-500 dark:text-slate-400 text-sm ml-7">Gérez vos abonnements et téléchargez vos factures</p>
+        </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="mb-4 space-y-2">
+        {% for cat, msg in messages %}
+        <div class="flex items-start gap-3 p-4 rounded-lg text-sm font-medium
+            {% if cat == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-700
+            {% elif cat == 'error' %}bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700
+            {% else %}bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700{% endif %}">
+            <i class="fa fa-{% if cat == 'success' %}check-circle{% elif cat == 'error' %}exclamation-circle{% else %}info-circle{% endif %} mt-0.5"></i>
+            <span>{{ msg }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Status banner from query param -->
+    {% if request.args.get('status') == 'success' %}
+    <div class="mb-4 p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 dark:bg-emerald-900/30 dark:border-emerald-700 dark:text-emerald-300 flex items-center gap-3">
+        <i class="fa fa-check-circle text-lg"></i>
+        <span>Paiement effectué avec succès ! Votre abonnement est actif.</span>
+    </div>
+    {% elif request.args.get('status') == 'cancel' %}
+    <div class="mb-4 p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-300 flex items-center gap-3">
+        <i class="fa fa-times-circle text-lg"></i>
+        <span>Paiement annulé. Votre abonnement n'a pas été modifié.</span>
+    </div>
+    {% endif %}
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div class="bg-white dark:bg-surface-900 rounded-xl border border-slate-200 dark:border-surface-700 p-5 shadow-sm">
+            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Total payé</p>
+            <p class="text-3xl font-bold text-slate-900 dark:text-white">{{ "%.2f"|format(total_paid_eur) }} €</p>
+        </div>
+        <div class="bg-white dark:bg-surface-900 rounded-xl border border-slate-200 dark:border-surface-700 p-5 shadow-sm">
+            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Factures payées</p>
+            <p class="text-3xl font-bold text-slate-900 dark:text-white">{{ paid_count }}</p>
+        </div>
+        <div class="bg-white dark:bg-surface-900 rounded-xl border border-slate-200 dark:border-surface-700 p-5 shadow-sm">
+            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Statut abonnement</p>
+            {% set sub_status = subscription.get('status', 'inactive') %}
+            <span class="inline-flex items-center gap-2 text-lg font-bold
+                {% if sub_status == 'active' %}text-emerald-600 dark:text-emerald-400
+                {% else %}text-slate-500 dark:text-slate-400{% endif %}">
+                <span class="w-2.5 h-2.5 rounded-full
+                    {% if sub_status == 'active' %}bg-emerald-500{% else %}bg-slate-400{% endif %}">
+                </span>
+                {{ sub_status|capitalize }}
+            </span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Checkout Card -->
+        <div class="lg:col-span-1">
+            <div class="bg-white dark:bg-surface-900 rounded-xl border border-slate-200 dark:border-surface-700 shadow-sm p-6">
+                <h2 class="text-base font-semibold text-slate-800 dark:text-white mb-1 flex items-center gap-2">
+                    <i class="fa fa-credit-card text-blue-500"></i> Payer un abonnement
+                </h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-5">Règlement sécurisé via Stripe</p>
+
+                {% if stripe_publishable_key %}
+                <form method="POST" action="{{ url_for('admin.billing_checkout') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Plan</label>
+                        <select name="plan_name"
+                                class="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-surface-600 bg-slate-50 dark:bg-surface-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="FootLogic Starter" data-amount="1900">Starter — 19 € / mois</option>
+                            <option value="FootLogic Pro"     data-amount="2900" selected>Pro — 29 € / mois</option>
+                            <option value="FootLogic Club"    data-amount="4900">Club — 49 € / mois</option>
+                        </select>
+                    </div>
+
+                    <input type="hidden" name="amount_cents" id="amountCents" value="2900">
+
+                    <button type="submit"
+                            class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <i class="fa fa-lock"></i> Payer avec Stripe
+                    </button>
+                </form>
+                <p class="text-xs text-center text-slate-400 mt-3">
+                    <i class="fa fa-shield-alt mr-1"></i> Paiement 100% sécurisé &middot; PCI-DSS
+                </p>
+                {% else %}
+                <div class="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-4 text-sm text-amber-700 dark:text-amber-300">
+                    <i class="fa fa-exclamation-triangle mr-2"></i>
+                    Stripe n'est pas configuré. Ajoutez <code class="bg-amber-100 dark:bg-amber-900 px-1 rounded">STRIPE_SECRET_KEY</code>
+                    et <code class="bg-amber-100 dark:bg-amber-900 px-1 rounded">STRIPE_PUBLISHABLE_KEY</code> dans votre <code>.env</code>.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Invoice History -->
+        <div class="lg:col-span-2">
+            <div class="bg-white dark:bg-surface-900 rounded-xl border border-slate-200 dark:border-surface-700 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 dark:border-surface-700 flex items-center justify-between">
+                    <h2 class="text-base font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                        <i class="fa fa-file-invoice-dollar text-slate-400"></i> Historique des factures
+                    </h2>
+                    <span class="text-xs text-slate-400">{{ invoices|length }} facture(s)</span>
+                </div>
+
+                {% if invoices %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-50 dark:bg-surface-800 border-b border-slate-100 dark:border-surface-700">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">N°</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Plan</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Montant</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Statut</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Date</th>
+                                <th class="px-4 py-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-surface-800">
+                        {% for inv in invoices %}
+                        <tr class="hover:bg-slate-50 dark:hover:bg-surface-800/40 transition-colors">
+                            <td class="px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400">
+                                {{ inv._id[-8:]|upper }}
+                            </td>
+                            <td class="px-4 py-3 text-slate-700 dark:text-slate-300">
+                                {{ inv.plan_name or '—' }}
+                            </td>
+                            <td class="px-4 py-3 font-medium text-slate-900 dark:text-white">
+                                {{ "%.2f"|format(inv.amount_cents / 100) }} {{ inv.currency|upper }}
+                            </td>
+                            <td class="px-4 py-3">
+                                {% if inv.status == 'paid' %}
+                                <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Payé
+                                </span>
+                                {% elif inv.status == 'pending' %}
+                                <span class="inline-flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> En attente
+                                </span>
+                                {% elif inv.status == 'failed' %}
+                                <span class="inline-flex items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Échoué
+                                </span>
+                                {% else %}
+                                <span class="inline-flex items-center gap-1 text-xs font-medium text-slate-500">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> {{ inv.status|capitalize }}
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
+                                {% if inv.created_at %}
+                                    {{ inv.created_at.strftime('%d/%m/%Y') if inv.created_at and inv.created_at.__class__.__name__ != 'str' else inv.created_at[:10] }}
+                                {% else %}—{% endif %}
+                            </td>
+                            <td class="px-4 py-3">
+                                {% if inv.status == 'paid' %}
+                                <a href="{{ url_for('admin.billing_invoice_pdf', invoice_id=inv._id) }}"
+                                   class="inline-flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 font-medium transition-colors"
+                                   title="Télécharger la facture PDF">
+                                    <i class="fa fa-file-pdf"></i> PDF
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="flex flex-col items-center justify-center py-16 text-center">
+                    <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-surface-800 flex items-center justify-center mb-4">
+                        <i class="fa fa-file-invoice-dollar text-2xl text-slate-400"></i>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400 font-medium">Aucune facture</p>
+                    <p class="text-slate-400 text-sm mt-1">Vos prochains paiements apparaîtront ici</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div><!-- /grid -->
+</div>
+
+<script>
+// Sync hidden amount_cents when plan changes
+document.querySelector('[name="plan_name"]')?.addEventListener('change', function () {
+    const sel = this.options[this.selectedIndex];
+    const amount = sel.getAttribute('data-amount') || '2900';
+    document.getElementById('amountCents').value = amount;
+});
+</script>
+{% endblock %}

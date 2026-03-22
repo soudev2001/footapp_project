@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block title %}Annuaire des membres - FootLogic{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 dark:bg-surface-950 p-4 md:p-8">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <a href="{{ url_for('admin.dashboard') }}" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                    <i class="fa fa-arrow-left"></i>
+                </a>
+                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Annuaire des membres</h1>
+            </div>
+            <p class="text-slate-500 dark:text-slate-400 text-sm ml-7">
+                {{ total }} membre{{ 's' if total != 1 else '' }} trouvé{{ 's' if total != 1 else '' }}
+            </p>
+        </div>
+        <a href="{{ url_for('admin.analytics_export', format='excel') }}"
+           class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors">
+            <i class="fa fa-file-excel"></i> Exporter
+        </a>
+    </div>
+
+    <!-- Search & Filters -->
+    <form method="GET" action="{{ url_for('admin.members_directory') }}"
+          class="bg-white dark:bg-surface-900 rounded-xl border border-slate-200 dark:border-surface-700 p-4 mb-6 shadow-sm">
+        <div class="flex flex-col md:flex-row gap-3">
+            <!-- Search bar -->
+            <div class="relative flex-1">
+                <span class="absolute inset-y-0 left-3 flex items-center text-slate-400">
+                    <i class="fa fa-search text-sm"></i>
+                </span>
+                <input type="text" name="search" value="{{ search or '' }}"
+                       placeholder="Rechercher par nom ou email…"
+                       class="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-slate-200 dark:border-surface-600 bg-slate-50 dark:bg-surface-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <!-- Role filter -->
+            <select name="role"
+                    class="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-surface-600 bg-slate-50 dark:bg-surface-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Tous les rôles</option>
+                {% for r in ['admin','coach','player','parent','fan'] %}
+                <option value="{{ r }}" {{ 'selected' if role == r }}>{{ r|capitalize }}</option>
+                {% endfor %}
+            </select>
+            <!-- Team filter -->
+            <select name="team_id"
+                    class="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-surface-600 bg-slate-50 dark:bg-surface-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Toutes les équipes</option>
+                {% for t in teams %}
+                <option value="{{ t._id }}" {{ 'selected' if team_id == t._id|string }}>{{ t.name }}</option>
+                {% endfor %}
+            </select>
+            <!-- Status filter -->
+            <select name="status"
+                    class="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-surface-600 bg-slate-50 dark:bg-surface-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Tous les statuts</option>
+                <option value="active"   {{ 'selected' if status == 'active'   }}>Actif</option>
+                <option value="pending"  {{ 'selected' if status == 'pending'  }}>En attente</option>
+                <option value="inactive" {{ 'selected' if status == 'inactive' }}>Inactif</option>
+            </select>
+            <button type="submit"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                Filtrer
+            </button>
+            {% if search or role or team_id or status %}
+            <a href="{{ url_for('admin.members_directory') }}"
+               class="px-4 py-2 bg-slate-200 dark:bg-surface-700 hover:bg-slate-300 dark:hover:bg-surface-600 text-slate-700 dark:text-slate-200 text-sm font-medium rounded-lg transition-colors">
+                Réinitialiser
+            </a>
+            {% endif %}
+        </div>
+    </form>
+
+    <!-- Members Table -->
+    <div class="bg-white dark:bg-surface-900 rounded-xl border border-slate-200 dark:border-surface-700 shadow-sm overflow-hidden">
+        {% if members %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-50 dark:bg-surface-800 border-b border-slate-200 dark:border-surface-700">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Membre</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Rôle</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Équipe</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Statut</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Dernière connexion</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-surface-800">
+                    {% for member in members %}
+                    {% set first = member.profile.first_name if member.profile else '' %}
+                    {% set last  = member.profile.last_name  if member.profile else '' %}
+                    {% set initials = (first[0]|upper if first else '') + (last[0]|upper if last else '') %}
+                    {% set initials = initials if initials else member.email[0]|upper %}
+                    <tr class="hover:bg-slate-50 dark:hover:bg-surface-800/50 transition-colors">
+                        <!-- Avatar + Name/Email -->
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-3">
+                                {% if member.profile and member.profile.avatar_url %}
+                                <img src="{{ member.profile.avatar_url }}" alt="{{ initials }}"
+                                     class="w-9 h-9 rounded-full object-cover flex-shrink-0">
+                                {% else %}
+                                <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0
+                                    {% if member.role == 'admin' %}bg-purple-500
+                                    {% elif member.role == 'coach' %}bg-blue-500
+                                    {% elif member.role == 'player' %}bg-emerald-500
+                                    {% elif member.role == 'parent' %}bg-amber-500
+                                    {% else %}bg-slate-400{% endif %}">
+                                    {{ initials }}
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <p class="font-medium text-slate-900 dark:text-white">
+                                        {{ first }} {{ last }}
+                                        {% if not first and not last %}<span class="text-slate-400">—</span>{% endif %}
+                                    </p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ member.email }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Role badge -->
+                        <td class="px-4 py-3">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                                {% if member.role == 'admin' %}bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300
+                                {% elif member.role == 'coach' %}bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300
+                                {% elif member.role == 'player' %}bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300
+                                {% elif member.role == 'parent' %}bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300
+                                {% else %}bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300{% endif %}">
+                                <i class="fa fa-{% if member.role == 'admin' %}shield-alt{% elif member.role == 'coach' %}chalkboard-teacher{% elif member.role == 'player' %}running{% elif member.role == 'parent' %}user-friends{% else %}user{% endif %} mr-1 text-[10px]"></i>
+                                {{ member.role|capitalize }}
+                            </span>
+                        </td>
+                        <!-- Team -->
+                        <td class="px-4 py-3 text-slate-600 dark:text-slate-300">
+                            {{ member.team_name or '—' }}
+                        </td>
+                        <!-- Status -->
+                        <td class="px-4 py-3">
+                            {% if member.status == 'active' %}
+                            <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Actif
+                            </span>
+                            {% elif member.status == 'pending' %}
+                            <span class="inline-flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> En attente
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Inactif
+                            </span>
+                            {% endif %}
+                        </td>
+                        <!-- Last login -->
+                        <td class="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
+                            {% if member.last_login %}
+                                {{ member.last_login.strftime('%d/%m/%Y %H:%M') }}
+                            {% else %}
+                                <span class="text-slate-300 dark:text-slate-600">Jamais</span>
+                            {% endif %}
+                        </td>
+                        <!-- Actions -->
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <a href="{{ url_for('admin.manage_member', member_id=member._id) }}"
+                                   class="text-blue-500 hover:text-blue-700 transition-colors" title="Modifier">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                {% if member.status == 'pending' %}
+                                <form method="POST" action="{{ url_for('admin.resend_invite', user_id=member._id) }}"
+                                      class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+                                    <button type="submit" class="text-amber-500 hover:text-amber-700 transition-colors" title="Renvoyer l'invitation">
+                                        <i class="fa fa-paper-plane"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <form method="POST" action="{{ url_for('admin.remove_member', member_id=member._id) }}"
+                                      class="inline"
+                                      onsubmit="return confirm('Supprimer ce membre ?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+                                    <button type="submit" class="text-red-400 hover:text-red-600 transition-colors" title="Supprimer">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="flex flex-col items-center justify-center py-16 text-center">
+            <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-surface-800 flex items-center justify-center mb-4">
+                <i class="fa fa-users text-2xl text-slate-400"></i>
+            </div>
+            <p class="text-slate-600 dark:text-slate-400 font-medium">Aucun membre trouvé</p>
+            {% if search or role or team_id or status %}
+            <p class="text-slate-400 text-sm mt-1">Essayez d'élargir vos critères de recherche</p>
+            <a href="{{ url_for('admin.members_directory') }}"
+               class="mt-4 text-blue-500 hover:text-blue-700 text-sm font-medium">
+                Voir tous les membres
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination (simple prev/next) -->
+    {% if total > per_page %}
+    <div class="flex items-center justify-between mt-4 text-sm">
+        <p class="text-slate-500 dark:text-slate-400">
+            Page {{ page }} sur {{ (total // per_page) + (1 if total % per_page else 0) }}
+            &bull; {{ total }} membres
+        </p>
+        <div class="flex gap-2">
+            {% if page > 1 %}
+            <a href="{{ url_for('admin.members_directory', page=page-1, search=search, role=role, team_id=team_id, status=status) }}"
+               class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-surface-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-surface-700 transition-colors">
+                <i class="fa fa-chevron-left mr-1"></i> Précédent
+            </a>
+            {% endif %}
+            {% if (page * per_page) < total %}
+            <a href="{{ url_for('admin.members_directory', page=page+1, search=search, role=role, team_id=team_id, status=status) }}"
+               class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-surface-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-surface-700 transition-colors">
+                Suivant <i class="fa fa-chevron-right ml-1"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

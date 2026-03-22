@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% block title %}Analytics Club - FootLogic{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 dark:bg-surface-950 p-4 md:p-8">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <a href="{{ url_for('admin.dashboard') }}" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <i class="fa fa-arrow-left"></i>
+                </a>
+                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Analytics du Club</h1>
+            </div>
+            <p class="text-slate-500 text-sm ml-7">Vue complète des performances et métriques du club</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{{ url_for('admin.analytics_export', format='excel') }}"
+               class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors">
+                <i class="fa fa-file-excel"></i> Export Excel
+            </a>
+            <a href="{{ url_for('admin.analytics_export', format='pdf') }}"
+               class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
+                <i class="fa fa-file-pdf"></i> Export PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white dark:bg-surface-800 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-surface-700">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Membres</span>
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fa fa-users text-blue-600 text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-bold text-slate-900 dark:text-white">{{ summary.engagement.total }}</p>
+            <p class="text-xs text-emerald-600 mt-1">+{{ summary.new_this_month }} ce mois</p>
+        </div>
+
+        <div class="bg-white dark:bg-surface-800 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-surface-700">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Membres Actifs</span>
+                <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                    <i class="fa fa-activity text-emerald-600 text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-bold text-slate-900 dark:text-white">{{ summary.engagement.active }}</p>
+            <p class="text-xs text-slate-500 mt-1">{{ summary.engagement.active_pct }}% sur 30j</p>
+        </div>
+
+        <div class="bg-white dark:bg-surface-800 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-surface-700">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Équipes</span>
+                <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                    <i class="fa fa-shield text-amber-600 text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-bold text-slate-900 dark:text-white">{{ summary.team_stats.details|length }}</p>
+            <p class="text-xs text-slate-500 mt-1">équipes actives</p>
+        </div>
+
+        <div class="bg-white dark:bg-surface-800 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-surface-700">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">MRR</span>
+                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <i class="fa fa-euro-sign text-purple-600 text-sm"></i>
+                </div>
+            </div>
+            <p class="text-3xl font-bold text-slate-900 dark:text-white">{{ summary.financial.mrr }}€</p>
+            <p class="text-xs text-slate-500 mt-1">{{ summary.financial.plan }}</p>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+        <!-- Member Growth Chart -->
+        <div class="bg-white dark:bg-surface-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-surface-700">
+            <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+                <i class="fa fa-trending-up text-blue-500"></i> Croissance des membres (90 derniers jours)
+            </h3>
+            <canvas id="memberGrowthChart" height="200"></canvas>
+        </div>
+
+        <!-- Members by Role Donut -->
+        <div class="bg-white dark:bg-surface-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-surface-700">
+            <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+                <i class="fa fa-pie-chart text-emerald-500"></i> Répartition par rôle
+            </h3>
+            <canvas id="membersByRoleChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Team Stats + Engagement Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+        <!-- Team Bar Chart -->
+        <div class="bg-white dark:bg-surface-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-surface-700">
+            <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+                <i class="fa fa-shield text-amber-500"></i> Joueurs par équipe
+            </h3>
+            {% if summary.team_stats.details %}
+            <canvas id="teamStatsChart" height="200"></canvas>
+            {% else %}
+            <div class="flex items-center justify-center h-32 text-slate-400 text-sm">
+                <i class="fa fa-info-circle mr-2"></i> Aucune équipe enregistrée
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Active vs Inactive Donut -->
+        <div class="bg-white dark:bg-surface-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-surface-700">
+            <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+                <i class="fa fa-activity text-purple-500"></i> Engagement membres
+            </h3>
+            <canvas id="engagementChart" height="200"></canvas>
+            {% if summary.engagement.top_active %}
+            <div class="mt-4">
+                <p class="text-xs font-semibold text-slate-500 uppercase mb-2">Top membres actifs</p>
+                {% for m in summary.engagement.top_active %}
+                <div class="flex items-center justify-between py-1">
+                    <span class="text-sm text-slate-700 dark:text-slate-300">
+                        {{ m.profile.first_name }} {{ m.profile.last_name }}
+                        <span class="text-xs text-slate-400 ml-1">({{ m.role }})</span>
+                    </span>
+                    <span class="text-xs bg-blue-100 text-blue-700 rounded-full px-2 py-0.5">
+                        {{ m.login_count }} connexions
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Teams Detail Table -->
+    {% if summary.team_stats.details %}
+    <div class="bg-white dark:bg-surface-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-surface-700 mb-8">
+        <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+            <i class="fa fa-table text-slate-500"></i> Détail des équipes
+        </h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-slate-100 dark:border-surface-700">
+                        <th class="text-left py-2 px-3 text-slate-500 font-medium">Équipe</th>
+                        <th class="text-left py-2 px-3 text-slate-500 font-medium">Catégorie</th>
+                        <th class="text-center py-2 px-3 text-slate-500 font-medium">Joueurs</th>
+                        <th class="text-center py-2 px-3 text-slate-500 font-medium">Entraîneurs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for team in summary.team_stats.details %}
+                    <tr class="border-b border-slate-50 dark:border-surface-750 hover:bg-slate-50 dark:hover:bg-surface-750">
+                        <td class="py-3 px-3 font-medium text-slate-800 dark:text-slate-200">
+                            <span class="inline-block w-3 h-3 rounded-full mr-2"
+                                  style="background:{{ team.colors.primary if team.colors else '#94a3b8' }}"></span>
+                            {{ team.name }}
+                        </td>
+                        <td class="py-3 px-3 text-slate-500">{{ team.category }}</td>
+                        <td class="py-3 px-3 text-center">
+                            <span class="bg-blue-100 text-blue-700 rounded-full px-2 py-0.5 text-xs font-medium">{{ team.players }}</span>
+                        </td>
+                        <td class="py-3 px-3 text-center">
+                            <span class="bg-emerald-100 text-emerald-700 rounded-full px-2 py-0.5 text-xs font-medium">{{ team.coaches }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Financial Summary -->
+    <div class="bg-white dark:bg-surface-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-surface-700">
+        <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+            <i class="fa fa-dollar-sign text-purple-500"></i> Résumé Financier
+        </h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                <p class="text-xs text-purple-500 font-medium mb-1">Plan actif</p>
+                <p class="text-lg font-bold text-purple-700 dark:text-purple-300">{{ summary.financial.plan }}</p>
+            </div>
+            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                <p class="text-xs text-purple-500 font-medium mb-1">Statut</p>
+                <p class="text-lg font-bold text-purple-700 dark:text-purple-300">{{ summary.financial.status }}</p>
+            </div>
+            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                <p class="text-xs text-purple-500 font-medium mb-1">MRR</p>
+                <p class="text-lg font-bold text-purple-700 dark:text-purple-300">{{ summary.financial.mrr }} €</p>
+            </div>
+            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                <p class="text-xs text-purple-500 font-medium mb-1">ARR (projection)</p>
+                <p class="text-lg font-bold text-purple-700 dark:text-purple-300">{{ summary.financial.arr }} €</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart data injected from server -->
+<script>
+const ANALYTICS = {
+    memberGrowth: {
+        labels: {{ summary.member_growth.labels | tojson }},
+        data:   {{ summary.member_growth.data   | tojson }}
+    },
+    membersByRole: {
+        labels: {{ summary.members_by_role.labels | tojson }},
+        data:   {{ summary.members_by_role.data   | tojson }}
+    },
+    teamStats: {
+        labels:     {{ summary.team_stats.labels      | tojson }},
+        playerData: {{ summary.team_stats.player_data | tojson }},
+        coachData:  {{ summary.team_stats.coach_data  | tojson }}
+    },
+    engagement: {
+        active:   {{ summary.engagement.active }},
+        inactive: {{ summary.engagement.inactive }}
+    }
+};
+</script>
+<script src="{{ url_for('static', filename='js/admin_charts.js') }}"></script>
+{% endblock %}

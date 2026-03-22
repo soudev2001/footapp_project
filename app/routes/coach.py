@@ -18,28 +18,30 @@ def dashboard():
     if not club_id:
         flash('Aucun club associe.', 'warning')
         return redirect(url_for('main.index'))
-    
-    from app.services import get_player_service, get_event_service, get_match_service, get_team_service
-    
+
+    from app.services import get_player_service, get_event_service, get_match_service, get_team_service, get_notification_service
+
     player_service = get_player_service()
     event_service = get_event_service()
     match_service = get_match_service()
     team_service = get_team_service()
-    
+    notification_service = get_notification_service()
+
     # Get all teams for the club to allow selection
     teams = team_service.get_by_club(club_id)
-    
+
     # Determine the selected team (default to the first one or a specific one from session/query)
     selected_team_id = request.args.get('team_id')
     if not selected_team_id and teams:
         selected_team_id = str(teams[0]['_id'])
-    
+
     players = player_service.get_by_club(club_id, team_id=selected_team_id)
     upcoming_events = event_service.get_upcoming(club_id, team_id=selected_team_id, limit=5)
     upcoming_matches = match_service.get_upcoming(club_id, team_id=selected_team_id, limit=3)
     recent_matches = match_service.get_completed(club_id, team_id=selected_team_id, limit=5)
     season_stats = match_service.get_season_stats(club_id, team_id=selected_team_id)
-    
+    alerts = notification_service.get_dashboard_alerts(club_id, team_id=selected_team_id, user_role='coach')
+
     return render_template('coach/dashboard.html',
         players=players,
         teams=teams,
@@ -47,7 +49,42 @@ def dashboard():
         upcoming_events=upcoming_events,
         upcoming_matches=upcoming_matches,
         recent_matches=recent_matches,
-        season_stats=season_stats
+        season_stats=season_stats,
+        alerts=alerts
+    )
+
+@coach_bp.route('/calendar')
+@login_required
+@role_required('coach', 'admin')
+def calendar():
+    """Coach match calendar"""
+    club_id = session.get('club_id')
+    if not club_id:
+        return redirect(url_for('main.index'))
+
+    from app.services import get_match_service, get_team_service
+    from app.models import serialize_docs
+    import json
+
+    match_service = get_match_service()
+    team_service = get_team_service()
+
+    teams = team_service.get_by_club(club_id)
+    selected_team_id = request.args.get('team_id')
+    if not selected_team_id and teams:
+        selected_team_id = str(teams[0]['_id'])
+
+    upcoming = match_service.get_upcoming(club_id, team_id=selected_team_id, limit=20)
+    completed = match_service.get_completed(club_id, team_id=selected_team_id, limit=20)
+    all_matches = upcoming + completed
+    matches_json = json.dumps(serialize_docs(all_matches), default=str)
+
+    return render_template('coach/calendar.html',
+        upcoming_matches=upcoming,
+        completed_matches=completed,
+        teams=teams,
+        selected_team_id=selected_team_id,
+        matches_json=matches_json
     )
 
 @coach_bp.route('/roster')
@@ -58,24 +95,24 @@ def roster():
     club_id = session.get('club_id')
     if not club_id:
         return redirect(url_for('main.index'))
-    
+
     from app.services import get_player_service, get_team_service
     player_service = get_player_service()
     team_service = get_team_service()
-    
+
     teams = team_service.get_by_club(club_id)
     selected_team_id = request.args.get('team_id')
     if not selected_team_id and teams:
         selected_team_id = str(teams[0]['_id'])
-        
+
     players = player_service.get_by_club(club_id, team_id=selected_team_id)
-    
+
     # Enrich players with user account status
     from app.services import get_user_service
     user_service = get_user_service()
     user_ids = [p.get('user_id') for p in players if p.get('user_id')]
     users = {str(u['_id']): u for u in user_service.collection.find({'_id': {'$in': user_ids}})}
-    
+
     for player in players:
         uid = str(player.get('user_id'))
         if uid in users:
@@ -91,11 +128,11 @@ def roster():
         'MID': [p for p in players if p.get('position') == 'MID'],
         'ATT': [p for p in players if p.get('position') == 'ATT'],
     }
-    
-    return render_template('coach/roster.html', 
-        players=players, 
-        by_position=by_position, 
-        teams=teams, 
+
+    return render_template('coach/roster.html',
+        players=players,
+        by_position=by_position,
+        teams=teams,
         selected_team_id=selected_team_id
     )
 
@@ -106,12 +143,12 @@ def player_detail(player_id):
     """Player detail view"""
     from app.services import get_player_service
     player_service = get_player_service()
-    
+
     player = player_service.get_by_id(player_id)
     if not player:
         flash('Joueur non trouve.', 'error')
         return redirect(url_for('coach.roster'))
-    
+
     return render_template('coach/player_detail.html', player=player)
 
 @coach_bp.route('/player/<player_id>/edit', methods=['GET', 'POST'])
@@ -121,12 +158,12 @@ def edit_player(player_id):
     """Edit player"""
     from app.services import get_player_service
     player_service = get_player_service()
-    
+
     player = player_service.get_by_id(player_id)
     if not player:
         flash('Joueur non trouve.', 'error')
         return redirect(url_for('coach.roster'))
-    
+
     if request.method == 'POST':
         data = {
             'name': request.form.get('name'),
@@ -139,9 +176,9 @@ def edit_player(player_id):
         player_service.update(player_id, data)
         flash('Joueur mis a jour.', 'success')
         return redirect(url_for('coach.player_detail', player_id=player_id))
-    
+
     return render_template('coach/edit_player.html', player=player)
-    
+
 @coach_bp.route('/player/add', methods=['GET', 'POST'])
 @login_required
 @role_required('coach', 'admin')
@@ -150,11 +187,11 @@ def add_player():
     club_id = session.get('club_id')
     if not club_id:
         return redirect(url_for('main.index'))
-    
+
     from app.services import get_player_service, get_team_service
     player_service = get_player_service()
     team_service = get_team_service()
-    
+
     if request.method == 'POST':
         from flask import current_app
         from app.services import get_user_service
@@ -204,7 +241,7 @@ def add_player():
         player_service.create(club_id=club_id, **data)
         flash('Nouveau joueur ajouté à l\'effectif.', 'success')
         return redirect(url_for('coach.roster', team_id=data['team_id']))
-    
+
     from flask import current_app as _app
     admin_config = _app.config.get('ADMIN_CONFIG', {})
     teams = team_service.get_by_club(club_id)
@@ -219,7 +256,7 @@ def delete_player(player_id):
     """Delete player"""
     from app.services import get_player_service
     player_service = get_player_service()
-    
+
     player_service.delete(player_id)
     flash('Joueur supprime de l\'effectif.', 'success')
     return redirect(url_for('coach.roster'))
@@ -231,7 +268,7 @@ def update_player_ratings(player_id):
     """Update technical ratings"""
     from app.services import get_player_service
     player_service = get_player_service()
-    
+
     ratings = {
         'VIT': int(request.form.get('VIT', 50)),
         'TIR': int(request.form.get('TIR', 50)),
@@ -240,7 +277,7 @@ def update_player_ratings(player_id):
         'DEF': int(request.form.get('DEF', 50)),
         'PHY': int(request.form.get('PHY', 50))
     }
-    
+
     player_service.update_technical_ratings(player_id, ratings)
     flash('Notes techniques mises a jour.', 'success')
     return redirect(url_for('coach.player_detail', player_id=player_id))
@@ -252,13 +289,13 @@ def add_player_evaluation(player_id):
     """Add coach evaluation"""
     from app.services import get_player_service
     player_service = get_player_service()
-    
+
     evaluation = {
         'type': request.form.get('type', 'Match'),
         'comment': request.form.get('comment'),
         'coach_name': session.get('user_profile', {}).get('first_name', 'Coach')
     }
-    
+
     player_service.add_evaluation(player_id, evaluation)
     flash('Evaluation ajoutee.', 'success')
     return redirect(url_for('coach.player_detail', player_id=player_id))
@@ -270,13 +307,13 @@ def add_player_physical(player_id):
     """Add physical record"""
     from app.services import get_player_service
     player_service = get_player_service()
-    
+
     record = {
         'weight': int(request.form.get('weight', 0)),
         'vma': float(request.form.get('vma', 0)),
         'note': request.form.get('note', '')
     }
-    
+
     player_service.add_physical_record(player_id, record)
     flash('Donnees physiques enregistrees.', 'success')
     return redirect(url_for('coach.player_detail', player_id=player_id))
@@ -290,36 +327,36 @@ def attendance(event_id=None):
     club_id = session.get('club_id')
     if not club_id:
         return redirect(url_for('main.index'))
-    
+
     from app.services import get_event_service, get_player_service, get_team_service
     event_service = get_event_service()
     player_service = get_player_service()
     team_service = get_team_service()
-    
+
     teams = team_service.get_by_club(club_id)
     selected_team_id = request.args.get('team_id')
-    
+
     selected_event = None
     if event_id:
         selected_event = event_service.get_by_id(event_id)
         if selected_event and selected_event.get('team_id') and not selected_team_id:
             selected_team_id = str(selected_event['team_id'])
-    
+
     if not selected_team_id and teams:
         selected_team_id = str(teams[0]['_id'])
-        
+
     players = player_service.get_by_club(club_id, team_id=selected_team_id)
     upcoming_events = event_service.get_upcoming(club_id, team_id=selected_team_id, limit=20)
-    
+
     if not selected_event and upcoming_events:
         selected_event = upcoming_events[0]
-        
+
     attendance_data = {}
     if selected_event:
         attendance_data = event_service.get_attendance(selected_event['_id'])
-    
-    return render_template('coach/attendance.html', 
-        events=upcoming_events, 
+
+    return render_template('coach/attendance.html',
+        events=upcoming_events,
         players=players,
         selected_event=selected_event,
         attendance_data=attendance_data,
@@ -335,15 +372,15 @@ def update_attendance():
     data = request.json
     event_id = data.get('event_id')
     attendance = data.get('attendance', {})
-    
+
     if not event_id:
         return {"error": "Missing event_id"}, 400
-        
+
     from app.services import get_event_service
     event_service = get_event_service()
-    
+
     event_service.set_bulk_attendance(event_id, attendance)
-        
+
     return {"status": "success"}
 
 @coach_bp.route('/tactics')
@@ -354,21 +391,21 @@ def tactics():
     club_id = session.get('club_id')
     if not club_id:
         return redirect(url_for('main.index'))
-    
+
     from app.services import get_player_service, get_team_service
     player_service = get_player_service()
     team_service = get_team_service()
-    
+
     teams = team_service.get_by_club(club_id)
     selected_team_id = request.args.get('team_id')
     if not selected_team_id and teams:
         selected_team_id = str(teams[0]['_id'])
-        
+
     active_lineup = player_service.get_active_lineup(club_id, team_id=selected_team_id)
     players = player_service.get_by_club(club_id, team_id=selected_team_id)
-    
+
     from app.models import serialize_doc
-    return render_template('coach/tactics.html', 
+    return render_template('coach/tactics.html',
         lineup=serialize_doc(active_lineup),
         players=players,
         teams=teams,
@@ -383,10 +420,10 @@ def save_tactics():
     data = request.json
     club_id = session.get('club_id')
     team_id = data.get('team_id')
-    
+
     from app.services import get_player_service
     player_service = get_player_service()
-    
+
     player_service.save_lineup(
         club_id=club_id,
         formation=data.get('formation'),
@@ -396,7 +433,7 @@ def save_tactics():
         captains=data.get('captains'),
         set_pieces=data.get('set_pieces')
     )
-    
+
     return {"status": "success"}
 
 @coach_bp.route('/tactics/save-config', methods=['POST'])
@@ -461,11 +498,11 @@ def get_tactic_presets():
     """Get saved presets"""
     club_id = session.get('club_id')
     team_id = request.args.get('team_id')
-    
+
     from app.services import get_player_service
     from app.models import serialize_docs
     player_service = get_player_service()
-    
+
     presets = player_service.get_tactic_presets(club_id, team_id)
     return jsonify(serialize_docs(presets))
 
@@ -478,14 +515,14 @@ def load_tactic_preset():
     preset_id = data.get('preset_id')
     club_id = session.get('club_id')
     team_id = data.get('team_id')
-    
+
     from app.services import get_player_service
     player_service = get_player_service()
-    
+
     preset = player_service.get_tactic_preset(preset_id)
     if not preset:
         return {"error": "Preset not found"}, 404
-    
+
     # starters can be a dict {pos: ObjectId} or a list (legacy)
     raw_starters = preset.get('starters', {})
     if isinstance(raw_starters, dict):
@@ -505,7 +542,7 @@ def load_tactic_preset():
         captains=[str(c) for c in preset.get('captains', [])],
         set_pieces={k: [str(p) for p in v] for k, v in preset.get('set_pieces', {}).items()}
     )
-    
+
     # Also apply instructions if present
     if preset.get('instructions'):
         player_service.save_tactical_config(
@@ -513,7 +550,7 @@ def load_tactic_preset():
             team_id=team_id,
             config=preset.get('instructions')
         )
-    
+
     return jsonify({"status": "success"})
 
 @coach_bp.route('/tactics/preset/<preset_id>', methods=['DELETE'])
@@ -533,19 +570,19 @@ def create_event():
     """Create new event"""
     club_id = session.get('club_id')
     user_id = session.get('user_id')
-    
+
     from app.services import get_event_service, get_team_service
     event_service = get_event_service()
     team_service = get_team_service()
-    
+
     if request.method == 'POST':
         from datetime import datetime
-        
+
         date_str = request.form.get('date')
         time_str = request.form.get('time', '18:00')
         event_date = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
         team_id = request.form.get('team_id')
-        
+
         event_service.create(
             club_id=club_id,
             team_id=team_id if team_id else None,
@@ -556,7 +593,7 @@ def create_event():
             description=request.form.get('description', ''),
             created_by=user_id
         )
-        
+
         # Send notification to team players
         try:
             from app.services import get_notification_service, get_player_service
@@ -576,13 +613,13 @@ def create_event():
                         )
         except Exception as e:
             print(f"[Notification] Error sending event notifications: {e}")
-        
+
         flash('Événement créé avec succès !', 'success')
         return redirect(url_for('main.calendar'))
-    
+
     teams = team_service.get_by_club(club_id)
     selected_team_id = request.args.get('team_id')
-    
+
     return render_template('coach/create_event.html', teams=teams, selected_team_id=selected_team_id)
 
 @coach_bp.route('/event/<event_id>/edit', methods=['POST'])
@@ -593,24 +630,24 @@ def edit_event(event_id):
     from app.services import get_event_service
     from datetime import datetime
     event_service = get_event_service()
-    
+
     date_str = request.form.get('date')
     time_str = request.form.get('time', '18:00')
-    
+
     update_data = {
         'title': request.form.get('title'),
         'type': request.form.get('type'),
         'location': request.form.get('location', ''),
         'description': request.form.get('description', ''),
     }
-    
+
     if date_str:
         update_data['date'] = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
-    
+
     if request.form.get('team_id'):
         from bson import ObjectId
         update_data['team_id'] = ObjectId(request.form.get('team_id'))
-    
+
     event_service.update(event_id, update_data)
     flash('Événement mis à jour !', 'success')
     return redirect(url_for('main.calendar'))
@@ -623,7 +660,7 @@ def delete_event(event_id):
     from app.services import get_event_service
     event_service = get_event_service()
     event_service.delete(event_id)
-    
+
     if request.is_json:
         return jsonify({"status": "success"})
     flash('Événement supprimé.', 'success')
@@ -650,35 +687,35 @@ def match_center(match_id=None):
     club_id = session.get('club_id')
     if not club_id:
         return redirect(url_for('main.index'))
-    
+
     from app.services import get_match_service, get_player_service, get_team_service
     match_service = get_match_service()
     player_service = get_player_service()
     team_service = get_team_service()
-    
+
     teams = team_service.get_by_club(club_id)
     selected_team_id = request.args.get('team_id')
-    
+
     selected_match = None
     if match_id:
         selected_match = match_service.get_by_id(match_id)
         if selected_match and selected_match.get('team_id') and not selected_team_id:
             selected_team_id = str(selected_match['team_id'])
-    
+
     if not selected_team_id and teams:
         selected_team_id = str(teams[0]['_id'])
-        
+
     upcoming = match_service.get_upcoming(club_id, team_id=selected_team_id)
     completed = match_service.get_completed(club_id, team_id=selected_team_id)
-    
+
     if not selected_match:
         if upcoming:
             selected_match = upcoming[0]
         elif completed:
             selected_match = completed[0]
-            
+
     players = player_service.get_by_club(club_id, team_id=selected_team_id)
-    
+
     return render_template('coach/match_center.html',
         upcoming_matches=upcoming,
         completed_matches=completed,
@@ -698,10 +735,10 @@ def update_score():
     home_score = int(data.get('home_score', 0))
     away_score = int(data.get('away_score', 0))
     status = data.get('status')
-    
+
     from app.services import get_match_service
     match_service = get_match_service()
-    
+
     match_service.set_score(match_id, home_score, away_score, status=status)
     return {"status": "success"}
 
@@ -712,7 +749,7 @@ def start_match():
     """Set match status to live"""
     data = request.json
     match_id = data.get('match_id')
-    
+
     from app.services import get_match_service
     match_service = get_match_service()
     match_service.start_match(match_id)
@@ -725,7 +762,7 @@ def finish_match():
     """Set match status to completed"""
     data = request.json
     match_id = data.get('match_id')
-    
+
     from app.services import get_match_service
     match_service = get_match_service()
     match_service.finish_match(match_id)
@@ -741,10 +778,10 @@ def add_match_event():
     event_type = data.get('type')
     player_id = data.get('player_id')
     minute = int(data.get('minute', 0))
-    
+
     from app.services import get_match_service
     match_service = get_match_service()
-    
+
     match_service.add_event(match_id, event_type, player_id, minute)
     return {"status": "success"}
 
@@ -761,22 +798,22 @@ def scouting():
     user_service = get_user_service()
     team_service = get_team_service()
     club_id = session.get('club_id')
-    
+
     # Get all users who are NOT already in a club
     all_users = user_service.get_all()
     free_agents = [
-        u for u in all_users 
+        u for u in all_users
         if (not u.get('club_id') and 'player' in (u.get('roles') or [u.get('role')]))
     ]
-    
+
     teams = team_service.get_by_club(club_id)
     selected_team_id = request.args.get('team_id')
     if not selected_team_id and teams:
         selected_team_id = str(teams[0]['_id'])
-    
-    return render_template('coach/scouting.html', 
-        free_agents=free_agents, 
-        teams=teams, 
+
+    return render_template('coach/scouting.html',
+        free_agents=free_agents,
+        teams=teams,
         selected_team_id=selected_team_id
     )
 
@@ -790,10 +827,10 @@ def offer_contract():
     conditions = request.form.get('conditions', '')
     team_id = request.form.get('team_id')
     club_id = session.get('club_id')
-    
+
     from app.services import get_contract_service
     contract_service = get_contract_service()
-    
+
     contract_service.create_offer(
         club_id=club_id,
         user_id=user_id,
@@ -802,7 +839,7 @@ def offer_contract():
         conditions=conditions,
         team_id=team_id
     )
-    
+
     flash('Offre de contrat envoyee !', 'success')
     return redirect(url_for('coach.scouting', team_id=team_id))
 
@@ -816,40 +853,40 @@ def offer_contract():
 def convocation():
     """Convocation interface"""
     from app.services import get_player_service, get_event_service, get_team_service, get_match_service
-    
+
     player_service = get_player_service()
     event_service = get_event_service()
     team_service = get_team_service()
     match_service = get_match_service()
-    
+
     club_id = session.get('club_id')
-    
+
     teams = team_service.get_by_club(club_id)
     selected_team_id = request.args.get('team_id')
     if not selected_team_id and teams:
         selected_team_id = str(teams[0]['_id'])
-    
+
     # Get upcoming events and matches
     events = event_service.get_upcoming(club_id, team_id=selected_team_id)
     upcoming_matches = match_service.get_upcoming(club_id, team_id=selected_team_id)
-    
+
     # Get players grouped by position
     players = player_service.get_by_club(club_id, team_id=selected_team_id)
-    
+
     by_position = {
         'GK': [p for p in players if p.get('position') == 'GK'],
         'DEF': [p for p in players if p.get('position') == 'DEF'],
         'MID': [p for p in players if p.get('position') == 'MID'],
         'ATT': [p for p in players if p.get('position') == 'ATT'],
     }
-    
+
     # Get saved tactics presets
     from app.models import serialize_docs
     import json
     saved_tactics = player_service.get_tactic_presets(club_id, selected_team_id)
     saved_tactics_json = json.dumps(serialize_docs(saved_tactics), default=str)
-    
-    return render_template('coach/convocation.html', 
+
+    return render_template('coach/convocation.html',
         events=events,
         upcoming_matches=upcoming_matches,
         players=players,
@@ -866,18 +903,18 @@ def convocation():
 def send_convocation():
     """Send convocation to selected players"""
     from app.services import get_event_service, get_notification_service
-    
+
     data = request.json
     event_id = data.get('event_id')
     player_ids = data.get('player_ids', [])
-    
+
     event_service = get_event_service()
     notification_service = get_notification_service()
-    
+
     # Send notifications
     event = event_service.get_by_id(event_id)
     event_title = event.get('title', 'Match') if event else 'Match'
-    
+
     for pid in player_ids:
         notification_service.create_notification(
             user_id=pid,
@@ -886,7 +923,5 @@ def send_convocation():
             type="convocation",
             link=f"/player/event/{event_id}"
         )
-        
+
     return {"status": "success", "count": len(player_ids)}
-
-

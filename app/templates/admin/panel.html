@@ -62,142 +62,153 @@
 
         <!-- Navigation -->
         <nav class="flex-1 px-3 space-y-1 mt-5 overflow-y-auto custom-scrollbar pb-6">
-            <div
-                class="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/20 mb-2 mt-2">
-                Principal</div>
+
+            <!-- ─── Principal ─── -->
+            <div class="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/20 mb-2 mt-2">Principal</div>
 
             <button onclick="switchTab('dashboard'); if(window.innerWidth < 1024) toggleAdminSidebar();"
                 id="nav-dashboard"
                 class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 active group text-left">
-                <div
-                    class="w-8 h-8 rounded-lg bg-primary-500/10 flex items-center justify-center shrink-0 group-hover:bg-primary-500/15 transition-colors">
-                    <i class="fa-solid fa-chart-pie text-primary-400 text-xs transition-colors nav-icon"></i>
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-primary-500/10 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-chart-pie text-primary-500 text-xs transition-colors"></i>
                 </div>
-                <span class="font-medium text-slate-900 dark:text-white text-sm">Tableau de Bord</span>
+                <span class="font-semibold text-slate-900 dark:text-white text-sm">Tableau de Bord</span>
             </button>
 
             <button onclick="switchTab('members'); if(window.innerWidth < 1024) toggleAdminSidebar();" id="nav-members"
                 class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
-                <div
-                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
-                    <i
-                        class="fa-solid fa-users text-white/40 group-hover:text-primary-400 text-xs nav-icon transition-colors"></i>
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-users text-slate-400 dark:text-slate-500 group-hover:text-primary-500 text-xs transition-colors"></i>
                 </div>
-                <span
-                    class="font-medium text-gray-400 group-hover:text-white group-hover:text-slate-900 text-sm">Effectif</span>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Effectif</span>
             </button>
+
             <button onclick="switchTab('teams'); if(window.innerWidth < 1024) toggleAdminSidebar();" id="nav-teams"
                 class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
-                <div
-                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
-                    <i
-                        class="fa-solid fa-layer-group text-white/40 group-hover:text-primary-400 text-xs transition-colors"></i>
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-layer-group text-slate-400 dark:text-slate-500 group-hover:text-primary-500 text-xs transition-colors"></i>
                 </div>
-                <span
-                    class="font-medium text-gray-400 group-hover:text-white group-hover:text-slate-900 text-sm">Équipes</span>
-            </button>
-            <button onclick="switchTab('competitions'); if(window.innerWidth < 1024) toggleAdminSidebar();"
-                id="nav-competitions"
-                class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
-                <div
-                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
-                    <i
-                        class="fa-solid fa-trophy text-white/40 group-hover:text-amber-400 text-xs transition-colors"></i>
-                </div>
-                <span
-                    class="font-medium text-gray-400 group-hover:text-white group-hover:text-slate-900 text-sm">Compétitions</span>
-            </button>
-            <button onclick="switchTab('matches'); if(window.innerWidth < 1024) toggleAdminSidebar();" id="nav-matches"
-                class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
-                <div
-                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
-                    <i
-                        class="fa-solid fa-calendar-days text-white/40 group-hover:text-blue-400 text-xs transition-colors"></i>
-                </div>
-                <span
-                    class="font-medium text-gray-400 group-hover:text-white group-hover:text-slate-900 text-sm">Matchs</span>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Équipes</span>
             </button>
 
-            <div
-                class="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/20 mb-2 mt-6">
-                Gestion</div>
+            <!-- ─── Terrain ─── -->
+            <div class="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/20 mb-2 mt-6">Terrain</div>
 
             <button onclick="switchTab('competitions'); if(window.innerWidth < 1024) toggleAdminSidebar();"
                 id="nav-competitions"
                 class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
-                <div
-                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
-                    <i
-                        class="fa-solid fa-trophy text-white/40 group-hover:text-amber-400 text-xs transition-colors"></i>
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-trophy text-slate-400 dark:text-slate-500 group-hover:text-amber-500 text-xs transition-colors"></i>
                 </div>
-                <span
-                    class="font-medium text-gray-400 group-hover:text-white group-hover:text-slate-900 text-sm">Compétitions</span>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Compétitions</span>
             </button>
+
             <button onclick="switchTab('matches'); if(window.innerWidth < 1024) toggleAdminSidebar();" id="nav-matches"
                 class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
-                <div
-                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
-                    <i
-                        class="fa-solid fa-calendar-check text-white/40 group-hover:text-blue-400 text-xs transition-colors"></i>
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 group-hover:text-blue-500 text-xs transition-colors"></i>
                 </div>
-                <span
-                    class="font-medium text-gray-400 group-hover:text-white group-hover:text-slate-900 text-sm">Matchs</span>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Matchs</span>
             </button>
+
+            <button onclick="switchTab('events'); if(window.innerWidth < 1024) toggleAdminSidebar();" id="nav-events"
+                class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-clipboard-list text-slate-400 dark:text-slate-500 group-hover:text-purple-500 text-xs transition-colors"></i>
+                </div>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Événements</span>
+            </button>
+
+            <button onclick="switchTab('calendrier'); if(window.innerWidth < 1024) toggleAdminSidebar();" id="nav-calendrier"
+                class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-calendar text-slate-400 dark:text-slate-500 group-hover:text-teal-500 text-xs transition-colors"></i>
+                </div>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Calendrier</span>
+            </button>
+
+            <!-- ─── Gestion ─── -->
+            <div class="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/20 mb-2 mt-6">Gestion</div>
 
             <button onclick="switchTab('subscription'); if(window.innerWidth < 1024) toggleAdminSidebar();"
                 id="nav-subscription"
                 class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
-                <div
-                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
-                    <i
-                        class="fa-solid fa-credit-card text-white/40 group-hover:text-green-400 text-xs transition-colors"></i>
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-credit-card text-slate-400 dark:text-slate-500 group-hover:text-emerald-500 text-xs transition-colors"></i>
                 </div>
-                <span
-                    class="font-medium text-gray-400 group-hover:text-white group-hover:text-slate-900 text-sm">Abonnement</span>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Abonnement</span>
             </button>
+
             <button onclick="switchTab('metrics'); if(window.innerWidth < 1024) toggleAdminSidebar();" id="nav-metrics"
                 class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
-                <div
-                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
-                    <i
-                        class="fa-solid fa-chart-line text-white/40 group-hover:text-primary-400 text-xs transition-colors"></i>
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-chart-line text-slate-400 dark:text-slate-500 group-hover:text-primary-500 text-xs transition-colors"></i>
                 </div>
-                <span
-                    class="font-medium text-gray-400 group-hover:text-white group-hover:text-slate-900 text-sm">Statistiques</span>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Statistiques</span>
             </button>
+
+            <a href="{{ url_for('admin.analytics') }}"
+                class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-chart-bar text-slate-400 dark:text-slate-500 group-hover:text-blue-500 text-xs transition-colors"></i>
+                </div>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Analytics</span>
+            </a>
+
+            <a href="{{ url_for('admin.members_directory') }}"
+                class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-address-book text-slate-400 dark:text-slate-500 group-hover:text-emerald-500 text-xs transition-colors"></i>
+                </div>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Annuaire</span>
+            </a>
+
+            <a href="{{ url_for('admin.announcements') }}"
+                class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-bullhorn text-slate-400 dark:text-slate-500 group-hover:text-amber-500 text-xs transition-colors"></i>
+                </div>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Annonces</span>
+            </a>
+
+            <a href="{{ url_for('admin.billing') }}"
+                class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-file-invoice-dollar text-slate-400 dark:text-slate-500 group-hover:text-purple-500 text-xs transition-colors"></i>
+                </div>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Facturation</span>
+            </a>
+
+            <!-- ─── Config ─── -->
+            <div class="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/20 mb-2 mt-6">Config</div>
+
             <button onclick="switchTab('settings'); if(window.innerWidth < 1024) toggleAdminSidebar();"
                 id="nav-settings"
                 class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
-                <div
-                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
-                    <i
-                        class="fa-solid fa-sliders text-white/40 group-hover:text-white/70 text-xs transition-colors"></i>
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-sliders text-slate-400 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-white/80 text-xs transition-colors"></i>
                 </div>
-                <span
-                    class="font-medium text-gray-400 group-hover:text-white group-hover:text-slate-900 text-sm">Configuration</span>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Configuration</span>
             </button>
+
             <button onclick="switchTab('personalization'); if(window.innerWidth < 1024) toggleAdminSidebar();"
                 id="nav-personalization"
                 class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
-                <div
-                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
-                    <i
-                        class="fa-solid fa-palette text-white/40 group-hover:text-purple-400 text-xs transition-colors"></i>
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-palette text-slate-400 dark:text-slate-500 group-hover:text-purple-500 text-xs transition-colors"></i>
                 </div>
-                <span
-                    class="font-medium text-gray-400 group-hover:text-white group-hover:text-slate-900 text-sm">Personnalisation</span>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Personnalisation</span>
             </button>
+
             <button onclick="switchTab('platform'); if(window.innerWidth < 1024) toggleAdminSidebar();"
                 id="nav-platform"
                 class="nav-item w-full flex items-center gap-3.5 px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all duration-200 group text-left">
-                <div
-                    class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-white/8 transition-colors">
-                    <i
-                        class="fa-solid fa-server text-white/40 group-hover:text-amber-400 text-xs transition-colors"></i>
+                <div class="nav-icon-wrap w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-server text-slate-400 dark:text-slate-500 group-hover:text-amber-500 text-xs transition-colors"></i>
                 </div>
-                <span
-                    class="font-medium text-gray-400 group-hover:text-white group-hover:text-slate-900 text-sm">Plateforme</span>
+                <span class="font-medium text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white text-sm">Plateforme</span>
             </button>
+
         </nav>
 
         <div class="p-5 border-t border-slate-200 dark:border-white/5">
@@ -844,19 +855,143 @@
                         <p class="text-slate-500 dark:text-white/40 text-sm mt-1.5 font-medium">Configurez les tournois
                             et championnats auxquels votre club participe.</p>
                     </div>
-                    <div
-                        class="glass p-12 text-center rounded-2xl border border-dashed border-white/10 relative overflow-hidden">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none">
+
+                    <!-- Action Bar -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                        <div class="flex items-center gap-3">
+                            <button onclick="document.getElementById('modal-add-competition').classList.remove('hidden')"
+                                class="gradient-primary px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-primary-500/20 hover:translate-y-[-1px] transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-plus text-xs"></i> Nouvelle compétition
+                            </button>
                         </div>
-                        <i class="fa-solid fa-trophy text-4xl text-amber-500/40 mb-4 animate-bounce-slow"></i>
-                        <h3 class="text-xl font-bold mb-2">Module en construction</h3>
-                        <p class="text-white/40 text-sm max-w-md mx-auto mb-6">La gestion avancée des compétitions,
-                            classements et statistiques de tournois arrivera dans une prochaine mise à jour.</p>
-                        <button type="button"
-                            class="px-6 py-3 rounded-xl bg-white/[0.04] text-white/50 text-sm font-semibold cursor-not-allowed border border-white/5">
-                            <i class="fa-solid fa-lock text-xs mr-2"></i> Bientôt disponible
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ url_for('admin.export_competitions') }}"
+                                class="glass bg-white/5 hover:bg-white/10 border-white/10 px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-file-excel text-green-400"></i> Exporter Excel
+                            </a>
+                            <button onclick="document.getElementById('modal-import-competitions').classList.remove('hidden')"
+                                class="glass bg-white/5 hover:bg-white/10 border-white/10 px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-file-import text-blue-400"></i> Importer Excel
+                            </button>
+                            <button onclick="downloadCompetitionTemplate()"
+                                class="glass bg-white/5 hover:bg-white/10 border-white/10 px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-download text-amber-400"></i> Template
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Competitions List (loaded dynamically) -->
+                    <div id="competitions-list">
+                        <div class="glass p-8 rounded-2xl border-white/5 text-center">
+                            <i class="fa-solid fa-spinner fa-spin text-primary-400 text-2xl mb-3"></i>
+                            <p class="text-white/30 text-sm">Chargement des compétitions...</p>
+                        </div>
+                    </div>
+
+                    <!-- Add Competition Modal -->
+                    <div id="modal-add-competition" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onclick="if(event.target===this)this.classList.add('hidden')">
+                        <div class="glass bg-surface-950/95 w-full max-w-lg rounded-2xl p-8 border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                            <h3 class="text-xl font-bold mb-6 flex items-center gap-3">
+                                <span class="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-400"><i class="fa-solid fa-trophy"></i></span>
+                                Nouvelle Compétition
+                            </h3>
+                            <form action="{{ url_for('admin.add_competition') }}" method="POST" class="space-y-4">
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Nom *</label>
+                                    <input type="text" name="name" required class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none" placeholder="Championnat Régional U17">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Type</label>
+                                        <select name="type" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                            <option value="league">Championnat</option>
+                                            <option value="cup">Coupe</option>
+                                            <option value="tournament">Tournoi</option>
+                                            <option value="friendly">Amical</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Statut</label>
+                                        <select name="status" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                            <option value="upcoming">À venir</option>
+                                            <option value="active" selected>En cours</option>
+                                            <option value="finished">Terminé</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Saison</label>
+                                        <input type="text" name="season" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none" placeholder="2025-2026">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Catégorie</label>
+                                        <select name="category" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                            <option value="">— Choisir —</option>
+                                            <option value="Senior">Senior</option>
+                                            <option value="U20">U20</option>
+                                            <option value="U19">U19</option>
+                                            <option value="U18">U18</option>
+                                            <option value="U17">U17</option>
+                                            <option value="U16">U16</option>
+                                            <option value="U15">U15</option>
+                                            <option value="U14">U14</option>
+                                            <option value="U13">U13</option>
+                                            <option value="U12">U12</option>
+                                            <option value="U11">U11</option>
+                                            <option value="U10">U10</option>
+                                            <option value="U9">U9</option>
+                                            <option value="Féminine">Féminine</option>
+                                            <option value="Vétérans">Vétérans</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Organisateur</label>
+                                    <input type="text" name="organizer" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none" placeholder="FFF / Ligue Régionale">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Date début</label>
+                                        <input type="date" name="start_date" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Date fin</label>
+                                        <input type="date" name="end_date" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Notes</label>
+                                    <textarea name="notes" rows="2" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none resize-none" placeholder="Infos complémentaires..."></textarea>
+                                </div>
+                                <div class="flex gap-3 pt-2">
+                                    <button type="submit" class="flex-1 gradient-primary py-3 rounded-xl font-bold text-sm text-white shadow-lg">Créer</button>
+                                    <button type="button" onclick="this.closest('[id=modal-add-competition]').classList.add('hidden')" class="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-sm font-bold transition-all hover:bg-white/10">Annuler</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Import Competition Modal -->
+                    <div id="modal-import-competitions" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onclick="if(event.target===this)this.classList.add('hidden')">
+                        <div class="glass bg-surface-950/95 w-full max-w-md rounded-2xl p-8 border border-white/10 shadow-2xl" onclick="event.stopPropagation()">
+                            <h3 class="text-xl font-bold mb-6 flex items-center gap-3">
+                                <span class="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400"><i class="fa-solid fa-file-import"></i></span>
+                                Importer des Compétitions
+                            </h3>
+                            <p class="text-white/40 text-sm mb-6">Uploadez un fichier <strong>.xlsx</strong> respectant le format du template téléchargeable.</p>
+                            <form action="{{ url_for('admin.import_competitions') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                                <div class="glass bg-white/[0.02] border-2 border-dashed border-white/10 rounded-xl p-6 text-center hover:border-primary-500/30 transition-colors">
+                                    <i class="fa-solid fa-cloud-arrow-up text-2xl text-white/20 mb-2"></i>
+                                    <p class="text-sm text-white/40 mb-3">Glissez votre fichier ou</p>
+                                    <input type="file" name="file" accept=".xlsx" required class="text-sm text-white/60">
+                                </div>
+                                <div class="flex gap-3 pt-2">
+                                    <button type="submit" class="flex-1 gradient-primary py-3 rounded-xl font-bold text-sm text-white shadow-lg">Importer</button>
+                                    <button type="button" onclick="this.closest('[id=modal-import-competitions]').classList.add('hidden')" class="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-sm font-bold transition-all hover:bg-white/10">Annuler</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
@@ -868,19 +1003,301 @@
                         <p class="text-slate-500 dark:text-white/40 text-sm mt-1.5 font-medium">Programmez et suivez
                             les rencontres de toutes vos équipes.</p>
                     </div>
-                    <div
-                        class="glass p-12 text-center rounded-2xl border border-dashed border-white/10 relative overflow-hidden">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none">
+
+                    <!-- Action Bar -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                        <div class="flex items-center gap-3">
+                            <button onclick="document.getElementById('modal-add-match').classList.remove('hidden')"
+                                class="gradient-primary px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-primary-500/20 hover:translate-y-[-1px] transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-plus text-xs"></i> Nouveau Match
+                            </button>
                         </div>
-                        <i class="fa-solid fa-calendar-days text-4xl text-blue-500/40 mb-4 animate-bounce-slow"></i>
-                        <h3 class="text-xl font-bold mb-2">Module en construction</h3>
-                        <p class="text-white/40 text-sm max-w-md mx-auto mb-6">La planification des matchs, la
-                            convocation des joueurs et la saisie des résultats seront bientôt disponibles.</p>
-                        <button type="button"
-                            class="px-6 py-3 rounded-xl bg-white/[0.04] text-white/50 text-sm font-semibold cursor-not-allowed border border-white/5">
-                            <i class="fa-solid fa-lock text-xs mr-2"></i> Bientôt disponible
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ url_for('admin.export_matches') }}"
+                                class="glass bg-white/5 hover:bg-white/10 border-white/10 px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-file-excel text-green-400"></i> Exporter Excel
+                            </a>
+                            <button onclick="document.getElementById('modal-import-matches').classList.remove('hidden')"
+                                class="glass bg-white/5 hover:bg-white/10 border-white/10 px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-file-import text-blue-400"></i> Importer Excel
+                            </button>
+                            <button onclick="downloadMatchTemplate()"
+                                class="glass bg-white/5 hover:bg-white/10 border-white/10 px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-download text-amber-400"></i> Template
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Match Filter -->
+                    <div class="flex items-center gap-3 mb-6">
+                        <button onclick="filterMatches('all')" class="match-filter-btn active-filter px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all" data-filter="all">Tous</button>
+                        <button onclick="filterMatches('scheduled')" class="match-filter-btn px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider glass bg-white/5 border-white/10 transition-all" data-filter="scheduled">Programmés</button>
+                        <button onclick="filterMatches('completed')" class="match-filter-btn px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider glass bg-white/5 border-white/10 transition-all" data-filter="completed">Terminés</button>
+                    </div>
+
+                    <!-- Matches List -->
+                    <div id="matches-list">
+                        <div class="glass p-8 rounded-2xl border-white/5 text-center">
+                            <i class="fa-solid fa-spinner fa-spin text-primary-400 text-2xl mb-3"></i>
+                            <p class="text-white/30 text-sm">Chargement des matchs...</p>
+                        </div>
+                    </div>
+
+                    <!-- Add Match Modal -->
+                    <div id="modal-add-match" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onclick="if(event.target===this)this.classList.add('hidden')">
+                        <div class="glass bg-surface-950/95 w-full max-w-lg rounded-2xl p-8 border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                            <h3 class="text-xl font-bold mb-6 flex items-center gap-3">
+                                <span class="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400"><i class="fa-solid fa-futbol"></i></span>
+                                Nouveau Match
+                            </h3>
+                            <form action="{{ url_for('admin.add_match') }}" method="POST" class="space-y-4">
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Adversaire *</label>
+                                    <input type="text" name="opponent" required class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none" placeholder="FC Rivaux">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Date *</label>
+                                        <input type="date" name="date" required class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Heure</label>
+                                        <input type="time" name="time" value="15:00" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Lieu</label>
+                                    <input type="text" name="location" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none" placeholder="Stade Municipal">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Équipe</label>
+                                        <select name="team_id" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                            <option value="">— Toutes —</option>
+                                            {% for team in teams %}
+                                            <option value="{{ team._id }}">{{ team.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Dom / Ext</label>
+                                        <select name="is_home" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                            <option value="1">Domicile</option>
+                                            <option value="0">Extérieur</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Compétition</label>
+                                    <input type="text" name="competition" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none" placeholder="Championnat Régional">
+                                </div>
+                                <div class="flex gap-3 pt-2">
+                                    <button type="submit" class="flex-1 gradient-primary py-3 rounded-xl font-bold text-sm text-white shadow-lg">Créer le match</button>
+                                    <button type="button" onclick="this.closest('[id=modal-add-match]').classList.add('hidden')" class="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-sm font-bold transition-all hover:bg-white/10">Annuler</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Import Match Modal -->
+                    <div id="modal-import-matches" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onclick="if(event.target===this)this.classList.add('hidden')">
+                        <div class="glass bg-surface-950/95 w-full max-w-md rounded-2xl p-8 border border-white/10 shadow-2xl" onclick="event.stopPropagation()">
+                            <h3 class="text-xl font-bold mb-6 flex items-center gap-3">
+                                <span class="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400"><i class="fa-solid fa-file-import"></i></span>
+                                Importer des Matchs
+                            </h3>
+                            <p class="text-white/40 text-sm mb-6">Uploadez un fichier <strong>.xlsx</strong> respectant le format du template téléchargeable.</p>
+                            <form action="{{ url_for('admin.import_matches') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                                <div class="glass bg-white/[0.02] border-2 border-dashed border-white/10 rounded-xl p-6 text-center hover:border-primary-500/30 transition-colors">
+                                    <i class="fa-solid fa-cloud-arrow-up text-2xl text-white/20 mb-2"></i>
+                                    <p class="text-sm text-white/40 mb-3">Glissez votre fichier ou</p>
+                                    <input type="file" name="file" accept=".xlsx" required class="text-sm text-white/60">
+                                </div>
+                                <div class="flex gap-3 pt-2">
+                                    <button type="submit" class="flex-1 gradient-primary py-3 rounded-xl font-bold text-sm text-white shadow-lg">Importer</button>
+                                    <button type="button" onclick="this.closest('[id=modal-import-matches]').classList.add('hidden')" class="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-sm font-bold transition-all hover:bg-white/10">Annuler</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: ÉVÉNEMENTS -->
+                <div id="tab-events" class="hidden animate-slide-up">
+                    <div class="mb-10 text-center md:text-left">
+                        <h2 class="text-2xl font-extrabold tracking-tight">Gestion des <span class="text-gradient">Événements</span></h2>
+                        <p class="text-slate-500 dark:text-white/40 text-sm mt-1.5 font-medium">Entraînements, réunions, stages et autres activités du club.</p>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                        <div class="flex items-center gap-3">
+                            <button onclick="document.getElementById('modal-add-event').classList.remove('hidden')"
+                                class="gradient-primary px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-primary-500/20 hover:translate-y-[-1px] transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-plus text-xs"></i> Nouvel événement
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="filterEvents('all')" class="evt-filter-btn active-filter px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all" data-filter="all">Tous</button>
+                            <button onclick="filterEvents('training')" class="evt-filter-btn px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider glass bg-white/5 border-white/10 transition-all" data-filter="training">Entraînements</button>
+                            <button onclick="filterEvents('meeting')" class="evt-filter-btn px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider glass bg-white/5 border-white/10 transition-all" data-filter="meeting">Réunions</button>
+                            <button onclick="filterEvents('other')" class="evt-filter-btn px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider glass bg-white/5 border-white/10 transition-all" data-filter="other">Autres</button>
+                        </div>
+                    </div>
+
+                    <!-- Events List -->
+                    <div id="events-list">
+                        <div class="glass p-8 rounded-2xl border-white/5 text-center">
+                            <i class="fa-solid fa-spinner fa-spin text-primary-400 text-2xl mb-3"></i>
+                            <p class="text-white/30 text-sm">Chargement des événements...</p>
+                        </div>
+                    </div>
+
+                    <!-- Add Event Modal -->
+                    <div id="modal-add-event" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onclick="if(event.target===this)this.classList.add('hidden')">
+                        <div class="glass bg-surface-950/95 w-full max-w-lg rounded-2xl p-8 border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                            <h3 class="text-xl font-bold mb-6 flex items-center gap-3">
+                                <span class="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-400"><i class="fa-solid fa-clipboard-list"></i></span>
+                                Nouvel Événement
+                            </h3>
+                            <form action="{{ url_for('admin.add_event') }}" method="POST" class="space-y-4">
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Titre *</label>
+                                    <input type="text" name="title" required class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none" placeholder="Entraînement du mardi">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Type *</label>
+                                        <select name="type" required class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                            <option value="training">Entraînement</option>
+                                            <option value="meeting">Réunion</option>
+                                            <option value="stage">Stage</option>
+                                            <option value="tournament">Tournoi interne</option>
+                                            <option value="ceremony">Cérémonie</option>
+                                            <option value="other">Autre</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Catégorie</label>
+                                        <select name="category" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                            <option value="">— Toutes —</option>
+                                            <option value="Senior">Senior</option>
+                                            <option value="U20">U20</option>
+                                            <option value="U19">U19</option>
+                                            <option value="U18">U18</option>
+                                            <option value="U17">U17</option>
+                                            <option value="U16">U16</option>
+                                            <option value="U15">U15</option>
+                                            <option value="U14">U14</option>
+                                            <option value="U13">U13</option>
+                                            <option value="U12">U12</option>
+                                            <option value="U11">U11</option>
+                                            <option value="Féminine">Féminine</option>
+                                            <option value="Vétérans">Vétérans</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Date *</label>
+                                        <input type="date" name="date" required class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Heure</label>
+                                        <input type="time" name="time" value="18:00" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Lieu</label>
+                                    <input type="text" name="location" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none" placeholder="Terrain principal">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Équipe</label>
+                                    <select name="team_id" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                                        <option value="">— Toutes —</option>
+                                        {% for team in teams %}
+                                        <option value="{{ team._id }}">{{ team.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Description</label>
+                                    <textarea name="description" rows="2" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none resize-none" placeholder="Détails de l'événement..."></textarea>
+                                </div>
+                                <div class="flex gap-3 pt-2">
+                                    <button type="submit" class="flex-1 gradient-primary py-3 rounded-xl font-bold text-sm text-white shadow-lg">Créer</button>
+                                    <button type="button" onclick="this.closest('[id=modal-add-event]').classList.add('hidden')" class="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-sm font-bold transition-all hover:bg-white/10">Annuler</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: CALENDRIER (Unified) -->
+                <div id="tab-calendrier" class="hidden animate-slide-up">
+                    <div class="mb-10 text-center md:text-left">
+                        <h2 class="text-2xl font-extrabold tracking-tight"><span class="text-gradient">Calendrier</span> Général</h2>
+                        <p class="text-slate-500 dark:text-white/40 text-sm mt-1.5 font-medium">Vue unifiée de tous les matchs, compétitions et événements.</p>
+                    </div>
+
+                    <!-- Toggle: Calendar / List -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                        <div class="flex items-center gap-2">
+                            <button onclick="setCalendarView('calendar')" id="btn-view-calendar"
+                                class="cal-view-btn gradient-primary px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg flex items-center gap-2">
+                                <i class="fa-solid fa-calendar-days text-xs"></i> Calendrier
+                            </button>
+                            <button onclick="setCalendarView('list')" id="btn-view-list"
+                                class="cal-view-btn glass bg-white/5 hover:bg-white/10 border-white/10 px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-list text-xs"></i> Liste
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="flex items-center gap-1.5 text-[11px] font-bold"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> Matchs</span>
+                            <span class="flex items-center gap-1.5 text-[11px] font-bold"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> Compétitions</span>
+                            <span class="flex items-center gap-1.5 text-[11px] font-bold"><span class="w-3 h-3 rounded-full bg-purple-500 inline-block"></span> Événements</span>
+                        </div>
+                    </div>
+
+                    <!-- Calendar View -->
+                    <div id="calendar-view">
+                        <!-- Calendar Header -->
+                        <div class="flex items-center justify-between mb-6">
+                            <button onclick="changeMonth(-1)" class="w-10 h-10 rounded-xl glass bg-white/5 border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                                <i class="fa-solid fa-chevron-left text-xs"></i>
+                            </button>
+                            <h3 id="calendar-month-title" class="text-lg font-extrabold tracking-tight"></h3>
+                            <button onclick="changeMonth(1)" class="w-10 h-10 rounded-xl glass bg-white/5 border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                                <i class="fa-solid fa-chevron-right text-xs"></i>
+                            </button>
+                        </div>
+                        <!-- Days Header -->
+                        <div class="grid grid-cols-7 gap-1 mb-2">
+                            <div class="text-center text-[10px] font-bold uppercase tracking-wider text-white/30 py-2">Lun</div>
+                            <div class="text-center text-[10px] font-bold uppercase tracking-wider text-white/30 py-2">Mar</div>
+                            <div class="text-center text-[10px] font-bold uppercase tracking-wider text-white/30 py-2">Mer</div>
+                            <div class="text-center text-[10px] font-bold uppercase tracking-wider text-white/30 py-2">Jeu</div>
+                            <div class="text-center text-[10px] font-bold uppercase tracking-wider text-white/30 py-2">Ven</div>
+                            <div class="text-center text-[10px] font-bold uppercase tracking-wider text-white/30 py-2">Sam</div>
+                            <div class="text-center text-[10px] font-bold uppercase tracking-wider text-white/30 py-2">Dim</div>
+                        </div>
+                        <!-- Calendar Grid -->
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-1"></div>
+                    </div>
+
+                    <!-- List View (hidden by default) -->
+                    <div id="calendar-list-view" class="hidden">
+                        <div id="calendar-list-content">
+                            <div class="glass p-8 rounded-2xl text-center">
+                                <p class="text-white/30 text-sm">Chargement...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Detail Popup (reusable) -->
+                <div id="modal-event-detail" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onclick="if(event.target===this)this.classList.add('hidden')">
+                    <div id="modal-event-detail-content" class="glass bg-surface-950/95 w-full max-w-md rounded-2xl p-8 border border-white/10 shadow-2xl" onclick="event.stopPropagation()">
                     </div>
                 </div>
 
@@ -1886,7 +2303,7 @@
             document.getElementById(id).classList.toggle('hidden');
         }
         function switchTab(tabId) {
-            const tabs = ['dashboard', 'members', 'teams', 'subscription', 'metrics', 'settings', 'personalization', 'platform'];
+            const tabs = ['dashboard', 'members', 'teams', 'competitions', 'matches', 'events', 'calendrier', 'subscription', 'metrics', 'settings', 'personalization', 'platform'];
             tabs.forEach(t => {
                 const tab = document.getElementById('tab-' + t);
                 const nav = document.getElementById('nav-' + t);
@@ -1894,7 +2311,15 @@
                 if (nav) {
                     nav.classList.remove('active');
                     const span = nav.querySelector('span');
-                    if (span) { span.classList.remove('text-slate-900'); span.classList.remove('text-white'); span.classList.add('text-gray-400'); }
+                    if (span) {
+                        span.classList.remove('text-slate-900', 'dark:text-white', 'font-semibold');
+                        span.classList.add('text-slate-500', 'dark:text-slate-400', 'font-medium');
+                    }
+                    const iconWrap = nav.querySelector('.nav-icon-wrap');
+                    if (iconWrap) {
+                        iconWrap.classList.remove('bg-primary-500/10');
+                        iconWrap.classList.add('bg-slate-200/60', 'dark:bg-white/5');
+                    }
                 }
             });
             const activeTab = document.getElementById('tab-' + tabId);
@@ -1905,18 +2330,28 @@
                 const span = activeNav.querySelector('span');
                 let tabName = '';
                 if (span) {
-                    span.classList.remove('text-gray-400');
-                    span.classList.add('text-slate-900');
-                    span.classList.add('dark:text-white');
-                    tabName = span.textContent;
+                    span.classList.remove('text-slate-500', 'dark:text-slate-400', 'font-medium');
+                    span.classList.add('text-slate-900', 'dark:text-white', 'font-semibold');
+                    tabName = span.textContent.trim();
                 }
-
+                const iconWrap = activeNav.querySelector('.nav-icon-wrap');
+                if (iconWrap) {
+                    iconWrap.classList.remove('bg-slate-200/60', 'dark:bg-white/5');
+                    iconWrap.classList.add('bg-primary-500/10');
+                }
                 // Update Breadcrumb dynamically
                 const breadcrumbSpan = document.querySelector('nav[aria-label="Breadcrumb"] span[aria-current="page"]');
                 if (breadcrumbSpan && tabName) {
                     breadcrumbSpan.textContent = tabName;
                 }
+                // update URL hash without page reload
+                history.replaceState(null, '', '#' + tabId);
             }
+            // Lazy-load data for competitions/matches/events/calendrier tabs
+            if (tabId === 'competitions') loadCompetitions();
+            if (tabId === 'matches') loadMatches();
+            if (tabId === 'events') loadEvents();
+            if (tabId === 'calendrier') loadCalendar();
         }
 
         function openEditMemberModal(btn) {
@@ -1946,61 +2381,67 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const hash = window.location.hash.replace('#', '');
-            switchTab(['dashboard', 'members', 'teams', 'subscription', 'metrics', 'settings', 'personalization', 'platform'].includes(hash) ? hash : 'dashboard');
+            switchTab(['dashboard', 'members', 'teams', 'competitions', 'matches', 'events', 'calendrier', 'subscription', 'metrics', 'settings', 'personalization', 'platform'].includes(hash) ? hash : 'dashboard');
 
-            // Initialize Admin KPI Chart
+            // Initialize Admin KPI Chart — fetch real data
             const ctxActivity = document.getElementById('adminActivityChart');
             if (ctxActivity) {
-                new Chart(ctxActivity, {
-                    type: 'line',
-                    data: {
-                        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
-                        datasets: [{
-                            label: 'Activité Globale',
-                            data: [15, 25, 40, 45, 60, 85, 90],
-                            borderColor: getComputedStyle(document.documentElement).getPropertyValue('--primary-color') || '#0ea5e9',
-                            backgroundColor: (context) => {
-                                const ctx = context.chart.ctx;
-                                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-                                gradient.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--primary-color') + '40');
-                                gradient.addColorStop(1, 'rgba(0,0,0,0)');
-                                return gradient;
+                fetch('/admin/analytics/data')
+                    .then(r => r.ok ? r.json() : null)
+                    .then(json => {
+                        const labels = json && json.member_growth ? json.member_growth.labels : ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'];
+                        const data   = json && json.member_growth ? json.member_growth.data   : [0, 0, 0, 0, 0, 0, 0];
+                        const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#0ea5e9';
+                        new Chart(ctxActivity, {
+                            type: 'line',
+                            data: {
+                                labels,
+                                datasets: [{
+                                    label: 'Nouveaux membres',
+                                    data,
+                                    borderColor: primary,
+                                    backgroundColor: (ctx2) => {
+                                        const g = ctx2.chart.ctx.createLinearGradient(0, 0, 0, 300);
+                                        g.addColorStop(0, primary + '40');
+                                        g.addColorStop(1, 'rgba(0,0,0,0)');
+                                        return g;
+                                    },
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointRadius: 4,
+                                    pointBackgroundColor: '#fff',
+                                    pointBorderColor: primary,
+                                    pointHoverRadius: 6
+                                }]
                             },
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#fff',
-                            pointBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--primary-color') || '#0ea5e9',
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                                titleColor: '#fff',
-                                bodyColor: '#cbd5e1',
-                                padding: 10,
-                                cornerRadius: 8,
-                                displayColors: false
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(15,23,42,0.9)',
+                                        titleColor: '#fff',
+                                        bodyColor: '#cbd5e1',
+                                        padding: 10,
+                                        cornerRadius: 8,
+                                        displayColors: false
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        grid: { display: false, drawBorder: false },
+                                        ticks: { color: '#94a3b8', font: { size: 10, weight: '600' } }
+                                    },
+                                    y: {
+                                        grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
+                                        ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 20 }
+                                    }
+                                }
                             }
-                        },
-                        scales: {
-                            x: {
-                                grid: { display: false, drawBorder: false },
-                                ticks: { color: '#94a3b8', font: { size: 10, weight: '600' } }
-                            },
-                            y: {
-                                grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
-                                ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 20 }
-                            }
-                        }
-                    }
-                });
+                        });
+                    });
             }
         });
 
@@ -2114,6 +2555,492 @@
             updatePersoPreview();
         }
 
+        // ===== COMPETITIONS MODULE =====
+        const COMP_TYPE_LABELS = {league:'Championnat', cup:'Coupe', tournament:'Tournoi', friendly:'Amical'};
+        const COMP_STATUS_LABELS = {active:'En cours', finished:'Terminé', upcoming:'À venir'};
+        const COMP_STATUS_COLORS = {active:'bg-green-500/15 text-green-400', finished:'bg-white/5 text-white/30', upcoming:'bg-amber-500/15 text-amber-400'};
+
+        function loadCompetitions() {
+            fetch('{{ url_for("admin.competitions_api") }}')
+                .then(r => r.json())
+                .then(data => renderCompetitions(data.competitions || []))
+                .catch(() => {
+                    document.getElementById('competitions-list').innerHTML = '<div class="glass p-8 rounded-2xl text-center"><p class="text-white/30 text-sm">Aucune compétition trouvée.</p></div>';
+                });
+        }
+        function renderCompetitions(comps) {
+            const el = document.getElementById('competitions-list');
+            if (!comps.length) {
+                el.innerHTML = '<div class="glass p-8 rounded-2xl border-white/5 text-center"><i class="fa-solid fa-trophy text-3xl text-amber-500/20 mb-3"></i><p class="text-white/40 text-sm">Aucune compétition. Cliquez sur "Nouvelle compétition" pour commencer.</p></div>';
+                return;
+            }
+            let html = '<div class="space-y-3">';
+            comps.forEach(c => {
+                const typeLbl = COMP_TYPE_LABELS[c.type] || c.type;
+                const statusLbl = COMP_STATUS_LABELS[c.status] || c.status;
+                const statusCls = COMP_STATUS_COLORS[c.status] || 'bg-white/5 text-white/30';
+                const dates = (c.start_date || '') + (c.end_date ? ' → ' + c.end_date : '');
+                html += `<div class="glass p-5 rounded-2xl border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-3 mb-1">
+                            <h4 class="font-bold text-sm truncate">${c.name}</h4>
+                            <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase ${statusCls}">${statusLbl}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-3 text-[11px] text-white/40">
+                            <span><i class="fa-solid fa-tag mr-1"></i>${typeLbl}</span>
+                            ${c.season ? '<span><i class="fa-solid fa-calendar mr-1"></i>' + c.season + '</span>' : ''}
+                            ${c.category ? '<span><i class="fa-solid fa-users mr-1"></i>' + c.category + '</span>' : ''}
+                            ${dates ? '<span><i class="fa-solid fa-clock mr-1"></i>' + dates + '</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openEditCompetition(this)" data-id="${c._id}" data-name="${c.name}" data-type="${c.type}" data-season="${c.season || ''}" data-category="${c.category || ''}" data-organizer="${c.organizer || ''}" data-start_date="${c.start_date || ''}" data-end_date="${c.end_date || ''}" data-status="${c.status}" data-notes="${(c.notes || '').replace(/"/g, '&quot;')}"
+                            class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-primary-400 hover:border-primary-500/30 transition-all text-xs">
+                            <i class="fa-solid fa-pen"></i></button>
+                        <form action="/admin/competitions/${c._id}/delete" method="POST" onsubmit="return confirm('Supprimer cette compétition ?')">
+                            <button class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-red-400 hover:border-red-500/30 transition-all text-xs">
+                                <i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            el.innerHTML = html;
+        }
+        function openEditCompetition(btn) {
+            const d = btn.dataset;
+            const html = `<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" id="modal-edit-comp" onclick="if(event.target===this){this.remove()}">
+                <div class="glass bg-surface-950/95 w-full max-w-lg rounded-2xl p-8 border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                    <h3 class="text-xl font-bold mb-6">Modifier la Compétition</h3>
+                    <form action="/admin/competitions/${d.id}/edit" method="POST" class="space-y-4">
+                        <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Nom</label><input type="text" name="name" value="${d.name}" required class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Type</label><select name="type" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"><option value="league" ${d.type==='league'?'selected':''}>Championnat</option><option value="cup" ${d.type==='cup'?'selected':''}>Coupe</option><option value="tournament" ${d.type==='tournament'?'selected':''}>Tournoi</option><option value="friendly" ${d.type==='friendly'?'selected':''}>Amical</option></select></div>
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Statut</label><select name="status" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"><option value="upcoming" ${d.status==='upcoming'?'selected':''}>À venir</option><option value="active" ${d.status==='active'?'selected':''}>En cours</option><option value="finished" ${d.status==='finished'?'selected':''}>Terminé</option></select></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Saison</label><input type="text" name="season" value="${d.season}" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Catégorie</label><input type="text" name="category" value="${d.category}" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                        </div>
+                        <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Organisateur</label><input type="text" name="organizer" value="${d.organizer}" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Date début</label><input type="date" name="start_date" value="${d.start_date}" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Date fin</label><input type="date" name="end_date" value="${d.end_date}" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                        </div>
+                        <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Notes</label><textarea name="notes" rows="2" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none resize-none">${d.notes}</textarea></div>
+                        <div class="flex gap-3 pt-2"><button type="submit" class="flex-1 gradient-primary py-3 rounded-xl font-bold text-sm text-white shadow-lg">Enregistrer</button><button type="button" onclick="document.getElementById('modal-edit-comp').remove()" class="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-sm font-bold transition-all hover:bg-white/10">Annuler</button></div>
+                    </form>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', html);
+            document.getElementById('modal-edit-comp').classList.remove('hidden');
+        }
+        function downloadCompetitionTemplate() {
+            const headers = ['Nom','Type (Championnat/Coupe/Tournoi/Amical)','Saison','Catégorie','Organisateur','Date début (JJ/MM/AAAA)','Date fin (JJ/MM/AAAA)','Statut (En cours/Terminé/À venir)','Notes'];
+            const example = ['Championnat U17','Championnat','2025-2026','U17','FFF','01/09/2025','30/06/2026','En cours','Phase aller'];
+            let csv = headers.join(';') + '\n' + example.join(';') + '\n';
+            const blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8;'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'template_competitions.csv';
+            a.click();
+        }
+
+        // ===== MATCHES MODULE =====
+        const MATCH_STATUS_LABELS = {scheduled:'Programmé', live:'En direct', completed:'Terminé', cancelled:'Annulé'};
+        const MATCH_STATUS_COLORS = {scheduled:'bg-blue-500/15 text-blue-400', live:'bg-green-500/15 text-green-400', completed:'bg-white/5 text-white/30', cancelled:'bg-red-500/15 text-red-400'};
+        let allMatches = [];
+        let matchTeamMap = {};
+
+        function loadMatches() {
+            fetch('{{ url_for("admin.matches_api") }}')
+                .then(r => r.json())
+                .then(data => {
+                    allMatches = data.matches || [];
+                    (data.teams || []).forEach(t => { matchTeamMap[t._id] = t.name; });
+                    renderMatches(allMatches);
+                })
+                .catch(() => {
+                    document.getElementById('matches-list').innerHTML = '<div class="glass p-8 rounded-2xl text-center"><p class="text-white/30 text-sm">Aucun match trouvé.</p></div>';
+                });
+        }
+        function renderMatches(matches) {
+            const el = document.getElementById('matches-list');
+            if (!matches.length) {
+                el.innerHTML = '<div class="glass p-8 rounded-2xl border-white/5 text-center"><i class="fa-solid fa-futbol text-3xl text-blue-500/20 mb-3"></i><p class="text-white/40 text-sm">Aucun match. Cliquez sur "Nouveau Match" pour commencer.</p></div>';
+                return;
+            }
+            let html = '<div class="space-y-3">';
+            matches.forEach(m => {
+                const statusLbl = MATCH_STATUS_LABELS[m.status] || m.status || 'Programmé';
+                const statusCls = MATCH_STATUS_COLORS[m.status] || 'bg-blue-500/15 text-blue-400';
+                const teamName = m.team_id && matchTeamMap[m.team_id] ? matchTeamMap[m.team_id] : '';
+                const homeAway = m.is_home ? 'DOM' : 'EXT';
+                const homeAwayColor = m.is_home ? 'text-green-400' : 'text-amber-400';
+                const dateStr = m.date ? new Date(m.date).toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '';
+                const timeStr = m.date ? new Date(m.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
+                const score = m.status === 'completed' && m.score ? `${m.score.home ?? '-'} - ${m.score.away ?? '-'}` : '';
+                html += `<div class="glass p-5 rounded-2xl border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 match-card" data-status="${m.status || 'scheduled'}">
+                    <div class="flex items-center gap-4 flex-1 min-w-0">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex flex-col items-center justify-center text-[10px] font-bold text-blue-400 shrink-0">
+                            <span>${dateStr.split(' ')[0] || ''}</span>
+                            <span class="text-[9px] uppercase text-white/30">${dateStr.split(' ')[1] || ''}</span>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-bold text-sm truncate">${m.opponent || '—'}</span>
+                                <span class="text-[10px] font-bold ${homeAwayColor}">${homeAway}</span>
+                                <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase ${statusCls}">${statusLbl}</span>
+                            </div>
+                            <div class="flex flex-wrap gap-3 text-[11px] text-white/40">
+                                ${timeStr ? '<span><i class="fa-solid fa-clock mr-1"></i>' + timeStr + '</span>' : ''}
+                                ${m.location ? '<span><i class="fa-solid fa-location-dot mr-1"></i>' + m.location + '</span>' : ''}
+                                ${teamName ? '<span><i class="fa-solid fa-shield mr-1"></i>' + teamName + '</span>' : ''}
+                                ${m.competition ? '<span><i class="fa-solid fa-trophy mr-1 text-amber-400/50"></i>' + m.competition + '</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        ${score ? '<span class="font-mono font-extrabold text-lg tracking-wider">' + score + '</span>' : ''}
+                        <button onclick='openEditMatch(this)' data-id="${m._id}" data-opponent="${(m.opponent||'').replace(/"/g,'&quot;')}" data-date="${m.date ? m.date.substring(0,10) : ''}" data-time="${timeStr}" data-location="${(m.location||'').replace(/"/g,'&quot;')}" data-is_home="${m.is_home?'1':'0'}" data-team_id="${m.team_id||''}" data-status="${m.status||'scheduled'}" data-competition="${(m.competition||'').replace(/"/g,'&quot;')}" data-score_home="${m.score?.home ?? ''}" data-score_away="${m.score?.away ?? ''}"
+                            class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-primary-400 hover:border-primary-500/30 transition-all text-xs">
+                            <i class="fa-solid fa-pen"></i></button>
+                        <form action="/admin/matches/${m._id}/delete" method="POST" onsubmit="return confirm('Supprimer ce match ?')">
+                            <button class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-red-400 hover:border-red-500/30 transition-all text-xs">
+                                <i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            el.innerHTML = html;
+        }
+        function filterMatches(status) {
+            document.querySelectorAll('.match-filter-btn').forEach(b => {
+                const isActive = b.dataset.filter === status;
+                b.className = `match-filter-btn px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all ${isActive ? 'gradient-primary text-white active-filter' : 'glass bg-white/5 border-white/10'}`;
+            });
+            if (status === 'all') renderMatches(allMatches);
+            else renderMatches(allMatches.filter(m => m.status === status));
+        }
+        function openEditMatch(btn) {
+            const d = btn.dataset;
+            const teamsOpts = Object.entries(matchTeamMap).map(([id,name]) => `<option value="${id}" ${id===d.team_id?'selected':''}>${name}</option>`).join('');
+            const html = `<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" id="modal-edit-match" onclick="if(event.target===this){this.remove()}">
+                <div class="glass bg-surface-950/95 w-full max-w-lg rounded-2xl p-8 border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                    <h3 class="text-xl font-bold mb-6">Modifier le Match</h3>
+                    <form action="/admin/matches/${d.id}/edit" method="POST" class="space-y-4">
+                        <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Adversaire</label><input type="text" name="opponent" value="${d.opponent}" required class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Date</label><input type="date" name="date" value="${d.date}" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Heure</label><input type="time" name="time" value="${d.time}" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                        </div>
+                        <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Lieu</label><input type="text" name="location" value="${d.location}" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Équipe</label><select name="team_id" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"><option value="">— Toutes —</option>${teamsOpts}</select></div>
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Dom / Ext</label><select name="is_home" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"><option value="1" ${d.is_home==='1'?'selected':''}>Domicile</option><option value="0" ${d.is_home==='0'?'selected':''}>Extérieur</option></select></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Statut</label><select name="status" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"><option value="scheduled" ${d.status==='scheduled'?'selected':''}>Programmé</option><option value="live" ${d.status==='live'?'selected':''}>En direct</option><option value="completed" ${d.status==='completed'?'selected':''}>Terminé</option><option value="cancelled" ${d.status==='cancelled'?'selected':''}>Annulé</option></select></div>
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Compétition</label><input type="text" name="competition" value="${d.competition}" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Score Domicile</label><input type="number" name="score_home" value="${d.score_home}" min="0" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Score Extérieur</label><input type="number" name="score_away" value="${d.score_away}" min="0" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                        </div>
+                        <div class="flex gap-3 pt-2"><button type="submit" class="flex-1 gradient-primary py-3 rounded-xl font-bold text-sm text-white shadow-lg">Enregistrer</button><button type="button" onclick="document.getElementById('modal-edit-match').remove()" class="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-sm font-bold transition-all hover:bg-white/10">Annuler</button></div>
+                    </form>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', html);
+            document.getElementById('modal-edit-match').classList.remove('hidden');
+        }
+        function downloadMatchTemplate() {
+            const headers = ['Adversaire','Date (JJ/MM/AAAA)','Heure (HH:MM)','Lieu','Domicile/Extérieur','Équipe','Statut (Programmé/Terminé/Annulé)','Score Domicile','Score Extérieur','Compétition'];
+            const example = ['FC Rivaux','15/09/2025','15:00','Stade Municipal','Domicile','Seniors A','Programmé','','','Championnat Régional'];
+            let csv = headers.join(';') + '\n' + example.join(';') + '\n';
+            const blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8;'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'template_matchs.csv';
+            a.click();
+        }
+
+        // ===== EVENTS MODULE =====
+        const EVT_TYPE_LABELS = {training:'Entraînement', meeting:'Réunion', stage:'Stage', tournament:'Tournoi interne', ceremony:'Cérémonie', other:'Autre'};
+        const EVT_TYPE_COLORS = {training:'bg-green-500/15 text-green-400', meeting:'bg-blue-500/15 text-blue-400', stage:'bg-amber-500/15 text-amber-400', tournament:'bg-red-500/15 text-red-400', ceremony:'bg-pink-500/15 text-pink-400', other:'bg-white/10 text-white/40'};
+        const EVT_TYPE_ICONS = {training:'fa-dumbbell', meeting:'fa-handshake', stage:'fa-campground', tournament:'fa-trophy', ceremony:'fa-award', other:'fa-circle-info'};
+        let allEvents = [];
+        let eventTeamMap = {};
+
+        function loadEvents() {
+            fetch('{{ url_for("admin.events_api") }}')
+                .then(r => r.json())
+                .then(data => {
+                    allEvents = data.events || [];
+                    (data.teams || []).forEach(t => { eventTeamMap[t._id] = t.name; });
+                    renderEvents(allEvents);
+                })
+                .catch(() => {
+                    document.getElementById('events-list').innerHTML = '<div class="glass p-8 rounded-2xl text-center"><p class="text-white/30 text-sm">Aucun événement trouvé.</p></div>';
+                });
+        }
+        function renderEvents(events) {
+            const el = document.getElementById('events-list');
+            if (!events.length) {
+                el.innerHTML = '<div class="glass p-8 rounded-2xl border-white/5 text-center"><i class="fa-solid fa-clipboard-list text-3xl text-purple-500/20 mb-3"></i><p class="text-white/40 text-sm">Aucun événement. Cliquez sur "Nouvel événement" pour commencer.</p></div>';
+                return;
+            }
+            let html = '<div class="space-y-3">';
+            events.forEach(e => {
+                const typeLbl = EVT_TYPE_LABELS[e.type] || e.type;
+                const typeCls = EVT_TYPE_COLORS[e.type] || EVT_TYPE_COLORS.other;
+                const icon = EVT_TYPE_ICONS[e.type] || EVT_TYPE_ICONS.other;
+                const teamName = e.team_id && eventTeamMap[e.team_id] ? eventTeamMap[e.team_id] : '';
+                const dateStr = e.date ? new Date(e.date).toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'}) : '';
+                const timeStr = e.date ? new Date(e.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
+                html += `<div class="glass p-5 rounded-2xl border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 event-card cursor-pointer" data-type="${e.type || 'other'}" onclick="showEventDetail(${JSON.stringify(e).replace(/"/g, '&quot;')})">
+                    <div class="flex items-center gap-4 flex-1 min-w-0">
+                        <div class="w-11 h-11 rounded-xl ${typeCls} flex items-center justify-center shrink-0">
+                            <i class="fa-solid ${icon} text-sm"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-bold text-sm truncate">${e.title || '—'}</span>
+                                <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase ${typeCls}">${typeLbl}</span>
+                            </div>
+                            <div class="flex flex-wrap gap-3 text-[11px] text-white/40">
+                                ${dateStr ? '<span><i class="fa-solid fa-calendar mr-1"></i>' + dateStr + '</span>' : ''}
+                                ${timeStr ? '<span><i class="fa-solid fa-clock mr-1"></i>' + timeStr + '</span>' : ''}
+                                ${e.location ? '<span><i class="fa-solid fa-location-dot mr-1"></i>' + e.location + '</span>' : ''}
+                                ${teamName ? '<span><i class="fa-solid fa-shield mr-1"></i>' + teamName + '</span>' : ''}
+                                ${e.category ? '<span><i class="fa-solid fa-tag mr-1"></i>' + e.category + '</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2" onclick="event.stopPropagation()">
+                        <button onclick="openEditEvent(this)" data-id="${e._id}" data-title="${(e.title||'').replace(/"/g,'&quot;')}" data-type="${e.type||'training'}" data-date="${e.date ? e.date.substring(0,10) : ''}" data-time="${timeStr}" data-location="${(e.location||'').replace(/"/g,'&quot;')}" data-description="${(e.description||'').replace(/"/g,'&quot;')}" data-category="${e.category||''}" data-team_id="${e.team_id||''}"
+                            class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-primary-400 hover:border-primary-500/30 transition-all text-xs">
+                            <i class="fa-solid fa-pen"></i></button>
+                        <form action="/admin/events/${e._id}/delete" method="POST" onsubmit="return confirm('Supprimer cet événement ?')">
+                            <button class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-red-400 hover:border-red-500/30 transition-all text-xs">
+                                <i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            el.innerHTML = html;
+        }
+        function filterEvents(type) {
+            document.querySelectorAll('.evt-filter-btn').forEach(b => {
+                const isActive = b.dataset.filter === type;
+                b.className = `evt-filter-btn px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all ${isActive ? 'gradient-primary text-white active-filter' : 'glass bg-white/5 border-white/10'}`;
+            });
+            if (type === 'all') renderEvents(allEvents);
+            else renderEvents(allEvents.filter(e => e.type === type));
+        }
+        function openEditEvent(btn) {
+            const d = btn.dataset;
+            const catOpts = ['','Senior','U20','U19','U18','U17','U16','U15','U14','U13','U12','U11','Féminine','Vétérans'].map(c => `<option value="${c}" ${c===d.category?'selected':''}>${c||'— Aucune —'}</option>`).join('');
+            const teamsOpts = Object.entries(eventTeamMap).map(([id,name]) => `<option value="${id}" ${id===d.team_id?'selected':''}>${name}</option>`).join('');
+            const html = `<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" id="modal-edit-event" onclick="if(event.target===this){this.remove()}">
+                <div class="glass bg-surface-950/95 w-full max-w-lg rounded-2xl p-8 border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                    <h3 class="text-xl font-bold mb-6">Modifier l'Événement</h3>
+                    <form action="/admin/events/${d.id}/edit" method="POST" class="space-y-4">
+                        <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Titre</label><input type="text" name="title" value="${d.title}" required class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Type</label><select name="type" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"><option value="training" ${d.type==='training'?'selected':''}>Entraînement</option><option value="meeting" ${d.type==='meeting'?'selected':''}>Réunion</option><option value="stage" ${d.type==='stage'?'selected':''}>Stage</option><option value="tournament" ${d.type==='tournament'?'selected':''}>Tournoi interne</option><option value="ceremony" ${d.type==='ceremony'?'selected':''}>Cérémonie</option><option value="other" ${d.type==='other'?'selected':''}>Autre</option></select></div>
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Catégorie</label><select name="category" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">${catOpts}</select></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Date</label><input type="date" name="date" value="${d.date}" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                            <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Heure</label><input type="time" name="time" value="${d.time}" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                        </div>
+                        <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Lieu</label><input type="text" name="location" value="${d.location}" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"></div>
+                        <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Équipe</label><select name="team_id" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none"><option value="">— Toutes —</option>${teamsOpts}</select></div>
+                        <div><label class="block text-[11px] font-bold uppercase tracking-wider text-white/40 mb-1.5">Description</label><textarea name="description" rows="2" class="w-full glass bg-white/5 border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none resize-none">${d.description}</textarea></div>
+                        <div class="flex gap-3 pt-2"><button type="submit" class="flex-1 gradient-primary py-3 rounded-xl font-bold text-sm text-white shadow-lg">Enregistrer</button><button type="button" onclick="document.getElementById('modal-edit-event').remove()" class="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-sm font-bold transition-all hover:bg-white/10">Annuler</button></div>
+                    </form>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', html);
+            document.getElementById('modal-edit-event').classList.remove('hidden');
+        }
+
+        // ===== CALENDAR MODULE =====
+        let calendarItems = [];
+        let calCurrentMonth = new Date().getMonth();
+        let calCurrentYear = new Date().getFullYear();
+        let calCurrentView = 'calendar';
+        const MONTH_NAMES = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+        const CAL_TYPE_COLORS = {match:'bg-blue-500', competition:'bg-amber-500', event:'bg-purple-500'};
+        const CAL_TYPE_ICONS = {match:'fa-futbol', competition:'fa-trophy', event:'fa-clipboard-list'};
+        const CAL_TYPE_LABELS = {match:'Match', competition:'Compétition', event:'Événement'};
+
+        function loadCalendar() {
+            fetch('{{ url_for("admin.calendar_data") }}')
+                .then(r => r.json())
+                .then(data => {
+                    calendarItems = data || [];
+                    renderCalendar();
+                })
+                .catch(() => {
+                    document.getElementById('calendar-grid').innerHTML = '<div class="col-span-7 glass p-8 rounded-2xl text-center"><p class="text-white/30 text-sm">Erreur de chargement.</p></div>';
+                });
+        }
+        function setCalendarView(view) {
+            calCurrentView = view;
+            document.getElementById('btn-view-calendar').className = `cal-view-btn ${view==='calendar' ? 'gradient-primary px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg' : 'glass bg-white/5 hover:bg-white/10 border-white/10 px-5 py-2.5 rounded-xl text-sm font-bold'} flex items-center gap-2`;
+            document.getElementById('btn-view-list').className = `cal-view-btn ${view==='list' ? 'gradient-primary px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg' : 'glass bg-white/5 hover:bg-white/10 border-white/10 px-5 py-2.5 rounded-xl text-sm font-bold'} flex items-center gap-2`;
+            document.getElementById('calendar-view').classList.toggle('hidden', view !== 'calendar');
+            document.getElementById('calendar-list-view').classList.toggle('hidden', view !== 'list');
+            if (view === 'list') renderCalendarList();
+            else renderCalendar();
+        }
+        function changeMonth(delta) {
+            calCurrentMonth += delta;
+            if (calCurrentMonth > 11) { calCurrentMonth = 0; calCurrentYear++; }
+            if (calCurrentMonth < 0) { calCurrentMonth = 11; calCurrentYear--; }
+            renderCalendar();
+        }
+        function renderCalendar() {
+            document.getElementById('calendar-month-title').textContent = MONTH_NAMES[calCurrentMonth] + ' ' + calCurrentYear;
+            const grid = document.getElementById('calendar-grid');
+            const firstDay = new Date(calCurrentYear, calCurrentMonth, 1);
+            const lastDay = new Date(calCurrentYear, calCurrentMonth + 1, 0);
+            const startWeekday = (firstDay.getDay() + 6) % 7; // Monday = 0
+            const totalDays = lastDay.getDate();
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+            let html = '';
+            // Empty cells before first day
+            for (let i = 0; i < startWeekday; i++) {
+                html += '<div class="min-h-[90px] rounded-xl bg-white/[0.01] border border-white/[0.03] p-1.5"></div>';
+            }
+            for (let day = 1; day <= totalDays; day++) {
+                const dateStr = `${calCurrentYear}-${String(calCurrentMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const isToday = dateStr === todayStr;
+                const dayItems = calendarItems.filter(it => it.date && it.date.substring(0,10) === dateStr);
+                const todayCls = isToday ? 'ring-2 ring-primary-500/40 bg-primary-500/5' : 'bg-white/[0.02]';
+                html += `<div class="min-h-[90px] rounded-xl ${todayCls} border border-white/[0.05] p-1.5 hover:border-white/10 transition-colors">`;
+                html += `<div class="text-[11px] font-bold ${isToday ? 'text-primary-400' : 'text-white/30'} mb-1">${day}</div>`;
+                dayItems.slice(0, 3).forEach(it => {
+                    const color = CAL_TYPE_COLORS[it.type] || 'bg-white/30';
+                    const safeItem = JSON.stringify(it).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    html += `<div onclick="showCalendarEventDetail(this)" data-item="${safeItem}" class="flex items-center gap-1 px-1.5 py-0.5 rounded-md ${color}/15 mb-0.5 cursor-pointer hover:${color}/25 transition-colors group">
+                        <span class="w-1.5 h-1.5 rounded-full ${color} shrink-0"></span>
+                        <span class="text-[9px] font-semibold truncate">${it.title}</span>
+                    </div>`;
+                });
+                if (dayItems.length > 3) {
+                    html += `<div class="text-[9px] text-white/30 pl-1">+${dayItems.length - 3} autres</div>`;
+                }
+                html += '</div>';
+            }
+            grid.innerHTML = html;
+        }
+        function renderCalendarList() {
+            const el = document.getElementById('calendar-list-content');
+            // Group and sort all items by date
+            const sorted = [...calendarItems].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+            if (!sorted.length) {
+                el.innerHTML = '<div class="glass p-8 rounded-2xl text-center"><p class="text-white/30 text-sm">Aucun événement dans le calendrier.</p></div>';
+                return;
+            }
+            let html = '<div class="space-y-2">';
+            let lastDate = '';
+            sorted.forEach(it => {
+                const d = it.date ? it.date.substring(0,10) : '';
+                if (d !== lastDate) {
+                    lastDate = d;
+                    const dateObj = new Date(d);
+                    html += `<div class="text-[11px] font-bold uppercase tracking-wider text-white/20 mt-4 mb-2">${dateObj.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}</div>`;
+                }
+                const color = CAL_TYPE_COLORS[it.type] || 'bg-white/30';
+                const icon = CAL_TYPE_ICONS[it.type] || 'fa-circle';
+                const lbl = CAL_TYPE_LABELS[it.type] || '';
+                const timeStr = it.date && it.date.length > 10 ? new Date(it.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
+                const safeItem = JSON.stringify(it).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                html += `<div onclick="showCalendarEventDetail(this)" data-item="${safeItem}" class="glass p-4 rounded-xl border-white/5 flex items-center gap-4 cursor-pointer hover:bg-white/[0.04] transition-all">
+                    <div class="w-10 h-10 rounded-xl ${color}/15 flex items-center justify-center shrink-0"><i class="fa-solid ${icon} text-sm ${color.replace('bg-','text-').replace('/15','')}/80"></i></div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2"><span class="font-bold text-sm truncate">${it.title}</span><span class="text-[9px] px-1.5 py-0.5 rounded ${color}/15 font-bold uppercase">${lbl}</span></div>
+                        <div class="flex flex-wrap gap-3 text-[11px] text-white/40">
+                            ${timeStr ? '<span><i class="fa-solid fa-clock mr-1"></i>' + timeStr + '</span>' : ''}
+                            ${it.location ? '<span><i class="fa-solid fa-location-dot mr-1"></i>' + it.location + '</span>' : ''}
+                            ${it.category ? '<span><i class="fa-solid fa-tag mr-1"></i>' + it.category + '</span>' : ''}
+                        </div>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            el.innerHTML = html;
+        }
+
+        // ===== EVENT DETAIL POPUP =====
+        function showCalendarEventDetail(el) {
+            const item = JSON.parse(el.dataset.item.replace(/&quot;/g, '"'));
+            showEventPopup(item);
+        }
+        function showEventDetail(item) {
+            showEventPopup(item);
+        }
+        function showEventPopup(item) {
+            const modal = document.getElementById('modal-event-detail');
+            const content = document.getElementById('modal-event-detail-content');
+            const color = CAL_TYPE_COLORS[item.type] || 'bg-white/30';
+            const icon = CAL_TYPE_ICONS[item.type] || 'fa-circle';
+            const lbl = CAL_TYPE_LABELS[item.type] || item.type;
+            const dateStr = item.date ? new Date(item.date).toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) : '';
+            const timeStr = item.date && item.date.length > 10 ? new Date(item.date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
+
+            let details = '';
+            if (item.type === 'match') {
+                const homeAway = item.subtype === 'home' ? 'Domicile' : 'Extérieur';
+                const score = item.score && item.status === 'completed' ? `<div class="text-center my-4"><span class="font-mono font-extrabold text-3xl tracking-wider">${item.score.home ?? '-'} — ${item.score.away ?? '-'}</span></div>` : '';
+                details = `
+                    ${score}
+                    <div class="space-y-2 text-sm">
+                        ${item.team ? '<div class="flex items-center gap-2 text-white/50"><i class="fa-solid fa-shield w-5 text-center text-white/30"></i>' + item.team + '</div>' : ''}
+                        <div class="flex items-center gap-2 text-white/50"><i class="fa-solid fa-flag w-5 text-center text-white/30"></i>${homeAway}</div>
+                        ${item.competition ? '<div class="flex items-center gap-2 text-white/50"><i class="fa-solid fa-trophy w-5 text-center text-amber-400/50"></i>' + item.competition + '</div>' : ''}
+                    </div>`;
+            } else if (item.type === 'competition') {
+                const subtypeLabels = {league:'Championnat',cup:'Coupe',tournament:'Tournoi',friendly:'Amical'};
+                details = `<div class="space-y-2 text-sm">
+                    <div class="flex items-center gap-2 text-white/50"><i class="fa-solid fa-tag w-5 text-center text-white/30"></i>${subtypeLabels[item.subtype] || item.subtype}</div>
+                    ${item.end_date ? '<div class="flex items-center gap-2 text-white/50"><i class="fa-solid fa-arrow-right w-5 text-center text-white/30"></i>Fin: ' + new Date(item.end_date).toLocaleDateString('fr-FR') + '</div>' : ''}
+                </div>`;
+            } else {
+                details = `<div class="space-y-2 text-sm">
+                    ${item.description ? '<p class="text-white/50">' + item.description + '</p>' : ''}
+                </div>`;
+            }
+
+            content.innerHTML = `
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-2xl ${color}/15 flex items-center justify-center shrink-0"><i class="fa-solid ${icon} text-xl"></i></div>
+                    <div>
+                        <h3 class="text-xl font-bold">${item.title}</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-lg ${color}/15 font-bold uppercase">${lbl}</span>
+                    </div>
+                </div>
+                <div class="glass bg-white/[0.02] rounded-xl p-4 mb-5 space-y-2 text-sm">
+                    ${dateStr ? '<div class="flex items-center gap-2 text-white/50"><i class="fa-solid fa-calendar w-5 text-center text-white/30"></i>' + dateStr + '</div>' : ''}
+                    ${timeStr ? '<div class="flex items-center gap-2 text-white/50"><i class="fa-solid fa-clock w-5 text-center text-white/30"></i>' + timeStr + '</div>' : ''}
+                    ${item.location ? '<div class="flex items-center gap-2 text-white/50"><i class="fa-solid fa-location-dot w-5 text-center text-white/30"></i>' + item.location + '</div>' : ''}
+                    ${item.category ? '<div class="flex items-center gap-2 text-white/50"><i class="fa-solid fa-users w-5 text-center text-white/30"></i>' + item.category + '</div>' : ''}
+                    ${item.status ? '<div class="flex items-center gap-2 text-white/50"><i class="fa-solid fa-circle-check w-5 text-center text-white/30"></i>' + (MATCH_STATUS_LABELS[item.status] || COMP_STATUS_LABELS[item.status] || item.status) + '</div>' : ''}
+                </div>
+                ${details}
+                <div class="mt-6 text-right">
+                    <button onclick="document.getElementById('modal-event-detail').classList.add('hidden')" class="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-bold hover:bg-white/10 transition-all">Fermer</button>
+                </div>`;
+            modal.classList.remove('hidden');
+        }
+
         // Member filtering
         let currentRoleFilter = 'all';
         function setRoleFilter(role) {
@@ -2142,9 +3069,27 @@
         }
     </script>
     <style>
+        /* Active nav item — light mode */
         .nav-item.active {
-            background-color: rgba(16, 185, 129, 0.1);
-            border-left: 4px solid #10b981;
+            background-color: rgba(14, 165, 233, 0.08);
+        }
+        /* Active nav item — dark mode */
+        .dark .nav-item.active {
+            background-color: rgba(14, 165, 233, 0.12);
+        }
+        /* Active icon colour override */
+        .nav-item.active i {
+            color: #0ea5e9 !important; /* primary-500 */
+        }
+        /* Active span colour */
+        .nav-item.active > span,
+        .nav-item.active span:first-of-type {
+            color: #0369a1; /* blue-700 */
+            font-weight: 600;
+        }
+        .dark .nav-item.active > span,
+        .dark .nav-item.active span:first-of-type {
+            color: #ffffff;
         }
     </style>
     {% endblock %}

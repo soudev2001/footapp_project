@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Notifications - FootLogic Elite{% endblock %}
+
+{% block content %}
+<div class="page-enter max-w-3xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between gap-6 mb-10">
+        <div>
+            <h1 class="text-3xl font-bold flex items-center gap-4 light:text-slate-900">
+                <span class="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary-500/20">
+                    <i class="fa-solid fa-bell text-white text-2xl"></i>
+                </span>
+                Notifications
+            </h1>
+            <p class="text-white/40 light:text-slate-500 mt-2 font-medium tracking-wide">
+                {% if unread_count %}{{ unread_count }} non lue{{ 's' if unread_count > 1 else '' }}{% else %}Tout est à jour{% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="space-y-3">
+        {% for notif in notifications %}
+        <div class="glass p-5 rounded-2xl border-white/5 flex items-start gap-4 transition-all
+            {% if not notif.read %}bg-primary-500/[0.03] border-l-4 border-l-primary-500{% else %}hover:bg-white/[0.02]{% endif %}">
+            <!-- Icon -->
+            <div class="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center mt-0.5
+                {% if notif.type == 'invitation' %}bg-amber-500/10 text-amber-400
+                {% elif notif.type == 'info' %}bg-primary-500/10 text-primary-400
+                {% elif notif.type == 'warning' %}bg-red-500/10 text-red-400
+                {% elif notif.type == 'success' %}bg-green-500/10 text-green-400
+                {% else %}bg-white/5 text-white/40{% endif %}">
+                {% if notif.type == 'invitation' %}
+                <i class="fa-solid fa-envelope text-lg"></i>
+                {% elif notif.type == 'warning' %}
+                <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                {% elif notif.type == 'success' %}
+                <i class="fa-solid fa-circle-check text-lg"></i>
+                {% else %}
+                <i class="fa-solid fa-bell text-lg"></i>
+                {% endif %}
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+                {% if notif.title %}
+                <h3 class="text-sm font-bold text-white light:text-slate-900 mb-1">{{ notif.title }}</h3>
+                {% endif %}
+                <p class="text-xs text-white/40 light:text-slate-500 leading-relaxed">{{ notif.message or '' }}</p>
+                <p class="text-[10px] font-bold text-white/20 light:text-slate-400 uppercase tracking-wider mt-2">
+                    {{ notif.sent_at.strftime('%d/%m/%Y à %H:%M') if notif.sent_at else '' }}
+                </p>
+            </div>
+
+            <!-- Unread dot -->
+            {% if not notif.read %}
+            <span class="shrink-0 w-2.5 h-2.5 rounded-full bg-primary-500 mt-2"></span>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="glass p-16 rounded-3xl border-white/5 text-center">
+            <div class="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <i class="fa-solid fa-bell-slash text-white/20 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold uppercase tracking-wider mb-2 light:text-slate-900">Aucune notification</h3>
+            <p class="text-white/20 light:text-slate-400 text-sm">Vous êtes à jour !</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

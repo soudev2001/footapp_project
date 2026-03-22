@@ -23,7 +23,7 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'FootLogic-secret-key-2026')
     MONGO_URI = os.environ.get('MONGO_URI', 'mongodb+srv://soufiane:gogo@cluster0.05omqhe.mongodb.net/FootClubApp')
     ADMIN_CONFIG = load_admin_config()
-    
+
     # Flask-Mail (Gmail SMTP) Config
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587
@@ -32,7 +32,12 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_USERNAME', 'noreply@footlogic.com')
-    
+
+    # Stripe
+    STRIPE_SECRET_KEY      = os.environ.get('STRIPE_SECRET_KEY', '')
+    STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
+    STRIPE_WEBHOOK_SECRET  = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
+
 class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True
@@ -57,4 +62,3 @@ config = {
     'testing': TestingConfig,
     'default': DevelopmentConfig
 }
-

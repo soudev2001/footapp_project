@@ -7,10 +7,10 @@ def serialize_doc(doc):
     """Convert MongoDB document to JSON-serializable dict recursively"""
     if doc is None:
         return None
-    
+
     if isinstance(doc, list):
         return [serialize_doc(item) for item in doc]
-    
+
     if isinstance(doc, dict):
         new_doc = {}
         for k, v in doc.items():
@@ -21,13 +21,13 @@ def serialize_doc(doc):
             else:
                 new_doc[k] = serialize_doc(v)
         return new_doc
-        
+
     if isinstance(doc, ObjectId):
         return str(doc)
-    
+
     if isinstance(doc, datetime):
         return doc.isoformat()
-        
+
     return doc
 
 def serialize_docs(docs):
@@ -265,6 +265,8 @@ def create_user(email, password_hash, role='player', club_id=None, profile=None,
         'last_reminder_at': kwargs.get('last_reminder_at'),
         'invitation_expires_at': kwargs.get('invitation_expires_at'),
         'import_batch_id': kwargs.get('import_batch_id'),
+        'last_login': kwargs.get('last_login'),
+        'login_count': kwargs.get('login_count', 0),
         'profile': profile or {
             'first_name': '',
             'last_name': '',
@@ -425,7 +427,7 @@ def create_saved_tactic(club_id, team_id, name, formation, starters, substitutes
             oid = safe_objectid(pid)
             if oid:
                 starters_dict[pos] = oid
-    
+
     # substitutes is a list of player_id strings
     substitutes_list = []
     if isinstance(substitutes, list):
@@ -457,4 +459,22 @@ def create_saved_tactic(club_id, team_id, name, formation, starters, substitutes
         'set_pieces': set_pieces_dict,
         'created_at': now,
         'updated_at': now
+    }
+
+
+def create_invoice(club_id, amount_cents, currency='eur', plan_name='', status='pending',
+                   stripe_payment_intent_id=None, stripe_invoice_id=None, period_start=None, period_end=None):
+    """Create a billing invoice document"""
+    return {
+        'club_id': ObjectId(club_id),
+        'amount_cents': int(amount_cents),
+        'currency': currency,
+        'plan_name': plan_name,
+        'status': status,                                  # pending | paid | void | refunded
+        'stripe_payment_intent_id': stripe_payment_intent_id,
+        'stripe_invoice_id': stripe_invoice_id,
+        'period_start': period_start,
+        'period_end': period_end,
+        'created_at': datetime.utcnow(),
+        'paid_at': None,
     }

@@ -1,0 +1,54 @@
+<!-- Dashboard Alerts Component — expects `alerts` list -->
+{% if alerts %}
+<div class="space-y-3 mb-8">
+    <div class="flex items-center justify-between px-2 mb-2">
+        <h2 class="text-xs font-black uppercase tracking-[0.25em] text-white/40 light:text-slate-500 flex items-center gap-2">
+            <i class="fa-solid fa-bell text-primary-400"></i>
+            Alertes &amp; Rappels
+            <span class="ml-1 w-5 h-5 bg-primary-500/20 text-primary-400 rounded-lg flex items-center justify-center text-[10px] font-black">{{ alerts|length }}</span>
+        </h2>
+    </div>
+
+    <div class="grid gap-3">
+        {% for alert in alerts %}
+        <div class="glass p-4 sm:p-5 rounded-2xl border-white/5 flex items-center gap-4 hover:bg-white/[0.03] transition-all group border-l-4
+            {% if alert.color == 'red' %}border-l-red-500{% elif alert.color == 'green' %}border-l-green-500{% elif alert.color == 'amber' %}border-l-amber-500{% else %}border-l-primary-500{% endif %}
+            {% if alert.urgent %}ring-1 ring-inset {% if alert.color == 'red' %}ring-red-500/20{% elif alert.color == 'green' %}ring-green-500/20{% else %}ring-amber-500/20{% endif %}{% endif %}">
+
+            <!-- Icon -->
+            <div class="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center
+                {% if alert.color == 'red' %}bg-red-500/10 text-red-400{% elif alert.color == 'green' %}bg-green-500/10 text-green-400{% elif alert.color == 'amber' %}bg-amber-500/10 text-amber-400{% else %}bg-primary-500/10 text-primary-400{% endif %}
+                group-hover:scale-110 transition-transform">
+                <i class="fa-solid {{ alert.icon }} text-lg"></i>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-0.5">
+                    {% if alert.urgent %}
+                    <span class="relative flex h-2 w-2 shrink-0">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75
+                            {% if alert.color == 'red' %}bg-red-400{% elif alert.color == 'green' %}bg-green-400{% else %}bg-amber-400{% endif %}"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2
+                            {% if alert.color == 'red' %}bg-red-500{% elif alert.color == 'green' %}bg-green-500{% else %}bg-amber-500{% endif %}"></span>
+                    </span>
+                    {% endif %}
+                    <h3 class="text-sm font-bold text-white light:text-slate-900 truncate">{{ alert.title }}</h3>
+                </div>
+                {% if alert.message %}
+                <p class="text-[10px] font-bold text-white/30 light:text-slate-400 uppercase tracking-wider truncate">{{ alert.message }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Date badge -->
+            <div class="shrink-0 text-right hidden sm:block">
+                <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full
+                    {% if alert.color == 'red' %}bg-red-500/10 text-red-400{% elif alert.color == 'green' %}bg-green-500/10 text-green-400{% elif alert.color == 'amber' %}bg-amber-500/10 text-amber-400{% else %}bg-primary-500/10 text-primary-400{% endif %}">
+                    {{ alert.date_label }}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

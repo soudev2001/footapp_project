@@ -8,3 +8,10 @@ pytest>=8.0.0
 pytest-playwright>=0.7.0
 
 Flask-Mail==0.10.0
+
+# Analytics exports
+reportlab>=4.0.0
+openpyxl>=3.1.0
+
+# Payments
+stripe==7.0.0
