@@ -489,13 +489,13 @@
                         <p class="text-[10px] font-bold uppercase tracking-widest">Tactiques</p>
                     </a>
 
-                    <a href="#"
+                    <a href="{{ url_for('messaging.index') }}"
                         class="glass bg-white/[0.02] p-5 rounded-2xl border-white/5 text-center group/btn hover:bg-amber-500/10 transition-all border-b-2 border-b-transparent hover:border-b-amber-500">
                         <div
                             class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mx-auto mb-3 text-amber-400 group-hover/btn:scale-110 transition-transform">
-                            <i class="fa-solid fa-bullhorn text-xl"></i>
+                            <i class="fa-solid fa-comments text-xl"></i>
                         </div>
-                        <p class="text-[10px] font-bold uppercase tracking-widest">Annonces</p>
+                        <p class="text-[10px] font-bold uppercase tracking-widest">Messages</p>
                     </a>
                 </div>
             </div>
@@ -548,11 +548,12 @@
                 <h3 class="text-[10px] font-black uppercase tracking-[0.25em] text-white/30 flex items-center gap-2">
                     INFIRMERIE
                     <span
-                        class="w-5 h-5 bg-red-500/20 text-red-500 rounded-lg flex items-center justify-center text-[10px] font-black">2</span>
+                        class="w-5 h-5 bg-red-500/20 text-red-500 rounded-lg flex items-center justify-center text-[10px] font-black">{{ injured_players|length }}</span>
                 </h3>
             </div>
 
             <div class="space-y-4">
+                {% for p in injured_players[:3] %}
                 <div
                     class="flex items-center gap-4 p-4 rounded-3xl bg-white/[0.02] border border-white/5 hover:bg-red-500/5 transition-all text-left group">
                     <div
@@ -560,13 +561,45 @@
                         <i class="fa-solid fa-kit-medical"></i>
                     </div>
                     <div>
-                        <p class="text-xs font-black uppercase text-white tracking-tight">Nicolas Petit</p>
-                        <p class="text-[9px] font-bold text-white/20 uppercase tracking-widest">Cheville • Retour 15
-                            fév.</p>
+                        <p class="text-xs font-black uppercase text-white tracking-tight">{{ p.name }}</p>
+                        <p class="text-[9px] font-bold text-white/20 uppercase tracking-widest">#{{ p.jersey_number }} • {{ p.position }}</p>
                     </div>
                 </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fa-solid fa-heart-pulse text-green-500/30 text-2xl mb-2"></i>
+                    <p class="text-[9px] font-bold text-white/20 uppercase tracking-wider">Aucun blessé</p>
+                </div>
+                {% endfor %}
             </div>
         </div>
+
+        <!-- Activity Feed -->
+        {% if activity_feed %}
+        <div class="glass p-8 rounded-[2.5rem] border-white/5">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-[10px] font-black uppercase tracking-[0.25em] text-white/30 flex items-center gap-2">
+                    <i class="fa-solid fa-bolt text-primary-400 text-xs"></i> ACTIVITÉ RÉCENTE
+                </h3>
+            </div>
+            <div class="space-y-3">
+                {% for item in activity_feed[:6] %}
+                <a href="{{ item.link }}" class="flex items-center gap-3 p-3 rounded-2xl hover:bg-white/[0.03] transition-all group">
+                    <div class="w-9 h-9 rounded-xl bg-{{ item.color }}-500/10 flex items-center justify-center shrink-0">
+                        <i class="fa-solid {{ item.icon }} text-{{ item.color }}-400 text-xs"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold text-white truncate group-hover:text-primary-400 transition-colors">{{ item.title }}</p>
+                        <p class="text-[9px] text-white/20 font-bold uppercase tracking-wider">{{ item.subtitle }}</p>
+                    </div>
+                    {% if item.date %}
+                    <span class="text-[8px] font-bold text-white/15 uppercase tracking-wider shrink-0">{{ item.date.strftime('%d/%m') if item.date else '' }}</span>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 </div>

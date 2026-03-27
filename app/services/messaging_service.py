@@ -100,3 +100,47 @@ class MessagingService:
             ]
         })
 
+    def get_last_messages_preview(self, user_id, club_id):
+        """Get last message preview for each conversation (DM, team, channel)"""
+        uid = ObjectId(user_id)
+        previews = {}
+
+        # Last DMs received
+        pipeline = [
+            {'$match': {'type': 'direct', '$or': [{'sender_id': uid}, {'receiver_id': uid}]}},
+            {'$sort': {'created_at': -1}},
+            {'$limit': 50}
+        ]
+        for msg in self.collection.aggregate(pipeline):
+            other_id = str(msg['receiver_id']) if msg['sender_id'] == uid else str(msg['sender_id'])
+            key = f"direct_{other_id}"
+            if key not in previews:
+                previews[key] = {
+                    'content': msg['content'][:60],
+                    'time': msg['created_at'],
+                    'is_me': msg['sender_id'] == uid
+                }
+
+        # Last team messages
+        team_msgs = self.collection.find({'type': 'team'}).sort('created_at', -1).limit(20)
+        for msg in team_msgs:
+            key = f"team_{msg['team_id']}"
+            if key not in previews:
+                previews[key] = {
+                    'content': msg['content'][:60],
+                    'time': msg['created_at'],
+                    'is_me': msg['sender_id'] == uid
+                }
+
+        # Last channel messages
+        channel_msgs = self.collection.find({'type': 'channel'}).sort('created_at', -1).limit(20)
+        for msg in channel_msgs:
+            key = f"channel_{msg['channel_id']}"
+            if key not in previews:
+                previews[key] = {
+                    'content': msg['content'][:60],
+                    'time': msg['created_at'],
+                    'is_me': msg['sender_id'] == uid
+                }
+
+        return previews

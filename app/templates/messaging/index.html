@@ -309,14 +309,15 @@
 </div>
 
 <template id="messageTemplate">
-    <div class="message-row flex w-full mb-4">
+    <div class="message-row flex w-full mb-4 items-end gap-2">
+        <div class="msg-avatar w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white/60 shrink-0 hidden"></div>
         <div class="message-content flex flex-col max-w-[75%] md:max-w-[60%]">
             <span class="sender-name text-[9px] text-white/30 ml-3 mb-0.5 font-bold hidden"></span>
             <div
                 class="message-bubble px-4 py-2.5 rounded-[18px] text-sm leading-relaxed shadow-sm break-words relative group">
                 <p class="text-content"></p>
                 <span
-                    class="time-read absolute bottom-0.5 right-3 text-[8px] opacity-0 group-hover:opacity-60 transition-opacity font-medium"></span>
+                    class="time-read text-[8px] opacity-50 font-medium mt-1 block text-right"></span>
             </div>
         </div>
     </div>
@@ -327,6 +328,16 @@
     let pollingInterval = null;
     let selectedChannelMembers = new Set();
     let currentRoleFilter = '';
+
+    function relativeTime(dateStr) {
+        const now = new Date(), d = new Date(dateStr);
+        const diff = Math.floor((now - d) / 1000);
+        if (diff < 60) return "à l'instant";
+        if (diff < 3600) return Math.floor(diff/60) + ' min';
+        if (diff < 86400) return Math.floor(diff/3600) + ' h';
+        if (diff < 604800) return Math.floor(diff/86400) + ' j';
+        return d.toLocaleDateString('fr-FR', {day:'numeric', month:'short'});
+    }
 
     // Auto-resize textarea
     const tx = document.getElementById('messageInput');
@@ -422,22 +433,25 @@
             const sender = clone.querySelector('.sender-name');
             const time = clone.querySelector('.time-read');
 
+            const avatar = clone.querySelector('.msg-avatar');
+
             if (isMe) {
-                row.classList.add('justify-end');
+                row.classList.add('justify-end', 'flex-row-reverse');
                 bubble.classList.add('gradient-primary', 'text-white', 'rounded-tr-sm');
             } else {
                 row.classList.add('justify-start');
                 bubble.classList.add('bg-[#1e293b]', 'text-white/90', 'border', 'border-white/5', 'rounded-tl-sm');
-            }
-
-            if (!isMe && (currentChat.type === 'team' || currentChat.type === 'channel') && msg.sender_id !== lastSenderId) {
-                sender.innerText = msg.sender_name;
-                sender.classList.remove('hidden');
+                if ((currentChat.type === 'team' || currentChat.type === 'channel') && msg.sender_id !== lastSenderId) {
+                    const initials = (msg.sender_name || '?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+                    avatar.textContent = initials;
+                    avatar.classList.remove('hidden');
+                    sender.innerText = msg.sender_name;
+                    sender.classList.remove('hidden');
+                }
             }
             lastSenderId = msg.sender_id;
             content.innerText = msg.content;
-            const d = new Date(msg.created_at);
-            time.innerText = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            time.innerText = relativeTime(msg.created_at);
             container.appendChild(clone);
         });
 

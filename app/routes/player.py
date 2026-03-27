@@ -16,12 +16,13 @@ def home():
     user_id = session.get('user_id')
     club_id = session.get('club_id')
 
-    from app.services import get_player_service, get_event_service, get_post_service, get_notification_service
+    from app.services import get_player_service, get_event_service, get_post_service, get_notification_service, get_match_service
 
     player_service = get_player_service()
     event_service = get_event_service()
     post_service = get_post_service()
     notification_service = get_notification_service()
+    match_service = get_match_service()
 
     # Get player profile
     player = player_service.get_by_user(user_id) if user_id else None
@@ -30,17 +31,30 @@ def home():
     # Get upcoming events (filtered by team)
     upcoming = event_service.get_upcoming(club_id, team_id=team_id, limit=5) if club_id else []
 
+    # Get upcoming matches
+    upcoming_matches = match_service.get_upcoming(club_id, team_id=team_id, limit=3) if club_id else []
+
     # Get recent posts
     posts = post_service.get_by_club(club_id, limit=5) if club_id else []
 
     # Dashboard alerts
     alerts = notification_service.get_dashboard_alerts(club_id, team_id=team_id, user_role='player') if club_id else []
 
+    # Get convocations (notifications of type 'convocation')
+    from bson import ObjectId
+    convocations = []
+    if user_id:
+        convocations = list(notification_service.collection.find(
+            {'user_id': ObjectId(user_id), 'type': 'convocation', 'read': False}
+        ).sort('sent_at', -1).limit(5))
+
     return render_template('player/home.html',
         player=player,
         upcoming_events=upcoming,
+        upcoming_matches=upcoming_matches,
         posts=posts,
-        alerts=alerts
+        alerts=alerts,
+        convocations=convocations
     )
 
 @player_bp.route('/evo-hub')
@@ -108,22 +122,50 @@ def calendar():
     user_id = session.get('user_id')
     club_id = session.get('club_id')
 
-    from app.services import get_event_service, get_player_service
+    from app.services import get_event_service, get_player_service, get_match_service
+    import json
     event_service = get_event_service()
     player_service = get_player_service()
+    match_service = get_match_service()
 
-    # Filter by team if player
     player = player_service.get_by_user(user_id) if user_id else None
     team_id = player.get('team_id') if player else None
 
     events = event_service.get_by_club(club_id) if club_id else []
-    # If it's a player, we might want to highlight or filter?
-    # For now, let's keep all club events but maybe filter in the service?
-    # Actually, the user asked for filtering.
     if team_id:
         events = [e for e in events if not e.get('team_id') or e.get('team_id') == team_id]
 
-    return render_template('player/calendar.html', events=events)
+    matches = match_service.get_by_club(club_id) if club_id else []
+    if team_id:
+        matches = [m for m in matches if not m.get('team_id') or m.get('team_id') == team_id]
+
+    calendar_items = []
+    for m in matches:
+        if m.get('date'):
+            calendar_items.append({
+                'id': str(m['_id']),
+                'type': 'match',
+                'date': m['date'].strftime('%Y-%m-%d'),
+                'title': f"vs {m.get('opponent', 'Adversaire')}",
+                'location': m.get('location', ''),
+                'score_home': m.get('score_home'),
+                'score_away': m.get('score_away'),
+                'link': url_for('player.event_detail', event_id=m['_id'])
+            })
+    for e in events:
+        if e.get('date'):
+            calendar_items.append({
+                'id': str(e['_id']),
+                'type': e.get('event_type', 'other'),
+                'date': e['date'].strftime('%Y-%m-%d'),
+                'title': e.get('title', 'Événement'),
+                'location': e.get('location', ''),
+                'link': url_for('player.event_detail', event_id=e['_id'])
+            })
+
+    calendar_json = json.dumps(calendar_items, default=str)
+
+    return render_template('player/calendar.html', events=events, matches=matches, calendar_json=calendar_json)
 
 @player_bp.route('/team')
 @login_required
@@ -219,6 +261,21 @@ def notifications():
         notifications=notifs,
         unread_count=unread_count
     )
+
+@player_bp.route('/notifications/mark-all-read', methods=['POST'])
+@login_required
+def mark_all_read():
+    """Mark all notifications as read"""
+    user_id = session.get('user_id')
+    from app.services import get_notification_service
+    from bson import ObjectId
+    notification_service = get_notification_service()
+    notification_service.collection.update_many(
+        {'user_id': ObjectId(user_id), 'read': False},
+        {'$set': {'read': True}}
+    )
+    flash('Toutes les notifications ont été marquées comme lues.', 'success')
+    return redirect(url_for('player.notifications'))
 
 # ============================================================
 # CONTRACTS

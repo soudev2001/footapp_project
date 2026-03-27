@@ -316,21 +316,30 @@
                         class="absolute -inset-1.5 bg-gradient-to-tr from-primary-500/20 to-primary-600/30 rounded-xl blur-[8px] opacity-0 group-hover:opacity-100 transition-all duration-700">
                     </div>
                     <div
-                        class="relative h-full w-full bg-slate-900/40 dark:bg-surface-950/40 backdrop-blur-md rounded-xl border border-slate-200/20 dark:border-white/10 flex items-center justify-center p-0 shadow-2xl overflow-hidden group-hover:scale-105 group-hover:rotate-3 transition-all duration-500">
+                        class="relative h-full w-full bg-slate-900/40 dark:bg-surface-950/40 backdrop-blur-md rounded-xl border border-slate-200/20 dark:border-white/10 flex items-center justify-center p-1.5 shadow-2xl overflow-hidden group-hover:scale-105 group-hover:rotate-3 transition-all duration-500">
                         {% if club and club.logo %}
                         <img src="{{ club.logo }}" class="w-full h-full object-contain filter drop-shadow-lg">
                         {% else %}
-                        <img src="{{ url_for('static', filename='img/logo_dark.png') }}"
-                            class="w-full h-full object-contain dark-logo filter drop-shadow-lg">
-                        <img src="{{ url_for('static', filename='img/logo_light.png') }}"
-                            class="w-full h-full object-contain light-logo filter drop-shadow-lg">
+                        <svg viewBox="0 0 40 40" class="w-full h-full drop-shadow-lg" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:var(--color-primary-400)"/>
+                                    <stop offset="100%" style="stop-color:var(--color-primary-600)"/>
+                                </linearGradient>
+                            </defs>
+                            <circle cx="20" cy="20" r="18" fill="url(#logoGrad)" opacity="0.15"/>
+                            <circle cx="20" cy="20" r="12" fill="none" stroke="url(#logoGrad)" stroke-width="2" stroke-dasharray="4 3"/>
+                            <circle cx="20" cy="20" r="5" fill="url(#logoGrad)"/>
+                            <path d="M20 2 L22 8 L20 6 L18 8 Z" fill="url(#logoGrad)" opacity="0.6"/>
+                            <path d="M20 38 L22 32 L20 34 L18 32 Z" fill="url(#logoGrad)" opacity="0.6"/>
+                        </svg>
                         {% endif %}
                     </div>
                 </div>
                 <div class="flex flex-col">
                     <h1 class="text-xl font-black uppercase tracking-tighter leading-none text-slate-900 dark:text-white"
                         style="font-family: 'Outfit', sans-serif;">
-                        Foot<span class="text-primary-500">Logic</span>
+                        Foot<span class="text-primary-500">App</span>
                     </h1>
                     <span
                         class="text-[8px] font-black uppercase tracking-[0.4em] text-slate-500 dark:text-white/30 mt-1 transition-colors group-hover:text-primary-500">
@@ -343,10 +352,13 @@
             <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-2">
                 {% for item in nav_items %}
                 <a href="{{ item.url }}"
-                    class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-[11px] font-semibold uppercase tracking-wider text-slate-600 dark:text-white/45 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/5 dark:hover:bg-white/5 transition-all duration-200 group whitespace-nowrap">
+                    class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-[11px] font-semibold uppercase tracking-wider text-slate-600 dark:text-white/45 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/5 dark:hover:bg-white/5 transition-all duration-200 group whitespace-nowrap relative">
                     <i
                         class="fa-solid {{ item.icon }} text-primary-500 opacity-50 group-hover:opacity-100 transition-all"></i>
                     {{ item.name }}
+                    {% if 'message' in item.url|lower and unread_messages_count %}
+                    <span class="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center bg-red-500 text-white text-[9px] font-bold rounded-full px-1 shadow-lg shadow-red-500/30">{{ unread_messages_count }}</span>
+                    {% endif %}
                 </a>
                 {% endfor %}
             </div>

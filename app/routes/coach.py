@@ -42,6 +42,35 @@ def dashboard():
     season_stats = match_service.get_season_stats(club_id, team_id=selected_team_id)
     alerts = notification_service.get_dashboard_alerts(club_id, team_id=selected_team_id, user_role='coach')
 
+    # Build activity feed — combine recent events + matches chronologically
+    activity_feed = []
+    for m in recent_matches[:5]:
+        score = m.get('score', {})
+        activity_feed.append({
+            'type': 'match_result',
+            'icon': 'fa-futbol',
+            'color': 'green' if (score.get('home', 0) > score.get('away', 0) if m.get('is_home') else score.get('away', 0) > score.get('home', 0)) else ('amber' if score.get('home', 0) == score.get('away', 0) else 'red'),
+            'title': f"{score.get('home', 0)} - {score.get('away', 0)} vs {m.get('opponent', 'Adversaire')}",
+            'subtitle': 'Victoire' if (score.get('home', 0) > score.get('away', 0) if m.get('is_home') else score.get('away', 0) > score.get('home', 0)) else ('Match nul' if score.get('home', 0) == score.get('away', 0) else 'Défaite'),
+            'date': m.get('date'),
+            'link': f"/coach/match-center/{m['_id']}"
+        })
+    for e in upcoming_events[:3]:
+        activity_feed.append({
+            'type': 'event',
+            'icon': 'fa-calendar-plus' if e.get('event_type') == 'training' else 'fa-flag',
+            'color': 'primary',
+            'title': e.get('title', 'Événement'),
+            'subtitle': e.get('event_type', 'event').capitalize(),
+            'date': e.get('date'),
+            'link': f"/coach/attendance/{e['_id']}"
+        })
+    activity_feed.sort(key=lambda x: x.get('date') or '', reverse=True)
+    activity_feed = activity_feed[:8]
+
+    # Injured players (status == 'injured')
+    injured_players = [p for p in players if p.get('status') == 'injured']
+
     return render_template('coach/dashboard.html',
         players=players,
         teams=teams,
@@ -50,7 +79,9 @@ def dashboard():
         upcoming_matches=upcoming_matches,
         recent_matches=recent_matches,
         season_stats=season_stats,
-        alerts=alerts
+        alerts=alerts,
+        activity_feed=activity_feed,
+        injured_players=injured_players
     )
 
 @coach_bp.route('/calendar')
@@ -69,6 +100,9 @@ def calendar():
     match_service = get_match_service()
     team_service = get_team_service()
 
+    from app.services import get_event_service
+    event_service = get_event_service()
+
     teams = team_service.get_by_club(club_id)
     selected_team_id = request.args.get('team_id')
     if not selected_team_id and teams:
@@ -77,14 +111,43 @@ def calendar():
     upcoming = match_service.get_upcoming(club_id, team_id=selected_team_id, limit=20)
     completed = match_service.get_completed(club_id, team_id=selected_team_id, limit=20)
     all_matches = upcoming + completed
-    matches_json = json.dumps(serialize_docs(all_matches), default=str)
+
+    # Also load events for unified calendar
+    events = event_service.get_by_club(club_id) or []
+    if selected_team_id:
+        events = [e for e in events if not e.get('team_id') or str(e.get('team_id')) == selected_team_id]
+
+    # Build JSON data for calendar grid view
+    calendar_items = []
+    for m in all_matches:
+        calendar_items.append({
+            '_id': str(m['_id']),
+            'title': f"vs {m.get('opponent', 'Adversaire')}",
+            'date': m.get('date').isoformat() if m.get('date') else None,
+            'type': 'match',
+            'status': m.get('status', 'scheduled'),
+            'score': m.get('score'),
+            'location': m.get('location', ''),
+            'link': f"/coach/match-center/{m['_id']}"
+        })
+    for e in events:
+        calendar_items.append({
+            '_id': str(e['_id']),
+            'title': e.get('title', 'Événement'),
+            'date': e.get('date').isoformat() if e.get('date') else None,
+            'type': e.get('event_type', 'event'),
+            'location': e.get('location', ''),
+            'link': f"/coach/attendance/{e['_id']}"
+        })
+    calendar_json = json.dumps(calendar_items, default=str)
 
     return render_template('coach/calendar.html',
         upcoming_matches=upcoming,
         completed_matches=completed,
+        events=events,
         teams=teams,
         selected_team_id=selected_team_id,
-        matches_json=matches_json
+        calendar_json=calendar_json
     )
 
 @coach_bp.route('/roster')

@@ -6,114 +6,219 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>
-            <h1 class="text-4xl font-bold flex items-center gap-4">
-                <span
-                    class="w-14 h-14 gradient-success rounded-2xl flex items-center justify-center shadow-2xl shadow-green-500/20">
+            <h1 class="text-4xl font-bold flex items-center gap-4 light:text-slate-900">
+                <span class="w-14 h-14 gradient-success rounded-2xl flex items-center justify-center shadow-2xl shadow-green-500/20">
                     <i class="fa-solid fa-calendar-days text-white text-2xl"></i>
                 </span>
                 Calendrier
             </h1>
-            <p class="text-white/40 mt-2 font-medium tracking-wide">Planifiez vos entraînements et ne manquez
-                aucun match.</p>
+            <p class="text-white/40 light:text-slate-500 mt-2 font-medium tracking-wide">Planifiez vos entraînements et ne manquez aucun match.</p>
         </div>
         <div class="flex gap-2 p-1.5 bg-white/5 rounded-2xl border border-white/10">
-            <button
-                class="px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-primary-500 text-primary-foreground shadow-lg">Liste</button>
-            <button
-                class="px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider text-white/40 hover:text-white transition-colors">Mois</button>
+            <button onclick="switchCalView('grid')" id="btnGrid" class="px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider text-white/40 hover:text-white transition-colors">Mois</button>
+            <button onclick="switchCalView('list')" id="btnList" class="px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-primary-500 text-primary-foreground shadow-lg">Liste</button>
         </div>
     </div>
 
-    <!-- Timeline View -->
-    <div class="relative">
-        <!-- Vertical Line -->
-        <div
-            class="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-primary-500 via-white/10 to-transparent hidden md:block">
+    <!-- ===== GRID VIEW ===== -->
+    <div id="calGridView" class="hidden">
+        <div class="glass p-6 rounded-3xl border-white/5 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <button onclick="changeMonth(-1)" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"><i class="fa-solid fa-chevron-left text-white/60 text-xs"></i></button>
+                <h2 id="monthTitle" class="text-lg font-black uppercase tracking-widest light:text-slate-900"></h2>
+                <button onclick="changeMonth(1)" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"><i class="fa-solid fa-chevron-right text-white/60 text-xs"></i></button>
+            </div>
+            <div class="grid grid-cols-7 gap-1 mb-2">
+                <div class="text-center text-[9px] font-bold uppercase tracking-widest text-white/20 py-2">Lun</div>
+                <div class="text-center text-[9px] font-bold uppercase tracking-widest text-white/20 py-2">Mar</div>
+                <div class="text-center text-[9px] font-bold uppercase tracking-widest text-white/20 py-2">Mer</div>
+                <div class="text-center text-[9px] font-bold uppercase tracking-widest text-white/20 py-2">Jeu</div>
+                <div class="text-center text-[9px] font-bold uppercase tracking-widest text-white/20 py-2">Ven</div>
+                <div class="text-center text-[9px] font-bold uppercase tracking-widest text-white/20 py-2">Sam</div>
+                <div class="text-center text-[9px] font-bold uppercase tracking-widest text-white/20 py-2">Dim</div>
+            </div>
+            <div id="calGrid" class="grid grid-cols-7 gap-1"></div>
         </div>
 
-        <div class="space-y-12">
-            {% for event in events %}
-            <div class="relative pl-0 md:pl-20 group">
-                <!-- Timeline Dot -->
-                <div class="absolute left-[31px] top-8 w-px h-full bg-white/5 md:hidden"></div>
-                <div
-                    class="absolute left-[28px] top-6 w-2.5 h-2.5 rounded-full border-2 border-primary-500 bg-surface-950 z-10 hidden md:block group-hover:scale-150 transition-transform">
-                </div>
+        <!-- Event Detail Popup -->
+        <div id="calPopup" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" onclick="closeCalPopup()">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+            <div class="glass relative p-8 rounded-3xl max-w-md w-full border-white/10" onclick="event.stopPropagation()">
+                <button onclick="closeCalPopup()" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center"><i class="fa-solid fa-xmark text-white/40"></i></button>
+                <h3 id="popupTitle" class="text-xl font-bold mb-4 light:text-slate-900"></h3>
+                <div id="popupBody" class="space-y-3 text-sm text-white/60 light:text-slate-600"></div>
+                <a id="popupLink" href="#" class="mt-6 block text-center gradient-primary py-3 rounded-xl text-xs font-bold uppercase tracking-wider">Voir détail</a>
+            </div>
+        </div>
+    </div>
 
-                <div
-                    class="glass p-8 rounded-3xl border-white/5 transition-all group-hover:bg-white/5 group-hover:border-white/10 relative overflow-hidden">
-                    <div class="flex flex-col lg:flex-row gap-8 items-start">
-                        <!-- Date Block -->
-                        <div
-                            class="w-full lg:w-32 flex flex-row lg:flex-col items-center justify-center lg:justify-start gap-4 lg:gap-2">
-                            <span class="text-5xl font-bold text-primary-400 leading-none">{{
-                                event.date.strftime('%d') if event.date else '--' }}</span>
-                            <div class="text-center">
-                                <span class="block text-[10px] font-bold uppercase tracking-[0.3em] text-white/20">{{
-                                    event.date.strftime('%B')|upper if event.date else '' }}</span>
-                                <span
-                                    class="block text-[10px] font-bold uppercase tracking-[0.2em] text-white/10 mt-1">{{
-                                    event.date.strftime('%Y') if event.date else '' }}</span>
-                            </div>
-                        </div>
+    <!-- ===== LIST VIEW ===== -->
+    <div id="calListView">
+        <!-- Upcoming Matches -->
+        {% set upcoming = matches|selectattr('date')|list|sort(attribute='date') %}
+        {% if upcoming %}
+        <div class="mb-10">
+            <h2 class="text-xs font-black uppercase tracking-[0.25em] text-white/40 light:text-slate-500 mb-5 flex items-center gap-3 px-2"><i class="fa-solid fa-futbol text-red-400"></i>Prochains Matchs</h2>
+            <div class="space-y-3">
+                {% for m in upcoming %}
+                {% if not m.score_home and m.score_home != 0 %}
+                <a href="{{ url_for('player.event_detail', event_id=m._id) }}" class="glass p-5 rounded-2xl border-white/5 flex items-center gap-5 hover:bg-white/[0.03] transition-all block">
+                    <div class="shrink-0 text-center w-14">
+                        <span class="block text-2xl font-black text-white leading-none">{{ m.date.strftime('%d') }}</span>
+                        <span class="block text-[8px] font-bold uppercase tracking-widest text-primary-400 mt-0.5">{{ m.date.strftime('%b') }}</span>
+                    </div>
+                    <div class="h-8 w-px bg-white/5"></div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-sm font-bold text-white light:text-slate-900 truncate">vs {{ m.opponent or 'Adversaire' }}</h3>
+                        <p class="text-[9px] text-white/20 font-bold uppercase tracking-wider mt-0.5">{{ '🏠 DOM' if m.is_home else '🚌 EXT' }} {% if m.location %}<i class="fa-solid fa-location-dot text-primary-400 ml-2"></i> {{ m.location }}{% endif %}</p>
+                    </div>
+                    <span class="text-[10px] font-black uppercase text-red-400/60 bg-red-500/10 px-3 py-1 rounded-full shrink-0">{{ m.date.strftime('%H:%M') }}</span>
+                </a>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
 
-                        <!-- Info Block -->
-                        <div class="flex-1">
-                            <div class="flex flex-wrap items-center gap-3 mb-4">
-                                <span
-                                    class="px-3 py-1 rounded-full {% if event.event_type == 'training' %}bg-green-500/10 text-green-400{% elif event.event_type == 'match' %}bg-red-500/10 text-red-400{% else %}bg-primary-500/10 text-primary-400{% endif %} text-[9px] font-bold uppercase tracking-wider border border-current/10">
-                                    {{ event.event_type|upper }}
-                                </span>
-                                <span class="text-white/20 text-xs">•</span>
-                                <span class="text-white/40 text-xs font-bold flex items-center gap-2">
-                                    <i class="fa-solid fa-clock text-[10px]"></i> {{ event.time or '18:00' }}
-                                </span>
+        <!-- Events Timeline -->
+        {% if events %}
+        <div class="mb-10">
+            <h2 class="text-xs font-black uppercase tracking-[0.25em] text-white/40 light:text-slate-500 mb-5 flex items-center gap-3 px-2"><i class="fa-solid fa-calendar-check text-green-400"></i>Événements</h2>
+            <div class="relative">
+                <div class="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-primary-500 via-white/10 to-transparent hidden md:block"></div>
+                <div class="space-y-4">
+                    {% for event in events %}
+                    <div class="relative pl-0 md:pl-20 group">
+                        <div class="absolute left-[28px] top-6 w-2.5 h-2.5 rounded-full border-2 border-primary-500 bg-surface-950 z-10 hidden md:block group-hover:scale-150 transition-transform"></div>
+                        <div class="glass p-6 rounded-2xl border-white/5 transition-all group-hover:bg-white/5 flex flex-col lg:flex-row gap-6 items-start">
+                            <div class="w-full lg:w-24 flex flex-row lg:flex-col items-center gap-3 lg:gap-1">
+                                <span class="text-3xl font-bold text-primary-400 leading-none">{{ event.date.strftime('%d') if event.date else '--' }}</span>
+                                <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-white/20">{{ event.date.strftime('%B')|upper if event.date else '' }}</span>
                             </div>
-                            <h3 class="text-2xl font-bold mb-4">{{ event.title }}</h3>
-                            <p class="text-white/40 text-sm font-medium leading-relaxed max-w-2xl mb-6">
-                                {{ event.description or "Préparation physique et technique pour le prochain match de
-                                championnat." }}
-                            </p>
-                            <div class="flex items-center gap-6 mt-auto">
-                                <div
-                                    class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/20">
-                                    <i class="fa-solid fa-location-dot text-primary-500"></i>
-                                    {{ event.location or 'Terrain Central' }}
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="px-3 py-1 rounded-full {% if event.event_type == 'training' %}bg-green-500/10 text-green-400{% elif event.event_type == 'match' %}bg-red-500/10 text-red-400{% else %}bg-primary-500/10 text-primary-400{% endif %} text-[9px] font-bold uppercase tracking-wider">{{ event.event_type|upper }}</span>
+                                    <span class="text-white/40 text-xs font-bold flex items-center gap-2"><i class="fa-solid fa-clock text-[10px]"></i>{{ event.time or '18:00' }}</span>
                                 </div>
-                                <div
-                                    class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/20">
-                                    <i class="fa-solid fa-users text-primary-500"></i>
-                                    14 CONFIRMÉS
-                                </div>
+                                <h3 class="text-lg font-bold light:text-slate-900 mb-2">{{ event.title }}</h3>
+                                {% if event.location %}
+                                <p class="text-[10px] font-bold uppercase tracking-wider text-white/20"><i class="fa-solid fa-location-dot text-primary-500 mr-1"></i>{{ event.location }}</p>
+                                {% endif %}
                             </div>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="w-full lg:w-48 space-y-3">
-                            <a href="{{ url_for('player.event_detail', event_id=event._id) }}"
-                                class="block w-full text-center gradient-primary py-4 rounded-2xl font-bold text-[10px] uppercase tracking-wider shadow-xl shadow-primary-500/10 hover:scale-[1.02] active:scale-95 transition-all">
-                                DÉTAILS & RÉPONDRE
-                            </a>
-                            <button
-                                class="block w-full bg-white/5 hover:bg-white/10 border border-white/10 py-4 rounded-2xl font-bold text-[10px] uppercase tracking-wider transition-all">
-                                <i class="fa-solid fa-share-nodes mr-2"></i>PARTAGER
-                            </button>
+                            <a href="{{ url_for('player.event_detail', event_id=event._id) }}" class="gradient-primary px-5 py-3 rounded-xl font-bold text-[10px] uppercase tracking-wider hover:scale-[1.02] active:scale-95 transition-all shrink-0">Détails</a>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
-            {% else %}
-            <div class="glass p-20 rounded-3xl border-white/5 text-center">
-                <div class="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <i class="fa-solid fa-calendar-xmark text-white/20 text-3xl"></i>
-                </div>
-                <h3 class="text-xl font-bold uppercase tracking-wider mb-2">Aucun événement</h3>
-                <p class="text-white/20 text-sm">Revenez plus tard pour voir le planning mis à jour.</p>
-            </div>
-            {% endfor %}
         </div>
+        {% endif %}
+
+        <!-- Completed Matches -->
+        {% if upcoming %}
+        <div class="mb-10">
+            <h2 class="text-xs font-black uppercase tracking-[0.25em] text-white/40 light:text-slate-500 mb-5 flex items-center gap-3 px-2"><i class="fa-solid fa-flag-checkered text-white/30"></i>Résultats</h2>
+            <div class="space-y-3">
+                {% for m in upcoming %}
+                {% if m.score_home is not none and m.score_home is defined %}
+                <a href="{{ url_for('player.event_detail', event_id=m._id) }}" class="glass p-4 rounded-2xl border-white/5 flex items-center gap-4 hover:bg-white/[0.03] transition-all block">
+                    <div class="shrink-0 text-center w-12">
+                        <span class="block text-lg font-black text-white/40 leading-none">{{ m.date.strftime('%d') }}</span>
+                        <span class="block text-[8px] font-bold uppercase tracking-widest text-white/20 mt-0.5">{{ m.date.strftime('%b') }}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-sm font-bold text-white/60 light:text-slate-700 truncate">vs {{ m.opponent or 'Adversaire' }}</h3>
+                    </div>
+                    <span class="text-sm font-black text-white/60">{{ m.score_home }} - {{ m.score_away }}</span>
+                    {% if m.score_home > m.score_away %}
+                    <span class="text-[9px] font-black bg-green-500/10 text-green-400 px-2.5 py-1 rounded-full">V</span>
+                    {% elif m.score_home == m.score_away %}
+                    <span class="text-[9px] font-black bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-full">N</span>
+                    {% else %}
+                    <span class="text-[9px] font-black bg-red-500/10 text-red-400 px-2.5 py-1 rounded-full">D</span>
+                    {% endif %}
+                </a>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if not events and not matches %}
+        <div class="glass p-20 rounded-3xl border-white/5 text-center">
+            <div class="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-calendar-xmark text-white/20 text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold uppercase tracking-wider mb-2 light:text-slate-900">Aucun événement</h3>
+            <p class="text-white/20 light:text-slate-400 text-sm">Revenez plus tard pour voir le planning mis à jour.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
+
+<script>
+const calendarData = {{ calendar_json|safe }};
+const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+let curYear = new Date().getFullYear(), curMonth = new Date().getMonth();
+
+function renderCalendar() {
+    const grid = document.getElementById('calGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    document.getElementById('monthTitle').textContent = MONTHS_FR[curMonth] + ' ' + curYear;
+    const first = new Date(curYear, curMonth, 1);
+    let startDay = first.getDay() - 1; if (startDay < 0) startDay = 6;
+    const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
+    const today = new Date();
+
+    for (let i = 0; i < startDay; i++) {
+        grid.innerHTML += '<div class="h-14 rounded-lg"></div>';
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = curYear + '-' + String(curMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+        const dayEvents = calendarData.filter(e => e.date === dateStr);
+        const isToday = today.getFullYear()===curYear && today.getMonth()===curMonth && today.getDate()===d;
+        let cell = '<div class="h-14 rounded-lg p-1 '+(isToday?'bg-primary-500/10 ring-1 ring-primary-500/30':'bg-white/[0.02] hover:bg-white/5')+' transition-colors cursor-default">';
+        cell += '<span class="text-[10px] font-bold '+(isToday?'text-primary-400':'text-white/40 light:text-slate-600')+'">'+d+'</span>';
+        if (dayEvents.length) {
+            cell += '<div class="flex gap-0.5 mt-0.5 flex-wrap">';
+            dayEvents.forEach(ev => {
+                const c = ev.type==='match'?'bg-red-400':ev.type==='training'?'bg-green-400':ev.type==='meeting'?'bg-amber-400':'bg-primary-400';
+                cell += '<button onclick="showCalPopup(event,\''+ev.id+'\')" class="w-1.5 h-1.5 rounded-full '+c+' hover:scale-150 transition-transform" title="'+ev.title+'"></button>';
+            });
+            cell += '</div>';
+        }
+        cell += '</div>';
+        grid.innerHTML += cell;
+    }
+}
+
+function changeMonth(d) { curMonth += d; if (curMonth > 11) { curMonth = 0; curYear++; } if (curMonth < 0) { curMonth = 11; curYear--; } renderCalendar(); }
+
+function switchCalView(v) {
+    document.getElementById('calGridView').classList.toggle('hidden', v !== 'grid');
+    document.getElementById('calListView').classList.toggle('hidden', v !== 'list');
+    document.getElementById('btnGrid').className = 'px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider ' + (v==='grid'?'bg-primary-500 text-primary-foreground shadow-lg':'text-white/40 hover:text-white transition-colors');
+    document.getElementById('btnList').className = 'px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider ' + (v==='list'?'bg-primary-500 text-primary-foreground shadow-lg':'text-white/40 hover:text-white transition-colors');
+    if (v === 'grid') renderCalendar();
+}
+
+function showCalPopup(evt, id) {
+    evt.stopPropagation();
+    const item = calendarData.find(e => e.id === id);
+    if (!item) return;
+    document.getElementById('popupTitle').textContent = item.title;
+    let body = '<p><i class="fa-solid fa-tag mr-2 text-primary-400"></i><span class="uppercase text-[10px] font-bold tracking-wider">' + item.type + '</span></p>';
+    body += '<p><i class="fa-solid fa-calendar mr-2 text-primary-400"></i>' + item.date + '</p>';
+    if (item.location) body += '<p><i class="fa-solid fa-location-dot mr-2 text-primary-400"></i>' + item.location + '</p>';
+    if (item.score_home != null) body += '<p><i class="fa-solid fa-futbol mr-2 text-primary-400"></i>' + item.score_home + ' - ' + item.score_away + '</p>';
+    document.getElementById('popupBody').innerHTML = body;
+    document.getElementById('popupLink').href = item.link || '#';
+    document.getElementById('calPopup').classList.remove('hidden');
+}
+
+function closeCalPopup() { document.getElementById('calPopup').classList.add('hidden'); }
+
+renderCalendar();
+</script>
 {% endblock %}
-
-
