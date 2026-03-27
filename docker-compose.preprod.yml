@@ -9,37 +9,45 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-FootClubApp_PreProd}
     volumes:
       - mongodb_data_preprod:/data/db
-    ports:
-      - "27018:27017" # Different external port for MongoDB if needed
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   web_preprod:
     build: .
     container_name: footapp_web_preprod
     restart: always
     depends_on:
-      - mongodb_preprod
-    ports:
-      - "5001:5000"
-    env_file:
-      - .env.preprod
+      mongodb_preprod:
+        condition: service_healthy
     environment:
-      - SECRET_KEY=${SECRET_KEY}
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-preprod}
       - MONGO_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-secret}@mongodb_preprod:27017/${MONGO_DATABASE:-FootClubApp_PreProd}?authSource=admin
       - FLASK_ENV=development
-      - MAIL_USERNAME=${MAIL_USERNAME}
-      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_USERNAME=${MAIL_USERNAME:-}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-}
     networks:
       - default
       - root_default
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.footapp-preprod.rule=Host(`preprod.takurte.fr`)"
-      - "traefik.http.routers.footapp-preprod.entrypoints=web"
+      - "traefik.http.routers.footapp-preprod.entrypoints=websecure"
+      - "traefik.http.routers.footapp-preprod.tls=true"
+      - "traefik.http.routers.footapp-preprod.tls.certresolver=mytlschallenge"
       - "traefik.http.services.footapp-preprod.loadbalancer.server.port=5000"
 
 volumes:
   mongodb_data_preprod:
-
 
 networks:
   root_default:

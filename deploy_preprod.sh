@@ -3,20 +3,32 @@
 
 echo "Connecting to Server to Deploy Pre-Prod..."
 ssh root@82.112.255.193 << 'EOF'
-  echo "Pulling latest code for preprod (from main branch)..."
+  set -e
   cd /root/footapp_project || { echo "Failed to enter /root/footapp_project"; exit 1; }
-  
-  # Stash any local changes on the server to avoid merge conflicts during pull
+
+  echo "=== Pulling latest code (main branch) ==="
   git stash
-  
-  # Ensure we are on main and pulling the latest
   git fetch origin
   git checkout main
   git pull origin main
-  
-  echo "Restarting Docker containers for preprod..."
-  docker-compose -f docker-compose.preprod.yml down
-  docker-compose -f docker-compose.preprod.yml up -d --build
-  
-  echo "Pre-prod deployment completed!"
+
+  echo "=== Ensuring Docker network exists ==="
+  docker network inspect root_default >/dev/null 2>&1 || docker network create root_default
+
+  echo "=== Ensuring acme.json exists ==="
+  mkdir -p traefik_data
+  [ -f traefik_data/acme.json ] || { touch traefik_data/acme.json && chmod 600 traefik_data/acme.json; }
+
+  echo "=== Starting Traefik (if not running) ==="
+  docker compose -f docker-compose.traefik.yml up -d
+
+  echo "=== Rebuilding & starting PreProd containers ==="
+  docker compose -f docker-compose.preprod.yml down
+  docker compose -f docker-compose.preprod.yml up -d --build
+
+  echo "=== Waiting for health checks ==="
+  sleep 10
+  docker ps --format "table {{.Names}}\t{{.Status}}" | grep footapp
+
+  echo "=== PreProd deployment completed! ==="
 EOF
