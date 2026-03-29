@@ -1,6 +1,7 @@
 # FootLogic V2 - App Factory
 
 from flask import Flask, session, render_template
+from flask_cors import CORS
 
 def create_app(config_name='default'):
     """Create and configure the Flask application"""
@@ -13,6 +14,9 @@ def create_app(config_name='default'):
     # Initialize Extensions (MongoDB & Mail)
     from app.services.db import init_db
     init_db(app)
+
+    # CORS for mobile API
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     try:
         from flask_mail import Mail
