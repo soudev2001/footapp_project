@@ -49,6 +49,21 @@ export async function getTactics(teamId?: string) {
   return data.data;
 }
 
+export async function saveTactic(tacticData: {
+  name: string; formation: string; passing_style?: string; pressing?: string;
+  defensive_block?: string; tempo?: string; width?: string; description?: string;
+  marking?: string; play_space?: string; gk_distribution?: string; counter_pressing?: boolean;
+  captains?: string[]; set_pieces?: Record<string, string[]>;
+}) {
+  const { data } = await api.post('/coach/tactics', tacticData);
+  return data;
+}
+
+export async function deleteTactic(tacticId: string) {
+  const { data } = await api.delete(`/coach/tactics/${tacticId}`);
+  return data;
+}
+
 // ===== Player CRUD =====
 
 export async function addPlayer(playerData: {
@@ -81,6 +96,11 @@ export async function addPlayerEvaluation(playerId: string, comment: string, rat
 
 export async function addPlayerPhysical(playerId: string, record: { weight?: number; height?: number; vma?: number }) {
   const { data } = await api.post(`/coach/players/${playerId}/physical`, record);
+  return data;
+}
+
+export async function generateParentCode(playerId: string) {
+  const { data } = await api.post(`/coach/players/${playerId}/parent-code`);
   return data;
 }
 
@@ -127,7 +147,7 @@ export async function updateMatchScore(matchId: string, home: number, away: numb
 }
 
 export async function addMatchEvent(matchId: string, event: {
-  type: string; player_id?: string; minute?: number; detail?: string;
+  type: string; player_id?: string; player_name?: string; minute?: number; detail?: string;
 }) {
   const { data } = await api.post(`/coach/matches/${matchId}/event`, event);
   return data;

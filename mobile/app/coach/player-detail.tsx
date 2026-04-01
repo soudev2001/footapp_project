@@ -5,9 +5,35 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Colors, Spacing, FontSizes, BorderRadius } from '../../constants/theme';
 import { getPlayer } from '../../services/player';
-import { updatePlayerRatings, addPlayerEvaluation, deletePlayer } from '../../services/coach';
+import { updatePlayerRatings, addPlayerEvaluation, deletePlayer, generateParentCode } from '../../services/coach';
 import { Ionicons } from '@expo/vector-icons';
 import { Alert, TextInput } from 'react-native';
+
+const RATING_LABELS: Record<string, string> = {
+  VIT: 'Vitesse',
+  TIR: 'Tir',
+  PAS: 'Passes',
+  DRI: 'Dribble',
+  DEF: 'Défense',
+  PHY: 'Physique',
+};
+
+function ratingColor(val: number) {
+  if (val >= 80) return Colors.success;
+  if (val >= 60) return '#FFC107';
+  if (val >= 40) return Colors.secondary;
+  return Colors.error;
+}
+
+function posColor(pos: string) {
+  switch (pos) {
+    case 'GK': return '#F57C00';
+    case 'DEF': case 'LB': case 'CB': case 'RB': return '#1565C0';
+    case 'MID': case 'CM': case 'CDM': case 'CAM': return '#2E7D32';
+    case 'ATT': case 'ST': case 'FW': case 'LW': case 'RW': return '#C62828';
+    default: return Colors.textSecondary;
+  }
+}
 
 export default function PlayerDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -48,26 +74,32 @@ export default function PlayerDetailScreen() {
   if (loading) return <View style={styles.centered}><ActivityIndicator size="large" color={Colors.primary} /></View>;
   if (!player) return <View style={styles.centered}><Text>Joueur introuvable</Text></View>;
 
-  const posColor = (pos: string) => pos === 'GK' ? '#FF9800' : pos === 'DEF' ? '#2196F3' : pos === 'MID' ? '#4CAF50' : '#F44336';
+  const pc = posColor(player.position);
   const ratings = player.technical_ratings || {};
   const ratingKeys = ['VIT', 'TIR', 'PAS', 'DRI', 'DEF', 'PHY'];
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.jerseyCircle}>
+      <View style={[styles.header, { borderBottomColor: pc }]}>
+        <View style={[styles.jerseyCircle, { borderColor: pc }]}>
           <Text style={styles.jerseyNum}>{player.jersey_number || '-'}</Text>
         </View>
-        <Text style={styles.name}>{player.first_name || ''} {player.last_name || ''}</Text>
-        <View style={[styles.posBadge, { backgroundColor: posColor(player.position) }]}>
+        <Text style={styles.name}>{player.first_name || player.profile?.first_name || ''} {player.last_name || player.profile?.last_name || ''}</Text>
+        <View style={[styles.posBadge, { backgroundColor: pc }]}>
           <Text style={styles.posText}>{player.position || '?'}</Text>
         </View>
         {player.status && player.status !== 'active' && (
           <View style={styles.statusBadge}>
             <Ionicons name="medkit" size={14} color={Colors.error} />
-            <Text style={styles.statusText}>{player.status}</Text>
+            <Text style={styles.statusText}>{player.status === 'injured' ? 'Blessé' : player.status === 'suspended' ? 'Suspendu' : player.status}</Text>
           </View>
         )}
+        {/* Profile info */}
+        <View style={styles.profileRow}>
+          {player.profile?.age && <Text style={styles.profileItem}>Âge: {player.profile.age}</Text>}
+          {player.profile?.nationality && <Text style={styles.profileItem}>🌍 {player.profile.nationality}</Text>}
+          {player.profile?.foot && <Text style={styles.profileItem}>Pied: {player.profile.foot === 'right' ? 'D' : player.profile.foot === 'left' ? 'G' : '2'}</Text>}
+        </View>
       </View>
 
       {/* Stats */}
@@ -87,15 +119,18 @@ export default function PlayerDetailScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Notes Techniques</Text>
         <View style={styles.card}>
-          {ratingKeys.map(key => {
+          {ratingKeys.map((key: string) => {
             const val = ratings[key] || ratings[key.toLowerCase()] || 0;
+            const color = ratingColor(val);
             return (
               <View key={key} style={styles.ratingRow}>
                 <Text style={styles.ratingLabel}>{key}</Text>
                 <View style={styles.ratingBar}>
-                  <View style={[styles.ratingFill, { width: `${Math.min(val, 100)}%` }]} />
+                  <View style={[styles.ratingFill, { width: `${Math.min(val, 100)}%`, backgroundColor: color }]} />
                 </View>
-                <Text style={styles.ratingValue}>{val}</Text>
+                <View style={[styles.ratingBadge, { backgroundColor: color + '20' }]}>
+                  <Text style={[styles.ratingValue, { color }]}>{val}</Text>
+                </View>
               </View>
             );
           })}
@@ -142,6 +177,15 @@ export default function PlayerDetailScreen() {
           <Ionicons name="trash" size={20} color={Colors.error} />
           <Text style={styles.deleteBtnText}>Retirer de l'effectif</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.parentCodeBtn} onPress={async () => {
+          try {
+            const code = await generateParentCode(id!);
+            Alert.alert('Code parent', `Code : ${code?.code ?? code}`, [{ text: 'OK' }]);
+          } catch { Alert.alert('Erreur', 'Impossible de générer le code'); }
+        }}>
+          <Ionicons name="key" size={20} color={Colors.accent} />
+          <Text style={styles.parentCodeText}>Générer code parent</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={{ height: Spacing.xl }} />
@@ -161,10 +205,10 @@ function Stat({ label, value, color }: { label: string; value: number; color: st
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { backgroundColor: Colors.primaryDark, alignItems: 'center', padding: Spacing.lg, paddingTop: Spacing.xl },
+  header: { backgroundColor: Colors.primaryDark, alignItems: 'center', padding: Spacing.lg, paddingTop: Spacing.xl, borderBottomWidth: 3 },
   jerseyCircle: {
     width: 72, height: 72, borderRadius: 36, backgroundColor: Colors.white,
-    justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.sm,
+    justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.sm, borderWidth: 3,
   },
   jerseyNum: { fontSize: FontSizes.title, fontWeight: 'bold', color: Colors.primary },
   name: { fontSize: FontSizes.xxl, fontWeight: 'bold', color: Colors.white },
@@ -182,8 +226,11 @@ const styles = StyleSheet.create({
   ratingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.sm },
   ratingLabel: { width: 40, fontSize: FontSizes.sm, fontWeight: '600' },
   ratingBar: { flex: 1, height: 10, backgroundColor: Colors.border, borderRadius: 5, marginHorizontal: Spacing.sm, overflow: 'hidden' },
-  ratingFill: { height: '100%', backgroundColor: Colors.primary, borderRadius: 5 },
-  ratingValue: { width: 30, textAlign: 'right', fontWeight: 'bold', fontSize: FontSizes.sm, color: Colors.primary },
+  ratingFill: { height: '100%', borderRadius: 5 },
+  ratingValue: { fontWeight: 'bold', fontSize: FontSizes.sm },
+  ratingBadge: { width: 36, height: 24, borderRadius: 6, justifyContent: 'center', alignItems: 'center' },
+  profileRow: { flexDirection: 'row', gap: Spacing.md, marginTop: Spacing.sm },
+  profileItem: { fontSize: FontSizes.xs, color: Colors.white + 'CC' },
   evalInput: { borderWidth: 1, borderColor: Colors.border, borderRadius: BorderRadius.md, padding: Spacing.sm, fontSize: FontSizes.md, minHeight: 60 },
   evalRow: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.sm },
   evalRatingInput: { flex: 1, borderWidth: 1, borderColor: Colors.border, borderRadius: BorderRadius.md, padding: Spacing.sm },
@@ -204,4 +251,10 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: Colors.error + '30',
   },
   deleteBtnText: { color: Colors.error, fontSize: FontSizes.lg, fontWeight: '600' },
+  parentCodeBtn: {
+    backgroundColor: Colors.white, borderRadius: BorderRadius.lg, padding: Spacing.md,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm,
+    borderWidth: 1, borderColor: Colors.accent + '30', marginTop: Spacing.sm,
+  },
+  parentCodeText: { color: Colors.accent, fontSize: FontSizes.md, fontWeight: '600' },
 });

@@ -1,0 +1,17 @@
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjljYWY4OWY3ODg1NGQzN2YyMDM3ODZjIiwiZW1haWwiOiJjb2FjaEBmY2VsaXRlLmZyIiwicm9sZSI6ImNvYWNoIiwiY2x1Yl9pZCI6IjY5Y2FmODlkNzg4NTRkMzdmMjAzNzg2NSIsImV4cCI6MTc3NDk5NjAxMywiaWF0IjoxNzc0OTA5NjEzLCJ0eXBlIjoiYWNjZXNzIn0.c8ZNH7_7IlK4i6YbrI7_q68POJNCYbfnDuOwbyzARDk",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjljYWY4OWY3ODg1NGQzN2YyMDM3ODZjIiwiZXhwIjoxNzc3NTAxNjEzLCJpYXQiOjE3NzQ5MDk2MTMsInR5cGUiOiJyZWZyZXNoIn0.9-qZML2-jrICdZ0LGtICF34TgiiLBjIdqXWY_pl_WmI",
+  "success": true,
+  "user": {
+    "club_id": "69caf89d78854d37f2037865",
+    "email": "coach@fcelite.fr",
+    "id": "69caf89f78854d37f203786c",
+    "profile": {
+      "avatar": "https://randomuser.me/api/portraits/men/1.jpg",
+      "first_name": "Michel",
+      "last_name": "Dupont",
+      "phone": "0612345678"
+    },
+    "role": "coach"
+  }
+}

@@ -6,6 +6,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, FontSizes, BorderRadius } from '../../constants/theme';
 import { getCoachDashboard } from '../../services/coach';
+import { getUpcomingMatches } from '../../services/matches';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function CoachDashboardScreen() {
@@ -13,13 +14,18 @@ export default function CoachDashboardScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [dashboard, setDashboard] = useState<any>(null);
+  const [nextMatch, setNextMatch] = useState<any>(null);
 
   useEffect(() => { loadData(); }, []);
 
   async function loadData() {
     try {
-      const data = await getCoachDashboard();
+      const [data, matches] = await Promise.all([
+        getCoachDashboard().catch(() => null),
+        getUpcomingMatches(undefined, 1).catch(() => []),
+      ]);
       setDashboard(data);
+      setNextMatch(data?.next_match ?? matches?.[0] ?? null);
     } catch {} finally {
       setLoading(false);
     }
@@ -44,21 +50,67 @@ export default function CoachDashboardScreen() {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[Colors.primary]} />}
     >
-      <Text style={styles.pageTitle}>Tableau de bord Coach</Text>
+      <View style={styles.header}>
+        <Ionicons name="shield" size={22} color={Colors.primary} />
+        <Text style={styles.pageTitle}>Tableau de bord</Text>
+      </View>
 
       {/* Stats overview */}
       <View style={styles.statsRow}>
         <View style={styles.statCard}>
-          <Ionicons name="people" size={28} color={Colors.primary} />
-          <Text style={styles.statValue}>{dashboard?.total_players || 0}</Text>
+          <Ionicons name="people" size={24} color={Colors.primary} />
+          <Text style={styles.statValue}>{dashboard?.total_players ?? dashboard?.player_count ?? 0}</Text>
           <Text style={styles.statLabel}>Joueurs</Text>
         </View>
         <View style={styles.statCard}>
-          <Ionicons name="medkit" size={28} color={Colors.error} />
-          <Text style={styles.statValue}>{dashboard?.injured_players?.length || 0}</Text>
+          <Ionicons name="medkit" size={24} color={Colors.error} />
+          <Text style={styles.statValue}>{dashboard?.injured_players?.length ?? 0}</Text>
           <Text style={styles.statLabel}>Blessés</Text>
         </View>
+        <View style={styles.statCard}>
+          <Ionicons name="calendar" size={24} color={Colors.warning} />
+          <Text style={styles.statValue}>{dashboard?.upcoming_events ?? 0}</Text>
+          <Text style={styles.statLabel}>Événements</Text>
+        </View>
       </View>
+
+      {/* Next match VS card */}
+      {nextMatch ? (
+        <TouchableOpacity style={styles.vsCard} onPress={() => router.push('/coach/match-center' as any)}>
+          <Text style={styles.vsCardTitle}>
+            <Ionicons name="shield" size={14} color={Colors.primary} /> Prochain match
+          </Text>
+          <View style={styles.vsRow}>
+            <View style={styles.vsTeam}>
+              <View style={[styles.vsCircle, { backgroundColor: Colors.primary + '20' }]}>
+                <Text style={[styles.vsInitial, { color: Colors.primary }]}>D</Text>
+              </View>
+              <Text style={styles.vsTeamName} numberOfLines={1}>{nextMatch.is_home ? 'Domicile' : nextMatch.opponent}</Text>
+            </View>
+            <View style={styles.vsCenter}>
+              <Text style={styles.vsBig}>VS</Text>
+              {nextMatch.date && (
+                <Text style={styles.vsDate}>
+                  {new Date(nextMatch.date).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                </Text>
+              )}
+            </View>
+            <View style={styles.vsTeam}>
+              <View style={[styles.vsCircle, { backgroundColor: Colors.secondary + '20' }]}>
+                <Text style={[styles.vsInitial, { color: Colors.secondary }]}>{(nextMatch.opponent ?? '?')[0]}</Text>
+              </View>
+              <Text style={styles.vsTeamName} numberOfLines={1}>{nextMatch.is_home ? nextMatch.opponent : 'Domicile'}</Text>
+            </View>
+          </View>
+          {nextMatch.location && <Text style={styles.vsLocation}>📍 {nextMatch.location}</Text>}
+          {nextMatch.competition && <View style={styles.vsCompBadge}><Text style={styles.vsCompText}>{nextMatch.competition}</Text></View>}
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.vsCardEmpty}>
+          <Ionicons name="shield-outline" size={32} color={Colors.textLight} />
+          <Text style={styles.vsEmptyText}>Aucun match programmé</Text>
+        </View>
+      )}
 
       {/* Season stats */}
       {dashboard?.season_stats && (
@@ -70,6 +122,22 @@ export default function CoachDashboardScreen() {
             <SeasonStat label="D" value={dashboard.season_stats.losses || 0} color={Colors.error} />
             <SeasonStat label="BP" value={dashboard.season_stats.goals_for || 0} color={Colors.primary} />
             <SeasonStat label="BC" value={dashboard.season_stats.goals_against || 0} color={Colors.textSecondary} />
+          </View>
+        </View>
+      )}
+
+      {/* Recent form */}
+      {dashboard?.recent_performance?.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Forme récente</Text>
+          <View style={styles.formRow}>
+            {dashboard.recent_performance.map((r: string, i: number) => (
+              <View key={i} style={[styles.formBadge, {
+                backgroundColor: r === 'W' ? Colors.success : r === 'D' ? Colors.warning : Colors.error,
+              }]}>
+                <Text style={styles.formText}>{r === 'W' ? 'V' : r === 'D' ? 'N' : 'D'}</Text>
+              </View>
+            ))}
           </View>
         </View>
       )}
@@ -125,7 +193,7 @@ export default function CoachDashboardScreen() {
         </View>
       </View>
 
-      <View style={{ height: Spacing.xl }} />
+      <View style={{ height: 60 }} />
     </ScrollView>
   );
 }
@@ -158,15 +226,39 @@ const seasonStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  pageTitle: { fontSize: FontSizes.title, fontWeight: 'bold', color: Colors.text, padding: Spacing.md },
-  statsRow: { flexDirection: 'row', paddingHorizontal: Spacing.md, gap: Spacing.sm },
+  header: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, paddingHorizontal: Spacing.md, paddingTop: Spacing.md },
+  pageTitle: { fontSize: FontSizes.title, fontWeight: 'bold', color: Colors.text },
+  statsRow: { flexDirection: 'row', paddingHorizontal: Spacing.md, gap: Spacing.sm, marginTop: Spacing.md },
   statCard: {
     flex: 1, backgroundColor: Colors.white, borderRadius: BorderRadius.lg,
     padding: Spacing.md, alignItems: 'center', elevation: 2,
     shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, shadowOffset: { width: 0, height: 2 },
   },
   statValue: { fontSize: FontSizes.xxl, fontWeight: 'bold', color: Colors.text, marginTop: Spacing.xs },
-  statLabel: { fontSize: FontSizes.sm, color: Colors.textSecondary },
+  statLabel: { fontSize: FontSizes.xs, color: Colors.textSecondary },
+
+  // VS card
+  vsCard: { backgroundColor: Colors.white, borderRadius: BorderRadius.lg, padding: Spacing.md, marginHorizontal: Spacing.md, marginTop: Spacing.md, elevation: 2, borderWidth: 1, borderColor: Colors.primary + '20' },
+  vsCardTitle: { fontSize: FontSizes.sm, fontWeight: 'bold', color: Colors.text, marginBottom: Spacing.sm },
+  vsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  vsTeam: { flex: 1, alignItems: 'center', gap: 6 },
+  vsCircle: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
+  vsInitial: { fontSize: 18, fontWeight: 'bold' },
+  vsTeamName: { fontSize: FontSizes.sm, fontWeight: '600', color: Colors.text, textAlign: 'center' },
+  vsCenter: { alignItems: 'center', paddingHorizontal: Spacing.md },
+  vsBig: { fontSize: 22, fontWeight: '900', color: Colors.textSecondary },
+  vsDate: { fontSize: FontSizes.xs, color: Colors.textSecondary, marginTop: 4 },
+  vsLocation: { fontSize: FontSizes.xs, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing.sm },
+  vsCompBadge: { backgroundColor: Colors.primary + '10', borderRadius: BorderRadius.sm, paddingHorizontal: 8, paddingVertical: 2, alignSelf: 'center', marginTop: 6 },
+  vsCompText: { fontSize: FontSizes.xs, color: Colors.primary, fontWeight: '600' },
+  vsCardEmpty: { backgroundColor: Colors.white, borderRadius: BorderRadius.lg, padding: Spacing.lg, marginHorizontal: Spacing.md, marginTop: Spacing.md, alignItems: 'center', gap: Spacing.sm },
+  vsEmptyText: { color: Colors.textSecondary, fontSize: FontSizes.sm },
+
+  // Form badges
+  formRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  formBadge: { width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
+  formText: { color: Colors.white, fontWeight: 'bold', fontSize: FontSizes.sm },
+
   section: { padding: Spacing.md },
   sectionTitle: { fontSize: FontSizes.xl, fontWeight: 'bold', color: Colors.text, marginBottom: Spacing.sm },
   seasonRow: {
