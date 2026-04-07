@@ -919,11 +919,12 @@ def send_convocation():
     event_service = get_event_service()
     event = event_service.get_by_id(event_id)
 
+    event_title = event.get("title", "\u00c9v\u00e9nement") if event else "\u00c9v\u00e9nement"
     for pid in player_ids:
         notification_service.create_notification(
             user_id=pid,
             title='Convocation',
-            message=f'Vous \u00eates convoqu\u00e9 pour: {event.get("title", "\u00c9v\u00e9nement") if event else "\u00c9v\u00e9nement"}',
+            message=f'Vous \u00eates convoqu\u00e9 pour: {event_title}',
             type='convocation',
             link='/player/calendar'
         )
