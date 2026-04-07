@@ -421,12 +421,17 @@ def create_saved_tactic(club_id, team_id, name, formation, starters, substitutes
         except Exception:
             return None
 
-    starters_dict = {}
+    starters_list = []
     if isinstance(starters, dict):
         for pos, pid in starters.items():
             oid = safe_objectid(pid)
             if oid:
-                starters_dict[pos] = oid
+                starters_list.append(oid)
+    elif isinstance(starters, list):
+        for pid in starters:
+            oid = safe_objectid(pid)
+            if oid:
+                starters_list.append(oid)
 
     # substitutes is a list of player_id strings
     substitutes_list = []
@@ -452,7 +457,7 @@ def create_saved_tactic(club_id, team_id, name, formation, starters, substitutes
         'name': name,
         'description': description,
         'formation': formation,
-        'starters': starters_dict,
+        'starters': starters_list,
         'substitutes': substitutes_list,
         'instructions': instructions or {},
         'captains': captains_list,

@@ -1,5 +1,6 @@
 __pycache__/
 *.py[cod]
+*.pyc
 *$py.class
 .env
 .env.prod
@@ -15,3 +16,7 @@ env/
 *.tmp
 *.log
 mongodb_data/
+.vite/
+frontend/node_modules/
+frontend/build/
+frontend/dist/

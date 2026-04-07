@@ -10,7 +10,10 @@ from app.services import (
     get_match_service, get_post_service, get_user_service,
     get_team_service, get_notification_service, get_contract_service,
     get_shop_service, get_project_service, get_parent_link_service,
-    get_subscription_service, get_isy_service
+    get_subscription_service, get_isy_service,
+    get_analytics_service, get_member_onboarding_service, get_billing_service,
+    get_platform_management_service, get_platform_analytics_service,
+    get_parent_monitoring_service, get_fan_engagement_service, get_media_service,
 )
 from app.services.messaging_service import MessagingService
 from app.services.db import mongo
@@ -978,6 +981,154 @@ def get_tactics():
     return jsonify({'success': True, 'data': serialize_docs(tactics)})
 
 
+@api_bp.route('/coach/tactics', methods=['POST'])
+@role_required('coach')
+def save_tactic():
+    """Save a tactic (create or update)."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'Data required'}), 400
+    club_id = request.current_user.get('club_id')
+    player_service = get_player_service()
+    try:
+        preset_id = player_service.save_tactic_preset(
+            club_id=club_id,
+            team_id=data.get('team_id'),
+            name=data.get('name', 'Sans nom'),
+            description=data.get('description', ''),
+            formation=data.get('formation', '4-3-3'),
+            starters=data.get('starters', []),
+            substitutes=data.get('substitutes', []),
+            instructions={
+                'passing_style': data.get('passing_style'),
+                'pressing': data.get('pressing'),
+                'defensive_block': data.get('defensive_block'),
+                'marking': data.get('marking'),
+                'tempo': data.get('tempo'),
+                'width': data.get('width'),
+                'play_space': data.get('play_space'),
+                'gk_distribution': data.get('gk_distribution'),
+                'counter_pressing': data.get('counter_pressing', False),
+            },
+            captains=data.get('captains', []),
+            set_pieces=data.get('set_pieces', {}),
+        )
+        return jsonify({'success': True, 'data': str(preset_id)})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@api_bp.route('/coach/tactics/<tactic_id>', methods=['DELETE'])
+@role_required('coach')
+def delete_tactic(tactic_id):
+    """Delete a tactic."""
+    player_service = get_player_service()
+    player_service.delete_tactic_preset(tactic_id)
+    return jsonify({'success': True, 'message': 'Tactique supprimée'})
+
+
+@api_bp.route('/coach/tactics/presets', methods=['GET'])
+@role_required('coach')
+def get_tactic_presets_api():
+    """Get tactic presets (alias)."""
+    club_id = request.current_user.get('club_id')
+    team_id = request.args.get('team_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': []})
+    player_service = get_player_service()
+    presets = player_service.get_tactic_presets(club_id, team_id)
+    return jsonify({'success': True, 'data': serialize_docs(presets)})
+
+
+@api_bp.route('/coach/tactics/presets', methods=['POST'])
+@role_required('coach')
+def save_tactic_preset_api():
+    """Save a tactic preset."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'Data required'}), 400
+    club_id = request.current_user.get('club_id')
+    player_service = get_player_service()
+    try:
+        preset_id = player_service.save_tactic_preset(
+            club_id=club_id,
+            team_id=data.get('team_id'),
+            name=data.get('name', 'Preset'),
+            description=data.get('description', ''),
+            formation=data.get('formation', '4-3-3'),
+            starters=data.get('starters', []),
+            substitutes=data.get('substitutes', []),
+            instructions=data.get('instructions') or {
+                'passing_style': data.get('passing_style'),
+                'pressing': data.get('pressing'),
+                'defensive_block': data.get('defensive_block'),
+                'marking': data.get('marking'),
+                'tempo': data.get('tempo'),
+                'width': data.get('width'),
+                'play_space': data.get('play_space'),
+                'gk_distribution': data.get('gk_distribution'),
+                'counter_pressing': data.get('counter_pressing', False),
+            },
+            captains=data.get('captains', []),
+            set_pieces=data.get('set_pieces', {}),
+        )
+        return jsonify({'success': True, 'data': str(preset_id)})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@api_bp.route('/coach/tactics/presets/<preset_id>', methods=['DELETE'])
+@role_required('coach')
+def delete_tactic_preset_api(preset_id):
+    """Delete a tactic preset."""
+    player_service = get_player_service()
+    player_service.delete_tactic_preset(preset_id)
+    return jsonify({'success': True, 'message': 'Preset supprimé'})
+
+
+@api_bp.route('/coach/events', methods=['GET'])
+@role_required('coach')
+def coach_get_events():
+    """Get coach events list."""
+    club_id = request.current_user.get('club_id')
+    team_id = request.args.get('team_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': []})
+    event_service = get_event_service()
+    events = event_service.get_upcoming(club_id, team_id=team_id, limit=50)
+    return jsonify({'success': True, 'data': serialize_docs(events)})
+
+
+@api_bp.route('/coach/attendance', methods=['GET'])
+@role_required('coach')
+def coach_get_attendance():
+    """Get attendance data for an event."""
+    event_id = request.args.get('event_id')
+    if not event_id:
+        return jsonify({'success': True, 'data': {}})
+    event_service = get_event_service()
+    attendance = event_service.get_attendance(event_id)
+    return jsonify({'success': True, 'data': attendance})
+
+
+@api_bp.route('/coach/convocation', methods=['GET'])
+@role_required('coach')
+def get_convocation():
+    """Get convocation data (upcoming matches + roster)."""
+    club_id = request.current_user.get('club_id')
+    team_id = request.args.get('team_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': {'matches': [], 'players': []}})
+    match_service = get_match_service()
+    player_service = get_player_service()
+    matches = match_service.get_upcoming(club_id, team_id=team_id, limit=10)
+    players = player_service.get_by_club(club_id, team_id=team_id)
+    return jsonify({'success': True, 'data': {
+        'matches': serialize_docs(matches),
+        'players': serialize_docs(players),
+    }})
+
+
 # ============================================================
 # DATABASE UTILITIES (Development only)
 # ============================================================
@@ -1096,6 +1247,131 @@ def get_player_evolution():
             'stats': player.get('stats', {}),
         }
     })
+
+
+# ============================================================
+# PLAYER: ENHANCED ENDPOINTS
+# ============================================================
+
+@api_bp.route('/player/dashboard/stats', methods=['GET'])
+@token_required
+def player_dashboard_stats():
+    """Get player performance dashboard."""
+    from app.services import get_player_analytics_service
+    player_service = get_player_service()
+    player = player_service.get_by_user(request.current_user['user_id'])
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    svc = get_player_analytics_service()
+    data = svc.get_player_dashboard(str(player['_id']))
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/player/dashboard/rankings', methods=['GET'])
+@token_required
+def player_dashboard_rankings():
+    """Get player position rankings within team."""
+    from app.services import get_player_analytics_service
+    player_service = get_player_service()
+    player = player_service.get_by_user(request.current_user['user_id'])
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    team_id = player.get('team_id')
+    if not team_id:
+        return jsonify({'success': True, 'data': []})
+    svc = get_player_analytics_service()
+    data = svc.get_team_rankings(str(team_id))
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/player/goals', methods=['GET'])
+@token_required
+def player_get_goals():
+    """Get player personal goals."""
+    player_service = get_player_service()
+    player = player_service.get_by_user(request.current_user['user_id'])
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    goals = list(mongo.db.player_goals.find({'player_id': player['_id']}).sort('created_at', -1))
+    return jsonify({'success': True, 'data': serialize_docs(goals)})
+
+
+@api_bp.route('/player/goals', methods=['POST'])
+@token_required
+def player_create_goal():
+    """Create a personal goal."""
+    data = request.get_json()
+    if not data or not data.get('title'):
+        return jsonify({'success': False, 'error': 'Titre requis'}), 400
+    player_service = get_player_service()
+    player = player_service.get_by_user(request.current_user['user_id'])
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    doc = {
+        'player_id': player['_id'],
+        'category': data.get('category', 'technical'),
+        'title': data['title'],
+        'description': data.get('description', ''),
+        'target_value': data.get('target_value', 0),
+        'current_value': data.get('current_value', 0),
+        'target_date': data.get('target_date'),
+        'status': 'active',
+        'created_at': datetime.datetime.utcnow(),
+    }
+    result = mongo.db.player_goals.insert_one(doc)
+    return jsonify({'success': True, 'goal_id': str(result.inserted_id)}), 201
+
+
+@api_bp.route('/player/goals/<goal_id>', methods=['PUT'])
+@token_required
+def player_update_goal(goal_id):
+    """Update a personal goal."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'No data'}), 400
+    updates = {}
+    for field in ['title', 'description', 'target_value', 'current_value', 'target_date', 'status', 'category']:
+        if field in data:
+            updates[field] = data[field]
+    if updates:
+        updates['updated_at'] = datetime.datetime.utcnow()
+        mongo.db.player_goals.update_one({'_id': ObjectId(goal_id)}, {'$set': updates})
+    return jsonify({'success': True, 'message': 'Objectif mis à jour'})
+
+
+@api_bp.route('/player/goals/<goal_id>', methods=['DELETE'])
+@token_required
+def player_delete_goal(goal_id):
+    """Delete a personal goal."""
+    mongo.db.player_goals.delete_one({'_id': ObjectId(goal_id)})
+    return jsonify({'success': True, 'message': 'Objectif supprimé'})
+
+
+@api_bp.route('/player/training/schedule', methods=['GET'])
+@token_required
+def player_training_schedule():
+    """Get player training schedule."""
+    from app.services import get_training_service
+    player_service = get_player_service()
+    player = player_service.get_by_user(request.current_user['user_id'])
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    team_id = player.get('team_id')
+    if not team_id:
+        return jsonify({'success': True, 'data': []})
+    svc = get_training_service()
+    plans = svc.get_plans(str(team_id))
+    return jsonify({'success': True, 'data': plans})
+
+
+@api_bp.route('/player/training/drills', methods=['GET'])
+@token_required
+def player_training_drills():
+    """Get drills available to player."""
+    from app.services import get_training_service
+    svc = get_training_service()
+    drills = svc.get_drills({})
+    return jsonify({'success': True, 'data': drills})
 
 
 # ============================================================
@@ -1543,6 +1819,125 @@ def admin_update_subscription():
 
 
 # ============================================================
+# ADMIN: ENHANCED ONBOARDING
+# ============================================================
+
+@api_bp.route('/admin/onboarding/import', methods=['POST'])
+@role_required('admin')
+def admin_import_csv():
+    """Validate and preview CSV import."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'No club'}), 400
+    file = request.files.get('file')
+    if not file:
+        return jsonify({'success': False, 'error': 'Fichier CSV requis'}), 400
+    svc = get_member_onboarding_service()
+    content = file.read()
+    valid, errors = svc.validate_csv(content, club_id)
+    return jsonify({'success': True, 'data': {'valid': valid, 'errors': errors}})
+
+
+@api_bp.route('/admin/onboarding/import/confirm', methods=['POST'])
+@role_required('admin')
+def admin_confirm_import():
+    """Confirm and execute bulk import."""
+    club_id = request.current_user.get('club_id')
+    data = request.get_json()
+    if not data or not data.get('members'):
+        return jsonify({'success': False, 'error': 'No members'}), 400
+    svc = get_member_onboarding_service()
+    result = svc.bulk_import_members(club_id, data['members'], data.get('custom_message'))
+    return jsonify({'success': True, 'data': result})
+
+
+@api_bp.route('/admin/onboarding/invitations', methods=['GET'])
+@role_required('admin')
+def admin_invitations():
+    """Get invitation dashboard."""
+    club_id = request.current_user.get('club_id')
+    status_filter = request.args.get('status')
+    svc = get_member_onboarding_service()
+    users = svc.get_invitation_dashboard(club_id, status_filter)
+    return jsonify({'success': True, 'data': serialize_docs(users)})
+
+
+@api_bp.route('/admin/onboarding/resend', methods=['POST'])
+@role_required('admin')
+def admin_resend_invitations():
+    """Resend invitations to selected members."""
+    club_id = request.current_user.get('club_id')
+    data = request.get_json()
+    if not data or not data.get('member_ids'):
+        return jsonify({'success': False, 'error': 'member_ids required'}), 400
+    svc = get_member_onboarding_service()
+    count = svc.resend_invitations(club_id, data['member_ids'])
+    return jsonify({'success': True, 'resent_count': count})
+
+
+# ============================================================
+# ADMIN: ENHANCED ANALYTICS
+# ============================================================
+
+@api_bp.route('/admin/analytics/teams', methods=['GET'])
+@role_required('admin')
+def admin_analytics_teams():
+    """Get team performance analytics."""
+    club_id = request.current_user.get('club_id')
+    svc = get_analytics_service()
+    return jsonify({'success': True, 'data': svc.get_team_performance(club_id)})
+
+
+@api_bp.route('/admin/analytics/retention', methods=['GET'])
+@role_required('admin')
+def admin_analytics_retention():
+    """Get member retention metrics."""
+    club_id = request.current_user.get('club_id')
+    svc = get_analytics_service()
+    return jsonify({'success': True, 'data': svc.get_member_retention(club_id)})
+
+
+@api_bp.route('/admin/analytics/engagement', methods=['GET'])
+@role_required('admin')
+def admin_analytics_engagement():
+    """Get feature usage metrics."""
+    club_id = request.current_user.get('club_id')
+    svc = get_analytics_service()
+    return jsonify({'success': True, 'data': svc.get_feature_usage(club_id)})
+
+
+@api_bp.route('/admin/analytics/financial', methods=['GET'])
+@role_required('admin')
+def admin_analytics_financial():
+    """Get financial analytics."""
+    club_id = request.current_user.get('club_id')
+    svc = get_analytics_service()
+    return jsonify({'success': True, 'data': svc.get_financial_metrics(club_id)})
+
+
+# ============================================================
+# ADMIN: BILLING
+# ============================================================
+
+@api_bp.route('/admin/billing/dashboard', methods=['GET'])
+@role_required('admin')
+def admin_billing_dashboard():
+    """Get billing dashboard."""
+    club_id = request.current_user.get('club_id')
+    svc = get_billing_service()
+    return jsonify({'success': True, 'data': svc.get_billing_dashboard(club_id)})
+
+
+@api_bp.route('/admin/billing/invoices', methods=['GET'])
+@role_required('admin')
+def admin_billing_invoices():
+    """Get invoices."""
+    club_id = request.current_user.get('club_id')
+    svc = get_billing_service()
+    return jsonify({'success': True, 'data': svc.get_invoices(club_id)})
+
+
+# ============================================================
 # PARENT ENDPOINTS
 # ============================================================
 
@@ -1643,6 +2038,78 @@ def generate_parent_code(player_id):
     parent_link_service = get_parent_link_service()
     code = parent_link_service.generate_link_code(player_id)
     return jsonify({'success': True, 'code': code})
+
+
+# ============================================================
+# PARENT: ENHANCED ENDPOINTS
+# ============================================================
+
+@api_bp.route('/parent/children/<player_id>/progress', methods=['GET'])
+@role_required('parent')
+def parent_child_progress(player_id):
+    """Get child progress monitoring data."""
+    svc = get_parent_monitoring_service()
+    data = svc.get_child_progress(player_id)
+    if not data:
+        return jsonify({'success': False, 'error': 'Joueur non trouvé'}), 404
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/parent/children/<player_id>/feedback', methods=['GET'])
+@role_required('parent')
+def parent_child_feedback(player_id):
+    """Get coach feedback for child."""
+    svc = get_parent_monitoring_service()
+    data = svc.get_coach_feedback(player_id)
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/parent/children/<player_id>/achievements', methods=['GET'])
+@role_required('parent')
+def parent_child_achievements(player_id):
+    """Get child achievements."""
+    svc = get_parent_monitoring_service()
+    data = svc.get_achievements(player_id)
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/parent/messages/coach/<coach_id>', methods=['GET'])
+@role_required('parent')
+def parent_coach_messages(coach_id):
+    """Get parent-coach message thread."""
+    user_id = request.current_user['user_id']
+    svc = MessagingService(mongo.db)
+    messages = svc.get_direct_messages(user_id, coach_id)
+    return jsonify({'success': True, 'data': serialize_docs(messages)})
+
+
+@api_bp.route('/parent/absence-report', methods=['POST'])
+@role_required('parent')
+def parent_absence_report():
+    """Report child absence."""
+    data = request.get_json()
+    if not data or not data.get('player_id') or not data.get('event_id'):
+        return jsonify({'success': False, 'error': 'player_id et event_id requis'}), 400
+    event_service = get_event_service()
+    event_service.update_attendance(data['event_id'], data['player_id'], 'absent', data.get('reason', ''))
+    return jsonify({'success': True, 'message': 'Absence signalée'})
+
+
+@api_bp.route('/parent/payments', methods=['GET'])
+@role_required('parent')
+def parent_payments():
+    """Get parent payment records."""
+    user_id = request.current_user['user_id']
+    svc = get_billing_service()
+    return jsonify({'success': True, 'data': svc.get_parent_payments(user_id)})
+
+
+@api_bp.route('/parent/payments/categories', methods=['GET'])
+@role_required('parent')
+def parent_payment_categories():
+    """Get payment categories."""
+    svc = get_billing_service()
+    return jsonify({'success': True, 'data': svc.get_payment_categories()})
 
 
 # ============================================================
@@ -1872,6 +2339,352 @@ def coach_add_prospect():
 
 
 # ============================================================
+# COACH TRAINING PLANS ENDPOINTS
+# ============================================================
+
+@api_bp.route('/coach/training-plans', methods=['GET'])
+@role_required('coach')
+def coach_training_plans():
+    """Get training plans for team."""
+    from app.services import get_training_service
+    team_id = request.args.get('team_id') or request.current_user.get('team_id')
+    if not team_id:
+        club_id = request.current_user.get('club_id')
+        team = mongo.db.teams.find_one({'club_id': ObjectId(club_id)}) if club_id else None
+        team_id = str(team['_id']) if team else None
+    if not team_id:
+        return jsonify({'success': True, 'data': []})
+    svc = get_training_service()
+    plans = svc.get_plans(team_id, status=request.args.get('status'))
+    return jsonify({'success': True, 'data': serialize_docs(plans)})
+
+
+@api_bp.route('/coach/training-plans', methods=['POST'])
+@role_required('coach')
+def coach_create_training_plan():
+    """Create a training plan."""
+    from app.services import get_training_service
+    data = request.get_json()
+    if not data or not data.get('name'):
+        return jsonify({'success': False, 'error': 'Name required'}), 400
+    club_id = request.current_user.get('club_id')
+    team_id = data.get('team_id') or request.args.get('team_id')
+    if not team_id:
+        team = mongo.db.teams.find_one({'club_id': ObjectId(club_id)}) if club_id else None
+        team_id = str(team['_id']) if team else None
+    if not team_id:
+        return jsonify({'success': False, 'error': 'Team required'}), 400
+    svc = get_training_service()
+    plan_id = svc.create_plan(club_id, team_id, request.current_user['user_id'], data)
+    return jsonify({'success': True, 'plan_id': plan_id}), 201
+
+
+@api_bp.route('/coach/training-plans/<plan_id>', methods=['GET'])
+@role_required('coach')
+def coach_training_plan_detail(plan_id):
+    """Get a single training plan with its sessions."""
+    from app.services import get_training_service
+    svc = get_training_service()
+    plan = svc.get_plan(plan_id)
+    if not plan:
+        return jsonify({'success': False, 'error': 'Plan not found'}), 404
+    sessions = svc.get_sessions(plan_id=plan_id)
+    result = serialize_doc(plan)
+    result['sessions'] = serialize_docs(sessions)
+    return jsonify({'success': True, 'data': result})
+
+
+@api_bp.route('/coach/training-plans/<plan_id>', methods=['PUT'])
+@role_required('coach')
+def coach_update_training_plan(plan_id):
+    """Update a training plan."""
+    from app.services import get_training_service
+    data = request.get_json()
+    svc = get_training_service()
+    svc.update_plan(plan_id, data)
+    return jsonify({'success': True})
+
+
+@api_bp.route('/coach/training-plans/<plan_id>', methods=['DELETE'])
+@role_required('coach')
+def coach_delete_training_plan(plan_id):
+    """Delete a training plan and its sessions."""
+    from app.services import get_training_service
+    svc = get_training_service()
+    svc.delete_plan(plan_id)
+    return jsonify({'success': True})
+
+
+@api_bp.route('/coach/training-plans/<plan_id>/sessions', methods=['POST'])
+@role_required('coach')
+def coach_create_session(plan_id):
+    """Add a session to a training plan."""
+    from app.services import get_training_service
+    data = request.get_json()
+    svc = get_training_service()
+    session_id = svc.create_session(plan_id, request.current_user['user_id'], data or {})
+    if not session_id:
+        return jsonify({'success': False, 'error': 'Plan not found'}), 404
+    return jsonify({'success': True, 'session_id': session_id}), 201
+
+
+@api_bp.route('/coach/training-sessions/<session_id>', methods=['GET'])
+@role_required('coach')
+def coach_session_detail(session_id):
+    """Get a training session."""
+    from app.services import get_training_service
+    svc = get_training_service()
+    session = svc.get_session(session_id)
+    if not session:
+        return jsonify({'success': False, 'error': 'Session not found'}), 404
+    return jsonify({'success': True, 'data': serialize_doc(session)})
+
+
+@api_bp.route('/coach/training-sessions/<session_id>', methods=['PUT'])
+@role_required('coach')
+def coach_update_session(session_id):
+    """Update a training session."""
+    from app.services import get_training_service
+    data = request.get_json()
+    svc = get_training_service()
+    svc.update_session(session_id, data or {})
+    return jsonify({'success': True})
+
+
+@api_bp.route('/coach/training-sessions/<session_id>/attendance', methods=['POST'])
+@role_required('coach')
+def coach_session_attendance(session_id):
+    """Mark attendance for a training session."""
+    from app.services import get_training_service
+    data = request.get_json()
+    svc = get_training_service()
+    if isinstance(data, list):
+        svc.bulk_attendance(session_id, data)
+    elif data and data.get('player_id'):
+        svc.mark_attendance(session_id, data['player_id'], data.get('status', 'present'),
+                            data.get('reason'), data.get('rating'))
+    return jsonify({'success': True})
+
+
+@api_bp.route('/coach/drills', methods=['GET'])
+@role_required('coach')
+def coach_drills():
+    """Get drill library."""
+    from app.services import get_training_service
+    club_id = request.current_user.get('club_id')
+    svc = get_training_service()
+    drills = svc.get_drills(
+        club_id=club_id,
+        category=request.args.get('category'),
+        difficulty=request.args.get('difficulty'),
+    )
+    return jsonify({'success': True, 'data': serialize_docs(drills)})
+
+
+@api_bp.route('/coach/drills', methods=['POST'])
+@role_required('coach')
+def coach_create_drill():
+    """Create a custom drill."""
+    from app.services import get_training_service
+    data = request.get_json()
+    if not data or not data.get('name'):
+        return jsonify({'success': False, 'error': 'Name required'}), 400
+    club_id = request.current_user.get('club_id')
+    svc = get_training_service()
+    drill_id = svc.create_drill(club_id, request.current_user['user_id'], data)
+    return jsonify({'success': True, 'drill_id': drill_id}), 201
+
+
+@api_bp.route('/coach/drills/<drill_id>', methods=['GET'])
+@role_required('coach')
+def coach_drill_detail(drill_id):
+    """Get drill details."""
+    from app.services import get_training_service
+    svc = get_training_service()
+    drill = svc.get_drill(drill_id)
+    if not drill:
+        return jsonify({'success': False, 'error': 'Drill not found'}), 404
+    return jsonify({'success': True, 'data': serialize_doc(drill)})
+
+
+@api_bp.route('/coach/training-load/<player_id>', methods=['GET'])
+@role_required('coach')
+def coach_training_load(player_id):
+    """Get training load for a player."""
+    from app.services import get_training_service
+    weeks = int(request.args.get('weeks', 1))
+    svc = get_training_service()
+    load = svc.get_training_load(player_id, weeks)
+    return jsonify({'success': True, 'data': load})
+
+
+# ============================================================
+# COACH INJURY ENDPOINTS
+# ============================================================
+
+@api_bp.route('/coach/injuries', methods=['GET'])
+@role_required('coach')
+def coach_injuries():
+    """Get injuries for team."""
+    from app.services import get_injury_service
+    team_id = request.args.get('team_id')
+    if not team_id:
+        club_id = request.current_user.get('club_id')
+        team = mongo.db.teams.find_one({'club_id': ObjectId(club_id)}) if club_id else None
+        team_id = str(team['_id']) if team else None
+    if not team_id:
+        return jsonify({'success': True, 'data': []})
+    svc = get_injury_service()
+    injuries = svc.get_injuries(team_id, status=request.args.get('status'))
+    # Enrich with player names
+    for inj in injuries:
+        player = mongo.db.players.find_one({'_id': inj.get('player_id')})
+        inj['player_name'] = player.get('name', '') if player else ''
+    return jsonify({'success': True, 'data': serialize_docs(injuries)})
+
+
+@api_bp.route('/coach/injuries', methods=['POST'])
+@role_required('coach')
+def coach_log_injury():
+    """Log a new injury."""
+    from app.services import get_injury_service
+    data = request.get_json()
+    if not data or not data.get('player_id'):
+        return jsonify({'success': False, 'error': 'Player ID required'}), 400
+    team_id = data.get('team_id')
+    if not team_id:
+        player = mongo.db.players.find_one({'_id': ObjectId(data['player_id'])})
+        team_id = str(player['team_id']) if player and player.get('team_id') else None
+    if not team_id:
+        return jsonify({'success': False, 'error': 'Team not found'}), 400
+    svc = get_injury_service()
+    injury_id = svc.log_injury(data['player_id'], request.current_user['user_id'], team_id, data)
+    return jsonify({'success': True, 'injury_id': injury_id}), 201
+
+
+@api_bp.route('/coach/injuries/<injury_id>', methods=['GET'])
+@role_required('coach')
+def coach_injury_detail(injury_id):
+    """Get injury details."""
+    from app.services import get_injury_service
+    svc = get_injury_service()
+    injury = svc.get_injury(injury_id)
+    if not injury:
+        return jsonify({'success': False, 'error': 'Injury not found'}), 404
+    player = mongo.db.players.find_one({'_id': injury.get('player_id')})
+    result = serialize_doc(injury)
+    result['player_name'] = player.get('name', '') if player else ''
+    return jsonify({'success': True, 'data': result})
+
+
+@api_bp.route('/coach/injuries/<injury_id>', methods=['PUT'])
+@role_required('coach')
+def coach_update_injury(injury_id):
+    """Update injury recovery notes."""
+    from app.services import get_injury_service
+    data = request.get_json()
+    svc = get_injury_service()
+    svc.update_recovery(injury_id, request.current_user['user_id'], data or {})
+    return jsonify({'success': True})
+
+
+@api_bp.route('/coach/injuries/<injury_id>/clear', methods=['POST'])
+@role_required('coach')
+def coach_clear_injury(injury_id):
+    """Clear a player for play."""
+    from app.services import get_injury_service
+    data = request.get_json() or {}
+    svc = get_injury_service()
+    svc.clear_for_play(injury_id, data.get('cleared_by', 'Coach'), data.get('date'))
+    return jsonify({'success': True})
+
+
+@api_bp.route('/coach/injuries/stats', methods=['GET'])
+@role_required('coach')
+def coach_injury_stats():
+    """Get injury statistics for team."""
+    from app.services import get_injury_service
+    team_id = request.args.get('team_id')
+    if not team_id:
+        club_id = request.current_user.get('club_id')
+        team = mongo.db.teams.find_one({'club_id': ObjectId(club_id)}) if club_id else None
+        team_id = str(team['_id']) if team else None
+    if not team_id:
+        return jsonify({'success': True, 'data': {}})
+    svc = get_injury_service()
+    stats = svc.get_injury_stats(team_id)
+    return jsonify({'success': True, 'data': stats})
+
+
+@api_bp.route('/coach/injuries/player/<player_id>', methods=['GET'])
+@role_required('coach')
+def coach_player_injuries(player_id):
+    """Get injury history for a player."""
+    from app.services import get_injury_service
+    svc = get_injury_service()
+    injuries = svc.get_player_injuries(player_id)
+    return jsonify({'success': True, 'data': serialize_docs(injuries)})
+
+
+# ============================================================
+# COACH PLAYER ANALYTICS ENDPOINTS
+# ============================================================
+
+@api_bp.route('/coach/analytics/players', methods=['GET'])
+@role_required('coach')
+def coach_analytics_players():
+    """Get team rankings / player list for analytics."""
+    from app.services import get_player_analytics_service
+    team_id = request.args.get('team_id')
+    if not team_id:
+        club_id = request.current_user.get('club_id')
+        team = mongo.db.teams.find_one({'club_id': ObjectId(club_id)}) if club_id else None
+        team_id = str(team['_id']) if team else None
+    if not team_id:
+        return jsonify({'success': True, 'data': []})
+    svc = get_player_analytics_service()
+    rankings = svc.get_team_rankings(team_id)
+    return jsonify({'success': True, 'data': rankings})
+
+
+@api_bp.route('/coach/analytics/player/<player_id>', methods=['GET'])
+@role_required('coach')
+def coach_analytics_player_detail(player_id):
+    """Get comprehensive player dashboard."""
+    from app.services import get_player_analytics_service
+    svc = get_player_analytics_service()
+    dashboard = svc.get_player_dashboard(player_id)
+    if not dashboard:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    return jsonify({'success': True, 'data': dashboard})
+
+
+@api_bp.route('/coach/analytics/compare', methods=['POST'])
+@role_required('coach')
+def coach_analytics_compare():
+    """Compare 2-5 players side-by-side."""
+    from app.services import get_player_analytics_service
+    data = request.get_json()
+    if not data or not data.get('player_ids'):
+        return jsonify({'success': False, 'error': 'player_ids required'}), 400
+    svc = get_player_analytics_service()
+    comparison = svc.compare_players(data['player_ids'])
+    return jsonify({'success': True, 'data': comparison})
+
+
+@api_bp.route('/coach/analytics/player/<player_id>/trends', methods=['GET'])
+@role_required('coach')
+def coach_analytics_trends(player_id):
+    """Get trend analysis for a player."""
+    from app.services import get_player_analytics_service
+    svc = get_player_analytics_service()
+    trends = svc.get_trend_analysis(player_id)
+    if not trends:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    return jsonify({'success': True, 'data': trends})
+
+
+# ============================================================
 # SUPERADMIN ENDPOINTS
 # ============================================================
 
@@ -1949,3 +2762,239 @@ def superadmin_clubs():
         c['member_count'] = user_count
         result.append(c)
     return jsonify({'success': True, 'data': result})
+
+
+# ============================================================
+# SUPERADMIN: ENHANCED ENDPOINTS
+# ============================================================
+
+@api_bp.route('/superadmin/clubs/<club_id>/details', methods=['GET'])
+@role_required('superadmin')
+def superadmin_club_details(club_id):
+    """Get detailed club info."""
+    svc = get_platform_management_service()
+    data = svc.get_club_details(club_id)
+    if not data:
+        return jsonify({'success': False, 'error': 'Club not found'}), 404
+    data['club'] = serialize_doc(data['club'])
+    data['teams'] = serialize_docs(data['teams'])
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/superadmin/clubs/<club_id>/suspend', methods=['POST'])
+@role_required('superadmin')
+def superadmin_suspend_club(club_id):
+    """Suspend a club."""
+    data = request.get_json() or {}
+    svc = get_platform_management_service()
+    svc.suspend_club(club_id, data.get('reason', ''))
+    return jsonify({'success': True, 'message': 'Club suspendu'})
+
+
+@api_bp.route('/superadmin/clubs/<club_id>/activate', methods=['POST'])
+@role_required('superadmin')
+def superadmin_activate_club(club_id):
+    """Activate a club."""
+    svc = get_platform_management_service()
+    svc.activate_club(club_id)
+    return jsonify({'success': True, 'message': 'Club activé'})
+
+
+@api_bp.route('/superadmin/analytics', methods=['GET'])
+@role_required('superadmin')
+def superadmin_analytics():
+    """Get platform analytics."""
+    svc = get_platform_analytics_service()
+    return jsonify({'success': True, 'data': svc.get_platform_metrics()})
+
+
+@api_bp.route('/superadmin/analytics/growth', methods=['GET'])
+@role_required('superadmin')
+def superadmin_analytics_growth():
+    """Get growth charts."""
+    days = int(request.args.get('days', 90))
+    svc = get_platform_analytics_service()
+    return jsonify({'success': True, 'data': svc.get_growth_charts(days)})
+
+
+@api_bp.route('/superadmin/analytics/revenue', methods=['GET'])
+@role_required('superadmin')
+def superadmin_analytics_revenue():
+    """Get revenue breakdown by plan."""
+    svc = get_platform_analytics_service()
+    return jsonify({'success': True, 'data': svc.get_revenue_breakdown()})
+
+
+@api_bp.route('/superadmin/analytics/cohorts', methods=['GET'])
+@role_required('superadmin')
+def superadmin_analytics_cohorts():
+    """Get cohort analysis."""
+    svc = get_platform_analytics_service()
+    return jsonify({'success': True, 'data': svc.get_cohort_analysis()})
+
+
+@api_bp.route('/superadmin/billing', methods=['GET'])
+@role_required('superadmin')
+def superadmin_billing():
+    """Get platform billing overview."""
+    svc = get_billing_service()
+    return jsonify({'success': True, 'data': svc.get_platform_billing()})
+
+
+@api_bp.route('/superadmin/billing/subscriptions', methods=['GET'])
+@role_required('superadmin')
+def superadmin_billing_subscriptions():
+    """Get all club subscriptions."""
+    svc = get_billing_service()
+    return jsonify({'success': True, 'data': svc.get_all_subscriptions()})
+
+
+@api_bp.route('/superadmin/billing/revenue', methods=['GET'])
+@role_required('superadmin')
+def superadmin_billing_revenue():
+    """Get revenue chart data."""
+    svc = get_billing_service()
+    return jsonify({'success': True, 'data': svc.get_revenue_chart()})
+
+
+# ============================================================
+# FAN ENDPOINTS
+# ============================================================
+
+@api_bp.route('/fan/comments/<post_id>', methods=['GET'])
+@token_required
+def fan_get_comments(post_id):
+    """Get comments for a post."""
+    svc = get_fan_engagement_service()
+    return jsonify({'success': True, 'data': svc.get_comments(post_id)})
+
+
+@api_bp.route('/fan/comments/<post_id>', methods=['POST'])
+@token_required
+def fan_create_comment(post_id):
+    """Create a comment."""
+    data = request.get_json()
+    if not data or not data.get('content'):
+        return jsonify({'success': False, 'error': 'Contenu requis'}), 400
+    svc = get_fan_engagement_service()
+    comment_id = svc.create_comment(post_id, request.current_user['user_id'],
+                                     data['content'], data.get('parent_comment_id'))
+    return jsonify({'success': True, 'comment_id': comment_id}), 201
+
+
+@api_bp.route('/fan/reactions/<post_id>', methods=['POST'])
+@token_required
+def fan_toggle_reaction(post_id):
+    """Toggle a reaction on a post."""
+    data = request.get_json() or {}
+    svc = get_fan_engagement_service()
+    result = svc.toggle_reaction(post_id, request.current_user['user_id'], data.get('type', 'like'))
+    return jsonify({'success': True, 'data': result})
+
+
+@api_bp.route('/fan/polls', methods=['GET'])
+@token_required
+def fan_get_polls():
+    """Get polls for club."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': []})
+    svc = get_fan_engagement_service()
+    return jsonify({'success': True, 'data': svc.get_polls(club_id)})
+
+
+@api_bp.route('/fan/polls', methods=['POST'])
+@role_required('admin', 'coach')
+def fan_create_poll():
+    """Create a poll (admin/coach only)."""
+    data = request.get_json()
+    if not data or not data.get('question') or not data.get('options'):
+        return jsonify({'success': False, 'error': 'question et options requis'}), 400
+    club_id = request.current_user.get('club_id')
+    svc = get_fan_engagement_service()
+    poll_id = svc.create_poll(club_id, data['question'], data['options'], data.get('expires_days', 7))
+    return jsonify({'success': True, 'poll_id': poll_id}), 201
+
+
+@api_bp.route('/fan/polls/<poll_id>/vote', methods=['POST'])
+@token_required
+def fan_vote_poll(poll_id):
+    """Vote on a poll."""
+    data = request.get_json()
+    if data is None or 'option_index' not in data:
+        return jsonify({'success': False, 'error': 'option_index requis'}), 400
+    svc = get_fan_engagement_service()
+    result = svc.vote_poll(poll_id, data['option_index'], request.current_user['user_id'])
+    if result and result.get('error'):
+        return jsonify({'success': False, 'error': result['error']}), 400
+    return jsonify({'success': True})
+
+
+@api_bp.route('/fan/media', methods=['GET'])
+@token_required
+def fan_get_media():
+    """Get media gallery."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': []})
+    category = request.args.get('category')
+    svc = get_media_service()
+    return jsonify({'success': True, 'data': svc.get_gallery(club_id, category)})
+
+
+@api_bp.route('/fan/media/<media_id>', methods=['GET'])
+@token_required
+def fan_get_media_detail(media_id):
+    """Get media detail."""
+    svc = get_media_service()
+    item = svc.get_media(media_id)
+    if not item:
+        return jsonify({'success': False, 'error': 'Media not found'}), 404
+    return jsonify({'success': True, 'data': item})
+
+
+@api_bp.route('/fan/media', methods=['POST'])
+@role_required('admin', 'coach')
+def fan_upload_media():
+    """Upload media (admin/coach only)."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'No data'}), 400
+    club_id = request.current_user.get('club_id')
+    svc = get_media_service()
+    media_id = svc.upload_media(club_id, data)
+    return jsonify({'success': True, 'media_id': media_id}), 201
+
+
+@api_bp.route('/matches/<match_id>/timeline', methods=['GET'])
+def match_timeline(match_id):
+    """Get match timeline (public)."""
+    match = mongo.db.matches.find_one({'_id': ObjectId(match_id)})
+    if not match:
+        return jsonify({'success': False, 'error': 'Match not found'}), 404
+    events = match.get('events', [])
+    return jsonify({'success': True, 'data': events})
+
+
+@api_bp.route('/matches/<match_id>/stats', methods=['GET'])
+def match_stats(match_id):
+    """Get match statistics (public)."""
+    match = mongo.db.matches.find_one({'_id': ObjectId(match_id)})
+    if not match:
+        return jsonify({'success': False, 'error': 'Match not found'}), 404
+    stats = match.get('stats', {
+        'possession_home': 50, 'possession_away': 50,
+        'shots_home': 0, 'shots_away': 0,
+        'corners_home': 0, 'corners_away': 0,
+    })
+    return jsonify({'success': True, 'data': stats})
+
+
+@api_bp.route('/matches/fixtures/<club_id>', methods=['GET'])
+def match_fixtures(club_id):
+    """Get upcoming fixtures (public)."""
+    matches = list(mongo.db.matches.find({
+        'club_id': ObjectId(club_id),
+        'status': {'$ne': 'completed'}
+    }).sort('date', 1).limit(10))
+    return jsonify({'success': True, 'data': serialize_docs(matches)})
