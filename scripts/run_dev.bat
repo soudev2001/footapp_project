@@ -14,7 +14,10 @@ if exist "..\venv\Scripts\activate.bat" (
     exit /b 1
 )
 
-echo [2/2] Starting application...
+echo [2/3] Starting frontend dev server...
+start "FootApp Frontend" cmd /c "cd ..\frontend && npm run dev"
+
+echo [3/3] Starting backend...
 echo.
 python ..\run.py
 

@@ -22,6 +22,13 @@ ssh root@82.112.255.193 << 'EOF'
   echo "=== Starting Traefik (if not running) ==="
   docker compose -f docker-compose.traefik.yml up -d
 
+  echo "=== Building frontend ==="
+  cd frontend
+  if command -v node &>/dev/null; then
+    npm ci && npm run build
+  fi
+  cd ..
+
   echo "=== Rebuilding & starting Prod containers ==="
   docker compose -f docker-compose.prod.yml down
   docker compose -f docker-compose.prod.yml up -d --build

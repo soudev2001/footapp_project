@@ -12,6 +12,10 @@ if (Test-Path "..\venv\Scripts\Activate.ps1") {
     exit 1
 }
 
-Write-Host "[2/2] Starting application..." -ForegroundColor Yellow
+Write-Host "[2/3] Starting frontend dev server..." -ForegroundColor Yellow
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+Start-Process -NoNewWindow -FilePath "cmd" -ArgumentList "/c cd ..\frontend && npm run dev"
+
+Write-Host "[3/3] Starting backend..." -ForegroundColor Yellow
 Write-Host ""
 python ..\run.py
