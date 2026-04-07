@@ -253,6 +253,15 @@ export default function Tactics() {
     onError: () => { setConfirmDeletePresetId(null); showToast('Erreur lors de la suppression', 'error') },
   })
 
+  const { register, handleSubmit, reset, watch, setValue } = useForm<TacticForm>({
+    defaultValues: {
+      formation: '4-3-3', passing_style: 'short', defensive_block: 'medium',
+      pressing: 'medium', tempo: 'balanced', width: 'normal',
+      marking: 'zone', play_space: 'mixed', gk_distribution: 'short',
+      counter_pressing: false, captains: [], set_pieces: { ...EMPTY_SET_PIECES },
+    },
+  })
+
   const closeForm = useCallback(() => {
     setCreating(false)
     setEditingId(null)
@@ -262,15 +271,6 @@ export default function Tactics() {
     setSelectedSlot(null)
     setGamePlan('balanced')
   }, [reset])
-
-  const { register, handleSubmit, reset, watch, setValue } = useForm<TacticForm>({
-    defaultValues: {
-      formation: '4-3-3', passing_style: 'short', defensive_block: 'medium',
-      pressing: 'medium', tempo: 'balanced', width: 'normal',
-      marking: 'zone', play_space: 'mixed', gk_distribution: 'short',
-      counter_pressing: false, captains: [], set_pieces: { ...EMPTY_SET_PIECES },
-    },
-  })
 
   const watchedFormation = watch('formation')
   const watchedPressing = watch('pressing') ?? 'medium'
@@ -1330,7 +1330,7 @@ export default function Tactics() {
             <button type="button" onClick={handleSavePreset} className="btn-secondary text-xs sm:text-sm">
               <Copy size={14} /> Preset
             </button>
-            <button type="button" onClick={() => { reset(); setCreating(false); setCaptains([]); setSetPieces({ ...EMPTY_SET_PIECES }); setShowRoles(false); setPitchSlots({}); setSubs([]); setSelectedSlot(null); setGamePlan('balanced') }} className="btn-secondary text-xs sm:text-sm">
+            <button type="button" onClick={() => { reset(); setCreating(false); setCaptains([]); setSetPieces({ ...EMPTY_SET_PIECES }); setPitchSlots({}); setSubs([]); setSelectedSlot(null); setGamePlan('balanced') }} className="btn-secondary text-xs sm:text-sm">
               Annuler
             </button>
             {Object.keys(pitchSlots).length > 0 && (
