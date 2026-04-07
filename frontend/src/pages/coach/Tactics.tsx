@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi } from '../../api'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Plus, Trash2, Save, Swords, ChevronDown, ChevronUp, Settings2, BookOpen, Copy, Crown, Target, X, Eye, GripVertical, UserMinus, ArrowRightLeft, Cloud, Check, Shield, Wand2, Users, Trophy, Heart, Repeat2 } from 'lucide-react'
+import { Plus, Trash2, Save, Swords, ChevronDown, ChevronUp, Settings2, BookOpen, Copy, Crown, Target, X, Eye, GripVertical, UserMinus, ArrowRightLeft, Cloud, Check, Shield, Wand2, Users, Trophy, Heart, Repeat2, Search, Pencil, AlertTriangle, XCircle, CheckCircle2, RotateCcw } from 'lucide-react'
 import TacticalVisualizer from '../../components/TacticalVisualizer'
 import { useForm } from 'react-hook-form'
 import PitchSVG, { FORMATIONS, FORMATION_POSITIONS, type DragPlayer } from '../../components/PitchSVG'
@@ -169,11 +169,11 @@ const EMPTY_SET_PIECES = {
 export default function Tactics() {
   const qc = useQueryClient()
   const [creating, setCreating] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [previewFormation, setPreviewFormation] = useState<string | null>(null)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [showPresets, setShowPresets] = useState(false)
-  const [showRoles, setShowRoles] = useState(false)
   const [captains, setCaptains] = useState<string[]>([])
   const [setPieces, setSetPieces] = useState<Record<string, string[]>>({ ...EMPTY_SET_PIECES })
   const [activeSetPieceTab, setActiveSetPieceTab] = useState('penalties')
@@ -184,10 +184,20 @@ export default function Tactics() {
   const [dragPlayer, setDragPlayer] = useState<DragPlayer | null>(null)
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  // FIFA additions
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
   const [gamePlan, setGamePlan] = useState('balanced')
   const [posFilter, setPosFilter] = useState('all')
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [confirmDeletePresetId, setConfirmDeletePresetId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type })
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setToast(null), 3000)
+  }, [])
 
   const { data: tactics, isLoading } = useQuery({
     queryKey: ['tactics'],
@@ -211,7 +221,8 @@ export default function Tactics() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => coachApi.deleteTactic(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['tactics'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['tactics'] }); setConfirmDeleteId(null); showToast('Tactique supprimée') },
+    onError: () => { setConfirmDeleteId(null); showToast('Erreur lors de la suppression', 'error') },
   })
 
   const saveMutation = useMutation({
@@ -224,22 +235,33 @@ export default function Tactics() {
     }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['tactics'] })
-      setCreating(false)
-      reset()
-      setCaptains([])
-      setSetPieces({ ...EMPTY_SET_PIECES })
+      showToast(editingId ? 'Tactique mise à jour' : 'Tactique enregistrée')
+      closeForm()
     },
+    onError: () => showToast('Erreur lors de l\'enregistrement', 'error'),
   })
 
   const savePresetMutation = useMutation({
     mutationFn: (data: object) => coachApi.savePreset(data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['tactic-presets'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['tactic-presets'] }); showToast('Preset sauvegardé') },
+    onError: () => showToast('Erreur lors de la sauvegarde du preset', 'error'),
   })
 
   const deletePresetMutation = useMutation({
     mutationFn: (id: string) => coachApi.deletePreset(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['tactic-presets'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['tactic-presets'] }); setConfirmDeletePresetId(null); showToast('Preset supprimé') },
+    onError: () => { setConfirmDeletePresetId(null); showToast('Erreur lors de la suppression', 'error') },
   })
+
+  const closeForm = useCallback(() => {
+    setCreating(false)
+    setEditingId(null)
+    reset()
+    setCaptains([])
+    setSetPieces({ ...EMPTY_SET_PIECES })
+    setSelectedSlot(null)
+    setGamePlan('balanced')
+  }, [reset])
 
   const { register, handleSubmit, reset, watch, setValue } = useForm<TacticForm>({
     defaultValues: {
@@ -525,9 +547,38 @@ export default function Tactics() {
     setCreating(true)
   }
 
+  const editTactic = (t: Tactic) => {
+    loadPreset(t)
+    setEditingId(t.id)
+    setCreating(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const duplicateTactic = (t: Tactic) => {
+    loadPreset(t)
+    setEditingId(null)
+    setValue('name', `${t.name ?? t.formation ?? ''} (copie)`)
+    setCreating(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const handleSavePreset = () => {
     const values = watch()
-    savePresetMutation.mutate({ ...values, name: values.name || 'Preset', formation: values.formation, captains, set_pieces: setPieces })
+    savePresetMutation.mutate({
+      ...values,
+      name: values.name || 'Preset',
+      formation: values.formation,
+      captains,
+      set_pieces: setPieces,
+      starters: Object.values(pitchSlots).map((s) => s.playerId),
+      substitutes: subs,
+    })
+  }
+
+  const clearPitch = () => {
+    setPitchSlots({})
+    setSubs([])
+    setSelectedSlot(null)
   }
 
   const toggleCaptain = (id: string) => {
@@ -716,6 +767,18 @@ export default function Tactics() {
 
   return (
     <div className="space-y-4">
+      {/* ─── Toast notification ─── */}
+      {toast && (
+        <div className={clsx(
+          'fixed top-4 right-4 z-[60] flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl border text-sm font-medium animate-in slide-in-from-right',
+          toast.type === 'success' ? 'bg-green-900/90 border-green-700 text-green-200' : 'bg-red-900/90 border-red-700 text-red-200'
+        )}>
+          {toast.type === 'success' ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+          {toast.message}
+          <button type="button" onClick={() => setToast(null)} className="ml-2 opacity-60 hover:opacity-100"><X size={14} /></button>
+        </div>
+      )}
+
       {/* ─── Header ─── */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
@@ -732,7 +795,7 @@ export default function Tactics() {
           <button type="button" onClick={() => setShowPresets(!showPresets)} className="btn-secondary text-xs sm:text-sm">
             <BookOpen size={15} /> <span className="hidden sm:inline">Presets</span> {presets?.length ? `(${presets.length})` : ''}
           </button>
-          <button type="button" onClick={() => setCreating(!creating)} className={clsx(creating ? 'btn-secondary' : 'btn-primary', 'text-xs sm:text-sm')}>
+          <button type="button" onClick={() => { if (creating) closeForm(); else { setCreating(true); setEditingId(null) } }} className={clsx(creating ? 'btn-secondary' : 'btn-primary', 'text-xs sm:text-sm')}>
             {creating ? <X size={16} /> : <Plus size={16} />} <span className="hidden sm:inline">{creating ? 'Fermer' : 'Nouvelle'}</span>
           </button>
         </div>
