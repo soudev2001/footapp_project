@@ -2,24 +2,47 @@ name: Deploy to Production
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - name: Deploy to VPS
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
           script: |
-            cd ~/footapp_project
+            set -e
+            cd ~/footapp_project || exit 1
+
+            echo "=== Pulling latest code ==="
+            git stash
+            git fetch origin
+            git checkout main
             git pull origin main
-            docker-compose -f docker-compose.prod.yml down
-            docker-compose -f docker-compose.prod.yml up -d --build
+
+            echo "=== Ensuring Docker network exists ==="
+            docker network inspect root_default >/dev/null 2>&1 || docker network create root_default
+
+            echo "=== Ensuring acme.json exists ==="
+            mkdir -p traefik_data
+            [ -f traefik_data/acme.json ] || { touch traefik_data/acme.json && chmod 600 traefik_data/acme.json; }
+
+            echo "=== Starting Traefik (if not running) ==="
+            docker compose -f docker-compose.traefik.yml up -d
+
+            echo "=== Rebuilding & starting Prod containers ==="
+            docker compose -f docker-compose.prod.yml down
+            docker compose -f docker-compose.prod.yml up -d --build
+
+            echo "=== Waiting for health checks ==="
+            sleep 15
+            docker ps --format "table {{.Names}}\t{{.Status}}" | grep footapp
+
+            echo "=== Prod deployment completed! ==="
