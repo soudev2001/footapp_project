@@ -27,18 +27,18 @@ export default function Calendar() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
         <CalendarIcon size={24} className="text-pitch-500" />
         Calendar
       </h1>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Upcoming Events */}
+        {/* Événements à venir */}
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-white">Upcoming Events</h2>
-          {isLoading && <p className="text-gray-400 text-sm">Loading...</p>}
+          <h2 className="text-lg font-semibold text-white">Événements à venir</h2>
+          {isLoading && <p className="text-gray-400 text-sm">Chargement...</p>}
           {!isLoading && !events?.length && (
-            <div className="card text-gray-400 text-sm text-center py-8">No upcoming events.</div>
+            <div className="card text-gray-400 text-sm text-center py-8">Aucun événement à venir.</div>
           )}
           {events?.map((event: Event) => (
             <div key={event.id} className={clsx('card border', TYPE_COLORS[event.type] ?? TYPE_COLORS.other)}>
@@ -61,26 +61,26 @@ export default function Calendar() {
           ))}
         </section>
 
-        {/* Upcoming Matches */}
+        {/* Matchs à venir */}
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-white">Upcoming Matches</h2>
-          {isLoading && <p className="text-gray-400 text-sm">Loading...</p>}
+          <h2 className="text-lg font-semibold text-white">Matchs à venir</h2>
+          {isLoading && <p className="text-gray-400 text-sm">Chargement...</p>}
           {!isLoading && !matches?.length && (
-            <div className="card text-gray-400 text-sm text-center py-8">No upcoming matches.</div>
+            <div className="card text-gray-400 text-sm text-center py-8">Aucun match à venir.</div>
           )}
           {matches?.map((match: Match) => (
             <div key={match.id} className="card border border-pitch-800 bg-pitch-900/20">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-white text-sm">
-                    {match.is_home ? 'Home' : 'Away'} vs {match.opponent}
+                    {match.is_home ? 'Domicile' : 'Extérieur'} vs {match.opponent}
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
                     <MapPin size={12} /> {match.location}
                   </p>
                 </div>
                 <span className={clsx('badge text-xs', match.is_home ? 'bg-pitch-700 text-white' : 'bg-gray-700 text-gray-200')}>
-                  {match.is_home ? 'H' : 'A'}
+                  {match.is_home ? 'D' : 'E'}
                 </span>
               </div>
               <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">

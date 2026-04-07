@@ -12,6 +12,8 @@ export default function SuperAdminLayout() {
       <Stack.Screen name="index" options={{ title: 'SuperAdmin' }} />
       <Stack.Screen name="projects" options={{ title: 'Projets' }} />
       <Stack.Screen name="clubs" options={{ title: 'Clubs' }} />
+      <Stack.Screen name="analytics" options={{ title: 'Analytics' }} />
+      <Stack.Screen name="billing" options={{ title: 'Facturation' }} />
     </Stack>
   );
 }

@@ -31,6 +31,12 @@ import Scouting from './pages/coach/Scouting'
 import Lineup from './pages/coach/Lineup'
 import Convocation from './pages/coach/Convocation'
 import PlayerDetail from './pages/coach/PlayerDetail'
+import TrainingPlans from './pages/coach/TrainingPlans'
+import TrainingSession from './pages/coach/TrainingSession'
+import DrillLibrary from './pages/coach/DrillLibrary'
+import Injuries from './pages/coach/Injuries'
+import PlayerAnalytics from './pages/coach/PlayerAnalytics'
+import PlayerComparison from './pages/coach/PlayerComparison'
 
 // Admin
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -40,6 +46,8 @@ import Analytics from './pages/admin/Analytics'
 import Subscription from './pages/admin/Subscription'
 import Announcements from './pages/admin/Announcements'
 import ClubSettings from './pages/admin/ClubSettings'
+import Onboarding from './pages/admin/Onboarding'
+import Financial from './pages/admin/Financial'
 
 // Player
 import PlayerDashboard from './pages/player/PlayerDashboard'
@@ -48,11 +56,16 @@ import EvoHub from './pages/player/EvoHub'
 import Documents from './pages/player/Documents'
 import PlayerTeam from './pages/player/PlayerTeam'
 import EventDetail from './pages/player/EventDetail'
+import PlayerGoals from './pages/player/Goals'
+import PlayerTraining from './pages/player/Training'
 
 // Parent
 import ParentDashboard from './pages/parent/ParentDashboard'
 import ChildCalendar from './pages/parent/ChildCalendar'
 import ChildRoster from './pages/parent/ChildRoster'
+import ChildProgress from './pages/parent/ChildProgress'
+import CoachFeedback from './pages/parent/CoachFeedback'
+import ParentPayments from './pages/parent/Payments'
 
 // ISY
 import ISYDashboard from './pages/isy/ISYDashboard'
@@ -63,6 +76,13 @@ import Sponsors from './pages/isy/Sponsors'
 import SuperAdminDashboard from './pages/superadmin/SuperAdminDashboard'
 import Clubs from './pages/superadmin/Clubs'
 import Projects from './pages/superadmin/Projects'
+import PlatformAnalytics from './pages/superadmin/PlatformAnalytics'
+import PlatformBilling from './pages/superadmin/PlatformBilling'
+
+// Fan
+import FanMatchCenter from './pages/fan/MatchCenter'
+import Community from './pages/fan/Community'
+import FanMedia from './pages/fan/Media'
 
 import type { Role } from './types'
 
@@ -92,6 +112,7 @@ const ADMIN_ROLES: Role[] = ['admin', 'superadmin']
 const PLAYER_ROLES: Role[] = ['player']
 const PARENT_ROLES: Role[] = ['parent']
 const SUPER_ROLES: Role[] = ['superadmin']
+const FAN_ROLES: Role[] = ['fan']
 const ISY_ROLES: Role[] = ['admin', 'superadmin', 'coach']
 
 export default function App() {
@@ -132,6 +153,12 @@ export default function App() {
           <Route path="/coach/attendance" element={<ProtectedRoute allowedRoles={COACH_ROLES}><Attendance /></ProtectedRoute>} />
           <Route path="/coach/scouting" element={<ProtectedRoute allowedRoles={COACH_ROLES}><Scouting /></ProtectedRoute>} />
           <Route path="/coach/convocation" element={<ProtectedRoute allowedRoles={COACH_ROLES}><Convocation /></ProtectedRoute>} />
+          <Route path="/coach/training-plans" element={<ProtectedRoute allowedRoles={COACH_ROLES}><TrainingPlans /></ProtectedRoute>} />
+          <Route path="/coach/training-session" element={<ProtectedRoute allowedRoles={COACH_ROLES}><TrainingSession /></ProtectedRoute>} />
+          <Route path="/coach/drills" element={<ProtectedRoute allowedRoles={COACH_ROLES}><DrillLibrary /></ProtectedRoute>} />
+          <Route path="/coach/injuries" element={<ProtectedRoute allowedRoles={COACH_ROLES}><Injuries /></ProtectedRoute>} />
+          <Route path="/coach/analytics" element={<ProtectedRoute allowedRoles={COACH_ROLES}><PlayerAnalytics /></ProtectedRoute>} />
+          <Route path="/coach/player-comparison" element={<ProtectedRoute allowedRoles={COACH_ROLES}><PlayerComparison /></ProtectedRoute>} />
 
           {/* Admin */}
           <Route path="/admin" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminDashboard /></ProtectedRoute>} />
@@ -141,6 +168,8 @@ export default function App() {
           <Route path="/admin/announcements" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><Announcements /></ProtectedRoute>} />
           <Route path="/admin/subscription" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><Subscription /></ProtectedRoute>} />
           <Route path="/admin/club-settings" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><ClubSettings /></ProtectedRoute>} />
+          <Route path="/admin/onboarding" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><Onboarding /></ProtectedRoute>} />
+          <Route path="/admin/financial" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><Financial /></ProtectedRoute>} />
 
           {/* Player */}
           <Route path="/player" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerDashboard /></ProtectedRoute>} />
@@ -149,11 +178,16 @@ export default function App() {
           <Route path="/player/documents" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><Documents /></ProtectedRoute>} />
           <Route path="/player/team" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerTeam /></ProtectedRoute>} />
           <Route path="/player/event/:id" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><EventDetail /></ProtectedRoute>} />
+          <Route path="/player/goals" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerGoals /></ProtectedRoute>} />
+          <Route path="/player/training" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerTraining /></ProtectedRoute>} />
 
           {/* Parent */}
           <Route path="/parent" element={<ProtectedRoute allowedRoles={PARENT_ROLES}><ParentDashboard /></ProtectedRoute>} />
           <Route path="/parent/calendar/:playerId" element={<ProtectedRoute allowedRoles={PARENT_ROLES}><ChildCalendar /></ProtectedRoute>} />
           <Route path="/parent/roster/:playerId" element={<ProtectedRoute allowedRoles={PARENT_ROLES}><ChildRoster /></ProtectedRoute>} />
+          <Route path="/parent/progress/:playerId" element={<ProtectedRoute allowedRoles={PARENT_ROLES}><ChildProgress /></ProtectedRoute>} />
+          <Route path="/parent/feedback/:playerId" element={<ProtectedRoute allowedRoles={PARENT_ROLES}><CoachFeedback /></ProtectedRoute>} />
+          <Route path="/parent/payments" element={<ProtectedRoute allowedRoles={PARENT_ROLES}><ParentPayments /></ProtectedRoute>} />
 
           {/* ISY */}
           <Route path="/isy" element={<ProtectedRoute allowedRoles={ISY_ROLES}><ISYDashboard /></ProtectedRoute>} />
@@ -164,6 +198,13 @@ export default function App() {
           <Route path="/superadmin" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><SuperAdminDashboard /></ProtectedRoute>} />
           <Route path="/superadmin/clubs" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><Clubs /></ProtectedRoute>} />
           <Route path="/superadmin/projects" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><Projects /></ProtectedRoute>} />
+          <Route path="/superadmin/analytics" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><PlatformAnalytics /></ProtectedRoute>} />
+          <Route path="/superadmin/billing" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><PlatformBilling /></ProtectedRoute>} />
+
+          {/* Fan */}
+          <Route path="/fan/matches" element={<ProtectedRoute allowedRoles={FAN_ROLES}><FanMatchCenter /></ProtectedRoute>} />
+          <Route path="/fan/community" element={<ProtectedRoute allowedRoles={FAN_ROLES}><Community /></ProtectedRoute>} />
+          <Route path="/fan/media" element={<ProtectedRoute allowedRoles={FAN_ROLES}><FanMedia /></ProtectedRoute>} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

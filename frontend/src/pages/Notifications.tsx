@@ -28,7 +28,7 @@ export default function Notifications() {
   return (
     <div className="max-w-2xl mx-auto space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
           <Bell size={22} className="text-pitch-500" />
           Notifications
           {unread > 0 && (
@@ -37,15 +37,15 @@ export default function Notifications() {
         </h1>
         {unread > 0 && (
           <button onClick={() => markAllMutation.mutate()} className="btn-secondary text-sm gap-1.5">
-            <CheckCheck size={15} /> Mark all read
+            <CheckCheck size={15} /> Tout marquer comme lu
           </button>
         )}
       </div>
 
-      {isLoading && <p className="text-gray-400">Loading...</p>}
+      {isLoading && <p className="text-gray-400">Chargement...</p>}
 
       {!isLoading && !notifications?.length && (
-        <div className="card text-center py-12 text-gray-400">You're all caught up!</div>
+        <div className="card text-center py-12 text-gray-400">Vous êtes à jour !</div>
       )}
 
       <div className="space-y-2">

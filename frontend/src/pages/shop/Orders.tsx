@@ -20,11 +20,11 @@ export default function Orders() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-        <ShoppingCart size={22} className="text-pitch-500" /> My Orders
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+        <ShoppingCart size={22} className="text-pitch-500" /> Mes commandes
       </h1>
 
-      {isLoading && <p className="text-gray-400">Loading orders...</p>}
+      {isLoading && <p className="text-gray-400">Chargement des commandes...</p>}
 
       <div className="space-y-4">
         {orders?.map((order: { id: string; created_at: string; status: string; items?: { name: string; quantity: number; price: number }[]; total?: number }) => (
@@ -57,7 +57,7 @@ export default function Orders() {
         {!isLoading && !orders?.length && (
           <div className="card text-center py-12 text-gray-400">
             <ShoppingCart size={40} className="mx-auto mb-3 opacity-30" />
-            No orders yet.
+            Aucune commande pour le moment.
           </div>
         )}
       </div>

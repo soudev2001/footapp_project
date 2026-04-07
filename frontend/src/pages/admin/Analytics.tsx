@@ -10,12 +10,12 @@ export default function Analytics() {
 
   const sections = [
     {
-      label: 'Members by Role',
+      label: 'Membres par rôle',
       icon: <Users size={18} className="text-blue-400" />,
       items: data?.members_by_role,
     },
     {
-      label: 'Team Performance',
+      label: 'Performance des équipes',
       icon: <Shield size={18} className="text-pitch-400" />,
       items: data?.team_stats,
     },
@@ -23,22 +23,22 @@ export default function Analytics() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-        <BarChart3 size={22} className="text-pitch-500" /> Analytics
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+        <BarChart3 size={22} className="text-pitch-500" /> Analyse
       </h1>
 
-      {isLoading && <p className="text-gray-400">Loading analytics...</p>}
+      {isLoading && <p className="text-gray-400">Chargement de l'analyse...</p>}
 
       <div className="grid gap-4 md:grid-cols-3">
         {[
-          { label: 'Total Members', value: data?.total_members ?? '—', icon: <Users size={22} className="text-blue-400" /> },
-          { label: 'Active Players', value: data?.active_players ?? '—', icon: <TrendingUp size={22} className="text-pitch-400" /> },
-          { label: 'Matches Played', value: data?.matches_played ?? '—', icon: <Shield size={22} className="text-purple-400" /> },
+          { label: 'Membres', value: data?.total_members ?? '—', icon: <Users size={22} className="text-blue-400" /> },
+          { label: 'Joueurs actifs', value: data?.active_players ?? '—', icon: <TrendingUp size={22} className="text-pitch-400" /> },
+          { label: 'Matchs joués', value: data?.matches_played ?? '—', icon: <Shield size={22} className="text-purple-400" /> },
         ].map((s) => (
           <div key={s.label} className="stat-card">
             {s.icon}
             <div>
-              <p className="text-2xl font-bold text-white">{s.value}</p>
+              <p className="text-xl sm:text-2xl font-bold text-white">{s.value}</p>
               <p className="text-sm text-gray-400">{s.label}</p>
             </div>
           </div>
@@ -80,10 +80,10 @@ export default function Analytics() {
           <h2 className="font-semibold text-white flex items-center gap-2">
             <TrendingUp size={18} className="text-yellow-400" /> Engagement
           </h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {Object.entries(data.engagement as Record<string, number>).map(([key, val]) => (
               <div key={key} className="text-center">
-                <p className="text-2xl font-bold text-white">{val}</p>
+                <p className="text-xl sm:text-2xl font-bold text-white">{val}</p>
                 <p className="text-xs text-gray-400 capitalize mt-1">{key.replace(/_/g, ' ')}</p>
               </div>
             ))}

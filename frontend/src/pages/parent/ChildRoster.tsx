@@ -15,11 +15,11 @@ export default function ChildRoster() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-        <Users size={22} className="text-pitch-500" /> Team Roster
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+        <Users size={22} className="text-pitch-500" /> Effectif de l'équipe
       </h1>
 
-      {isLoading && <p className="text-gray-400">Loading...</p>}
+      {isLoading && <p className="text-gray-400">Chargement...</p>}
 
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {players?.map((player: Player) => (
@@ -34,7 +34,7 @@ export default function ChildRoster() {
           </div>
         ))}
         {!isLoading && !players?.length && (
-          <div className="col-span-3 card text-gray-400 text-sm text-center py-10">No players found.</div>
+          <div className="col-span-3 card text-gray-400 text-sm text-center py-10">Aucun joueur trouvé.</div>
         )}
       </div>
     </div>

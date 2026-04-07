@@ -12,11 +12,11 @@ export default function Documents() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
         <FolderKanban size={22} className="text-pitch-500" /> Documents
       </h1>
 
-      {isLoading && <p className="text-gray-400">Loading...</p>}
+      {isLoading && <p className="text-gray-400">Chargement...</p>}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {DOC_TYPES.map((docType) => {
@@ -29,7 +29,7 @@ export default function Documents() {
                   <p className="font-medium text-white capitalize">{docType}</p>
                 </div>
                 <span className={`badge text-xs ${doc ? 'bg-pitch-900 text-pitch-300' : 'bg-gray-800 text-gray-500'}`}>
-                  {doc ? 'Uploaded' : 'Missing'}
+                  {doc ? 'Téléchargé' : 'Manquant'}
                 </span>
               </div>
 
@@ -39,7 +39,7 @@ export default function Documents() {
 
               <label className="btn-secondary text-sm cursor-pointer justify-center">
                 <Upload size={14} />
-                {doc ? 'Replace' : 'Upload'}
+                {doc ? 'Remplacer' : 'Télécharger'}
                 <input type="file" className="sr-only" />
               </label>
             </div>

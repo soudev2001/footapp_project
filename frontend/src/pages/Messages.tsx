@@ -44,9 +44,9 @@ export default function Messages() {
   })
 
   return (
-    <div className="h-[calc(100vh-8rem)] flex gap-4">
+    <div className="h-[calc(100vh-8rem)] flex flex-col sm:flex-row gap-4">
       {/* Conversation list */}
-      <div className="w-72 shrink-0 card overflow-y-auto space-y-1 p-3">
+      <div className="w-full sm:w-72 shrink-0 card overflow-y-auto space-y-1 p-3 max-h-48 sm:max-h-full">
         <h2 className="font-semibold text-white px-2 pb-2 border-b border-gray-800 mb-2">Messages</h2>
         {conversations?.map((conv: Conversation) => (
           <button
@@ -71,7 +71,7 @@ export default function Messages() {
           </button>
         ))}
         {!conversations?.length && (
-          <p className="text-sm text-gray-400 px-2 py-4 text-center">No conversations</p>
+          <p className="text-sm text-gray-400 px-2 py-4 text-center">Aucune conversation</p>
         )}
       </div>
 
@@ -101,7 +101,7 @@ export default function Messages() {
                 </div>
               ))}
               {!history?.length && (
-                <p className="text-center text-gray-500 text-sm">No messages yet. Start the conversation!</p>
+                <p className="text-center text-gray-500 text-sm">Aucun message. Commencez la conversation !</p>
               )}
             </div>
 
@@ -110,7 +110,7 @@ export default function Messages() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && text.trim() && sendMutation.mutate()}
-                placeholder="Type a message..."
+                placeholder="Tapez un message..."
                 className="input flex-1"
               />
               <button
@@ -124,7 +124,7 @@ export default function Messages() {
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center text-gray-500 text-sm">
-            Select a conversation to start chatting
+            Sélectionnez une conversation pour commencer
           </div>
         )}
       </div>

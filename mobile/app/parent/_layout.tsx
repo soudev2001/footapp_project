@@ -13,6 +13,9 @@ export default function ParentLayout() {
       <Stack.Screen name="link-child" options={{ title: 'Lier un enfant' }} />
       <Stack.Screen name="child-calendar" options={{ title: 'Calendrier' }} />
       <Stack.Screen name="child-roster" options={{ title: 'Effectif' }} />
+      <Stack.Screen name="child-progress" options={{ title: 'Progression' }} />
+      <Stack.Screen name="coach-feedback" options={{ title: 'Retours du Coach' }} />
+      <Stack.Screen name="payments" options={{ title: 'Paiements' }} />
     </Stack>
   );
 }

@@ -61,3 +61,46 @@ export async function getPlayerEvolution() {
   const { data } = await api.get('/player/evolution');
   return data.data;
 }
+
+// ─── Enhanced: Dashboard ─────────────────────────────────────────────────────
+export async function getDashboardStats() {
+  const { data } = await api.get('/player/dashboard/stats');
+  return data.data;
+}
+
+export async function getDashboardRankings() {
+  const { data } = await api.get('/player/dashboard/rankings');
+  return data.data;
+}
+
+// ─── Enhanced: Goals ─────────────────────────────────────────────────────────
+export async function getGoals() {
+  const { data } = await api.get('/player/goals');
+  return data.data;
+}
+
+export async function createGoal(goalData: { title: string; category: string; target_value: number; deadline?: string }) {
+  const { data } = await api.post('/player/goals', goalData);
+  return data;
+}
+
+export async function updateGoal(goalId: string, goalData: any) {
+  const { data } = await api.put(`/player/goals/${goalId}`, goalData);
+  return data;
+}
+
+export async function deleteGoal(goalId: string) {
+  const { data } = await api.delete(`/player/goals/${goalId}`);
+  return data;
+}
+
+// ─── Enhanced: Training ──────────────────────────────────────────────────────
+export async function getTrainingSchedule() {
+  const { data } = await api.get('/player/training/schedule');
+  return data.data;
+}
+
+export async function getTrainingDrills() {
+  const { data } = await api.get('/player/training/drills');
+  return data.data;
+}

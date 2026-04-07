@@ -29,12 +29,9 @@ export default function Login() {
 
   const loginAsDemo = async (role: string) => {
     setDemoLoading(role)
-    // Activate demo mock adapter
     installDemoMock(role)
-    // Persist demo mode
     localStorage.setItem(DEMO_MODE_KEY, 'true')
     localStorage.setItem(DEMO_ROLE_KEY, role)
-    // "Login" via mock — will return fake tokens + user
     try {
       const res = await authApi.login('demo@demo.fc', 'demo')
       setTokens(res.data.access_token, res.data.refresh_token)
@@ -53,7 +50,7 @@ export default function Login() {
 
   const onSubmit = async (data: FormData) => {
     setError('')
-    exitDemo() // Make sure demo is off for real login
+    exitDemo()
     try {
       const res = await authApi.login(data.email, data.password)
       setTokens(res.data.access_token, res.data.refresh_token)
@@ -66,19 +63,19 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl space-y-6">
+    <div className="auth-page">
+      <div className="auth-card max-w-2xl">
         {/* Logo */}
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-pitch-600 mb-4">
+        <div className="auth-logo">
+          <div className="auth-logo-icon">
             <span className="text-white font-bold text-2xl">FA</span>
           </div>
-          <h1 className="text-3xl font-bold text-white">FootApp</h1>
+          <h1 className="text-3xl font-bold text-white font-outfit">FootApp</h1>
           <p className="text-gray-400 mt-1">Plateforme de gestion de club de football</p>
         </div>
 
-        {/* ── DEMO MODE ─────────────────────────────────────────────── */}
-        <div className="card border-pitch-800 bg-pitch-950/30 space-y-4">
+        {/* Demo Mode */}
+        <div className="card border-pitch-800 bg-pitch-950/30 space-y-4 animate-fade-in">
           <div className="flex items-center gap-2">
             <Zap size={18} className="text-pitch-400" />
             <h2 className="font-semibold text-white">Accès Démo — Choisissez un rôle</h2>
@@ -95,7 +92,7 @@ export default function Login() {
                   type="button"
                   onClick={() => loginAsDemo(role)}
                   disabled={demoLoading !== null}
-                  className={`relative flex flex-col gap-2 p-4 rounded-xl border bg-gradient-to-br ${color} text-left text-white hover:brightness-110 transition-all disabled:opacity-60 group`}
+                  className={`relative flex flex-col gap-2 p-4 rounded-xl border bg-gradient-to-br ${color} text-left text-white hover:brightness-110 hover:scale-[1.02] transition-all duration-200 disabled:opacity-60 group`}
                 >
                   {demoLoading === role && (
                     <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/40">
@@ -103,7 +100,7 @@ export default function Login() {
                     </div>
                   )}
                   <div className="flex items-center justify-between">
-                    <div className="p-1.5 rounded-lg bg-white/10">{icon}</div>
+                    <div className="p-1.5 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">{icon}</div>
                     <span className="text-xs text-white/60 font-mono capitalize">{role}</span>
                   </div>
                   <div>
@@ -119,26 +116,22 @@ export default function Login() {
           </div>
 
           <div className="text-xs text-gray-500 flex items-center gap-1.5">
-            <span className="inline-block w-2 h-2 rounded-full bg-pitch-500" />
+            <span className="inline-block w-2 h-2 rounded-full bg-pitch-500 animate-pulse-slow" />
             Club démo : <span className="text-gray-300 font-medium">FC Les Aiglons — Lyon</span>
             · Données fictives, aucune action réelle
           </div>
         </div>
 
-        {/* ── DIVIDER ───────────────────────────────────────────────── */}
-        <div className="flex items-center gap-4">
-          <hr className="flex-1 border-gray-800" />
-          <span className="text-gray-500 text-sm">ou connectez-vous avec votre compte</span>
-          <hr className="flex-1 border-gray-800" />
+        {/* Divider */}
+        <div className="auth-divider">
+          <hr />
+          <span>ou connectez-vous avec votre compte</span>
+          <hr />
         </div>
 
-        {/* ── REAL LOGIN ────────────────────────────────────────────── */}
-        <form onSubmit={handleSubmit(onSubmit)} className="card space-y-5">
-          {error && (
-            <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">
-              {error}
-            </div>
-          )}
+        {/* Real Login Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="auth-form animate-fade-in">
+          {error && <div className="alert-error">{error}</div>}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
             <input {...register('email', { required: true })} type="email" placeholder="vous@club.fr" className="input" />
@@ -147,7 +140,7 @@ export default function Login() {
             <label className="block text-sm font-medium text-gray-300 mb-1.5">Mot de passe</label>
             <div className="relative">
               <input {...register('password', { required: true })} type={showPassword ? 'text' : 'password'} placeholder="••••••••" className="input pr-11" />
-              <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+              <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors">
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
@@ -157,7 +150,7 @@ export default function Login() {
           </button>
           <p className="text-center text-sm text-gray-400">
             Pas encore de compte ?{' '}
-            <Link to="/register" className="text-pitch-500 hover:underline">Créer un club</Link>
+            <Link to="/register" className="text-pitch-400 hover:text-pitch-300 hover:underline transition-colors">Créer un club</Link>
           </p>
         </form>
       </div>

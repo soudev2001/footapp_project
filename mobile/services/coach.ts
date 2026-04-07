@@ -100,7 +100,7 @@ export async function addPlayerPhysical(playerId: string, record: { weight?: num
 }
 
 export async function generateParentCode(playerId: string) {
-  const { data } = await api.post(`/coach/players/${playerId}/parent-code`);
+  const { data } = await api.post(`/parent/generate-code/${playerId}`);
   return data;
 }
 
@@ -151,4 +151,147 @@ export async function addMatchEvent(matchId: string, event: {
 }) {
   const { data } = await api.post(`/coach/matches/${matchId}/event`, event);
   return data;
+}
+
+// ===== Training Plans =====
+
+export async function getTrainingPlans(params?: { status?: string }) {
+  const { data } = await api.get('/coach/training-plans', { params });
+  return data.data;
+}
+
+export async function createTrainingPlan(planData: {
+  name: string; type?: string; focus_area?: string; start_date?: string; end_date?: string; description?: string;
+}) {
+  const { data } = await api.post('/coach/training-plans', planData);
+  return data;
+}
+
+export async function getTrainingPlan(planId: string) {
+  const { data } = await api.get(`/coach/training-plans/${planId}`);
+  return data.data;
+}
+
+export async function updateTrainingPlan(planId: string, planData: any) {
+  const { data } = await api.put(`/coach/training-plans/${planId}`, planData);
+  return data;
+}
+
+export async function deleteTrainingPlan(planId: string) {
+  const { data } = await api.delete(`/coach/training-plans/${planId}`);
+  return data;
+}
+
+export async function createTrainingSession(planId: string, sessionData: {
+  date: string; duration_minutes?: number; location?: string; focus?: string; intensity?: string; notes?: string;
+}) {
+  const { data } = await api.post(`/coach/training-plans/${planId}/sessions`, sessionData);
+  return data;
+}
+
+export async function getTrainingSessions(planId: string) {
+  const { data } = await api.get(`/coach/training-plans/${planId}/sessions`);
+  return data.data;
+}
+
+export async function getTrainingSession(sessionId: string) {
+  const { data } = await api.get(`/coach/training-sessions/${sessionId}`);
+  return data.data;
+}
+
+export async function updateTrainingSession(sessionId: string, sessionData: any) {
+  const { data } = await api.put(`/coach/training-sessions/${sessionId}`, sessionData);
+  return data;
+}
+
+export async function markSessionAttendance(sessionId: string, attendance: { player_id: string; status: string }[]) {
+  const { data } = await api.post(`/coach/training-sessions/${sessionId}/attendance`, { attendance });
+  return data;
+}
+
+// ===== Drills =====
+
+export async function getDrills(params?: { category?: string; difficulty?: string }) {
+  const { data } = await api.get('/coach/drills', { params });
+  return data.data;
+}
+
+export async function createDrill(drillData: {
+  name: string; category: string; difficulty: string; description?: string;
+  duration_minutes?: number; min_players?: number; equipment?: string[]; coaching_points?: string[];
+}) {
+  const { data } = await api.post('/coach/drills', drillData);
+  return data;
+}
+
+export async function getDrill(drillId: string) {
+  const { data } = await api.get(`/coach/drills/${drillId}`);
+  return data.data;
+}
+
+// ===== Injuries =====
+
+export async function getInjuries(params?: { status?: string }) {
+  const { data } = await api.get('/coach/injuries', { params });
+  return data.data;
+}
+
+export async function logInjury(injuryData: {
+  player_id: string; injury_type: string; body_part: string; severity: string;
+  description?: string; injury_date?: string;
+}) {
+  const { data } = await api.post('/coach/injuries', injuryData);
+  return data;
+}
+
+export async function getInjury(injuryId: string) {
+  const { data } = await api.get(`/coach/injuries/${injuryId}`);
+  return data.data;
+}
+
+export async function updateInjury(injuryId: string, updateData: { notes?: string; status?: string }) {
+  const { data } = await api.put(`/coach/injuries/${injuryId}`, updateData);
+  return data;
+}
+
+export async function clearForPlay(injuryId: string, clearedBy?: string) {
+  const { data } = await api.post(`/coach/injuries/${injuryId}/clear`, { cleared_by: clearedBy || 'Médecin' });
+  return data;
+}
+
+export async function getInjuryStats() {
+  const { data } = await api.get('/coach/injuries/stats');
+  return data.data;
+}
+
+export async function getPlayerInjuries(playerId: string) {
+  const { data } = await api.get(`/coach/injuries/player/${playerId}`);
+  return data.data;
+}
+
+// ===== Player Analytics =====
+
+export async function getAnalyticsPlayers() {
+  const { data } = await api.get('/coach/analytics/players');
+  return data.data;
+}
+
+export async function getAnalyticsPlayer(playerId: string) {
+  const { data } = await api.get(`/coach/analytics/player/${playerId}`);
+  return data.data;
+}
+
+export async function comparePlayersAnalytics(playerIds: string[]) {
+  const { data } = await api.post('/coach/analytics/compare', { player_ids: playerIds });
+  return data.data;
+}
+
+export async function getPlayerTrends(playerId: string) {
+  const { data } = await api.get(`/coach/analytics/player/${playerId}/trends`);
+  return data.data;
+}
+
+export async function getTrainingLoad(playerId: string) {
+  const { data } = await api.get(`/coach/training-load/${playerId}`);
+  return data.data;
 }

@@ -54,7 +54,7 @@ export default function Roster() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <Users size={22} className="text-pitch-500" />
-          <h1 className="text-2xl font-bold text-white">Effectif</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Effectif</h1>
           {players && <span className="badge bg-gray-800 text-gray-300 ml-2">{players.length} joueurs</span>}
         </div>
         <Link to="/coach/scouting" className="btn-primary text-sm">
@@ -95,7 +95,7 @@ export default function Roster() {
           </h2>
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {(grouped[position] as Player[]).map((player: Player) => (
-              <Link key={player.id} to={`/coach/player/${player.id}`} className="card hover:border-gray-700 transition-colors group">
+              <Link key={player.id} to={`/coach/roster/${player.id}`} className="card hover:border-gray-700 transition-colors group">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center font-bold text-lg text-white">
                     {player.jersey_number ?? '?'}

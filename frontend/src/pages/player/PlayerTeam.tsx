@@ -37,13 +37,13 @@ export default function PlayerTeam() {
       <div className="flex items-center gap-3">
         <Shield size={22} className="text-pitch-500" />
         <div>
-          <h1 className="text-2xl font-bold text-white">{team?.name ?? 'My Team'}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">{team?.name ?? 'Mon Équipe'}</h1>
           {team?.category && <p className="text-gray-400 text-sm">{team.category}</p>}
         </div>
       </div>
 
       {!myProfile?.team_id && (
-        <div className="card text-center py-12 text-gray-400">You are not assigned to a team yet.</div>
+        <div className="card text-center py-12 text-gray-400">Vous n'êtes pas encore assigné à une équipe.</div>
       )}
 
       {grouped && positions.map((pos) => {
@@ -68,7 +68,7 @@ export default function PlayerTeam() {
                     <div>
                       <p className="font-medium text-white text-sm">
                         {player.profile.first_name} {player.profile.last_name}
-                        {isMe && <span className="ml-2 text-xs text-pitch-400">(you)</span>}
+                        {isMe && <span className="ml-2 text-xs text-pitch-400">(vous)</span>}
                       </p>
                       <p className="text-xs text-gray-400">{player.position}</p>
                     </div>

@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
-import { Bell, MessageSquare, LogOut } from 'lucide-react'
+import { Bell, MessageSquare, LogOut, Menu } from 'lucide-react'
 import { useAuthStore } from '../store/auth'
 import { useQuery } from '@tanstack/react-query'
 import { messagesApi, notificationsApi } from '../api'
 
-export default function Navbar() {
+export default function Navbar({ onMenuToggle }: { onMenuToggle: () => void }) {
   const { logout } = useAuthStore()
 
   const { data: unread } = useQuery({
@@ -22,7 +22,19 @@ export default function Navbar() {
   const unreadNotifs = notifications?.filter((n) => !n.read).length ?? 0
 
   return (
-    <header className="h-14 shrink-0 bg-gray-900 border-b border-gray-800 flex items-center justify-end px-6 gap-3">
+    <header className="h-14 shrink-0 bg-gray-900 border-b border-gray-800 flex items-center px-3 sm:px-4 md:px-6 gap-2 sm:gap-3">
+      {/* Hamburger — mobile only */}
+      <button
+        type="button"
+        onClick={onMenuToggle}
+        className="lg:hidden p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition-colors"
+        aria-label="Ouvrir le menu"
+      >
+        <Menu size={22} />
+      </button>
+
+      <div className="flex-1" />
+
       <Link
         to="/messages"
         className="relative p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition-colors"
@@ -50,7 +62,7 @@ export default function Navbar() {
       <button
         onClick={logout}
         className="p-2 text-gray-400 hover:text-red-400 rounded-lg hover:bg-gray-800 transition-colors"
-        title="Logout"
+        title="Déconnexion"
       >
         <LogOut size={20} />
       </button>

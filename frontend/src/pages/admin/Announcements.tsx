@@ -34,27 +34,27 @@ export default function Announcements() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Megaphone size={22} className="text-pitch-500" /> Announcements
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+          <Megaphone size={22} className="text-pitch-500" /> Annonces
         </h1>
         <button onClick={() => setCreating(true)} className="btn-primary">
-          <Plus size={16} /> New Announcement
+          <Plus size={16} /> Nouvelle annonce
         </button>
       </div>
 
       {creating && (
         <form onSubmit={handleSubmit((d) => createMutation.mutate(d))} className="card space-y-4 border-pitch-800">
-          <h2 className="font-semibold text-white">New Announcement</h2>
+          <h2 className="font-semibold text-white">Nouvelle annonce</h2>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Title</label>
-            <input {...register('title', { required: true })} className="input" placeholder="Important update..." />
+            <label className="block text-sm text-gray-400 mb-1">Titre</label>
+            <input {...register('title', { required: true })} className="input" placeholder="Mise à jour importante..." />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Content</label>
-            <textarea {...register('content', { required: true })} rows={4} className="input resize-none" placeholder="Write your announcement..." />
+            <label className="block text-sm text-gray-400 mb-1">Contenu</label>
+            <textarea {...register('content', { required: true })} rows={4} className="input resize-none" placeholder="Écrivez votre annonce..." />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Send to</label>
+            <label className="block text-sm text-gray-400 mb-2">Envoyer à</label>
             <div className="flex gap-3 flex-wrap">
               {['player', 'coach', 'parent', 'admin'].map((role) => (
                 <label key={role} className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
@@ -66,14 +66,14 @@ export default function Announcements() {
           </div>
           <div className="flex gap-2">
             <button type="submit" className="btn-primary" disabled={createMutation.isPending}>
-              <Send size={16} /> Send
+              <Send size={16} /> Envoyer
             </button>
-            <button type="button" onClick={() => { reset(); setCreating(false) }} className="btn-secondary">Cancel</button>
+            <button type="button" onClick={() => { reset(); setCreating(false) }} className="btn-secondary">Annuler</button>
           </div>
         </form>
       )}
 
-      {isLoading && <p className="text-gray-400">Loading announcements...</p>}
+      {isLoading && <p className="text-gray-400">Chargement des annonces...</p>}
 
       <div className="space-y-3">
         {announcements?.map((a: { id: string; title: string; content: string; created_at: string; target_roles?: string[] }) => (
@@ -95,7 +95,7 @@ export default function Announcements() {
           </div>
         ))}
         {!isLoading && !announcements?.length && (
-          <div className="card text-center py-12 text-gray-400">No announcements yet.</div>
+          <div className="card text-center py-12 text-gray-400">Aucune annonce pour le moment.</div>
         )}
       </div>
     </div>

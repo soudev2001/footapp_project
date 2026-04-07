@@ -251,3 +251,80 @@ class BillingService:
 
         pdf.build(elements)
         return buffer.getvalue()
+
+    # -------------------------------------------------------------------
+    # Platform-wide billing (SuperAdmin)
+    # -------------------------------------------------------------------
+
+    def get_platform_billing(self) -> dict:
+        """Aggregate billing KPIs across all clubs."""
+        clubs = list(self.db.clubs.find())
+        mrr = 0.0
+        active_subs = 0
+        trial_subs = 0
+        for club in clubs:
+            sub = club.get('subscription', {})
+            billing = sub.get('billing', {})
+            mrr += float(billing.get('total_monthly', 0))
+            status = sub.get('status', '')
+            if status == 'active':
+                active_subs += 1
+            elif status == 'trial':
+                trial_subs += 1
+        return {
+            'mrr': round(mrr, 2),
+            'arr': round(mrr * 12, 2),
+            'total_clubs': len(clubs),
+            'active_subscriptions': active_subs,
+            'trial_subscriptions': trial_subs,
+        }
+
+    def get_all_subscriptions(self) -> list:
+        """Return all club subscriptions for SuperAdmin view."""
+        clubs = list(self.db.clubs.find({}, {'name': 1, 'subscription': 1, 'created_at': 1}))
+        result = []
+        for club in clubs:
+            sub = club.get('subscription', {})
+            result.append({
+                'club_id': str(club['_id']),
+                'club_name': club.get('name', ''),
+                'plan': sub.get('plan_id', 'free'),
+                'status': sub.get('status', 'none'),
+                'mrr': float(sub.get('billing', {}).get('total_monthly', 0)),
+            })
+        return result
+
+    def get_revenue_chart(self, months=6) -> dict:
+        """Return MRR over past months (mock data if no historical invoices)."""
+        from datetime import timedelta
+        labels = []
+        data = []
+        now = datetime.utcnow()
+        for i in range(months - 1, -1, -1):
+            dt = now - timedelta(days=30 * i)
+            month_start = datetime(dt.year, dt.month, 1)
+            month_end = month_start + timedelta(days=32)
+            month_end = datetime(month_end.year, month_end.month, 1)
+            paid = list(self.invoices.find({
+                'status': 'paid',
+                'paid_at': {'$gte': month_start, '$lt': month_end}
+            }))
+            total = sum(inv.get('amount_cents', 0) for inv in paid) / 100
+            labels.append(month_start.strftime('%b %Y'))
+            data.append(round(total, 2))
+        return {'labels': labels, 'data': data}
+
+    # -------------------------------------------------------------------
+    # Parent payment views (mocked)
+    # -------------------------------------------------------------------
+
+    def get_parent_payments(self, parent_id: str) -> list:
+        """Return mock payment records for a parent."""
+        return [
+            {'id': '1', 'category': 'Cotisation', 'amount': 150.0, 'status': 'paid', 'date': '2026-01-15', 'child': 'Lucas'},
+            {'id': '2', 'category': 'Équipement', 'amount': 45.0, 'status': 'paid', 'date': '2026-02-01', 'child': 'Lucas'},
+            {'id': '3', 'category': 'Cotisation', 'amount': 150.0, 'status': 'pending', 'date': '2026-04-15', 'child': 'Lucas'},
+        ]
+
+    def get_payment_categories(self) -> list:
+        return ['Cotisation', 'Équipement', 'Déplacement', 'Stage', 'Autre']

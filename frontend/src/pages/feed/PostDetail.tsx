@@ -31,15 +31,15 @@ export default function PostDetail() {
     },
   })
 
-  if (isLoading) return <p className="text-gray-400">Loading...</p>
-  if (!post) return <p className="text-gray-400">Post not found.</p>
+  if (isLoading) return <p className="text-gray-400">Chargement...</p>
+  if (!post) return <p className="text-gray-400">Publication non trouvée.</p>
 
   const p = post as Post
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <button onClick={() => navigate(-1)} className="btn-secondary gap-1.5 text-sm">
-        <ArrowLeft size={15} /> Back to Feed
+        <ArrowLeft size={15} /> Retour au fil
       </button>
 
       <article className="card space-y-5">
@@ -76,7 +76,7 @@ export default function PostDetail() {
 
         {/* Comments */}
         <div className="space-y-4 pt-2 border-t border-gray-800">
-          <h2 className="font-semibold text-white">Comments ({p.comments?.length ?? 0})</h2>
+          <h2 className="font-semibold text-white">Commentaires ({p.comments?.length ?? 0})</h2>
 
           <div className="space-y-3">
             {p.comments?.map((c, i) => (
@@ -92,7 +92,7 @@ export default function PostDetail() {
               </div>
             ))}
             {!p.comments?.length && (
-              <p className="text-sm text-gray-500">No comments yet. Be the first!</p>
+              <p className="text-sm text-gray-500">Pas de commentaires. Soyez le premier !</p>
             )}
           </div>
 
@@ -102,7 +102,7 @@ export default function PostDetail() {
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && comment.trim() && commentMutation.mutate()}
-              placeholder="Write a comment..."
+              placeholder="Écrivez un commentaire..."
               className="input flex-1"
             />
             <button

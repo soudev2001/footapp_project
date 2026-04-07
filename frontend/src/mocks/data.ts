@@ -320,3 +320,117 @@ export const DEMO_PROJECTS = [
   { id: 'proj03', name: 'App Mobile iOS Push', description: 'Notifications push natives pour iOS — intégration APNs.', status: 'completed', tickets: [{}, {}, {}, {}] },
   { id: 'proj04', name: 'Export PDF Feuille de Match', description: 'Génération PDF de la feuille de match officielle au format FFF.', status: 'paused', tickets: [{}] },
 ]
+
+// ─── Demo Training Plans ─────────────────────────────────────────────────────
+export const DEMO_TRAINING_PLANS = [
+  {
+    id: 'tp01', name: 'Préparation Match AS Beaumont', type: 'weekly', start_date: '2026-03-31', end_date: '2026-04-05',
+    focus_area: 'Phases de transition', description: 'Programme axé sur les transitions rapides et le pressing haut avant le match de samedi.',
+    status: 'active', created_at: '2026-03-30T08:00:00Z',
+    sessions: [
+      { id: 'ts01', plan_id: 'tp01', date: '2026-04-01T18:30:00Z', duration: 90, location: 'Terrain 2', focus: 'Transitions défensives',
+        drills: [{ drill_id: 'dr01', order: 1, duration: 20 }, { drill_id: 'dr03', order: 2, duration: 25 }],
+        attendance: [], coach_notes: 'Bon travail collectif', training_load: 'high', status: 'completed' },
+      { id: 'ts02', plan_id: 'tp01', date: '2026-04-03T18:30:00Z', duration: 75, location: 'Terrain 1', focus: 'Tactique 4-2-3-1',
+        drills: [{ drill_id: 'dr02', order: 1, duration: 30 }, { drill_id: 'dr04', order: 2, duration: 20 }],
+        attendance: [], coach_notes: '', training_load: 'medium', status: 'planned' },
+    ],
+  },
+  {
+    id: 'tp02', name: 'Bloc physique avril', type: 'monthly', start_date: '2026-04-01', end_date: '2026-04-30',
+    focus_area: 'Endurance & explosivité', description: 'Renforcement physique pour la fin de saison. 3 séances/semaine.',
+    status: 'active', created_at: '2026-03-28T10:00:00Z', sessions: [],
+  },
+  {
+    id: 'tp03', name: 'Stage pré-saison', type: 'seasonal', start_date: '2026-07-15', end_date: '2026-08-05',
+    focus_area: 'Reprise complète', description: 'Stage de 3 semaines — tests physiques, tactique et cohésion.',
+    status: 'archived', created_at: '2025-06-10T09:00:00Z', sessions: [],
+  },
+]
+
+// ─── Demo Drills ─────────────────────────────────────────────────────────────
+export const DEMO_DRILLS = [
+  { id: 'dr01', name: 'Rondo 5v2', description: 'Conservation du ballon en espace réduit. Développe la première touche et la vision du jeu.', category: 'passing', sub_category: 'rondo', duration: 15, players_needed: 7, equipment: ['ballons', 'coupelles'], difficulty: 'beginner', coaching_points: ['Première touche orientée', 'Appels dans le dos', 'Communication'], is_public: true },
+  { id: 'dr02', name: 'Jeu de position 6v3', description: 'Possession structurée en supériorité numérique. Travail de la circulation du ballon.', category: 'tactical', sub_category: 'positional_play', duration: 20, players_needed: 9, equipment: ['ballons', 'chasubles', 'coupelles'], difficulty: 'intermediate', coaching_points: ['Occupation de l\'espace', 'Changement de jeu', 'Timing des passes'], is_public: true },
+  { id: 'dr03', name: 'Circuit physique avec ballon', description: 'Enchaînement de sprints, dribbles et frappes. Travail de l\'endurance capacité.', category: 'physical', sub_category: 'endurance', duration: 25, players_needed: 12, equipment: ['ballons', 'haies', 'échelles', 'plots'], difficulty: 'advanced', coaching_points: ['Intensité constante', 'Qualité technique sous fatigue'], is_public: true },
+  { id: 'dr04', name: 'Pressing haut 4v4+GK', description: 'Travail du pressing offensif en situation de jeu réel. Déclenchement et couverture.', category: 'tactical', sub_category: 'pressing', duration: 20, players_needed: 9, equipment: ['ballons', 'mini-buts', 'chasubles'], difficulty: 'intermediate', coaching_points: ['Déclencheur du pressing', 'Couverture en 2e rideau', 'Récupération haute'], is_public: false },
+  { id: 'dr05', name: 'Finition en pivot', description: 'Travail des enchaînements contrôle-frappe en pivot et demi-tour.', category: 'shooting', sub_category: 'finishing', duration: 15, players_needed: 6, equipment: ['ballons', 'but'], difficulty: 'intermediate', coaching_points: ['Orientation du corps', 'Prise d\'info avant le contrôle', 'Frappe placée'], is_public: true },
+  { id: 'dr06', name: 'Échauffement dynamique', description: 'Routine d\'échauffement complète avec mobilité articulaire et activation musculaire.', category: 'warmup', sub_category: 'activation', duration: 12, players_needed: 16, equipment: [], difficulty: 'beginner', coaching_points: ['Amplitude progressive', 'Travail proprioceptif'], is_public: true },
+]
+
+export const DEMO_DRILL_CATEGORIES = ['passing', 'tactical', 'physical', 'shooting', 'warmup', 'set_piece', 'goalkeeping']
+
+// ─── Demo Injuries ───────────────────────────────────────────────────────────
+export const DEMO_INJURIES = [
+  {
+    id: 'inj01', player_id: 'p04', player_name: 'Antoine Bernard', injury_type: 'Entorse', body_part: 'Cheville gauche',
+    severity: 'moderate', description: 'Entorse de la cheville lors du match vs Clermont B. Pas de fracture (radio ok).', injury_date: '2026-03-22T15:30:00Z',
+    expected_return: '2026-04-15', actual_return: null, status: 'recovering', medical_clearance: false,
+    recovery_notes: [
+      { date: '2026-03-23', update: 'Glaçage + repos complet 48h. Anti-inflammatoires prescrits.' },
+      { date: '2026-03-28', update: 'Reprise marche normale. Début kiné lundi.' },
+      { date: '2026-04-01', update: 'Kiné 3x/semaine. Travail proprioception en salle.' },
+    ],
+  },
+  {
+    id: 'inj02', player_id: 'p13', player_name: 'Florian Denis', injury_type: 'Contracture', body_part: 'Ischio-jambiers droit',
+    severity: 'minor', description: 'Contracture survenue à l\'entraînement. Pas de déchirure à l\'écho.', injury_date: '2026-03-29T19:00:00Z',
+    expected_return: '2026-04-07', actual_return: null, status: 'recovering', medical_clearance: false,
+    recovery_notes: [
+      { date: '2026-03-30', update: 'Repos + étirements doux. À réévaluer mercredi.' },
+    ],
+  },
+  {
+    id: 'inj03', player_id: 'p02', player_name: 'Thomas Dubois', injury_type: 'Contusion', body_part: 'Genou droit',
+    severity: 'minor', description: 'Coup reçu au genou lors du match. Douleur modérée, pas de gonflement.', injury_date: '2026-03-15T16:00:00Z',
+    expected_return: '2026-03-22', actual_return: '2026-03-21', status: 'resolved', medical_clearance: true, cleared_by: 'Dr. Martin',
+    recovery_notes: [
+      { date: '2026-03-16', update: 'Glaçage et repos. Contrôle OK.' },
+      { date: '2026-03-21', update: 'Reprise sans douleur. Feu vert médical.' },
+    ],
+  },
+]
+
+export const DEMO_INJURY_STATS = {
+  total: 5, active: 0, recovering: 2, resolved: 3,
+  active_injuries: [],
+  by_type: { 'Entorse': 2, 'Contracture': 1, 'Contusion': 1, 'Élongation': 1 },
+  by_body_part: { 'Cheville': 2, 'Ischio-jambiers': 1, 'Genou': 1, 'Mollet': 1 },
+  avg_recovery_days: 14,
+}
+
+// ─── Demo Player Analytics ───────────────────────────────────────────────────
+export const DEMO_PLAYER_RANKINGS = [
+  { player_id: 'p10', name: 'Nicolas Garcia', position: 'Forward', jersey_number: 9, goals: 18, assists: 6, matches_played: 22, avg_rating: 7.4, status: 'fit' },
+  { player_id: 'p16', name: 'Hugo Renard', position: 'Midfielder', jersey_number: 10, goals: 12, assists: 14, matches_played: 22, avg_rating: 7.8, status: 'fit' },
+  { player_id: 'p11', name: 'Romain Thomas', position: 'Winger', jersey_number: 11, goals: 9, assists: 7, matches_played: 19, avg_rating: 7.1, status: 'fit' },
+  { player_id: 'p09', name: 'Alexandre Petit', position: 'Winger', jersey_number: 7, goals: 8, assists: 11, matches_played: 22, avg_rating: 7.2, status: 'fit' },
+  { player_id: 'p15', name: 'Clément Blanc', position: 'Forward', jersey_number: 22, goals: 7, assists: 3, matches_played: 15, avg_rating: 6.8, status: 'fit' },
+  { player_id: 'p06', name: 'Kevin Simon', position: 'Midfielder', jersey_number: 8, goals: 5, assists: 8, matches_played: 22, avg_rating: 7.0, status: 'fit' },
+  { player_id: 'p08', name: 'Julien Roux', position: 'Midfielder', jersey_number: 14, goals: 4, assists: 7, matches_played: 20, avg_rating: 6.9, status: 'fit' },
+  { player_id: 'p07', name: 'Baptiste Laurent', position: 'Midfielder', jersey_number: 4, goals: 3, assists: 6, matches_played: 21, avg_rating: 7.0, status: 'fit' },
+]
+
+export const DEMO_PLAYER_DASHBOARD_ANALYTICS = {
+  player_id: 'p10', name: 'Nicolas Garcia', position: 'Forward', jersey_number: 9,
+  stats: { goals: 18, assists: 6, matches_played: 22, yellow_cards: 2, red_cards: 0, minutes: 1890 },
+  technical_ratings: { shooting: 88, passing: 72, dribbling: 80, heading: 75, first_touch: 82 },
+  evaluations: [
+    { comment: 'Finition excellente, placement dans la surface, appels de balle', rating: 8, date: '2026-03-15' },
+    { comment: 'Bonne entente avec Hugo Renard, efforts reconnus', rating: 7, date: '2026-02-01' },
+  ],
+  physical_history: [
+    { date: '2026-03-01', weight: 77, height: 181, sprint_speed: 84, endurance: 78 },
+    { date: '2026-01-15', weight: 78, height: 181, sprint_speed: 82, endurance: 76 },
+  ],
+  goals_timeline: [
+    { date: '2026-03-29', opponent: 'US Villeurbanne' }, { date: '2026-03-29', opponent: 'US Villeurbanne' },
+    { date: '2026-03-15', opponent: 'Annecy FC' }, { date: '2026-03-08', opponent: 'FC Roanne' },
+  ],
+  assists_timeline: [
+    { date: '2026-03-15', opponent: 'Annecy FC' }, { date: '2026-03-01', opponent: 'AS Oyonnax' },
+  ],
+  training_attendance: { total_sessions: 36, attended: 33, rate: 91.7 },
+  injury_summary: { total: 0, active: null },
+  matches_played: 22,
+}

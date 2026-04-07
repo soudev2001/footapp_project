@@ -8,7 +8,8 @@ import {
   DEMO_ADMIN_DASHBOARD, DEMO_ANALYTICS, DEMO_COACH_DASHBOARD, DEMO_PLAYER_STATS,
   DEMO_PLAYER_EVOLUTION, DEMO_MEMBERS, DEMO_ANNOUNCEMENTS, DEMO_SUBSCRIPTION,
   DEMO_ISY_PAYMENTS, DEMO_ISY_SPONSORS, DEMO_SUPERADMIN_DASHBOARD, DEMO_ALL_CLUBS,
-  DEMO_PROJECTS, DEMO_USERS,
+  DEMO_PROJECTS, DEMO_USERS, DEMO_TRAINING_PLANS, DEMO_DRILLS, DEMO_DRILL_CATEGORIES,
+  DEMO_INJURIES, DEMO_INJURY_STATS, DEMO_PLAYER_RANKINGS, DEMO_PLAYER_DASHBOARD_ANALYTICS,
 } from './data'
 
 let mockInstance: MockAdapter | null = null
@@ -120,6 +121,46 @@ export function installDemoMock(role: string) {
   mockInstance.onDelete(/\/coach\/events\/\w+/).reply(200, ok({ message: 'Deleted' }))
   mockInstance.onGet('/coach/scouting').reply(200, ok(DEMO_SCOUTING))
   mockInstance.onPost('/coach/scouting').reply(201, ok({ id: 'new-scout', player_name: DEMO_SCOUTING[0].player_name, position: DEMO_SCOUTING[0].position }))
+
+  // ── Coach — Tactic Presets ───────────────────────────────────────────────
+  mockInstance.onGet('/coach/tactics/presets').reply(200, ok(DEMO_TACTICS))
+  mockInstance.onPost('/coach/tactics/presets').reply(201, ok({ id: 'new-preset' }))
+  mockInstance.onDelete(/\/coach\/tactics\/presets\/\w+/).reply(200, ok({ message: 'Preset deleted' }))
+
+  // ── Coach — Parent Code ──────────────────────────────────────────────────
+  mockInstance.onPost(/\/parent\/generate-code\/\w+/).reply(200, ok({ code: 'AIG-7X3K' }))
+
+  // ── Coach — Training Plans ───────────────────────────────────────────────
+  mockInstance.onGet('/coach/training-plans').reply(200, ok(DEMO_TRAINING_PLANS))
+  mockInstance.onPost('/coach/training-plans').reply(201, ok({ id: 'new-plan' }))
+  mockInstance.onGet(/\/coach\/training-plans\/\w+/).reply(200, ok(DEMO_TRAINING_PLANS[0]))
+  mockInstance.onPut(/\/coach\/training-plans\/\w+/).reply(200, ok({ message: 'Plan updated' }))
+  mockInstance.onDelete(/\/coach\/training-plans\/\w+/).reply(200, ok({ message: 'Plan deleted' }))
+  mockInstance.onPost(/\/coach\/training-plans\/\w+\/sessions/).reply(201, ok({ id: 'new-session' }))
+  mockInstance.onGet(/\/coach\/training-sessions\/\w+/).reply(200, ok(DEMO_TRAINING_PLANS[0].sessions[0]))
+  mockInstance.onPut(/\/coach\/training-sessions\/\w+/).reply(200, ok({ message: 'Session updated' }))
+  mockInstance.onPost(/\/coach\/training-sessions\/\w+\/attendance/).reply(200, ok({ message: 'Attendance saved' }))
+  mockInstance.onGet(/\/coach\/training-load\/\w+/).reply(200, ok({ weekly_load: [65, 80, 72, 85, 70], avg: 74 }))
+
+  // ── Coach — Drills ───────────────────────────────────────────────────────
+  mockInstance.onGet('/coach/drills').reply(200, ok(DEMO_DRILLS))
+  mockInstance.onPost('/coach/drills').reply(201, ok({ id: 'new-drill' }))
+  mockInstance.onGet(/\/coach\/drills\/\w+/).reply(200, ok(DEMO_DRILLS[0]))
+
+  // ── Coach — Injuries ─────────────────────────────────────────────────────
+  mockInstance.onGet('/coach/injuries/stats').reply(200, ok(DEMO_INJURY_STATS))
+  mockInstance.onGet('/coach/injuries').reply(200, ok(DEMO_INJURIES))
+  mockInstance.onPost('/coach/injuries').reply(201, ok({ id: 'new-injury' }))
+  mockInstance.onGet(/\/coach\/injuries\/player\/\w+/).reply(200, ok(DEMO_INJURIES.filter(i => i.player_id === 'p04')))
+  mockInstance.onGet(/\/coach\/injuries\/\w+/).reply(200, ok(DEMO_INJURIES[0]))
+  mockInstance.onPut(/\/coach\/injuries\/\w+/).reply(200, ok({ message: 'Injury updated' }))
+  mockInstance.onPost(/\/coach\/injuries\/\w+\/clear/).reply(200, ok({ message: 'Injury cleared' }))
+
+  // ── Coach — Player Analytics ─────────────────────────────────────────────
+  mockInstance.onGet('/coach/analytics/players').reply(200, ok(DEMO_PLAYER_RANKINGS))
+  mockInstance.onPost('/coach/analytics/compare').reply(200, ok({ players: DEMO_PLAYER_RANKINGS.slice(0, 2) }))
+  mockInstance.onGet(/\/coach\/analytics\/player\/\w+\/trends/).reply(200, ok({ goals_per_month: [2, 3, 4, 3, 2, 4], rating_trend: [7.0, 7.2, 7.1, 7.4, 7.3, 7.5] }))
+  mockInstance.onGet(/\/coach\/analytics\/player\/\w+/).reply(200, ok(DEMO_PLAYER_DASHBOARD_ANALYTICS))
 
   // ── Admin ─────────────────────────────────────────────────────────────────
   mockInstance.onGet('/admin/dashboard').reply(200, ok(DEMO_ADMIN_DASHBOARD))

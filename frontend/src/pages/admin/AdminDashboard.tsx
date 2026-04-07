@@ -10,15 +10,15 @@ export default function AdminDashboard() {
   })
 
   const stats = [
-    { label: 'Total Members', value: data?.member_count ?? '—', icon: <Users size={22} />, to: '/admin/members', color: 'text-blue-400' },
-    { label: 'Teams', value: data?.team_count ?? '—', icon: <Shield size={22} />, to: '/admin/teams', color: 'text-pitch-400' },
-    { label: 'Active Players', value: data?.active_players ?? '—', icon: <TrendingUp size={22} />, to: '/admin/members', color: 'text-green-400' },
-    { label: 'Subscription', value: data?.subscription_plan ?? 'Free', icon: <CreditCard size={22} />, to: '/admin/subscription', color: 'text-purple-400' },
+    { label: 'Membres', value: data?.member_count ?? '—', icon: <Users size={22} />, to: '/admin/members', color: 'text-blue-400' },
+    { label: 'Équipes', value: data?.team_count ?? '—', icon: <Shield size={22} />, to: '/admin/teams', color: 'text-pitch-400' },
+    { label: 'Joueurs actifs', value: data?.active_players ?? '—', icon: <TrendingUp size={22} />, to: '/admin/members', color: 'text-green-400' },
+    { label: 'Abonnement', value: data?.subscription_plan ?? 'Gratuit', icon: <CreditCard size={22} />, to: '/admin/subscription', color: 'text-purple-400' },
   ]
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">Club Admin</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-white">Administration du Club</h1>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (
@@ -34,13 +34,13 @@ export default function AdminDashboard() {
 
       <div className="grid gap-6 md:grid-cols-2">
         <div className="card space-y-3">
-          <h2 className="font-semibold text-white">Quick Actions</h2>
-          <div className="grid grid-cols-2 gap-2">
+          <h2 className="font-semibold text-white">Actions rapides</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {[
-              { to: '/admin/members', label: 'Manage Members' },
-              { to: '/admin/teams', label: 'Manage Teams' },
-              { to: '/admin/analytics', label: 'Analytics' },
-              { to: '/admin/announcements', label: 'Announcements' },
+              { to: '/admin/members', label: 'Gérer les membres' },
+              { to: '/admin/teams', label: 'Gérer les équipes' },
+              { to: '/admin/analytics', label: 'Analyse' },
+              { to: '/admin/announcements', label: 'Annonces' },
             ].map((a) => (
               <Link key={a.to} to={a.to} className="btn-secondary text-sm justify-center">
                 {a.label}
@@ -51,7 +51,7 @@ export default function AdminDashboard() {
 
         {data?.onboarding && (
           <div className="card space-y-3">
-            <h2 className="font-semibold text-white">Onboarding</h2>
+            <h2 className="font-semibold text-white">Intégration</h2>
             <div className="space-y-2">
               {Object.entries(data.onboarding).map(([key, done]) => (
                 <div key={key} className="flex items-center justify-between text-sm">
@@ -68,7 +68,7 @@ export default function AdminDashboard() {
 
       {data?.recent_activity && (
         <div className="card space-y-3">
-          <h2 className="font-semibold text-white">Recent Activity</h2>
+          <h2 className="font-semibold text-white">Activité récente</h2>
           <div className="space-y-2">
             {data.recent_activity.map((item: { text: string; date: string }, i: number) => (
               <div key={i} className="flex justify-between text-sm">

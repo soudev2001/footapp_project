@@ -126,3 +126,58 @@ export async function getAnnouncements() {
   const { data } = await api.get('/admin/announcements');
   return data.data;
 }
+
+// ─── Enhanced: Onboarding Import ─────────────────────────────────────────────
+export async function importCSV(formData: FormData) {
+  const { data } = await api.post('/admin/onboarding/import', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+}
+
+export async function confirmImport() {
+  const { data } = await api.post('/admin/onboarding/confirm');
+  return data;
+}
+
+export async function getInvitations() {
+  const { data } = await api.get('/admin/onboarding/invitations');
+  return data.data;
+}
+
+export async function resendInvitations(memberIds: string[]) {
+  const { data } = await api.post('/admin/onboarding/resend', { member_ids: memberIds });
+  return data;
+}
+
+// ─── Enhanced: Analytics ─────────────────────────────────────────────────────
+export async function getAnalyticsTeams() {
+  const { data } = await api.get('/admin/analytics/teams');
+  return data.data;
+}
+
+export async function getAnalyticsRetention() {
+  const { data } = await api.get('/admin/analytics/retention');
+  return data.data;
+}
+
+export async function getAnalyticsEngagement() {
+  const { data } = await api.get('/admin/analytics/engagement');
+  return data.data;
+}
+
+export async function getAnalyticsFinancial() {
+  const { data } = await api.get('/admin/analytics/financial');
+  return data.data;
+}
+
+// ─── Enhanced: Billing ───────────────────────────────────────────────────────
+export async function getBillingDashboard() {
+  const { data } = await api.get('/admin/billing/dashboard');
+  return data.data;
+}
+
+export async function getBillingInvoices() {
+  const { data } = await api.get('/admin/billing/invoices');
+  return data.data;
+}

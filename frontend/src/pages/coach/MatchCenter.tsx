@@ -132,7 +132,7 @@ export default function MatchCenter() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
           <Shield size={22} className="text-pitch-500" /> Centre des Matchs
         </h1>
         <button type="button" onClick={() => setCreatingMatch(true)} className="btn-primary">
@@ -337,7 +337,7 @@ export default function MatchCenter() {
               Événement — {eventMatch.opponent}
             </h2>
             {/* Event type grid */}
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {EVENT_TYPES.map((et) => (
                 <button
                   key={et.value}
@@ -355,7 +355,7 @@ export default function MatchCenter() {
                 </button>
               ))}
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Minute</label>
                 <input {...registerEvent('minute', { valueAsNumber: true })} type="number" min={0} max={120} className="input text-center font-bold" />

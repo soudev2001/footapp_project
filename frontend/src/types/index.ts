@@ -132,3 +132,119 @@ export interface AuthTokens {
   access_token: string
   refresh_token: string
 }
+
+// ─── Training ────────────────────────────────────────────────────────────────
+export interface TrainingPlan {
+  id: string
+  name: string
+  type: 'weekly' | 'monthly' | 'seasonal'
+  start_date?: string
+  end_date?: string
+  focus_area: string
+  description?: string
+  status: 'active' | 'archived'
+  sessions?: TrainingSession[]
+  created_at: string
+}
+
+export interface TrainingSession {
+  id: string
+  plan_id: string
+  date: string
+  duration: number
+  location?: string
+  focus: string
+  drills: SessionDrill[]
+  attendance: SessionAttendance[]
+  coach_notes?: string
+  training_load: 'low' | 'medium' | 'high'
+  status: 'planned' | 'completed' | 'cancelled'
+}
+
+export interface SessionDrill {
+  drill_id: string
+  order: number
+  duration: number
+  notes?: string
+}
+
+export interface SessionAttendance {
+  player_id: string
+  status: 'present' | 'absent' | 'late'
+  reason?: string
+  rating?: number
+}
+
+export interface Drill {
+  id: string
+  name: string
+  description?: string
+  category: string
+  sub_category?: string
+  duration: number
+  players_needed: number
+  equipment: string[]
+  difficulty: 'beginner' | 'intermediate' | 'advanced'
+  coaching_points: string[]
+  diagram_image?: string
+  video_link?: string
+  is_public: boolean
+}
+
+// ─── Injuries ────────────────────────────────────────────────────────────────
+export interface Injury {
+  id: string
+  player_id: string
+  player_name?: string
+  injury_type: string
+  body_part: string
+  severity: 'minor' | 'moderate' | 'severe'
+  description?: string
+  injury_date: string
+  expected_return?: string
+  actual_return?: string
+  status: 'active' | 'recovering' | 'resolved'
+  medical_clearance: boolean
+  cleared_by?: string
+  recovery_notes: { date: string; update: string }[]
+}
+
+export interface InjuryStats {
+  total: number
+  active: number
+  recovering: number
+  resolved: number
+  active_injuries: Injury[]
+  by_type: Record<string, number>
+  by_body_part: Record<string, number>
+  avg_recovery_days: number
+}
+
+// ─── Player Analytics ────────────────────────────────────────────────────────
+export interface PlayerDashboard {
+  player_id: string
+  name: string
+  position: string
+  jersey_number?: number
+  stats: Record<string, number>
+  technical_ratings: Record<string, number>
+  evaluations: { comment: string; rating?: number; date: string }[]
+  physical_history: Record<string, unknown>[]
+  goals_timeline: { date: string; opponent: string }[]
+  assists_timeline: { date: string; opponent: string }[]
+  training_attendance: { total_sessions: number; attended: number; rate: number }
+  injury_summary: { total: number; active: Injury | null }
+  matches_played: number
+}
+
+export interface PlayerRanking {
+  player_id: string
+  name: string
+  position: string
+  jersey_number?: number
+  goals: number
+  assists: number
+  matches_played: number
+  avg_rating: number
+  status: string
+}

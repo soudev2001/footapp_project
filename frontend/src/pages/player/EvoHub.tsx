@@ -19,17 +19,17 @@ export default function EvoHub() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-        <BarChart3 size={22} className="text-pitch-500" /> Evolution Hub
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+        <BarChart3 size={22} className="text-pitch-500" /> Hub d'Évolution
       </h1>
 
-      {isLoading && <p className="text-gray-400">Loading...</p>}
+      {isLoading && <p className="text-gray-400">Chargement...</p>}
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Attribute bars */}
         <div className="card space-y-4">
           <h2 className="font-semibold text-white flex items-center gap-2">
-            <Star size={16} className="text-yellow-400" /> Attributes
+            <Star size={16} className="text-yellow-400" /> Attributs
           </h2>
           {Object.entries(attributes).map(([attr, val]) => (
             <div key={attr} className="space-y-1">
@@ -53,16 +53,16 @@ export default function EvoHub() {
         {/* Season stats */}
         <div className="card space-y-4">
           <h2 className="font-semibold text-white flex items-center gap-2">
-            <TrendingUp size={16} className="text-pitch-400" /> Season Stats
+            <TrendingUp size={16} className="text-pitch-400" /> Stats de saison
           </h2>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              { label: 'Goals', value: stats?.goals ?? 0, icon: <Target size={18} className="text-pitch-400" /> },
-              { label: 'Assists', value: stats?.assists ?? 0, icon: <Star size={18} className="text-yellow-400" /> },
-              { label: 'Matches', value: stats?.matches_played ?? 0, icon: <BarChart3 size={18} className="text-blue-400" /> },
-              { label: 'Avg Rating', value: stats?.average_rating ?? '—', icon: <TrendingUp size={18} className="text-purple-400" /> },
-              { label: 'Yellow Cards', value: stats?.yellow_cards ?? 0, icon: <span className="text-yellow-400 font-bold text-sm">Y</span> },
-              { label: 'Red Cards', value: stats?.red_cards ?? 0, icon: <span className="text-red-400 font-bold text-sm">R</span> },
+              { label: 'Buts', value: stats?.goals ?? 0, icon: <Target size={18} className="text-pitch-400" /> },
+              { label: 'Passes déc.', value: stats?.assists ?? 0, icon: <Star size={18} className="text-yellow-400" /> },
+              { label: 'Matchs', value: stats?.matches_played ?? 0, icon: <BarChart3 size={18} className="text-blue-400" /> },
+              { label: 'Note moy.', value: stats?.average_rating ?? '—', icon: <TrendingUp size={18} className="text-purple-400" /> },
+              { label: 'Cartons jaunes', value: stats?.yellow_cards ?? 0, icon: <span className="text-yellow-400 font-bold text-sm">J</span> },
+              { label: 'Cartons rouges', value: stats?.red_cards ?? 0, icon: <span className="text-red-400 font-bold text-sm">R</span> },
             ].map((s) => (
               <div key={s.label} className="bg-gray-800 rounded-lg p-3 flex items-center gap-3">
                 {s.icon}
@@ -78,7 +78,7 @@ export default function EvoHub() {
 
       {data?.evaluations?.length > 0 && (
         <div className="card space-y-3">
-          <h2 className="font-semibold text-white">Coach Evaluations</h2>
+          <h2 className="font-semibold text-white">Évaluations du coach</h2>
           <div className="space-y-3">
             {data.evaluations.map((ev: { date: string; coach_name?: string; strengths?: string; weaknesses?: string; rating?: number }, i: number) => (
               <div key={i} className="bg-gray-800 rounded-lg p-4 space-y-2">
@@ -91,8 +91,8 @@ export default function EvoHub() {
                     <p className="text-xs text-gray-500">{ev.date}</p>
                   </div>
                 </div>
-                {ev.strengths && <p className="text-sm text-pitch-300">Strengths: {ev.strengths}</p>}
-                {ev.weaknesses && <p className="text-sm text-red-300">Areas to improve: {ev.weaknesses}</p>}
+                {ev.strengths && <p className="text-sm text-pitch-300">Points forts : {ev.strengths}</p>}
+                {ev.weaknesses && <p className="text-sm text-red-300">Axes d'amélioration : {ev.weaknesses}</p>}
               </div>
             ))}
           </div>

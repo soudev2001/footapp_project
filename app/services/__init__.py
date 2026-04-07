@@ -79,5 +79,37 @@ def get_competition_service():
     from .competition_service import CompetitionService
     return CompetitionService(mongo.db)
 
+def get_training_service():
+    from .training_service import TrainingService
+    return TrainingService(mongo.db)
+
+def get_injury_service():
+    from .injury_service import InjuryService
+    return InjuryService(mongo.db)
+
+def get_player_analytics_service():
+    from .player_analytics_service import PlayerAnalyticsService
+    return PlayerAnalyticsService(mongo.db)
+
+def get_platform_management_service():
+    from .platform_management_service import PlatformManagementService
+    return PlatformManagementService(mongo.db)
+
+def get_platform_analytics_service():
+    from .platform_analytics_service import PlatformAnalyticsService
+    return PlatformAnalyticsService(mongo.db)
+
+def get_parent_monitoring_service():
+    from .parent_monitoring_service import ParentMonitoringService
+    return ParentMonitoringService(mongo.db)
+
+def get_fan_engagement_service():
+    from .fan_engagement_service import FanEngagementService
+    return FanEngagementService(mongo.db)
+
+def get_media_service():
+    from .media_service import MediaService
+    return MediaService(mongo.db)
+
 # Role helpers
 from .user_service import has_permission, get_nav_for_role, ROLE_PERMISSIONS

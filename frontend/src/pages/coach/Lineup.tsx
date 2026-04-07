@@ -1,23 +1,35 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi } from '../../api'
-import { useState, useEffect } from 'react'
-import { Save, RefreshCw, Star, UserPlus, Shield } from 'lucide-react'
-import PitchSVG, { FORMATIONS, FORMATION_POSITIONS } from '../../components/PitchSVG'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { Save, RefreshCw, Star, Shield, GripVertical, UserMinus, ArrowRightLeft, ChevronDown, ChevronUp, Check, Cloud, BarChart3, Eye, Users, AlertTriangle, Swords, Wand2, Zap, Repeat2, Trophy, Heart } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import PitchSVG, { FORMATIONS, FORMATION_POSITIONS, type DragPlayer } from '../../components/PitchSVG'
+import TacticalAnalytics from '../../components/TacticalAnalytics'
+import TacticalVisualizer from '../../components/TacticalVisualizer'
 import type { Player } from '../../types'
-
-type SlotData = {
-  playerId?: string
-  playerName?: string
-  jerseyNumber?: number
-  isCaptain?: boolean
-}
+import clsx from 'clsx'
+import {
+  posColor, calcOVR, ovrColor, ovrBg, teamRating, teamChemistry,
+  remapPlayersOnFormationChange, autoFillPlayers, GAME_PLANS,
+  type SlotData,
+} from '../../utils/fifaLogic'
 
 export default function Lineup() {
   const qc = useQueryClient()
   const [formation, setFormation] = useState('4-3-3')
-  const [slots, setSlots] = useState<Record<number, SlotData>>({})
+  const [slots, setSlots] = useState<Record<string, SlotData>>({})
   const [captainId, setCaptainId] = useState<string | null>(null)
   const [subs, setSubs] = useState<string[]>([])
+  const [dragPlayer, setDragPlayer] = useState<DragPlayer | null>(null)
+  const [showAnalytics, setShowAnalytics] = useState(false)
+  const [showVisualizer, setShowVisualizer] = useState(false)
+  const [showAllPlayers, setShowAllPlayers] = useState(true)
+  const [filterPos, setFilterPos] = useState<string>('all')
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // FIFA additions
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null) // swap mode
+  const [gamePlan, setGamePlan] = useState('balanced')
 
   const { data: players } = useQuery({
     queryKey: ['coach-roster'],
@@ -29,24 +41,27 @@ export default function Lineup() {
     queryFn: () => coachApi.lineup().then((r) => r.data),
   })
 
-  // Load saved lineup into state
+  // Load saved lineup
   useEffect(() => {
-    if (savedLineup?.formation) setFormation(savedLineup.formation)
-    if (savedLineup?.captain) setCaptainId(savedLineup.captain)
-    if (savedLineup?.substitutes) setSubs(savedLineup.substitutes)
-    if (savedLineup?.starters && players) {
+    if (!savedLineup || !players) return
+    if (savedLineup.formation) setFormation(savedLineup.formation)
+    if (savedLineup.captain) setCaptainId(savedLineup.captain)
+    if (savedLineup.substitutes) setSubs(Array.isArray(savedLineup.substitutes) ? savedLineup.substitutes : [])
+    if (savedLineup.starters) {
       const positions = FORMATION_POSITIONS[savedLineup.formation ?? formation] ?? []
-      const newSlots: Record<number, SlotData> = {}
+      const newSlots: Record<string, SlotData> = {}
       const starterIds = Array.isArray(savedLineup.starters) ? savedLineup.starters : Object.values(savedLineup.starters)
       starterIds.forEach((pid: string, i: number) => {
         if (i < positions.length) {
           const p = (players as Player[])?.find((pl: Player) => pl.id === pid)
           if (p) {
-            newSlots[i] = {
+            const pos = positions[i]
+            newSlots[`${pos.name}-${i}`] = {
               playerId: p.id,
               playerName: p.profile?.last_name ?? '',
               jerseyNumber: p.jersey_number,
               isCaptain: savedLineup.captain === p.id,
+              position: p.position,
             }
           }
         }
@@ -57,9 +72,11 @@ export default function Lineup() {
 
   const saveMutation = useMutation({
     mutationFn: () => {
-      const starters = Object.values(slots)
-        .filter((s: SlotData) => s.playerId)
-        .map((s: SlotData) => s.playerId!)
+      const positions = FORMATION_POSITIONS[formation] ?? []
+      const starters = positions.map((pos, i) => {
+        const key = `${pos.name}-${i}`
+        return slots[key]?.playerId ?? null
+      }).filter(Boolean)
       return coachApi.saveLineup({
         formation,
         starters,
@@ -67,165 +84,483 @@ export default function Lineup() {
         captains: captainId ? [captainId] : [],
       })
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['coach-lineup'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['coach-lineup'] })
+      setAutoSaveStatus('saved')
+      setTimeout(() => setAutoSaveStatus('idle'), 2000)
+    },
   })
 
-  const positions = FORMATION_POSITIONS[formation] ?? []
-  const usedIds = new Set([
-    ...Object.values(slots).map((s: SlotData) => s.playerId).filter(Boolean),
+  const getPlayer = (id: string) => (players as Player[] | undefined)?.find((pl) => pl.id === id)
+
+  const assignedIds = new Set([
+    ...Object.values(slots).map((s) => s.playerId).filter(Boolean),
     ...subs,
   ])
-  const availablePlayers = (players as Player[] | undefined)?.filter((p: Player) => !usedIds.has(p.id)) ?? []
 
-  const assignToSlot = (slotIndex: number, playerId: string) => {
-    const p = (players as Player[])?.find((pl: Player) => pl.id === playerId)
+  const availablePlayers = (players as Player[] | undefined)?.filter((p) => !assignedIds.has(p.id)) ?? []
+  const filteredAvailable = filterPos === 'all' ? availablePlayers : availablePlayers.filter((p) => {
+    if (filterPos === 'DEF') return ['CB', 'LB', 'RB', 'LWB', 'RWB'].includes(p.position ?? '')
+    if (filterPos === 'MID') return ['CDM', 'CM', 'CAM', 'LM', 'RM'].includes(p.position ?? '')
+    if (filterPos === 'ATT') return ['LW', 'RW', 'ST', 'CF', 'RF', 'LF', 'RAM', 'LAM'].includes(p.position ?? '')
+    if (filterPos === 'GK') return p.position === 'GK'
+    return true
+  })
+
+  const starterCount = Object.values(slots).filter((s) => s.playerId).length
+  const positions = FORMATION_POSITIONS[formation] ?? []
+
+  const autoFill = useCallback(() => {
+    const allPlayers = (players as Player[] | undefined) ?? []
+    setSlots(autoFillPlayers(formation, slots, allPlayers, subs, captainId))
+  }, [players, formation, slots, subs, captainId])
+
+  // FIFA: smart formation change — remap players instead of clearing
+  const handleFormationChange = useCallback((newFormation: string) => {
+    if (newFormation === formation) return
+    const remapped = remapPlayersOnFormationChange(formation, newFormation, slots)
+    setFormation(newFormation)
+    setSlots(remapped)
+    setSelectedSlot(null)
+  }, [formation, slots])
+
+  // FIFA: swap mode — click on slot to select, click another to swap
+  const handleSlotClick = useCallback((slotKey: string, _posIndex: number) => {
+    if (!selectedSlot) {
+      // First click: select this slot (only if filled)
+      if (slots[slotKey]?.playerId) setSelectedSlot(slotKey)
+      return
+    }
+    if (selectedSlot === slotKey) {
+      // Deselect
+      setSelectedSlot(null)
+      return
+    }
+    // Second click: swap the two slots
+    setSlots((prev) => {
+      const next = { ...prev }
+      const a = next[selectedSlot] ?? {}
+      const b = next[slotKey] ?? {}
+      if (a.playerId || b.playerId) {
+        next[selectedSlot] = b.playerId ? { ...b } : {}
+        next[slotKey] = a.playerId ? { ...a } : {}
+        // Clean up empty
+        if (!next[selectedSlot].playerId) delete next[selectedSlot]
+        if (!next[slotKey]?.playerId) delete next[slotKey]
+      }
+      return next
+    })
+    setSelectedSlot(null)
+  }, [selectedSlot, slots])
+
+  // Team stats (FIFA-style)
+  const tRating = teamRating(slots, getPlayer, formation)
+  const tChemistry = teamChemistry(slots, getPlayer, formation)
+
+  // Drag-and-drop handlers
+  const handlePitchDrop = useCallback((slotKey: string, _posIndex: number, playerId: string) => {
+    const p = getPlayer(playerId)
     if (!p) return
-    setSlots((prev) => ({
-      ...prev,
-      [slotIndex]: {
+    setSelectedSlot(null)
+    setSubs((prev) => prev.filter((id) => id !== playerId))
+    setSlots((prev) => {
+      const next = { ...prev }
+      for (const [k, v] of Object.entries(next)) {
+        if (v.playerId === playerId) delete next[k]
+      }
+      next[slotKey] = {
         playerId: p.id,
         playerName: p.profile?.last_name ?? '',
         jerseyNumber: p.jersey_number,
         isCaptain: captainId === p.id,
-      },
-    }))
-  }
+        position: p.position,
+      }
+      return next
+    })
+  }, [players, captainId])
 
-  const removeFromSlot = (slotIndex: number) => {
+  const handleSlotRemove = useCallback((slotKey: string) => {
     setSlots((prev) => {
       const next = { ...prev }
-      const removed = next[slotIndex]?.playerId
-      delete next[slotIndex]
+      const removed = next[slotKey]?.playerId
+      delete next[slotKey]
       if (removed && captainId === removed) setCaptainId(null)
       return next
     })
+  }, [captainId])
+
+  const handleSubDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    const playerId = e.dataTransfer.getData('playerId')
+    if (!playerId) return
+    setSlots((prev) => {
+      const next = { ...prev }
+      for (const [k, v] of Object.entries(next)) {
+        if (v.playerId === playerId) delete next[k]
+      }
+      return next
+    })
+    setSubs((prev) => prev.includes(playerId) ? prev : [...prev, playerId])
   }
 
+  const handlePlayerDragStart = (e: React.DragEvent, player: Player) => {
+    e.dataTransfer.setData('playerId', player.id)
+    e.dataTransfer.effectAllowed = 'move'
+    setDragPlayer({ id: player.id, name: player.profile?.last_name ?? '', jerseyNumber: player.jersey_number, position: player.position })
+  }
+
+  const handleDragEnd = () => setDragPlayer(null)
+
   const toggleCaptain = (playerId: string) => {
-    setCaptainId((prev) => prev === playerId ? null : playerId)
-    // Update the slot's isCaptain flag
+    const newCaptain = captainId === playerId ? null : playerId
+    setCaptainId(newCaptain)
     setSlots((prev) => {
       const next = { ...prev }
       for (const key of Object.keys(next)) {
-        const k = Number(key)
-        next[k] = { ...next[k], isCaptain: next[k].playerId === playerId ? (captainId !== playerId) : false }
+        next[key] = { ...next[key], isCaptain: next[key].playerId === playerId ? newCaptain !== null : false }
       }
       return next
     })
   }
 
-  const addSub = (pid: string) => setSubs((prev) => [...prev, pid])
-  const removeSub = (pid: string) => setSubs((prev) => prev.filter((id: string) => id !== pid))
+  const removeSub = (pid: string) => setSubs((prev) => prev.filter((id) => id !== pid))
+
+  // Auto-save indicator
+  const triggerAutoSave = useCallback(() => {
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current)
+    setAutoSaveStatus('saving')
+    autoSaveTimer.current = setTimeout(() => setAutoSaveStatus('idle'), 600)
+  }, [])
+
+  useEffect(() => {
+    if (starterCount > 0 || subs.length > 0) triggerAutoSave()
+  }, [slots, subs, triggerAutoSave, starterCount])
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
           <Shield size={22} className="text-pitch-500" /> Composition
         </h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <select
             value={formation}
-            onChange={(e) => { setFormation(e.target.value); setSlots({}) }}
+            onChange={(e) => handleFormationChange(e.target.value)}
             className="input w-auto text-sm"
           >
-            <optgroup label="Équilibré">
+            <optgroup label="⚖️ Équilibré">
               {['4-3-3', '4-4-2', '4-2-3-1', '4-5-1'].map((f) => <option key={f} value={f}>{f}</option>)}
             </optgroup>
-            <optgroup label="Défensif">
-              {['3-5-2', '5-3-2'].map((f) => <option key={f} value={f}>{f}</option>)}
+            <optgroup label="🛡️ Défensif">
+              {['3-5-2', '5-3-2', '5-4-1'].map((f) => <option key={f} value={f}>{f}</option>)}
             </optgroup>
-            <optgroup label="Offensif">
-              {['4-1-2-1-2', '3-4-3', '4-1-4-1'].map((f) => <option key={f} value={f}>{f}</option>)}
+            <optgroup label="⚡ Offensif">
+              {['4-1-2-1-2', '3-4-3', '4-1-4-1', '4-3-2-1'].map((f) => <option key={f} value={f}>{f}</option>)}
             </optgroup>
           </select>
-          <button onClick={() => { setSlots({}); setSubs([]); setCaptainId(null) }} className="btn-secondary gap-1.5 text-sm">
+          <button onClick={autoFill} className="btn-secondary gap-1.5 text-sm bg-gradient-to-r from-pitch-900/80 to-pitch-800/60 border-pitch-700 hover:border-pitch-500 text-pitch-300 hover:text-pitch-200" title="Remplir automatiquement les 11 postes">
+            <Wand2 size={14} /> Auto XI
+          </button>
+          <Link to="/coach/tactics" className="btn-secondary text-sm gap-1.5" title="Tableau Tactique">
+            <Swords size={15} /> Tactiques
+          </Link>
+          <button type="button" onClick={() => setShowAnalytics(true)} className="btn-secondary text-sm" title="Analyse Tactique">
+            <BarChart3 size={15} />
+          </button>
+          <button type="button" onClick={() => setShowVisualizer(true)} className="btn-secondary text-sm" title="Visualisation">
+            <Eye size={15} />
+          </button>
+          <button onClick={() => { setSlots({}); setSubs([]); setCaptainId(null); setSelectedSlot(null) }} className="btn-secondary gap-1.5 text-sm text-red-400 hover:text-red-300 border-red-900/50 hover:border-red-700/50">
             <RefreshCw size={14} /> Vider
           </button>
           <button onClick={() => saveMutation.mutate()} className="btn-primary gap-1.5 text-sm" disabled={saveMutation.isPending}>
-            <Save size={14} /> Sauvegarder
+            <Save size={14} /> {saveMutation.isPending ? 'Sauvegarde...' : 'Sauvegarder'}
           </button>
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Pitch */}
-        <div className="lg:col-span-2">
-          <PitchSVG formation={formation} size="lg" slots={slots} />
+      {/* FIFA Game Plan bar */}
+      <div className="flex items-center gap-1 bg-gray-900/70 rounded-xl px-3 py-2 border border-gray-800/60 overflow-x-auto">
+        <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mr-2 shrink-0">Plan de jeu</span>
+        {GAME_PLANS.map((gp) => (
+          <button
+            key={gp.key}
+            onClick={() => setGamePlan(gp.key)}
+            className={clsx(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap',
+              gamePlan === gp.key
+                ? 'bg-pitch-600 text-white shadow-lg shadow-pitch-600/30 ring-1 ring-pitch-400/40'
+                : 'bg-gray-800/60 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
+            )}
+          >
+            <span>{gp.icon}</span>
+            <span className="hidden sm:inline">{gp.label}</span>
+            <span className="sm:hidden">{gp.shortLabel}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Status bar + Team Rating + Chemistry */}
+      <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap bg-gray-900/50 rounded-lg px-3 py-2 border border-gray-800/60">
+        {/* Team Rating */}
+        {starterCount > 0 && (
+          <>
+            <div className="flex items-center gap-1.5">
+              <Trophy size={12} className="text-yellow-400" />
+              <span className="text-yellow-400 font-bold">{tRating}</span>
+              <span className="text-gray-600">OVR</span>
+            </div>
+            <span className="text-gray-700">|</span>
+            <div className="flex items-center gap-1.5">
+              <Heart size={12} className={clsx(tChemistry >= 80 ? 'text-green-400' : tChemistry >= 50 ? 'text-yellow-400' : 'text-red-400')} />
+              <span className={clsx('font-bold', tChemistry >= 80 ? 'text-green-400' : tChemistry >= 50 ? 'text-yellow-400' : 'text-red-400')}>{tChemistry}</span>
+              <span className="text-gray-600">CHM</span>
+            </div>
+            <span className="text-gray-700">|</span>
+          </>
+        )}
+        <div className="flex items-center gap-2">
+          <div className={clsx('w-2 h-2 rounded-full', starterCount === 11 ? 'bg-green-500' : starterCount > 0 ? 'bg-amber-500 animate-pulse' : 'bg-gray-600')} />
+          <span className={clsx(starterCount === 11 ? 'text-green-400 font-semibold' : starterCount > 0 ? 'text-amber-400' : 'text-gray-500')}>
+            {starterCount}/11
+          </span>
+        </div>
+        <span className="text-gray-700">|</span>
+        <span className="flex items-center gap-1"><ArrowRightLeft size={11} /> {subs.length} remplaçants</span>
+        {captainId && (
+          <>
+            <span className="text-gray-700">|</span>
+            <span className="flex items-center gap-1 text-yellow-400"><Star size={11} className="fill-yellow-400" /> {getPlayer(captainId)?.profile?.last_name ?? 'Capitaine'}</span>
+          </>
+        )}
+        {starterCount === 11 && !captainId && (
+          <>
+            <span className="text-gray-700">|</span>
+            <span className="flex items-center gap-1 text-amber-400"><AlertTriangle size={11} /> Aucun capitaine</span>
+          </>
+        )}
+        {selectedSlot && (
+          <>
+            <span className="text-gray-700">|</span>
+            <span className="flex items-center gap-1 text-yellow-400 animate-pulse"><Repeat2 size={11} /> Mode échange — cliquez un autre joueur</span>
+          </>
+        )}
+        <div className="ml-auto flex items-center gap-2">
+          {starterCount < 11 && availablePlayers.length > 0 && (
+            <button onClick={autoFill} className="flex items-center gap-1 text-pitch-400 hover:text-pitch-300 font-medium transition-colors">
+              <Zap size={10} /> Compléter
+            </button>
+          )}
+          {autoSaveStatus === 'saving' && <span className="flex items-center gap-1 text-amber-400"><Cloud size={11} className="animate-pulse" />Modifié</span>}
+          {autoSaveStatus === 'saved' && <span className="flex items-center gap-1 text-green-400"><Check size={11} />Sauvegardé</span>}
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        {/* Pitch — main area */}
+        <div className="lg:col-span-2 space-y-3">
+          <div className="relative">
+            <PitchSVG
+              formation={formation}
+              size="lg"
+              slots={slots}
+              interactive
+              showLabels
+              highlightEmpty={!!dragPlayer}
+              dragPlayer={dragPlayer}
+              onSlotClick={handleSlotClick}
+              onSlotDrop={handlePitchDrop}
+              onSlotRemove={handleSlotRemove}
+              getPlayer={getPlayer}
+              selectedSlot={selectedSlot}
+            />
+            {/* Overlay hint when empty */}
+            {starterCount === 0 && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <p className="text-white/30 text-sm font-medium mb-2">Terrain vide</p>
+                <button onClick={autoFill} className="btn-primary text-sm gap-1.5 pointer-events-auto animate-pulse">
+                  <Wand2 size={14} /> Remplir automatiquement
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Substitutes bench below pitch */}
+          <div
+            className={clsx(
+              'border rounded-xl p-3 space-y-2 transition-colors',
+              dragPlayer ? 'bg-yellow-900/10 border-yellow-700/40' : 'bg-gray-800/40 border-gray-700'
+            )}
+            onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move' }}
+            onDrop={handleSubDrop}
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold text-gray-400 flex items-center gap-1.5">
+                <ArrowRightLeft size={13} className="text-yellow-400" /> Banc ({subs.length})
+              </p>
+              {dragPlayer && <p className="text-[10px] text-yellow-400 animate-pulse">↓ Déposez ici</p>}
+            </div>
+            {subs.length > 0 ? (
+              <div className="flex gap-2 flex-wrap">
+                {subs.map((id) => {
+                  const p = getPlayer(id)
+                  if (!p) return null
+                  return (
+                    <div
+                      key={id}
+                      draggable
+                      onDragStart={(e) => { e.dataTransfer.setData('playerId', id); e.dataTransfer.effectAllowed = 'move'; setDragPlayer({ id, name: p.profile?.last_name ?? '', jerseyNumber: p.jersey_number, position: p.position }) }}
+                      onDragEnd={handleDragEnd}
+                      className="inline-flex items-center gap-1.5 bg-gray-700/60 border border-gray-600 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 cursor-grab active:cursor-grabbing hover:border-yellow-600/50 transition-colors group"
+                    >
+                      <GripVertical size={10} className="text-gray-500" />
+                      <span className={clsx('w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold', posColor(p.position))}>{p.jersey_number ?? '?'}</span>
+                      {p.profile?.last_name ?? 'Joueur'}
+                      <span className="text-[10px] text-gray-500">{p.position}</span>
+                      <button type="button" onClick={() => removeSub(id)} className="ml-0.5 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><UserMinus size={11} /></button>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="text-center text-gray-600 text-xs py-3 border border-dashed border-gray-700 rounded-lg">
+                Aucun remplaçant — glissez un joueur ici
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Player assignment panel */}
-        <div className="space-y-4">
-          <div className="card overflow-y-auto max-h-[420px] space-y-2">
-            <h2 className="font-semibold text-white text-sm sticky top-0 bg-gray-900 pb-2 border-b border-gray-800">
-              Assigner les postes
-            </h2>
-            {positions.map((pos: { name: string; x: number; y: number }, i: number) => {
-              const slot = slots[i]
+        {/* Right panel — players list */}
+        <div className="space-y-3">
+          {/* Starters quick overview */}
+          <div className="bg-gray-900/60 border border-gray-800 rounded-xl p-3 space-y-1.5 max-h-[260px] overflow-y-auto">
+            <div className="flex items-center justify-between sticky top-0 bg-gray-900/95 backdrop-blur pb-1.5 z-10">
+              <h2 className="font-semibold text-white text-sm flex items-center gap-2"><Shield size={14} className="text-pitch-400" /> XI de départ</h2>
+              <span className={clsx('text-[10px] font-bold px-2 py-0.5 rounded-full', starterCount === 11 ? 'bg-green-900/50 text-green-400' : 'bg-gray-800 text-gray-500')}>{starterCount}/11</span>
+            </div>
+            {positions.map((pos, i) => {
+              const key = `${pos.name}-${i}`
+              const slot = slots[key]
+              const player = slot?.playerId ? getPlayer(slot.playerId) : undefined
+              const ovr = player ? calcOVR(player) : 0
               return (
-                <div key={`${pos.name}-${i}`} className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-gray-400 w-8">{pos.name}</span>
+                <div key={key} className="flex items-center gap-1.5 group">
+                  <span className={clsx('text-[9px] font-bold w-7 text-center py-0.5 rounded', posColor(pos.name))}>{pos.name}</span>
                   {slot?.playerId ? (
-                    <div className="flex-1 flex items-center gap-1.5 bg-pitch-900/20 border border-pitch-800 rounded-lg px-2 py-1.5">
-                      <span className="text-xs font-bold text-pitch-400 w-5">#{slot.jerseyNumber ?? '?'}</span>
-                      <span className="text-sm text-white flex-1 truncate">{slot.playerName}</span>
-                      <button onClick={() => toggleCaptain(slot.playerId!)}
-                        className={`p-0.5 ${captainId === slot.playerId ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-400'}`}>
-                        <Star size={12} className={captainId === slot.playerId ? 'fill-yellow-400' : ''} />
+                    <div className={clsx(
+                      'flex-1 flex items-center gap-1.5 bg-gray-800/60 border rounded-lg px-2 py-1 hover:border-pitch-700/40 transition-colors cursor-pointer',
+                      selectedSlot === key ? 'border-yellow-400/80 bg-yellow-900/20' : 'border-gray-700/50'
+                    )} onClick={() => handleSlotClick(key, i)}>
+                      <span className={clsx('text-[10px] font-bold w-4', ovrColor(ovr))}>{ovr}</span>
+                      <span className="text-[10px] font-bold text-pitch-400 w-4">{slot.jerseyNumber ?? '?'}</span>
+                      <span className="text-[11px] text-white flex-1 truncate">{slot.playerName}</span>
+                      <button onClick={(e) => { e.stopPropagation(); toggleCaptain(slot.playerId!) }}
+                        className={clsx('p-0.5 transition-all', captainId === slot.playerId ? 'text-yellow-400 scale-110' : 'text-gray-600 hover:text-yellow-400 opacity-0 group-hover:opacity-100')}>
+                        <Star size={10} className={captainId === slot.playerId ? 'fill-yellow-400' : ''} />
                       </button>
-                      <button onClick={() => removeFromSlot(i)} className="text-gray-500 hover:text-red-400 text-xs">×</button>
+                      <button onClick={(e) => { e.stopPropagation(); handleSlotRemove(key) }} className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all text-[10px]">✕</button>
                     </div>
                   ) : (
-                    <select
-                      value=""
-                      onChange={(e) => assignToSlot(i, e.target.value)}
-                      className="input text-xs py-1.5 flex-1"
-                    >
-                      <option value="">— Sélectionner —</option>
-                      {availablePlayers.map((p: Player) => (
-                        <option key={p.id} value={p.id}>
-                          #{p.jersey_number ?? '?'} {p.profile?.first_name} {p.profile?.last_name} ({p.position ?? '—'})
-                        </option>
-                      ))}
-                    </select>
+                    <span className="flex-1 text-[10px] text-gray-700 italic px-2">—</span>
                   )}
                 </div>
               )
             })}
           </div>
 
-          {/* Substitutes */}
-          <div className="card space-y-2">
-            <h2 className="font-semibold text-white text-sm flex items-center gap-2">
-              <UserPlus size={14} className="text-yellow-400" /> Remplaçants ({subs.length})
-            </h2>
-            {subs.map((sid: string) => {
-              const p = (players as Player[])?.find((pl: Player) => pl.id === sid)
-              return p ? (
-                <div key={sid} className="flex items-center gap-2 bg-yellow-900/10 border border-yellow-800/30 rounded-lg px-2 py-1.5">
-                  <span className="text-xs font-bold text-yellow-400">#{p.jersey_number ?? '?'}</span>
-                  <span className="text-sm text-white flex-1">{p.profile?.first_name} {p.profile?.last_name}</span>
-                  <button onClick={() => removeSub(sid)} className="text-gray-500 hover:text-red-400 text-xs">×</button>
+          {/* Available players */}
+          <div className="bg-gray-900/60 border border-gray-800 rounded-xl p-3 space-y-2">
+            <button type="button" onClick={() => setShowAllPlayers(!showAllPlayers)} className="w-full flex items-center justify-between">
+              <h2 className="font-semibold text-white text-sm flex items-center gap-2">
+                <Users size={14} className="text-gray-400" /> Effectif ({availablePlayers.length})
+              </h2>
+              {showAllPlayers ? <ChevronUp size={14} className="text-gray-500" /> : <ChevronDown size={14} className="text-gray-500" />}
+            </button>
+
+            {showAllPlayers && (
+              <>
+                {/* Position filter */}
+                <div className="flex gap-1 flex-wrap">
+                  {[
+                    { key: 'all', label: 'Tous', color: '' },
+                    { key: 'GK', label: 'GK', color: 'text-amber-400' },
+                    { key: 'DEF', label: 'DÉF', color: 'text-blue-400' },
+                    { key: 'MID', label: 'MIL', color: 'text-green-400' },
+                    { key: 'ATT', label: 'ATT', color: 'text-red-400' },
+                  ].map((f) => (
+                    <button key={f.key} type="button" onClick={() => setFilterPos(f.key)} className={clsx(
+                      'text-[10px] px-2.5 py-1 rounded-md font-medium transition-all',
+                      filterPos === f.key
+                        ? 'bg-pitch-800 text-pitch-200 ring-1 ring-pitch-600/30'
+                        : 'bg-gray-800 text-gray-500 hover:text-gray-300'
+                    )}>
+                      {f.label}
+                    </button>
+                  ))}
                 </div>
-              ) : null
-            })}
-            {availablePlayers.length > 0 && (
-              <select
-                value=""
-                onChange={(e) => { if (e.target.value) addSub(e.target.value) }}
-                className="input text-xs py-1.5"
-              >
-                <option value="">+ Ajouter un remplaçant</option>
-                {availablePlayers.map((p: Player) => (
-                  <option key={p.id} value={p.id}>
-                    #{p.jersey_number ?? '?'} {p.profile?.first_name} {p.profile?.last_name}
-                  </option>
-                ))}
-              </select>
+
+                <div className="space-y-1 max-h-[280px] overflow-y-auto pr-1 scrollbar-thin">
+                  {filteredAvailable.length > 0 ? filteredAvailable.map((p) => (
+                    <div
+                      key={p.id}
+                      draggable
+                      onDragStart={(e) => handlePlayerDragStart(e, p)}
+                      onDragEnd={handleDragEnd}
+                      onClick={() => {
+                        // FIFA: if in swap mode, drop selected slot player and place this one
+                        if (selectedSlot) {
+                          const prev = slots[selectedSlot]
+                          setSlots((s) => ({
+                            ...s,
+                            [selectedSlot]: {
+                              playerId: p.id,
+                              playerName: p.profile?.last_name ?? '',
+                              jerseyNumber: p.jersey_number,
+                              isCaptain: captainId === p.id,
+                              position: p.position,
+                            },
+                          }))
+                          // Move previous player back to available (remove from slots)
+                          setSelectedSlot(null)
+                        }
+                      }}
+                      className={clsx(
+                        'flex items-center gap-2 bg-gray-800/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 cursor-grab active:cursor-grabbing hover:bg-gray-700 hover:text-white transition-all border hover:shadow-md hover:shadow-pitch-900/20',
+                        selectedSlot ? 'border-yellow-700/30 hover:border-yellow-500/50 cursor-pointer' : 'border-transparent hover:border-pitch-700/30'
+                      )}
+                    >
+                      <GripVertical size={10} className="text-gray-600 shrink-0" />
+                      <span className={clsx('w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0', posColor(p.position))}>{p.jersey_number ?? '?'}</span>
+                      <span className="truncate flex-1">{p.profile?.last_name}</span>
+                      <span className={clsx('text-[9px] font-bold shrink-0', ovrColor(calcOVR(p)))}>{calcOVR(p)}</span>
+                      <span className="text-[9px] text-gray-500 shrink-0">{p.position ?? '—'}</span>
+                    </div>
+                  )) : (
+                    <div className="text-center py-4">
+                      <p className="text-xs text-gray-600">
+                        {availablePlayers.length === 0 ? '✓ Tous les joueurs sont assignés' : 'Aucun joueur pour ce filtre'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <TacticalAnalytics
+        open={showAnalytics}
+        onClose={() => setShowAnalytics(false)}
+        formation={formation}
+      />
+      <TacticalVisualizer
+        open={showVisualizer}
+        onClose={() => setShowVisualizer(false)}
+        formation={formation}
+      />
     </div>
   )
 }

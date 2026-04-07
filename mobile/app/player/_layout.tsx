@@ -17,6 +17,8 @@ export default function PlayerLayout() {
       <Stack.Screen name="edit-profile" options={{ title: 'Modifier profil' }} />
       <Stack.Screen name="event-detail" options={{ title: 'Détail événement' }} />
       <Stack.Screen name="settings" options={{ title: 'Paramètres' }} />
+      <Stack.Screen name="goals" options={{ title: 'Mes Objectifs' }} />
+      <Stack.Screen name="training" options={{ title: 'Entraînement' }} />
     </Stack>
   );
 }

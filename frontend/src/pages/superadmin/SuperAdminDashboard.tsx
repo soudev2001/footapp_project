@@ -10,15 +10,15 @@ export default function SuperAdminDashboard() {
   })
 
   const stats = [
-    { label: 'Total Clubs', value: data?.club_count ?? '—', icon: <Globe size={22} className="text-blue-400" />, to: '/superadmin/clubs' },
-    { label: 'Total Users', value: data?.user_count ?? '—', icon: <Users size={22} className="text-pitch-400" />, to: '/superadmin/clubs' },
-    { label: 'Active Projects', value: data?.project_count ?? '—', icon: <FolderKanban size={22} className="text-purple-400" />, to: '/superadmin/projects' },
-    { label: 'Revenue', value: data?.revenue ? `€${data.revenue}` : '—', icon: <TrendingUp size={22} className="text-yellow-400" />, to: '/superadmin/projects' },
+    { label: 'Clubs', value: data?.club_count ?? '—', icon: <Globe size={22} className="text-blue-400" />, to: '/superadmin/clubs' },
+    { label: 'Utilisateurs', value: data?.user_count ?? '—', icon: <Users size={22} className="text-pitch-400" />, to: '/superadmin/clubs' },
+    { label: 'Projets actifs', value: data?.project_count ?? '—', icon: <FolderKanban size={22} className="text-purple-400" />, to: '/superadmin/projects' },
+    { label: 'Revenu', value: data?.revenue ? `${data.revenue}€` : '—', icon: <TrendingUp size={22} className="text-yellow-400" />, to: '/superadmin/projects' },
   ]
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">SuperAdmin Dashboard</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-white">Tableau de bord SuperAdmin</h1>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (
@@ -35,13 +35,13 @@ export default function SuperAdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2">
         <Link to="/superadmin/clubs" className="card hover:border-gray-700 transition-colors">
           <Globe size={28} className="text-blue-400 mb-3" />
-          <p className="font-semibold text-white">Manage Clubs</p>
-          <p className="text-sm text-gray-400 mt-1">View and manage all registered clubs.</p>
+          <p className="font-semibold text-white">Gérer les clubs</p>
+          <p className="text-sm text-gray-400 mt-1">Afficher et gérer tous les clubs enregistrés.</p>
         </Link>
         <Link to="/superadmin/projects" className="card hover:border-gray-700 transition-colors">
           <FolderKanban size={28} className="text-purple-400 mb-3" />
-          <p className="font-semibold text-white">Projects & Tickets</p>
-          <p className="text-sm text-gray-400 mt-1">Track platform development projects.</p>
+          <p className="font-semibold text-white">Projets & Tickets</p>
+          <p className="text-sm text-gray-400 mt-1">Suivre les projets de développement de la plateforme.</p>
         </Link>
       </div>
     </div>

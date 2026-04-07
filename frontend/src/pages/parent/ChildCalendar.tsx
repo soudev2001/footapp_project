@@ -15,11 +15,11 @@ export default function ChildCalendar() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-        <Calendar size={22} className="text-pitch-500" /> Child's Calendar
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+        <Calendar size={22} className="text-pitch-500" /> Calendrier de l'enfant
       </h1>
 
-      {isLoading && <p className="text-gray-400">Loading...</p>}
+      {isLoading && <p className="text-gray-400">Chargement...</p>}
 
       <div className="space-y-3">
         {events?.map((event: { id: string; title: string; type: string; date: string; location?: string }) => (
@@ -35,7 +35,7 @@ export default function ChildCalendar() {
           </div>
         ))}
         {!isLoading && !events?.length && (
-          <div className="card text-center py-10 text-gray-400">No events found.</div>
+          <div className="card text-center py-10 text-gray-400">Aucun événement trouvé.</div>
         )}
       </div>
     </div>

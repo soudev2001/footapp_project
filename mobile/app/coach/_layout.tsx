@@ -22,6 +22,12 @@ export default function CoachLayout() {
       <Stack.Screen name="add-player" options={{ title: 'Ajouter joueur' }} />
       <Stack.Screen name="create-event" options={{ title: 'Créer événement' }} />
       <Stack.Screen name="scouting" options={{ title: 'Scouting' }} />
+      <Stack.Screen name="training-plans" options={{ title: 'Plans d\'entraînement' }} />
+      <Stack.Screen name="training-session" options={{ title: 'Séance' }} />
+      <Stack.Screen name="drill-library" options={{ title: 'Exercices' }} />
+      <Stack.Screen name="injuries" options={{ title: 'Blessures' }} />
+      <Stack.Screen name="player-analytics" options={{ title: 'Analyse joueurs' }} />
+      <Stack.Screen name="player-comparison" options={{ title: 'Comparaison' }} />
     </Stack>
   );
 }

@@ -40,33 +40,33 @@ export default function Projects() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <FolderKanban size={22} className="text-pitch-500" /> Projects
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+          <FolderKanban size={22} className="text-pitch-500" /> Projets
         </h1>
         <button onClick={() => setCreating(true)} className="btn-primary">
-          <Plus size={16} /> New Project
+          <Plus size={16} /> Nouveau projet
         </button>
       </div>
 
       {creating && (
         <form onSubmit={handleSubmit((d) => createMutation.mutate(d))} className="card space-y-4 border-pitch-800">
-          <h2 className="font-semibold text-white">New Project</h2>
+          <h2 className="font-semibold text-white">Nouveau projet</h2>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Name</label>
-            <input {...register('name', { required: true })} className="input" placeholder="Project name" />
+            <label className="block text-sm text-gray-400 mb-1">Nom</label>
+            <input {...register('name', { required: true })} className="input" placeholder="Nom du projet" />
           </div>
           <div>
             <label className="block text-sm text-gray-400 mb-1">Description</label>
-            <textarea {...register('description')} rows={3} className="input resize-none" placeholder="Project description..." />
+            <textarea {...register('description')} rows={3} className="input resize-none" placeholder="Description du projet..." />
           </div>
           <div className="flex gap-2">
-            <button type="submit" className="btn-primary" disabled={createMutation.isPending}>Create</button>
-            <button type="button" onClick={() => { reset(); setCreating(false) }} className="btn-secondary">Cancel</button>
+            <button type="submit" className="btn-primary" disabled={createMutation.isPending}>Créer</button>
+            <button type="button" onClick={() => { reset(); setCreating(false) }} className="btn-secondary">Annuler</button>
           </div>
         </form>
       )}
 
-      {isLoading && <p className="text-gray-400">Loading projects...</p>}
+      {isLoading && <p className="text-gray-400">Chargement des projets...</p>}
 
       <div className="grid gap-4 md:grid-cols-2">
         {projects?.map((proj: { id: string; name: string; description?: string; status: string; tickets?: unknown[] }) => (
@@ -82,7 +82,7 @@ export default function Projects() {
           </div>
         ))}
         {!isLoading && !projects?.length && (
-          <div className="col-span-2 card text-gray-400 text-sm text-center py-12">No projects yet.</div>
+          <div className="col-span-2 card text-gray-400 text-sm text-center py-12">Aucun projet pour le moment.</div>
         )}
       </div>
     </div>

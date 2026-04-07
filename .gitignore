@@ -1,22 +1,48 @@
+# Python
 __pycache__/
 *.py[cod]
 *.pyc
 *$py.class
+
+# Env files
 .env
 .env.prod
 .env.preprod
+
+# Virtual environments
 .venv
 venv/
 ENV/
 env/
+
+# IDE
 .idea/
 .vscode/
 *.swp
 *.bak
 *.tmp
 *.log
+
+# Data
 mongodb_data/
-.vite/
+
+# Frontend (Vite/React web app)
 frontend/node_modules/
 frontend/build/
 frontend/dist/
+frontend/.vite/
+
+# frontend_fresh — unused scaffold, do NOT push
+frontend_fresh/
+
+# Mobile (Expo/React Native)
+mobile/node_modules/
+mobile/.expo/
+mobile/dist/
+mobile/android/
+mobile/ios/
+
+# General
+node_modules/
+.vite/
+*.tsbuildinfo

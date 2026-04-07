@@ -27,21 +27,21 @@ export default function Contracts() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-        <FileText size={22} className="text-pitch-500" /> Contracts
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+        <FileText size={22} className="text-pitch-500" /> Contrats
       </h1>
 
-      {isLoading && <p className="text-gray-400">Loading contracts...</p>}
+      {isLoading && <p className="text-gray-400">Chargement des contrats...</p>}
 
       <div className="space-y-4">
         {contracts?.map((contract: { id: string; status: string; role?: string; start_date?: string; end_date?: string; salary?: number; conditions?: string }) => (
           <div key={contract.id} className="card space-y-4">
             <div className="flex items-start justify-between">
               <div>
-                <p className="font-semibold text-white capitalize">{contract.role ?? 'Player'} Contract</p>
+                <p className="font-semibold text-white capitalize">{contract.role ?? 'Joueur'} Contrat</p>
                 <div className="flex gap-3 text-sm text-gray-400 mt-1">
-                  {contract.start_date && <span>From {format(new Date(contract.start_date), 'MMM d, yyyy')}</span>}
-                  {contract.end_date && <span>To {format(new Date(contract.end_date), 'MMM d, yyyy')}</span>}
+                  {contract.start_date && <span>Du {format(new Date(contract.start_date), 'dd/MM/yyyy')}</span>}
+                  {contract.end_date && <span>Au {format(new Date(contract.end_date), 'dd/MM/yyyy')}</span>}
                 </div>
               </div>
               <span className={clsx('badge text-xs capitalize', STATUS_STYLE[contract.status] ?? 'bg-gray-800 text-gray-400')}>
@@ -51,8 +51,8 @@ export default function Contracts() {
 
             {contract.salary !== undefined && (
               <div className="bg-gray-800 rounded-lg px-4 py-2 text-sm">
-                <span className="text-gray-400">Salary: </span>
-                <span className="text-white font-medium">€{contract.salary.toLocaleString()}/month</span>
+                <span className="text-gray-400">Salaire : </span>
+                <span className="text-white font-medium">{contract.salary.toLocaleString()}€/mois</span>
               </div>
             )}
 
@@ -66,13 +66,13 @@ export default function Contracts() {
                   onClick={() => respondMutation.mutate({ id: contract.id, action: 'accept' })}
                   className="btn-primary flex-1 justify-center"
                 >
-                  <CheckCircle size={16} /> Accept
+                  <CheckCircle size={16} /> Accepter
                 </button>
                 <button
                   onClick={() => respondMutation.mutate({ id: contract.id, action: 'reject' })}
                   className="btn-danger flex-1 justify-center"
                 >
-                  <XCircle size={16} /> Reject
+                  <XCircle size={16} /> Rejeter
                 </button>
               </div>
             )}
@@ -82,7 +82,7 @@ export default function Contracts() {
         {!isLoading && !contracts?.length && (
           <div className="card text-center py-12 text-gray-400">
             <FileText size={40} className="mx-auto mb-3 opacity-30" />
-            No contracts found.
+            Aucun contrat trouvé.
           </div>
         )}
       </div>

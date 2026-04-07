@@ -18,6 +18,6 @@ export interface Announcement {
 }
 
 export async function getAnnouncements(): Promise<Announcement[]> {
-  const { data } = await api.get('/announcements');
-  return data.announcements || data;
+  const { data } = await api.get('/admin/announcements');
+  return data.data || data.announcements || [];
 }

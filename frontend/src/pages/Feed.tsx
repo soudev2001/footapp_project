@@ -25,14 +25,14 @@ export default function Feed() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <h1 className="text-2xl font-bold text-white flex-1">Feed</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex-1">Fil d'actualité</h1>
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search posts..."
-            className="input pl-9 w-56"
+            placeholder="Rechercher des publications..."
+            className="input pl-9 w-full sm:w-56"
           />
         </div>
       </div>
@@ -58,7 +58,7 @@ export default function Feed() {
       )}
 
       {posts?.length === 0 && !isLoading && (
-        <div className="card text-center py-12 text-gray-400">No posts yet.</div>
+        <div className="card text-center py-12 text-gray-400">Aucune publication pour le moment.</div>
       )}
 
       {posts?.map((post: Post) => (

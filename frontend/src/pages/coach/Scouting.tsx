@@ -66,7 +66,7 @@ export default function Scouting() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
           <Eye size={22} className="text-pitch-500" /> Recrutement
         </h1>
         <button onClick={() => setAdding(true)} className="btn-primary">
@@ -95,7 +95,7 @@ export default function Scouting() {
       {adding && (
         <form onSubmit={handleSubmit((d) => addMutation.mutate({ ...d, player_name: `${d.first_name} ${d.last_name}` }))} className="card space-y-4 border-pitch-800">
           <h2 className="font-semibold text-white">Nouveau rapport de scouting</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-gray-400 mb-1">Prénom</label>
               <input {...register('first_name', { required: true })} className="input" placeholder="Prénom" />

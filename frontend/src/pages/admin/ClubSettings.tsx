@@ -52,8 +52,8 @@ export default function ClubSettings() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-        <Settings size={22} className="text-pitch-500" /> Club Settings
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+        <Settings size={22} className="text-pitch-500" /> Paramètres du Club
       </h1>
 
       {/* Club preview */}
@@ -70,32 +70,32 @@ export default function ClubSettings() {
       )}
 
       <form onSubmit={handleSubmit((d) => updateMutation.mutate(d))} className="card space-y-5">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Club Name</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">Nom du club</label>
             <input {...register('name', { required: true })} className="input" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">City</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">Ville</label>
             <input {...register('city')} className="input" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Founded Year</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">Année de fondation</label>
             <input {...register('founded_year', { valueAsNumber: true })} type="number" className="input" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Stadium</label>
-            <input {...register('stadium')} className="input" placeholder="Stadium name" />
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">Stade</label>
+            <input {...register('stadium')} className="input" placeholder="Nom du stade" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Primary Color</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">Couleur primaire</label>
             <div className="flex items-center gap-2">
               <input {...register('primary_color')} type="color" className="h-10 w-16 rounded bg-transparent cursor-pointer border-0 p-0" />
               <input {...register('primary_color')} className="input flex-1" placeholder="#16a34a" />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Secondary Color</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">Couleur secondaire</label>
             <div className="flex items-center gap-2">
               <input {...register('secondary_color')} type="color" className="h-10 w-16 rounded bg-transparent cursor-pointer border-0 p-0" />
               <input {...register('secondary_color')} className="input flex-1" placeholder="#ffffff" />
@@ -103,19 +103,19 @@ export default function ClubSettings() {
           </div>
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-1.5">Description</label>
-            <textarea {...register('description')} rows={4} className="input resize-none" placeholder="About your club..." />
+            <textarea {...register('description')} rows={4} className="input resize-none" placeholder="À propos de votre club..." />
           </div>
         </div>
 
         {updateMutation.isSuccess && (
           <div className="text-sm text-pitch-300 bg-pitch-900/30 rounded-lg px-4 py-2">
-            Club settings saved successfully!
+            Les paramètres du club ont été enregistrés !
           </div>
         )}
 
         <button type="submit" disabled={isSubmitting || updateMutation.isPending} className="btn-primary">
           {isSubmitting || updateMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          Save Changes
+          Enregistrer
         </button>
       </form>
     </div>

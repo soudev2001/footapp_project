@@ -119,6 +119,85 @@ class AnalyticsService:
             'details': stats
         }
 
+    def get_team_performance(self, club_id):
+        """Return win/draw/loss and attendance per team."""
+        teams = list(self.teams.find({'club_id': ObjectId(club_id)}))
+        result = []
+        for team in teams:
+            tid = team['_id']
+            matches = list(self.db['matches'].find({'$or': [
+                {'club_id': ObjectId(club_id), 'team_id': tid},
+                {'club_id': ObjectId(club_id)}
+            ], 'status': 'completed'}))
+            w = d = l = 0
+            for m in matches:
+                h = m.get('home_score', 0)
+                a = m.get('away_score', 0)
+                if h > a:
+                    w += 1
+                elif h == a:
+                    d += 1
+                else:
+                    l += 1
+            events = list(self.events.find({'club_id': ObjectId(club_id), 'team_id': tid, 'type': 'training'}))
+            total_att = 0
+            present_att = 0
+            for ev in events:
+                for att in ev.get('attendance', []):
+                    total_att += 1
+                    if att.get('status') == 'present':
+                        present_att += 1
+            att_rate = round((present_att / total_att * 100) if total_att else 0, 1)
+            result.append({
+                'team_name': team['name'],
+                'category': team.get('category', ''),
+                'wins': w, 'draws': d, 'losses': l,
+                'matches_total': w + d + l,
+                'attendance_rate': att_rate,
+            })
+        return result
+
+    def get_member_retention(self, club_id):
+        """Return retention and churn metrics."""
+        now = datetime.utcnow()
+        total = self.users.count_documents({'club_id': ObjectId(club_id)})
+        three_months_ago = now - timedelta(days=90)
+        new_3m = self.users.count_documents({
+            'club_id': ObjectId(club_id),
+            'created_at': {'$gte': three_months_ago}
+        })
+        still_active_3m = self.users.count_documents({
+            'club_id': ObjectId(club_id),
+            'created_at': {'$gte': three_months_ago},
+            'last_login': {'$gte': now - timedelta(days=30)}
+        })
+        retention_3m = round((still_active_3m / new_3m * 100) if new_3m else 0, 1)
+        one_month_ago = now - timedelta(days=30)
+        left_last_month = self.users.count_documents({
+            'club_id': ObjectId(club_id),
+            'account_status': {'$in': ['deleted', 'suspended']},
+            'updated_at': {'$gte': one_month_ago}
+        })
+        churn_rate = round((left_last_month / total * 100) if total else 0, 1)
+        return {
+            'total': total,
+            'new_3_months': new_3m,
+            'retained_3_months': still_active_3m,
+            'retention_rate_3m': retention_3m,
+            'churn_rate_monthly': churn_rate,
+        }
+
+    def get_feature_usage(self, club_id):
+        """Return basic feature usage stats."""
+        cid = ObjectId(club_id)
+        return {
+            'messages_sent': self.messages.count_documents({'club_id': cid}),
+            'events_created': self.events.count_documents({'club_id': cid}),
+            'matches_played': self.db['matches'].count_documents({'club_id': cid, 'status': 'completed'}),
+            'posts_created': self.db['posts'].count_documents({'club_id': cid}),
+            'players_registered': self.players.count_documents({'club_id': cid}),
+        }
+
     # ================================================================
     # FINANCIAL METRICS
     # ================================================================

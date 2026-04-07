@@ -38,7 +38,7 @@ export default function CoachDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
         <Shield size={22} className="text-pitch-500" /> Tableau de bord
       </h1>
 
@@ -100,7 +100,7 @@ export default function CoachDashboard() {
         {/* Quick access */}
         <div className="card space-y-3">
           <h2 className="font-semibold text-white">Accès rapide</h2>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {QUICK_LINKS.map((a) => (
               <Link key={a.to} to={a.to} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 transition-colors text-sm text-gray-300 hover:text-white group">
                 <span className={a.color}>{a.icon}</span>

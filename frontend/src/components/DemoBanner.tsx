@@ -24,10 +24,10 @@ export default function DemoBanner() {
   }
 
   return (
-    <div className="bg-yellow-500 text-yellow-950 px-4 py-1.5 flex items-center justify-between gap-4 text-sm font-medium shrink-0">
-      <div className="flex items-center gap-2">
+    <div className="bg-yellow-500 text-yellow-950 px-3 sm:px-4 py-1.5 flex items-center justify-between gap-2 sm:gap-4 text-xs sm:text-sm font-medium shrink-0 flex-wrap">
+      <div className="flex items-center gap-2 min-w-0">
         <Zap size={15} className="shrink-0" />
-        <span>Mode Démo — <span className="font-bold capitalize">{user?.role}</span> · FC Les Aiglons · Données fictives</span>
+        <span className="truncate">Mode Démo — <span className="font-bold capitalize">{user?.role}</span> <span className="hidden sm:inline">· FC Les Aiglons · Données fictives</span></span>
       </div>
       <div className="flex items-center gap-2 shrink-0">
         <button

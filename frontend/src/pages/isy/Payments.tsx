@@ -52,22 +52,22 @@ export default function Payments() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <DollarSign size={22} className="text-yellow-400" /> Payments
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+          <DollarSign size={22} className="text-yellow-400" /> Paiements
         </h1>
-        <button onClick={() => setAdding(true)} className="btn-primary"><Plus size={16} /> Add Payment</button>
+        <button onClick={() => setAdding(true)} className="btn-primary"><Plus size={16} /> Ajouter un paiement</button>
       </div>
 
       {adding && (
         <form onSubmit={handleSubmit((d) => addMutation.mutate(d))} className="card space-y-4 border-yellow-800">
-          <h2 className="font-semibold text-white">New Payment</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <h2 className="font-semibold text-white">Nouveau paiement</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Member Name</label>
+              <label className="block text-sm text-gray-400 mb-1">Nom du membre</label>
               <input {...register('member_name', { required: true })} className="input" />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Amount (€)</label>
+              <label className="block text-sm text-gray-400 mb-1">Montant (€)</label>
               <input {...register('amount', { required: true, valueAsNumber: true })} type="number" step="0.01" className="input" />
             </div>
             <div>
@@ -79,8 +79,8 @@ export default function Payments() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Period</label>
-              <input {...register('period')} placeholder="e.g. Jan 2026" className="input" />
+              <label className="block text-sm text-gray-400 mb-1">Période</label>
+              <input {...register('period')} placeholder="ex. Jan 2026" className="input" />
             </div>
             <div className="col-span-2">
               <label className="block text-sm text-gray-400 mb-1">Notes</label>
@@ -88,23 +88,23 @@ export default function Payments() {
             </div>
           </div>
           <div className="flex gap-2">
-            <button type="submit" className="btn-primary" disabled={addMutation.isPending}>Save</button>
-            <button type="button" onClick={() => { reset(); setAdding(false) }} className="btn-secondary">Cancel</button>
+            <button type="submit" className="btn-primary" disabled={addMutation.isPending}>Enregistrer</button>
+            <button type="button" onClick={() => { reset(); setAdding(false) }} className="btn-secondary">Annuler</button>
           </div>
         </form>
       )}
 
-      {isLoading && <p className="text-gray-400">Loading...</p>}
+      {isLoading && <p className="text-gray-400">Chargement...</p>}
 
       <div className="card overflow-hidden p-0">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-800 text-gray-400">
-              <th className="text-left px-5 py-3">Member</th>
+              <th className="text-left px-5 py-3">Membre</th>
               <th className="text-left px-5 py-3">Type</th>
-              <th className="text-left px-5 py-3">Amount</th>
-              <th className="text-left px-5 py-3 hidden md:table-cell">Period</th>
-              <th className="text-left px-5 py-3">Status</th>
+              <th className="text-left px-5 py-3">Montant</th>
+              <th className="text-left px-5 py-3 hidden md:table-cell">Période</th>
+              <th className="text-left px-5 py-3">Statut</th>
               <th className="px-5 py-3" />
             </tr>
           </thead>
@@ -130,7 +130,7 @@ export default function Payments() {
               </tr>
             ))}
             {!isLoading && !payments?.length && (
-              <tr><td colSpan={6} className="px-5 py-8 text-center text-gray-400">No payments recorded.</td></tr>
+              <tr><td colSpan={6} className="px-5 py-8 text-center text-gray-400">Aucun paiement enregistré.</td></tr>
             )}
           </tbody>
         </table>

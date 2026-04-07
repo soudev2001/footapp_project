@@ -43,8 +43,8 @@ export default function Profile() {
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-        <User size={22} className="text-pitch-500" /> Profile
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+        <User size={22} className="text-pitch-500" /> Profil
       </h1>
 
       <div className="card space-y-5">
@@ -64,33 +64,33 @@ export default function Profile() {
         <hr className="border-gray-800" />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">First Name</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">Prénom</label>
               <input {...register('first_name')} className="input" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Last Name</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">Nom</label>
               <input {...register('last_name')} className="input" />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Phone</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">Téléphone</label>
             <input {...register('phone')} type="tel" className="input" />
           </div>
           {user?.role === 'player' && (
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Position</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">Poste</label>
               <select {...register('position')} className="input">
-                <option value="">Select position</option>
-                {['Goalkeeper', 'Defender', 'Midfielder', 'Forward', 'Winger'].map((p) => (
-                  <option key={p} value={p}>{p}</option>
+                <option value="">Sélectionnez un poste</option>
+                {[{v:'Goalkeeper',l:'Gardien'},{v:'Defender',l:'Défenseur'},{v:'Midfielder',l:'Milieu'},{v:'Forward',l:'Attaquant'},{v:'Winger',l:'Ailier'}].map((p) => (
+                  <option key={p.v} value={p.v}>{p.l}</option>
                 ))}
               </select>
             </div>
           )}
           <button type="submit" disabled={isSubmitting} className="btn-primary">
-            {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'Save Changes'}
+            {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'Enregistrer'}
           </button>
         </form>
       </div>

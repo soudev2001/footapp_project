@@ -21,11 +21,11 @@ export default function Shop() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <ShoppingBag size={22} className="text-pitch-500" /> Shop
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+          <ShoppingBag size={22} className="text-pitch-500" /> Boutique
         </h1>
         <Link to="/shop/orders" className="btn-secondary gap-2">
-          <ShoppingCart size={16} /> My Orders
+          <ShoppingCart size={16} /> Mes commandes
         </Link>
       </div>
 
@@ -36,7 +36,7 @@ export default function Shop() {
             onClick={() => setCategory('')}
             className={clsx('badge text-sm cursor-pointer transition-colors', !category ? 'bg-pitch-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700')}
           >
-            All
+            Tous
           </button>
           {categories.map((cat: string) => (
             <button
@@ -50,7 +50,7 @@ export default function Shop() {
         </div>
       )}
 
-      {isLoading && <p className="text-gray-400">Loading products...</p>}
+      {isLoading && <p className="text-gray-400">Chargement des produits...</p>}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {products?.map((product: { id: string; name: string; price: number; image?: string; category?: string; stock?: number }) => (
@@ -70,10 +70,10 @@ export default function Shop() {
               <div className="flex items-center justify-between">
                 <p className="text-pitch-400 font-bold">€{product.price?.toFixed(2)}</p>
                 {product.stock !== undefined && product.stock <= 5 && product.stock > 0 && (
-                  <span className="text-xs text-yellow-400">Only {product.stock} left</span>
+                  <span className="text-xs text-yellow-400">Plus que {product.stock}</span>
                 )}
                 {product.stock === 0 && (
-                  <span className="text-xs text-red-400">Out of stock</span>
+                  <span className="text-xs text-red-400">Rupture de stock</span>
                 )}
               </div>
             </div>
@@ -84,7 +84,7 @@ export default function Shop() {
       {!isLoading && !products?.length && (
         <div className="card text-center py-12 text-gray-400">
           <ShoppingBag size={40} className="mx-auto mb-3 opacity-30" />
-          No products available.
+          Aucun produit disponible.
         </div>
       )}
     </div>

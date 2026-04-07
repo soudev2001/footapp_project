@@ -21,8 +21,8 @@ export default function EventDetail() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['event', id] }),
   })
 
-  if (isLoading) return <p className="text-gray-400">Loading...</p>
-  if (!event) return <p className="text-gray-400">Event not found.</p>
+  if (isLoading) return <p className="text-gray-400">Chargement...</p>
+  if (!event) return <p className="text-gray-400">Événement non trouvé.</p>
 
   const TYPE_COLOR: Record<string, string> = {
     training: 'text-blue-400',
@@ -34,7 +34,7 @@ export default function EventDetail() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <button type="button" onClick={() => navigate(-1)} className="btn-secondary gap-1.5 text-sm">
-        <ArrowLeft size={15} /> Back
+        <ArrowLeft size={15} /> Retour
       </button>
 
       <div className="card space-y-5">
@@ -43,7 +43,7 @@ export default function EventDetail() {
             <span className={`text-sm font-semibold uppercase tracking-wider ${TYPE_COLOR[event.type] ?? 'text-gray-400'}`}>
               {event.type}
             </span>
-            <h1 className="text-2xl font-bold text-white mt-1">{event.title}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-white mt-1">{event.title}</h1>
           </div>
         </div>
 
@@ -61,7 +61,7 @@ export default function EventDetail() {
           {(event as ClubEvent & { attendees?: string[] }).attendees && (
             <div className="flex items-center gap-2">
               <Users size={16} className="text-gray-500 shrink-0" />
-              {(event as ClubEvent & { attendees?: string[] }).attendees!.length} attendees
+              {(event as ClubEvent & { attendees?: string[] }).attendees!.length} participants
             </div>
           )}
         </div>
@@ -79,7 +79,7 @@ export default function EventDetail() {
             className="btn-primary flex-1 justify-center"
             disabled={rsvpMutation.isPending}
           >
-            <CheckCircle size={16} /> I'm Going
+            <CheckCircle size={16} /> Je viens
           </button>
           <button
             type="button"
@@ -87,7 +87,7 @@ export default function EventDetail() {
             className="btn-danger flex-1 justify-center"
             disabled={rsvpMutation.isPending}
           >
-            <XCircle size={16} /> Can't Go
+            <XCircle size={16} /> Pas dispo
           </button>
         </div>
       </div>

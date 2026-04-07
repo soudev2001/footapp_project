@@ -18,6 +18,7 @@ export default function AdminLayout() {
       <Stack.Screen name="onboarding" options={{ title: 'Onboarding' }} />
       <Stack.Screen name="analytics" options={{ title: 'Statistiques' }} />
       <Stack.Screen name="subscription" options={{ title: 'Abonnement' }} />
+      <Stack.Screen name="financial" options={{ title: 'Finances' }} />
     </Stack>
   );
 }

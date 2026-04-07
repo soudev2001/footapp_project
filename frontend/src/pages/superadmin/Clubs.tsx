@@ -11,12 +11,12 @@ export default function Clubs() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-        <Globe size={22} className="text-pitch-500" /> All Clubs
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+        <Globe size={22} className="text-pitch-500" /> Tous les clubs
         {clubs && <span className="badge bg-gray-800 text-gray-300">{clubs.length}</span>}
       </h1>
 
-      {isLoading && <p className="text-gray-400">Loading clubs...</p>}
+      {isLoading && <p className="text-gray-400">Chargement des clubs...</p>}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {clubs?.map((club: Club) => (
@@ -39,7 +39,7 @@ export default function Clubs() {
               </div>
             </div>
             {club.founded_year && (
-              <p className="text-xs text-gray-500">Founded {club.founded_year}</p>
+              <p className="text-xs text-gray-500">Fondé en {club.founded_year}</p>
             )}
             {club.description && (
               <p className="text-sm text-gray-400 line-clamp-2">{club.description}</p>
@@ -47,7 +47,7 @@ export default function Clubs() {
           </div>
         ))}
         {!isLoading && !clubs?.length && (
-          <div className="col-span-3 card text-gray-400 text-sm text-center py-12">No clubs registered.</div>
+          <div className="col-span-3 card text-gray-400 text-sm text-center py-12">Aucun club enregistré.</div>
         )}
       </div>
     </div>

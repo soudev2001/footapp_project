@@ -103,7 +103,7 @@ export default function Attendance() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
         <UserCheck size={22} className="text-pitch-500" /> Feuille de Présence
       </h1>
 

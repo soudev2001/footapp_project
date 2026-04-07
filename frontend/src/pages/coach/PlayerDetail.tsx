@@ -158,7 +158,7 @@ export default function PlayerDetail() {
             <h2 className="font-semibold text-white flex items-center gap-2">
               <BarChart3 size={16} className="text-pitch-400" /> Statistiques saison
             </h2>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
                 { label: 'Buts', value: player.stats?.goals ?? 0 },
                 { label: 'Passes D.', value: player.stats?.assists ?? 0 },
@@ -166,7 +166,7 @@ export default function PlayerDetail() {
                 { label: 'Cartons', value: (player.stats?.yellow_cards ?? 0) + (player.stats?.red_cards ?? 0) },
               ].map((s) => (
                 <div key={s.label} className="text-center bg-gray-800 rounded-lg p-3">
-                  <p className="text-2xl font-bold text-white">{s.value}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-white">{s.value}</p>
                   <p className="text-xs text-gray-400">{s.label}</p>
                 </div>
               ))}

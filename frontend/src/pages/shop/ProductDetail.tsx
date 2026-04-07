@@ -21,13 +21,13 @@ export default function ProductDetail() {
     onSuccess: () => setOrdered(true),
   })
 
-  if (isLoading) return <p className="text-gray-400">Loading...</p>
-  if (!product) return <p className="text-gray-400">Product not found.</p>
+  if (isLoading) return <p className="text-gray-400">Chargement...</p>
+  if (!product) return <p className="text-gray-400">Produit non trouvé.</p>
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <button onClick={() => navigate(-1)} className="btn-secondary gap-1.5 text-sm">
-        <ArrowLeft size={15} /> Back
+        <ArrowLeft size={15} /> Retour
       </button>
 
       <div className="grid md:grid-cols-2 gap-8">
@@ -53,12 +53,12 @@ export default function ProductDetail() {
 
           {product.stock !== undefined && (
             <p className={`text-sm ${product.stock > 0 ? 'text-pitch-400' : 'text-red-400'}`}>
-              {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+              {product.stock > 0 ? `${product.stock} en stock` : 'Rupture de stock'}
             </p>
           )}
 
           <div className="flex items-center gap-3">
-            <label className="text-sm text-gray-400">Qty:</label>
+            <label className="text-sm text-gray-400">Qté :</label>
             <input
               type="number"
               min={1}
@@ -71,7 +71,7 @@ export default function ProductDetail() {
 
           {ordered ? (
             <div className="bg-pitch-900/50 border border-pitch-700 rounded-lg px-4 py-3 text-pitch-300 text-sm">
-              Order placed successfully! View in <button onClick={() => navigate('/shop/orders')} className="underline">My Orders</button>.
+              Commande passée avec succès ! Voir dans <button onClick={() => navigate('/shop/orders')} className="underline">Mes commandes</button>.
             </div>
           ) : (
             <button
@@ -79,7 +79,7 @@ export default function ProductDetail() {
               disabled={orderMutation.isPending || product.stock === 0}
               className="btn-primary w-full justify-center"
             >
-              <ShoppingCart size={16} /> Add to Order
+              <ShoppingCart size={16} /> Ajouter à la commande
             </button>
           )}
         </div>

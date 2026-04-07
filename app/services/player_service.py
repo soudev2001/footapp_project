@@ -5,37 +5,37 @@ from datetime import datetime
 
 class PlayerService:
     """Service for player-related operations"""
-    
+
     def __init__(self, db):
         self.db = db
         self.collection = db.players
-    
+
     def get_all(self):
         """Get all players"""
         return list(self.collection.find())
-    
+
     def get_by_id(self, player_id):
         """Get player by ID"""
         return self.collection.find_one({'_id': ObjectId(player_id)})
-    
+
     def get_by_club(self, club_id, team_id=None):
         """Get all players for a club, optionally filtered by team"""
         query = {'club_id': ObjectId(club_id)}
         if team_id:
             query['team_id'] = ObjectId(team_id)
         return list(self.collection.find(query))
-    
+
     def get_by_position(self, club_id, position):
         """Get players by position"""
         return list(self.collection.find({
             'club_id': ObjectId(club_id),
             'position': position
         }))
-    
+
     def get_by_user(self, user_id):
         """Get player profile for a user"""
         return self.collection.find_one({'user_id': ObjectId(user_id)})
-    
+
     def create(self, club_id, jersey_number, position, name, **kwargs):
         """Create a new player"""
         team_id = kwargs.get('team_id')
@@ -82,14 +82,14 @@ class PlayerService:
         result = self.collection.insert_one(player)
         player['_id'] = result.inserted_id
         return player
-    
+
     def update(self, player_id, data):
         """Update player data"""
         return self.collection.update_one(
             {'_id': ObjectId(player_id)},
             {'$set': data}
         )
-    
+
     def update_stats(self, player_id, stats):
         """Update player statistics (goals, assist, etc)"""
         return self.collection.update_one(
@@ -120,14 +120,14 @@ class PlayerService:
             {'_id': ObjectId(player_id)},
             {'$push': {'evaluations': evaluation}}
         )
-    
+
     def set_status(self, player_id, status):
         """Set player status (active, injured, suspended)"""
         return self.collection.update_one(
             {'_id': ObjectId(player_id)},
             {'$set': {'status': status}}
         )
-    
+
     def delete(self, player_id):
         """Delete a player"""
         return self.collection.delete_one({'_id': ObjectId(player_id)})
@@ -149,7 +149,7 @@ class PlayerService:
             {'_id': ObjectId(player_id)},
             {'$set': {f'parents.{parent_type}': data}}
         )
-    
+
     def get_upcoming(self, club_id, team_id=None, limit=10):
         """Get upcoming events, optionally filtered by team"""
         query = {
@@ -159,27 +159,27 @@ class PlayerService:
         if team_id:
             query['team_id'] = ObjectId(team_id)
         return list(self.collection.find(query).sort('date', 1).limit(limit))
-    
+
     def get_top_scorers(self, club_id, limit=5):
         """Get top scorers for a club"""
         return list(self.collection.find(
             {'club_id': ObjectId(club_id)}
         ).sort('stats.goals', -1).limit(limit))
-    
+
     def get_lineup_by_formation(self, club_id, formation='4-3-3'):
         """Get suggested lineup based on formation"""
         players = self.get_by_club(club_id)
-        
+
         # Parse formation
         parts = [int(x) for x in formation.split('-')]
         lineup = {'GK': [], 'DEF': [], 'MID': [], 'ATT': []}
-        
+
         for player in players:
             if player.get('status') == 'active':
                 pos = player.get('position')
                 if pos in lineup:
                     lineup[pos].append(player)
-        
+
         return lineup
 
     def save_lineup(self, club_id, formation, starters, team_id=None, substitutes=None, name=None, captains=None, set_pieces=None):
@@ -188,9 +188,17 @@ class PlayerService:
         if team_id:
             query['team_id'] = ObjectId(team_id)
 
+        # Handle starters as list (from frontend) or dict (legacy)
+        if isinstance(starters, list):
+            starters_data = [ObjectId(pid) for pid in starters if pid]
+        elif isinstance(starters, dict):
+            starters_data = [ObjectId(pid) for pid in starters.values() if pid]
+        else:
+            starters_data = []
+
         update_data = {
             'formation': formation,
-            'starters': {pos: ObjectId(pid) for pos, pid in starters.items() if pid},
+            'starters': starters_data,
             'substitutes': [ObjectId(s) for s in (substitutes or []) if s],
             'team_id': ObjectId(team_id) if team_id else None,
             'captains': [ObjectId(p) for p in (captains or []) if p],
@@ -214,7 +222,21 @@ class PlayerService:
 
         lineup = self.db.lineups.find_one(query)
         if not lineup:
-            return {'formation': '4-3-3', 'starters': {}, 'substitutes': [], 'tactical_config': {}}
+            return {'formation': '4-3-3', 'starters': [], 'substitutes': [], 'captains': [], 'tactical_config': {}}
+
+        # Normalize starters to a flat list of string IDs
+        raw_starters = lineup.get('starters', [])
+        if isinstance(raw_starters, dict):
+            starters = [str(v) for v in raw_starters.values() if v]
+        elif isinstance(raw_starters, list):
+            starters = [str(s) for s in raw_starters if s]
+        else:
+            starters = []
+        lineup['starters'] = starters
+        lineup['substitutes'] = [str(s) for s in lineup.get('substitutes', []) if s]
+        lineup['captains'] = [str(c) for c in lineup.get('captains', []) if c]
+        if lineup['captains']:
+            lineup['captain'] = lineup['captains'][0]
         return lineup
 
     def save_tactical_config(self, club_id, team_id=None, config=None):
@@ -239,7 +261,7 @@ class PlayerService:
         """Save a new tactical preset (upsert by name/club/team)"""
         from app.models import create_saved_tactic
         tactic = create_saved_tactic(club_id, team_id, name, formation, starters, substitutes, instructions, description, captains, set_pieces)
-        
+
         query = {
             'club_id': ObjectId(club_id),
             'name': name
@@ -254,10 +276,10 @@ class PlayerService:
             {'$set': tactic},
             upsert=True
         )
-        
+
         if result.upserted_id:
             return str(result.upserted_id)
-        
+
         # If it was an update, we need to find the ID
         existing = self.db.saved_tactics.find_one(query)
         return str(existing['_id'])
@@ -272,8 +294,7 @@ class PlayerService:
     def get_tactic_preset(self, preset_id):
         """Get a specific preset"""
         return self.db.saved_tactics.find_one({'_id': ObjectId(preset_id)})
-    
+
     def delete_tactic_preset(self, preset_id):
         """Delete a tactic preset"""
         return self.db.saved_tactics.delete_one({'_id': ObjectId(preset_id)})
-

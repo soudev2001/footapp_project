@@ -34,35 +34,35 @@ export default function ParentDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Users size={22} className="text-pitch-500" /> Parent Dashboard
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+          <Users size={22} className="text-pitch-500" /> Espace Parent
         </h1>
         <button onClick={() => setLinking(true)} className="btn-primary">
-          <LinkIcon size={16} /> Link Child
+          <LinkIcon size={16} /> Lier un enfant
         </button>
       </div>
 
       {linking && (
         <form onSubmit={handleSubmit((d) => linkMutation.mutate(d))} className="card space-y-4 border-pitch-800">
-          <h2 className="font-semibold text-white">Link to Player</h2>
-          <p className="text-sm text-gray-400">Enter the code provided by your child's club.</p>
+          <h2 className="font-semibold text-white">Lier à un joueur</h2>
+          <p className="text-sm text-gray-400">Entrez le code fourni par le club de votre enfant.</p>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Link Code</label>
-            <input {...register('code', { required: true })} placeholder="e.g. ABC-123" className="input" />
+            <label className="block text-sm text-gray-400 mb-1">Code de liaison</label>
+            <input {...register('code', { required: true })} placeholder="ex. ABC-123" className="input" />
           </div>
           <div className="flex gap-2">
-            <button type="submit" className="btn-primary" disabled={linkMutation.isPending}>Link</button>
-            <button type="button" onClick={() => { reset(); setLinking(false) }} className="btn-secondary">Cancel</button>
+            <button type="submit" className="btn-primary" disabled={linkMutation.isPending}>Lier</button>
+            <button type="button" onClick={() => { reset(); setLinking(false) }} className="btn-secondary">Annuler</button>
           </div>
         </form>
       )}
 
-      {isLoading && <p className="text-gray-400">Loading...</p>}
+      {isLoading && <p className="text-gray-400">Chargement...</p>}
 
       {!linkedPlayers?.length && !isLoading && (
         <div className="card text-center py-12 text-gray-400">
           <Users size={40} className="mx-auto mb-3 opacity-30" />
-          No linked children. Use the link code from their club.
+          Aucun enfant lié. Utilisez le code de liaison de leur club.
         </div>
       )}
 
@@ -81,7 +81,7 @@ export default function ParentDashboard() {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gray-800 text-center text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-3 border-t border-gray-800 text-center text-sm">
               <div>
                 <p className="font-bold text-white">{player.stats?.goals ?? 0}</p>
                 <p className="text-gray-500 text-xs">Goals</p>
@@ -96,7 +96,7 @@ export default function ParentDashboard() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <Link to={`/parent/calendar/${player.id}`} className="btn-secondary text-sm justify-center gap-1.5">
                 <Calendar size={14} /> Calendar
               </Link>

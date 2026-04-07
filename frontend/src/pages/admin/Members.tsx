@@ -61,39 +61,39 @@ export default function Members() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Users size={22} className="text-pitch-500" /> Members
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+          <Users size={22} className="text-pitch-500" /> Membres
           {members && <span className="badge bg-gray-800 text-gray-300">{members.length}</span>}
         </h1>
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="input pl-9 w-48" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher..." className="input pl-9 w-48" />
           </div>
           <button onClick={() => setInviting(true)} className="btn-primary">
-            <UserPlus size={16} /> Invite
+            <UserPlus size={16} /> Inviter
           </button>
         </div>
       </div>
 
       {inviting && (
         <form onSubmit={handleSubmit((d) => inviteMutation.mutate(d))} className="card space-y-4 border-pitch-800">
-          <h2 className="font-semibold text-white flex items-center gap-2"><Mail size={16} /> Invite Member</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <h2 className="font-semibold text-white flex items-center gap-2"><Mail size={16} /> Inviter un membre</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">First Name</label>
+              <label className="block text-sm text-gray-400 mb-1">Prénom</label>
               <input {...register('first_name', { required: true })} className="input" />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Last Name</label>
+              <label className="block text-sm text-gray-400 mb-1">Nom</label>
               <input {...register('last_name', { required: true })} className="input" />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Email</label>
+              <label className="block text-sm text-gray-400 mb-1">E-mail</label>
               <input {...register('email', { required: true })} type="email" className="input" />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Role</label>
+              <label className="block text-sm text-gray-400 mb-1">Rôle</label>
               <select {...register('role')} className="input">
                 {['player', 'coach', 'parent', 'admin'].map((r) => (
                   <option key={r} value={r} className="capitalize">{r}</option>
@@ -102,22 +102,22 @@ export default function Members() {
             </div>
           </div>
           <div className="flex gap-2">
-            <button type="submit" className="btn-primary" disabled={inviteMutation.isPending}>Send Invite</button>
-            <button type="button" onClick={() => { reset(); setInviting(false) }} className="btn-secondary">Cancel</button>
+            <button type="submit" className="btn-primary" disabled={inviteMutation.isPending}>Envoyer l'invitation</button>
+            <button type="button" onClick={() => { reset(); setInviting(false) }} className="btn-secondary">Annuler</button>
           </div>
         </form>
       )}
 
-      {isLoading && <p className="text-gray-400">Loading members...</p>}
+      {isLoading && <p className="text-gray-400">Chargement des membres...</p>}
 
-      <div className="card overflow-hidden p-0">
+      <div className="card overflow-x-auto p-0">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-800 text-gray-400">
-              <th className="text-left px-5 py-3 font-medium">Member</th>
-              <th className="text-left px-5 py-3 font-medium hidden md:table-cell">Email</th>
-              <th className="text-left px-5 py-3 font-medium">Role</th>
-              <th className="text-left px-5 py-3 font-medium hidden sm:table-cell">Status</th>
+              <th className="text-left px-5 py-3 font-medium">Membre</th>
+              <th className="text-left px-5 py-3 font-medium hidden md:table-cell">E-mail</th>
+              <th className="text-left px-5 py-3 font-medium">Rôle</th>
+              <th className="text-left px-5 py-3 font-medium hidden sm:table-cell">Statut</th>
               <th className="px-5 py-3" />
             </tr>
           </thead>
@@ -148,7 +148,7 @@ export default function Members() {
                 <td className="px-5 py-3 text-right">
                   <button
                     onClick={() => {
-                      if (confirm('Delete this member?')) deleteMutation.mutate(member.id)
+                      if (confirm('Supprimer ce membre ?')) deleteMutation.mutate(member.id)
                     }}
                     className="text-gray-600 hover:text-red-400 transition-colors"
                   >
@@ -159,7 +159,7 @@ export default function Members() {
             ))}
             {!isLoading && !filtered?.length && (
               <tr>
-                <td colSpan={5} className="px-5 py-8 text-center text-gray-400">No members found.</td>
+                <td colSpan={5} className="px-5 py-8 text-center text-gray-400">Aucun membre trouvé.</td>
               </tr>
             )}
           </tbody>
