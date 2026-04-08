@@ -1,19 +1,24 @@
 import { useQuery } from '@tanstack/react-query'
 import { coachApi, matchesApi } from '../../api'
-import { Users, Calendar, Shield, BarChart3, ClipboardList, Target, UserCheck, Search, ChevronRight } from 'lucide-react'
+import { Users, Calendar, Shield, BarChart3, ClipboardList, Target, UserCheck, Search, ChevronRight, Swords, Dumbbell, BookOpen, Heart, PieChart, GitCompare, Mail, ListOrdered, AlertTriangle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import clsx from 'clsx'
 
 const QUICK_LINKS = [
-  { to: '/coach/roster', label: 'Effectif', icon: <Users size={16} />, color: 'text-blue-400' },
-  { to: '/coach/tactics', label: 'Tactiques', icon: <Target size={16} />, color: 'text-pitch-400' },
-  { to: '/coach/lineup', label: 'Composition', icon: <ClipboardList size={16} />, color: 'text-purple-400' },
-  { to: '/coach/convocation', label: 'Convocation', icon: <UserCheck size={16} />, color: 'text-yellow-400' },
-  { to: '/coach/attendance', label: 'Présence', icon: <Calendar size={16} />, color: 'text-orange-400' },
-  { to: '/coach/scouting', label: 'Recrutement', icon: <Search size={16} />, color: 'text-cyan-400' },
-  { to: '/coach/match-center', label: 'Matchs', icon: <Shield size={16} />, color: 'text-red-400' },
+  { to: '/coach/roster', label: 'Effectif', icon: <Users size={16} />, color: 'text-blue-400', desc: 'Gérer les joueurs' },
+  { to: '/coach/lineup', label: 'Composition', icon: <ListOrdered size={16} />, color: 'text-purple-400', desc: 'Compo & formation' },
+  { to: '/coach/tactics', label: 'Tactiques', icon: <Swords size={16} />, color: 'text-pitch-400', desc: 'Config tactique' },
+  { to: '/coach/convocation', label: 'Convocation', icon: <Mail size={16} />, color: 'text-yellow-400', desc: 'Appel joueurs' },
+  { to: '/coach/match-center', label: 'Matchs', icon: <Shield size={16} />, color: 'text-red-400', desc: 'Score & événements' },
+  { to: '/coach/attendance', label: 'Présence', icon: <UserCheck size={16} />, color: 'text-orange-400', desc: 'Feuille pointage' },
+  { to: '/coach/training-plans', label: 'Entraînement', icon: <Dumbbell size={16} />, color: 'text-lime-400', desc: 'Plans & séances' },
+  { to: '/coach/drills', label: 'Exercices', icon: <BookOpen size={16} />, color: 'text-emerald-400', desc: 'Bibliothèque' },
+  { to: '/coach/injuries', label: 'Blessures', icon: <Heart size={16} />, color: 'text-pink-400', desc: 'Suivi médical' },
+  { to: '/coach/scouting', label: 'Recrutement', icon: <Search size={16} />, color: 'text-cyan-400', desc: 'Rapports scouting' },
+  { to: '/coach/analytics', label: 'Analyse', icon: <PieChart size={16} />, color: 'text-indigo-400', desc: 'Stats joueurs' },
+  { to: '/coach/player-comparison', label: 'Comparer', icon: <GitCompare size={16} />, color: 'text-fuchsia-400', desc: 'Comparer joueurs' },
 ]
 
 export default function CoachDashboard() {
@@ -86,53 +91,78 @@ export default function CoachDashboard() {
             </div>
             {nextMatch.location && <p className="text-xs text-gray-500 text-center">📍 {nextMatch.location}</p>}
             {nextMatch.competition && <p className="text-xs text-center"><span className="badge bg-gray-800 text-gray-300 text-[10px]">{nextMatch.competition}</span></p>}
-            <Link to="/coach/match-center" className="btn-primary w-full justify-center text-sm">
-              Ouvrir le Centre des Matchs
-            </Link>
+            <div className="flex gap-2">
+              <Link to="/coach/match-center" className="btn-primary flex-1 justify-center text-sm">
+                Centre des Matchs
+              </Link>
+              <Link to="/coach/convocation" className="btn-secondary flex-1 justify-center text-sm">
+                Convoquer
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="card text-center py-10 text-gray-500">
             <Shield size={32} className="mx-auto mb-2 opacity-30" />
             <p className="text-sm">Aucun match programmé</p>
+            <Link to="/coach/match-center" className="btn-primary text-xs mt-3 mx-auto">
+              <Shield size={13} /> Créer un match
+            </Link>
           </div>
         )}
 
-        {/* Quick access */}
-        <div className="card space-y-3">
-          <h2 className="font-semibold text-white">Accès rapide</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {QUICK_LINKS.map((a) => (
-              <Link key={a.to} to={a.to} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 transition-colors text-sm text-gray-300 hover:text-white group">
-                <span className={a.color}>{a.icon}</span>
-                <span className="flex-1">{a.label}</span>
-                <ChevronRight size={14} className="text-gray-600 group-hover:text-gray-400" />
-              </Link>
-            ))}
+        {/* Recent form */}
+        {data?.recent_performance ? (
+          <div className="card space-y-3">
+            <h2 className="font-semibold text-white">Résultats récents</h2>
+            <div className="flex gap-2 flex-wrap">
+              {data.recent_performance.map((r: string, i: number) => (
+                <span
+                  key={i}
+                  className={clsx(
+                    'badge text-sm font-bold w-8 text-center',
+                    r === 'W' ? 'bg-pitch-700 text-white' :
+                    r === 'D' ? 'bg-yellow-700 text-white' :
+                    'bg-red-700 text-white'
+                  )}
+                >
+                  {r === 'W' ? 'V' : r === 'D' ? 'N' : 'D'}
+                </span>
+              ))}
+            </div>
+            {data.injured_players?.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-gray-800">
+                <p className="text-xs font-semibold text-red-400 flex items-center gap-1 mb-2">
+                  <AlertTriangle size={12} /> {data.injured_players.length} joueur(s) blessé(s)
+                </p>
+                <div className="flex gap-1 flex-wrap">
+                  {data.injured_players.map((p: any, i: number) => (
+                    <span key={i} className="badge bg-red-900/40 text-red-300 text-xs">{p.name ?? p.player_name ?? 'Joueur'}</span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        ) : (
+          <div className="card text-center py-10 text-gray-500">
+            <BarChart3 size={32} className="mx-auto mb-2 opacity-30" />
+            <p className="text-sm">Aucun résultat encore</p>
+          </div>
+        )}
       </div>
 
-      {/* Recent form */}
-      {data?.recent_performance && (
-        <div className="card space-y-3">
-          <h2 className="font-semibold text-white">Résultats récents</h2>
-          <div className="flex gap-2 flex-wrap">
-            {data.recent_performance.map((r: string, i: number) => (
-              <span
-                key={i}
-                className={clsx(
-                  'badge text-sm font-bold w-8 text-center',
-                  r === 'W' ? 'bg-pitch-700 text-white' :
-                  r === 'D' ? 'bg-yellow-700 text-white' :
-                  'bg-red-700 text-white'
-                )}
-              >
-                {r === 'W' ? 'V' : r === 'D' ? 'N' : 'D'}
-              </span>
-            ))}
-          </div>
+      {/* Quick access — all coach tools (full width) */}
+      <div className="card space-y-3">
+        <h2 className="font-semibold text-white">Accès rapide</h2>
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+          {QUICK_LINKS.map((a) => (
+            <Link key={a.to} to={a.to} className="flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-colors text-center group border border-transparent hover:border-gray-700">
+              <span className={clsx(a.color, 'group-hover:scale-110 transition-transform')}>{a.icon}</span>
+              <span className="text-sm font-medium text-white">{a.label}</span>
+              <span className="text-[10px] text-gray-500 leading-tight">{a.desc}</span>
+            </Link>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   )
 }

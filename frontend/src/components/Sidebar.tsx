@@ -6,7 +6,7 @@ import {
   Clipboard, Shield, Swords, UserCheck, Eye, CreditCard,
   Megaphone, Globe, FolderKanban, Mail, ListOrdered,
   DollarSign, Handshake, FileText, Star, TrendingUp,
-  Dumbbell, Heart, PieChart, BookOpen, X,
+  Dumbbell, Heart, PieChart, BookOpen, X, GitCompare,
 } from 'lucide-react'
 import type { Role } from '../types'
 import clsx from 'clsx'
@@ -50,6 +50,7 @@ const SECTIONS: NavSection[] = [
       { to: '/coach/drills', label: 'Exercices', icon: <BookOpen size={17} />, roles: ['coach', 'admin', 'superadmin'] },
       { to: '/coach/injuries', label: 'Blessures', icon: <Heart size={17} />, roles: ['coach', 'admin', 'superadmin'] },
       { to: '/coach/analytics', label: 'Analyse', icon: <PieChart size={17} />, roles: ['coach', 'admin', 'superadmin'] },
+      { to: '/coach/player-comparison', label: 'Comparer', icon: <GitCompare size={17} />, roles: ['coach', 'admin', 'superadmin'] },
     ],
   },
   {

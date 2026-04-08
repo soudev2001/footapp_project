@@ -2,7 +2,7 @@ import React from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { playersApi, coachApi } from '../../api'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Star, TrendingUp, BarChart3, Key } from 'lucide-react'
+import { ArrowLeft, Star, TrendingUp, BarChart3, Key, Trash2, PieChart, Edit, Save, X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 import type { Player } from '../../types'
@@ -47,6 +47,8 @@ export default function PlayerDetail() {
   const [physicalForm, setPhysicalForm] = useState(false)
   const [parentCodeModal, setParentCodeModal] = useState(false)
   const [generatedCode, setGeneratedCode] = useState<string | null>(null)
+  const [editing, setEditing] = useState(false)
+  const [editForm, setEditForm] = useState({ first_name: '', last_name: '', position: '', jersey_number: '' })
 
   const { data: player, isLoading } = useQuery({
     queryKey: ['player', id],
@@ -77,6 +79,19 @@ export default function PlayerDetail() {
     onSuccess: (res) => setGeneratedCode(res.data?.code ?? 'N/A'),
   })
 
+  const editMutation = useMutation({
+    mutationFn: (data: object) => coachApi.editPlayer(id!, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['player', id] })
+      setEditing(false)
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => coachApi.deletePlayer(id!),
+    onSuccess: () => navigate('/coach/roster'),
+  })
+
   const { register: registerRate, handleSubmit: handleRate, reset: resetRate } = useForm<RatingForm>({
     defaultValues: { overall: 7, technical: 7, physical: 7, tactical: 7 },
   })
@@ -99,9 +114,25 @@ export default function PlayerDetail() {
 
   return (
     <div className="space-y-6">
-      <button type="button" onClick={() => navigate(-1)} className="btn-secondary gap-1.5 text-sm">
-        <ArrowLeft size={15} /> Retour à l'effectif
-      </button>
+      <div className="flex items-center gap-2 flex-wrap">
+        <button type="button" onClick={() => navigate(-1)} className="btn-secondary gap-1.5 text-sm">
+          <ArrowLeft size={15} /> Retour
+        </button>
+        <div className="flex-1" />
+        <button type="button" onClick={() => {
+          if (!player) return
+          setEditForm({ first_name: player.profile?.first_name ?? '', last_name: player.profile?.last_name ?? '', position: player.position ?? '', jersey_number: String(player.jersey_number ?? '') })
+          setEditing(true)
+        }} className="btn-secondary text-xs gap-1">
+          <Edit size={13} /> Modifier
+        </button>
+        <a href={`#/coach/analytics`} className="btn-secondary text-xs gap-1">
+          <PieChart size={13} /> Analyse
+        </a>
+        <button type="button" onClick={() => { if (confirm('Supprimer ce joueur de l\'effectif ?')) deleteMutation.mutate() }} className="btn-secondary text-xs gap-1 text-red-400 hover:text-red-300">
+          <Trash2 size={13} /> Supprimer
+        </button>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Player Card */}
@@ -286,6 +317,42 @@ export default function PlayerDetail() {
             <p className="text-xs text-gray-500">Partagez ce code avec le parent pour lier le compte.</p>
             <button type="button" onClick={() => { setParentCodeModal(false); setGeneratedCode(null) }} className="btn-secondary w-full justify-center">Fermer</button>
           </div>
+        </div>
+      )}
+
+      {/* Edit player modal */}
+      {editing && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setEditing(false)}>
+          <form onSubmit={(e) => { e.preventDefault(); editMutation.mutate({ profile: { first_name: editForm.first_name, last_name: editForm.last_name }, position: editForm.position, jersey_number: editForm.jersey_number ? +editForm.jersey_number : undefined }) }} className="card max-w-md w-full space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-white">Modifier le joueur</h2>
+              <button type="button" onClick={() => setEditing(false)} className="text-gray-500 hover:text-white"><X size={18} /></button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Prénom</label>
+                <input value={editForm.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} className="input" required />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Nom</label>
+                <input value={editForm.last_name} onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })} className="input" required />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Poste</label>
+                <select value={editForm.position} onChange={(e) => setEditForm({ ...editForm, position: e.target.value })} className="input">
+                  {['Goalkeeper', 'Defender', 'Midfielder', 'Forward', 'Winger'].map((p) => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">N° Maillot</label>
+                <input value={editForm.jersey_number} onChange={(e) => setEditForm({ ...editForm, jersey_number: e.target.value })} type="number" min={1} max={99} className="input" />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button type="submit" className="btn-primary" disabled={editMutation.isPending}><Save size={14} /> Enregistrer</button>
+              <button type="button" onClick={() => setEditing(false)} className="btn-secondary">Annuler</button>
+            </div>
+          </form>
         </div>
       )}
     </div>

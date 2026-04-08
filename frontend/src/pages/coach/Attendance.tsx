@@ -107,6 +107,12 @@ export default function Attendance() {
         <UserCheck size={22} className="text-pitch-500" /> Feuille de Présence
       </h1>
 
+      {/* Quick nav */}
+      <div className="flex gap-2 flex-wrap text-xs">
+        <a href="#/coach" className="btn-ghost gap-1"><Users size={12} /> Dashboard</a>
+        <a href="#/coach/training-plans" className="btn-ghost gap-1"><Clock size={12} /> Entraînements</a>
+      </div>
+
       {saved && (
         <div className="bg-pitch-900/40 border border-pitch-700 rounded-lg px-4 py-3 text-pitch-300 text-sm flex items-center gap-2">
           <CheckCircle size={16} /> Présences enregistrées avec succès !

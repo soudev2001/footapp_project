@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { matchesApi, coachApi } from '../../api'
 import { useState } from 'react'
-import { Shield, Plus, Goal, CreditCard, ArrowLeftRight, Save, Play, Square, Clock, ChevronLeft, ChevronRight, CircleDot, Zap } from 'lucide-react'
+import { Shield, Plus, Goal, CreditCard, ArrowLeftRight, Save, Play, Square, Clock, ChevronLeft, ChevronRight, CircleDot, Zap, ClipboardList } from 'lucide-react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { useForm } from 'react-hook-form'
@@ -138,6 +138,13 @@ export default function MatchCenter() {
         <button type="button" onClick={() => setCreatingMatch(true)} className="btn-primary">
           <Plus size={16} /> Nouveau Match
         </button>
+      </div>
+
+      {/* Quick nav */}
+      <div className="flex gap-2 flex-wrap text-xs">
+        <a href="#/coach/lineup" className="btn-ghost gap-1"><ClipboardList size={12} /> Composition</a>
+        <a href="#/coach/convocation" className="btn-ghost gap-1"><ArrowLeftRight size={12} /> Convocation</a>
+        <a href="#/coach/injuries" className="btn-ghost gap-1"><CircleDot size={12} /> Blessures</a>
       </div>
 
       {/* Horizontal match selector */}

@@ -80,6 +80,10 @@ export default function TrainingPlans() {
             <CalendarDays className="w-7 h-7 text-green-400" /> Plans d'entraînement
           </h1>
           <p className="text-gray-400 mt-1">Planifiez vos séances et suivez la progression</p>
+          <div className="flex gap-2 mt-2 text-xs">
+            <a href="#/coach/drills" className="text-emerald-400 hover:text-emerald-300">Exercices →</a>
+            <a href="#/coach/attendance" className="text-orange-400 hover:text-orange-300">Présences →</a>
+          </div>
         </div>
         <button onClick={() => setShowCreate(true)}
           className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">

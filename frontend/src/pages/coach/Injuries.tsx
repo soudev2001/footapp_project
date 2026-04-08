@@ -96,6 +96,10 @@ export default function Injuries() {
             <HeartPulse className="w-7 h-7 text-red-400" /> Suivi des blessures
           </h1>
           <p className="text-gray-400 mt-1">Gestion des blessures et récupération</p>
+          <div className="flex gap-2 mt-2 text-xs">
+            <a href="#/coach/roster" className="text-blue-400 hover:text-blue-300">Effectif →</a>
+            <a href="#/coach/attendance" className="text-orange-400 hover:text-orange-300">Présences →</a>
+          </div>
         </div>
         <button onClick={() => setShowLog(true)}
           className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition">

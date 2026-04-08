@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi } from '../../api'
-import { Users, Search, Filter } from 'lucide-react'
+import { Users, Search, Plus, X, Save, PieChart, GitCompare, CheckCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import type { Player } from '../../types'
@@ -26,12 +26,27 @@ const POS_FR: Record<string, string> = {
 const POS_ORDER = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward', 'Winger', 'Other']
 
 export default function Roster() {
+  const qc = useQueryClient()
   const [search, setSearch] = useState('')
   const [posFilter, setPosFilter] = useState<string | null>(null)
+  const [adding, setAdding] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [form, setForm] = useState({ first_name: '', last_name: '', position: 'Midfielder', jersey_number: '' })
 
   const { data: players, isLoading } = useQuery({
     queryKey: ['coach-roster'],
     queryFn: () => coachApi.roster().then((r) => r.data),
+  })
+
+  const addMutation = useMutation({
+    mutationFn: (data: object) => coachApi.addPlayer(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['coach-roster'] })
+      setAdding(false)
+      setForm({ first_name: '', last_name: '', position: 'Midfielder', jersey_number: '' })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    },
   })
 
   const filtered = (players as Player[] | undefined)?.filter((p: Player) => {
@@ -57,10 +72,55 @@ export default function Roster() {
           <h1 className="text-xl sm:text-2xl font-bold text-white">Effectif</h1>
           {players && <span className="badge bg-gray-800 text-gray-300 ml-2">{players.length} joueurs</span>}
         </div>
-        <Link to="/coach/scouting" className="btn-primary text-sm">
-          + Recruter
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link to="/coach/analytics" className="btn-secondary text-xs gap-1">
+            <PieChart size={13} /> Analyse
+          </Link>
+          <Link to="/coach/player-comparison" className="btn-secondary text-xs gap-1">
+            <GitCompare size={13} /> Comparer
+          </Link>
+          <button type="button" onClick={() => setAdding(!adding)} className="btn-primary text-sm">
+            {adding ? <><X size={14} /> Fermer</> : <><Plus size={14} /> Ajouter</>}
+          </button>
+        </div>
       </div>
+
+      {saved && (
+        <div className="bg-pitch-900/40 border border-pitch-700 rounded-lg px-4 py-3 text-pitch-300 text-sm flex items-center gap-2">
+          <CheckCircle size={16} /> Joueur ajouté avec succès !
+        </div>
+      )}
+
+      {/* Add player form */}
+      {adding && (
+        <form onSubmit={(e) => { e.preventDefault(); addMutation.mutate({ profile: { first_name: form.first_name, last_name: form.last_name }, position: form.position, jersey_number: form.jersey_number ? +form.jersey_number : undefined }) }} className="card space-y-4 border-pitch-800">
+          <h2 className="font-semibold text-white">Nouveau joueur</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Prénom *</label>
+              <input value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} className="input" placeholder="Prénom" required />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Nom *</label>
+              <input value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} className="input" placeholder="Nom" required />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Poste</label>
+              <select value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} className="input">
+                {POS_ORDER.filter(p => p !== 'Other').map((p) => <option key={p} value={p}>{POS_FR[p]}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">N° Maillot</label>
+              <input value={form.jersey_number} onChange={(e) => setForm({ ...form, jersey_number: e.target.value })} type="number" min={1} max={99} className="input" placeholder="#" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button type="submit" className="btn-primary" disabled={addMutation.isPending}><Save size={14} /> Enregistrer</button>
+            <button type="button" onClick={() => setAdding(false)} className="btn-secondary">Annuler</button>
+          </div>
+        </form>
+      )}
 
       {/* Search + position filter */}
       <div className="space-y-3">
