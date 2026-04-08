@@ -63,96 +63,127 @@ export default function Login() {
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card max-w-2xl">
-        {/* Logo */}
-        <div className="auth-logo">
-          <div className="auth-logo-icon">
-            <span className="text-white font-bold text-2xl">FA</span>
+    <div className="min-h-screen flex">
+      {/* Left Panel — Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-950 via-pitch-950 to-gray-950 relative items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.15\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }} />
+        <div className="relative z-10 text-center px-12 max-w-lg">
+          <div className="w-24 h-24 bg-pitch-500/20 backdrop-blur-xl rounded-3xl flex items-center justify-center mx-auto mb-8 border border-pitch-500/30 shadow-2xl shadow-pitch-500/20">
+            <span className="text-white font-bold text-4xl">FA</span>
           </div>
-          <h1 className="text-3xl font-bold text-white font-outfit">FootApp</h1>
-          <p className="text-gray-400 mt-1">Plateforme de gestion de club de football</p>
+          <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-tight">
+            Foot<span className="text-pitch-400">App</span>
+          </h1>
+          <p className="text-lg text-gray-400 mb-10 leading-relaxed">
+            La plateforme tout-en-un pour la gestion professionnelle de votre club de football
+          </p>
+          <div className="grid grid-cols-3 gap-6 mb-10">
+            <div className="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
+              <p className="text-2xl font-black text-pitch-400">150+</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mt-1">Clubs actifs</p>
+            </div>
+            <div className="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
+              <p className="text-2xl font-black text-blue-400">25k</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mt-1">Licenciés</p>
+            </div>
+            <div className="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
+              <p className="text-2xl font-black text-purple-400">99.9%</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mt-1">Uptime</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-3 text-gray-500 text-xs">
+            <ShieldCheck size={14} />
+            <span>Données sécurisées · RGPD · Hébergement FR</span>
+          </div>
         </div>
+      </div>
 
-        {/* Demo Mode */}
-        <div className="card border-pitch-800 bg-pitch-950/30 space-y-4 animate-fade-in">
-          <div className="flex items-center gap-2">
-            <Zap size={18} className="text-pitch-400" />
-            <h2 className="font-semibold text-white">Accès Démo — Choisissez un rôle</h2>
-            <span className="badge bg-pitch-700 text-pitch-200 text-xs ml-auto">Aucun compte requis</span>
+      {/* Right Panel — Login */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-gray-950">
+        <div className="w-full max-w-md space-y-8">
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-4">
+            <div className="w-16 h-16 bg-pitch-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-pitch-500/30">
+              <span className="text-white font-bold text-2xl">FA</span>
+            </div>
+            <h1 className="text-2xl font-black text-white">Foot<span className="text-pitch-400">App</span></h1>
           </div>
-          <p className="text-sm text-gray-400">Explorez l'application avec des données réalistes. Cliquez sur un rôle pour accéder instantanément.</p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {DEMO_ROLES.map(({ role, label, desc, icon, color }) => {
-              const demoUser = DEMO_USERS[role] as { profile: { first_name: string; last_name: string }; email: string }
-              return (
+          {/* Welcome */}
+          <div>
+            <h2 className="text-2xl font-bold text-white">Bon retour 👋</h2>
+            <p className="text-gray-400 text-sm mt-1">Connectez-vous pour gérer votre club</p>
+            <p className="text-pitch-400 text-xs font-semibold mt-2">🚀 v2.0 — CI/CD Active</p>
+          </div>
+
+          {/* Login Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {error && <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">{error}</div>}
+            <div>
+              <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Email</label>
+              <input {...register('email', { required: true })} type="email" placeholder="vous@club.fr"
+                className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-pitch-500/50 focus:bg-white/[0.07] transition-all text-sm" />
+            </div>
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Mot de passe</label>
+                <Link to="/forgot-password" className="text-[10px] font-semibold uppercase tracking-wider text-pitch-400 hover:text-pitch-300 transition">Oublié ?</Link>
+              </div>
+              <div className="relative">
+                <input {...register('password', { required: true })} type={showPassword ? 'text' : 'password'} placeholder="••••••••"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 pr-11 text-white placeholder:text-gray-600 focus:outline-none focus:border-pitch-500/50 focus:bg-white/[0.07] transition-all text-sm" />
+                <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+            <button type="submit" disabled={isSubmitting}
+              className="w-full bg-pitch-600 hover:bg-pitch-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-pitch-600/20 hover:shadow-pitch-500/30 disabled:opacity-50 flex items-center justify-center gap-2">
+              {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'Se connecter'}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <hr className="flex-1 border-white/10" />
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-600">Accès Démo</span>
+            <hr className="flex-1 border-white/10" />
+          </div>
+
+          {/* Demo Roles */}
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+              {DEMO_ROLES.map(({ role, label, icon, color }) => (
                 <button
                   key={role}
                   type="button"
                   onClick={() => loginAsDemo(role)}
                   disabled={demoLoading !== null}
-                  className={`relative flex flex-col gap-2 p-4 rounded-xl border bg-gradient-to-br ${color} text-left text-white hover:brightness-110 hover:scale-[1.02] transition-all duration-200 disabled:opacity-60 group`}
+                  className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl border bg-gradient-to-br ${color} text-white hover:brightness-110 hover:scale-105 transition-all duration-200 disabled:opacity-60`}
                 >
                   {demoLoading === role && (
-                    <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/40">
-                      <Loader2 size={20} className="animate-spin text-white" />
+                    <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50">
+                      <Loader2 size={14} className="animate-spin" />
                     </div>
                   )}
-                  <div className="flex items-center justify-between">
-                    <div className="p-1.5 rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors">{icon}</div>
-                    <span className="text-xs text-white/60 font-mono capitalize">{role}</span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm">{label}</p>
-                    <p className="text-xs text-white/70">{desc}</p>
-                  </div>
-                  <div className="text-[11px] text-white/50 border-t border-white/10 pt-2 mt-1">
-                    {demoUser.profile.first_name} {demoUser.profile.last_name} · {demoUser.email}
-                  </div>
+                  {icon}
+                  <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
                 </button>
-              )
-            })}
-          </div>
-
-          <div className="text-xs text-gray-500 flex items-center gap-1.5">
-            <span className="inline-block w-2 h-2 rounded-full bg-pitch-500 animate-pulse-slow" />
-            Club démo : <span className="text-gray-300 font-medium">FC Les Aiglons — Lyon</span>
-            · Données fictives, aucune action réelle
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="auth-divider">
-          <hr />
-          <span>ou connectez-vous avec votre compte</span>
-          <hr />
-        </div>
-
-        {/* Real Login Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="auth-form animate-fade-in">
-          {error && <div className="alert-error">{error}</div>}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
-            <input {...register('email', { required: true })} type="email" placeholder="vous@club.fr" className="input" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">Mot de passe</label>
-            <div className="relative">
-              <input {...register('password', { required: true })} type={showPassword ? 'text' : 'password'} placeholder="••••••••" className="input pr-11" />
-              <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors">
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+              ))}
             </div>
+            <p className="text-[10px] text-gray-600 text-center">
+              Club démo : <span className="text-gray-400 font-medium">FC Les Aiglons — Lyon</span> · Données fictives
+            </p>
           </div>
-          <button type="submit" disabled={isSubmitting} className="btn-primary w-full py-2.5">
-            {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'Se connecter'}
-          </button>
-          <p className="text-center text-sm text-gray-400">
-            Pas encore de compte ?{' '}
-            <Link to="/register" className="text-pitch-400 hover:text-pitch-300 hover:underline transition-colors">Créer un club</Link>
-          </p>
-        </form>
+
+          {/* Register CTA */}
+          <div className="text-center pt-4 border-t border-white/5">
+            <p className="text-sm text-gray-500">
+              Pas encore de compte ?{' '}
+              <Link to="/register" className="text-pitch-400 font-bold hover:text-pitch-300 transition">Créer un club →</Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )
