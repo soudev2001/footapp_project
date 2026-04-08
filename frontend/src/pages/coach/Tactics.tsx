@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi } from '../../api'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Plus, Trash2, Save, Swords, ChevronDown, ChevronUp, Settings2, BookOpen, Copy, Crown, Target, X, Eye, GripVertical, UserMinus, ArrowRightLeft, Cloud, Check, Shield, Wand2, Users, Trophy, Heart, Repeat2, Search, Pencil, AlertTriangle, XCircle, CheckCircle2, RotateCcw } from 'lucide-react'
+import { Plus, Trash2, Save, Swords, ChevronDown, ChevronUp, Settings2, BookOpen, Copy, Crown, Target, X, Eye, GripVertical, UserMinus, ArrowRightLeft, Cloud, Check, Shield, Wand2, Users, Trophy, Heart, Repeat2, Search, Pencil, AlertTriangle, XCircle, CheckCircle2, RotateCcw, Mail } from 'lucide-react'
 import TacticalVisualizer from '../../components/TacticalVisualizer'
 import { useForm } from 'react-hook-form'
 import PitchSVG, { FORMATIONS, FORMATION_POSITIONS, type DragPlayer } from '../../components/PitchSVG'
@@ -789,6 +789,9 @@ export default function Tactics() {
           <Link to="/coach/lineup" className="btn-secondary text-xs sm:text-sm gap-1.5" title="Composition">
             <Shield size={15} /> <span className="hidden sm:inline">Composition</span>
           </Link>
+          <Link to="/coach/convocation" className="btn-secondary text-xs sm:text-sm gap-1.5" title="Convocation">
+            <Mail size={15} /> <span className="hidden sm:inline">Convoquer</span>
+          </Link>
           <button type="button" onClick={() => setShowVisualizer(true)} className="btn-secondary text-xs sm:text-sm">
             <Eye size={15} /> <span className="hidden sm:inline">Visualiser</span>
           </button>
@@ -1345,8 +1348,32 @@ export default function Tactics() {
       {/* ─── Saved tactics grid ─── */}
       {isLoading && <p className="text-gray-400">Chargement des tactiques...</p>}
 
+      {/* Search and filter bar for tactics */}
+      {(tactics as Tactic[] | undefined)?.length ? (
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+            <input
+              value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+              className="input pl-9 text-sm" placeholder="Rechercher une tactique..."
+            />
+          </div>
+          <span className="text-xs text-gray-500">
+            {(tactics as Tactic[]).filter((t: Tactic) => {
+              if (!searchQuery) return true
+              const q = searchQuery.toLowerCase()
+              return (t.name ?? '').toLowerCase().includes(q) || (t.formation ?? '').includes(q)
+            }).length} tactique(s)
+          </span>
+        </div>
+      ) : null}
+
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {(tactics as Tactic[] | undefined)?.map((t) => {
+        {(tactics as Tactic[] | undefined)?.filter((t: Tactic) => {
+          if (!searchQuery) return true
+          const q = searchQuery.toLowerCase()
+          return (t.name ?? '').toLowerCase().includes(q) || (t.formation ?? '').includes(q)
+        }).map((t) => {
           const pressing = t.pressing ?? t.instructions?.pressing ?? 'medium'
           const passingStyle = t.passing_style ?? t.instructions?.passing_style ?? '—'
           const block = t.defensive_block ?? t.instructions?.defensive_block ?? 'medium'
@@ -1368,15 +1395,29 @@ export default function Tactics() {
                   {t.name && <p className="text-pitch-400 text-sm font-medium">{t.name}</p>}
                 </div>
                 <div className="flex items-center gap-1">
-                  <button type="button" onClick={() => loadPreset(t)} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-blue-400 transition-colors" title="Charger">
+                  <button type="button" onClick={() => editTactic(t)} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-yellow-400 transition-colors" title="Modifier">
+                    <Pencil size={14} />
+                  </button>
+                  <button type="button" onClick={() => duplicateTactic(t)} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-blue-400 transition-colors" title="Dupliquer">
                     <Copy size={14} />
                   </button>
                   <button type="button" onClick={() => setPreviewFormation(showPreview ? null : t.id)} className={clsx('p-1.5 rounded-lg transition-colors', showPreview ? 'bg-pitch-900/40 text-pitch-400' : 'hover:bg-gray-800 text-gray-500 hover:text-pitch-400')} title="Aperçu pitch">
                     <Eye size={14} />
                   </button>
-                  <button type="button" onClick={() => deleteMutation.mutate(t.id)} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-red-400 transition-colors">
-                    <Trash2 size={14} />
-                  </button>
+                  {confirmDeleteId === t.id ? (
+                    <div className="flex items-center gap-1">
+                      <button type="button" onClick={() => deleteMutation.mutate(t.id)} className="p-1.5 rounded-lg bg-red-900/40 text-red-400 hover:bg-red-900/60 transition-colors" title="Confirmer">
+                        <Trash2 size={14} />
+                      </button>
+                      <button type="button" onClick={() => setConfirmDeleteId(null)} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 transition-colors" title="Annuler">
+                        <RotateCcw size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <button type="button" onClick={() => setConfirmDeleteId(t.id)} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-red-400 transition-colors" title="Supprimer">
+                      <Trash2 size={14} />
+                    </button>
+                  )}
                 </div>
               </div>
 

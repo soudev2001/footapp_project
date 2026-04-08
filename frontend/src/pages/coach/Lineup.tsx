@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi } from '../../api'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Save, RefreshCw, Star, Shield, GripVertical, UserMinus, ArrowRightLeft, ChevronDown, ChevronUp, Check, Cloud, BarChart3, Eye, Users, AlertTriangle, Swords, Wand2, Zap, Repeat2, Trophy, Heart } from 'lucide-react'
+import { Save, RefreshCw, Star, Shield, GripVertical, UserMinus, ArrowRightLeft, ChevronDown, ChevronUp, Check, Cloud, BarChart3, Eye, Users, AlertTriangle, Swords, Wand2, Zap, Repeat2, Trophy, Heart, CheckCircle2, XCircle, X, Download, BookOpen, Mail } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import PitchSVG, { FORMATIONS, FORMATION_POSITIONS, type DragPlayer } from '../../components/PitchSVG'
 import TacticalAnalytics from '../../components/TacticalAnalytics'
@@ -11,8 +11,18 @@ import clsx from 'clsx'
 import {
   posColor, calcOVR, ovrColor, ovrBg, teamRating, teamChemistry,
   remapPlayersOnFormationChange, autoFillPlayers, GAME_PLANS,
+  positionFit, fitColor,
   type SlotData,
 } from '../../utils/fifaLogic'
+
+interface Tactic {
+  id: string
+  formation?: string
+  name?: string
+  starters?: string[] | Record<string, string>
+  substitutes?: string[]
+  captains?: string[]
+}
 
 export default function Lineup() {
   const qc = useQueryClient()
@@ -30,6 +40,16 @@ export default function Lineup() {
   // FIFA additions
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null) // swap mode
   const [gamePlan, setGamePlan] = useState('balanced')
+  const [showTacticPicker, setShowTacticPicker] = useState(false)
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null)
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type })
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setToast(null), 3000)
+  }, [])
 
   const { data: players } = useQuery({
     queryKey: ['coach-roster'],
@@ -39,6 +59,11 @@ export default function Lineup() {
   const { data: savedLineup } = useQuery({
     queryKey: ['coach-lineup'],
     queryFn: () => coachApi.lineup().then((r) => r.data),
+  })
+
+  const { data: tactics } = useQuery({
+    queryKey: ['tactics'],
+    queryFn: () => coachApi.tactics().then((r) => r.data).catch(() => []),
   })
 
   // Load saved lineup
@@ -87,11 +112,47 @@ export default function Lineup() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['coach-lineup'] })
       setAutoSaveStatus('saved')
+      setLastSaveTime(new Date())
+      showToast('Composition sauvegardée')
       setTimeout(() => setAutoSaveStatus('idle'), 2000)
     },
+    onError: () => showToast('Erreur lors de la sauvegarde', 'error'),
   })
 
   const getPlayer = (id: string) => (players as Player[] | undefined)?.find((pl) => pl.id === id)
+
+  // Load from tactic
+  const loadFromTactic = useCallback((tactic: Tactic) => {
+    if (!tactic.formation || !players) return
+    const form = tactic.formation
+    setFormation(form)
+    const positions = FORMATION_POSITIONS[form] ?? []
+    const starterIds: string[] = Array.isArray(tactic.starters)
+      ? tactic.starters
+      : tactic.starters ? Object.values(tactic.starters) : []
+    const newSlots: Record<string, SlotData> = {}
+    starterIds.forEach((pid: string, i: number) => {
+      if (i < positions.length) {
+        const p = (players as Player[])?.find((pl) => pl.id === pid)
+        if (p) {
+          const pos = positions[i]
+          newSlots[`${pos.name}-${i}`] = {
+            playerId: p.id,
+            playerName: p.profile?.last_name ?? '',
+            jerseyNumber: p.jersey_number,
+            isCaptain: tactic.captains?.includes(p.id),
+            position: p.position,
+          }
+        }
+      }
+    })
+    setSlots(newSlots)
+    if (tactic.substitutes?.length) setSubs([...tactic.substitutes])
+    if (tactic.captains?.length) setCaptainId(tactic.captains[0])
+    setSelectedSlot(null)
+    setShowTacticPicker(false)
+    showToast(`Tactique "${tactic.name || tactic.formation}" chargée`)
+  }, [players, showToast])
 
   const assignedIds = new Set([
     ...Object.values(slots).map((s) => s.playerId).filter(Boolean),
@@ -238,6 +299,18 @@ export default function Lineup() {
 
   return (
     <div className="space-y-4">
+      {/* Toast notification */}
+      {toast && (
+        <div className={clsx(
+          'fixed top-4 right-4 z-[60] flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl border text-sm font-medium animate-in slide-in-from-right',
+          toast.type === 'success' ? 'bg-green-900/90 border-green-700 text-green-200' : 'bg-red-900/90 border-red-700 text-red-200'
+        )}>
+          {toast.type === 'success' ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+          {toast.message}
+          <button type="button" onClick={() => setToast(null)} className="ml-2 opacity-60 hover:opacity-100"><X size={14} /></button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
@@ -262,8 +335,29 @@ export default function Lineup() {
           <button onClick={autoFill} className="btn-secondary gap-1.5 text-sm bg-gradient-to-r from-pitch-900/80 to-pitch-800/60 border-pitch-700 hover:border-pitch-500 text-pitch-300 hover:text-pitch-200" title="Remplir automatiquement les 11 postes">
             <Wand2 size={14} /> Auto XI
           </button>
+          {/* Load from tactic */}
+          <div className="relative">
+            <button type="button" onClick={() => setShowTacticPicker(!showTacticPicker)} className="btn-secondary text-sm gap-1.5" title="Charger depuis une tactique">
+              <Download size={14} /> <span className="hidden sm:inline">Tactique</span>
+            </button>
+            {showTacticPicker && (tactics as Tactic[] | undefined)?.length ? (
+              <div className="absolute right-0 top-full mt-1 z-30 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl p-2 min-w-[200px] max-h-[300px] overflow-y-auto">
+                <p className="text-[10px] text-gray-500 uppercase font-semibold px-2 py-1">Charger tactique</p>
+                {(tactics as Tactic[]).map((t) => (
+                  <button key={t.id} type="button" onClick={() => loadFromTactic(t)}
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800 text-sm text-gray-300 hover:text-white transition-colors">
+                    <span className="text-xs font-bold text-pitch-400">{t.formation}</span>
+                    <span className="truncate">{t.name || 'Sans nom'}</span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
           <Link to="/coach/tactics" className="btn-secondary text-sm gap-1.5" title="Tableau Tactique">
-            <Swords size={15} /> Tactiques
+            <Swords size={15} /> <span className="hidden sm:inline">Tactiques</span>
+          </Link>
+          <Link to="/coach/convocation" className="btn-secondary text-sm gap-1.5" title="Convocation">
+            <Mail size={15} /> <span className="hidden sm:inline">Convoquer</span>
           </Link>
           <button type="button" onClick={() => setShowAnalytics(true)} className="btn-secondary text-sm" title="Analyse Tactique">
             <BarChart3 size={15} />
@@ -354,6 +448,11 @@ export default function Lineup() {
           )}
           {autoSaveStatus === 'saving' && <span className="flex items-center gap-1 text-amber-400"><Cloud size={11} className="animate-pulse" />Modifié</span>}
           {autoSaveStatus === 'saved' && <span className="flex items-center gap-1 text-green-400"><Check size={11} />Sauvegardé</span>}
+          {lastSaveTime && autoSaveStatus === 'idle' && (
+            <span className="text-[10px] text-gray-600">
+              Dernière sauvegarde: {lastSaveTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
         </div>
       </div>
 
@@ -444,17 +543,20 @@ export default function Lineup() {
               const slot = slots[key]
               const player = slot?.playerId ? getPlayer(slot.playerId) : undefined
               const ovr = player ? calcOVR(player) : 0
+              const fit = player ? positionFit(player.position, pos.name) : 0
               return (
                 <div key={key} className="flex items-center gap-1.5 group">
                   <span className={clsx('text-[9px] font-bold w-7 text-center py-0.5 rounded', posColor(pos.name))}>{pos.name}</span>
                   {slot?.playerId ? (
                     <div className={clsx(
-                      'flex-1 flex items-center gap-1.5 bg-gray-800/60 border rounded-lg px-2 py-1 hover:border-pitch-700/40 transition-colors cursor-pointer',
-                      selectedSlot === key ? 'border-yellow-400/80 bg-yellow-900/20' : 'border-gray-700/50'
+                      'flex-1 flex items-center gap-1.5 bg-gray-800/60 border-l-2 border rounded-lg px-2 py-1 hover:border-pitch-700/40 transition-colors cursor-pointer',
+                      selectedSlot === key ? 'border-yellow-400/80 bg-yellow-900/20' : 'border-gray-700/50',
+                      fitColor(fit)
                     )} onClick={() => handleSlotClick(key, i)}>
                       <span className={clsx('text-[10px] font-bold w-4', ovrColor(ovr))}>{ovr}</span>
                       <span className="text-[10px] font-bold text-pitch-400 w-4">{slot.jerseyNumber ?? '?'}</span>
                       <span className="text-[11px] text-white flex-1 truncate">{slot.playerName}</span>
+                      {fit < 0.9 && <span className="text-[8px] text-gray-500" title={`Position naturelle: ${player?.position}`}>{player?.position}</span>}
                       <button onClick={(e) => { e.stopPropagation(); toggleCaptain(slot.playerId!) }}
                         className={clsx('p-0.5 transition-all', captainId === slot.playerId ? 'text-yellow-400 scale-110' : 'text-gray-600 hover:text-yellow-400 opacity-0 group-hover:opacity-100')}>
                         <Star size={10} className={captainId === slot.playerId ? 'fill-yellow-400' : ''} />
