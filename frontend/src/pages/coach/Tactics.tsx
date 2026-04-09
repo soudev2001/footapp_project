@@ -3,6 +3,11 @@ import { coachApi } from '../../api'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Plus, Trash2, Save, Swords, ChevronDown, ChevronUp, Settings2, BookOpen, Copy, Crown, Target, X, Eye, GripVertical, UserMinus, ArrowRightLeft, Cloud, Check, Shield, Wand2, Users, Trophy, Heart, Repeat2, Search, Pencil, AlertTriangle, XCircle, CheckCircle2, RotateCcw, Mail } from 'lucide-react'
 import TacticalVisualizer from '../../components/TacticalVisualizer'
+import TabNavigation from '../../components/TabNavigation'
+import CollapsibleSection from '../../components/CollapsibleSection'
+import MentalitySlider from '../../components/MentalitySlider'
+import LoadedTacticDisplay from '../../components/LoadedTacticDisplay'
+import PlayerRoleModal from '../../components/PlayerRoleModal'
 import { useForm } from 'react-hook-form'
 import PitchSVG, { FORMATIONS, FORMATION_POSITIONS, type DragPlayer } from '../../components/PitchSVG'
 import { Link } from 'react-router-dom'
@@ -73,6 +78,109 @@ const GK_DIST_LABELS: Record<string, string> = {
   fast: 'Rapide',
 }
 
+// New tactical parameter labels
+const MENTALITY_LABELS: Record<string, string> = {
+  ultra_defensive: '🛡️ Ultra Déf',
+  defensive: '🔵 Défensif',
+  balanced: '⚖️ Équilibré',
+  attacking: '🔴 Offensif',
+  ultra_attacking: '⚡ Ultra Off',
+}
+
+const DEFENSIVE_SHAPE_LABELS: Record<string, string> = {
+  compact: 'Compacte',
+  normal: 'Normale',
+  spread: 'Étalée',
+}
+
+const BUILDUP_STYLE_LABELS: Record<string, string> = {
+  goalkeeper_short: 'Relance courte GK',
+  defenders_build: 'Construction défenseurs',
+  midfield_drop: 'Milieux décalés',
+  long_ball: 'Lancement direct',
+  mixed: 'Mixte',
+}
+
+const TRANSITION_SPEED_LABELS: Record<string, string> = {
+  slow: 'Lent',
+  balanced: 'Équilibré',
+  fast: 'Rapide',
+}
+
+const CREATIVE_FREEDOM_LABELS: Record<string, string> = {
+  strict: 'Stricte',
+  balanced: 'Équilibrée',
+  high: 'Libre',
+}
+
+const DEFENSIVE_WIDTH_LABELS: Record<string, string> = {
+  narrow: 'Étroit',
+  normal: 'Normal',
+  wide: 'Large',
+}
+
+const PRESSING_TRIGGER_LABELS: Record<string, string> = {
+  immediate: 'Immédiat',
+  losing_ball: 'Perte de balle',
+  opponent_half: 'Demi-terrain adverse',
+  final_third: 'Dernier tiers',
+}
+
+// Player role constants
+const GK_ROLES = ['sweeper_keeper', 'traditional']
+const DEFENDER_ROLES = ['ball_playing_defender', 'stopper', 'cover', 'wingback', 'fullback']
+const MIDFIELDER_ROLES = ['deep_playmaker', 'ball_winner', 'box_to_box', 'advanced_playmaker', 'attacking_midfielder']
+const WINGER_ROLES = ['inverted_winger', 'traditional_winger', 'inside_forward', 'wide_midfielder']
+const FORWARD_ROLES = ['target_man', 'poacher', 'false_nine', 'advanced_forward', 'complete_forward']
+
+const ROLE_LABELS: Record<string, string> = {
+  sweeper_keeper: 'Libéro',
+  traditional: 'Traditionnel',
+  ball_playing_defender: 'Défenseur qui joue',
+  stopper: 'Défenseur agressif',
+  cover: 'Défenseur de couverture',
+  wingback: 'Piston',
+  fullback: 'Arrière',
+  deep_playmaker: 'Créateur depuis la profondeur',
+  ball_winner: 'Récupérateur',
+  box_to_box: 'Milieu de terrain complet',
+  advanced_playmaker: 'Créateur avancé',
+  attacking_midfielder: 'Milieu offensif',
+  inverted_winger: 'Ailier inversé',
+  traditional_winger: 'Ailier traditionnel',
+  inside_forward: 'Avant intérieur',
+  wide_midfielder: 'Milieu large',
+  target_man: 'Pivot',
+  poacher: 'Renard des surfaces',
+  false_nine: 'Faux 9',
+  advanced_forward: 'Avant avancé',
+  complete_forward: 'Attaquant complet',
+}
+
+const DUTY_LABELS: Record<string, string> = {
+  defend: 'Défendre',
+  support: 'Soutenir',
+  attack: 'Attaquer',
+}
+
+const FREEDOM_LABELS: Record<string, string> = {
+  stay_position: 'Strictement positionnée',
+  roam: 'Peut se décaler',
+  free: 'Liberté totale',
+}
+
+const SPECIFIC_TASKS = [
+  { key: 'run_channels', label: 'Courses en profondeur' },
+  { key: 'take_long_shots', label: 'Tirs de loin' },
+  { key: 'dribble_more', label: 'Dribbler plus' },
+  { key: 'stay_wide', label: 'Rester large' },
+  { key: 'get_forward', label: 'Monter en attaque' },
+  { key: 'mark_specific', label: 'Marquer spécifique' },
+  { key: 'play_simple', label: 'Jeu simple' },
+  { key: 'crosses_often', label: 'Centrer souvent' },
+  { key: 'sit_narrow', label: 'Se rapprocher' },
+]
+
 const POS_FILTERS = [
   { key: 'all', label: 'Tous' },
   { key: 'GK', label: 'GK' },
@@ -103,6 +211,13 @@ const formationCategory = (f: string) => {
   return { label: '⚖️ Équilibré', cls: 'bg-gray-800 text-gray-300' }
 }
 
+interface PlayerInstruction {
+  role: string
+  duty: 'defend' | 'support' | 'attack'
+  freedom: 'stay_position' | 'roam' | 'free'
+  specific_tasks: string[]
+}
+
 interface TacticForm {
   name: string
   formation: string
@@ -116,6 +231,16 @@ interface TacticForm {
   play_space: string
   gk_distribution: string
   counter_pressing: boolean
+  // New team-level parameters
+  mentality: string
+  defensive_shape: string
+  buildup_style: string
+  transition_speed: string
+  offside_trap: boolean
+  creative_freedom: string
+  defensive_width: string
+  pressing_trigger: string
+  // Existing fields
   captains: string[]
   set_pieces: {
     penalties: string[]
@@ -141,11 +266,38 @@ interface Tactic {
   play_space?: string
   gk_distribution?: string
   counter_pressing?: boolean
+  mentality?: string
+  defensive_shape?: string
+  buildup_style?: string
+  transition_speed?: string
+  offside_trap?: boolean
+  creative_freedom?: string
+  defensive_width?: string
+  pressing_trigger?: string
   captains?: string[]
   set_pieces?: Record<string, string[]>
   starters?: string[] | Record<string, string>
   substitutes?: string[]
-  instructions?: { passing_style?: string; pressing?: string; defensive_block?: string; marking?: string; tempo?: string; width?: string; play_space?: string; gk_distribution?: string; counter_pressing?: boolean }
+  player_instructions?: Record<string, PlayerInstruction>
+  instructions?: {
+    passing_style?: string
+    pressing?: string
+    defensive_block?: string
+    marking?: string
+    tempo?: string
+    width?: string
+    play_space?: string
+    gk_distribution?: string
+    counter_pressing?: boolean
+    mentality?: string
+    defensive_shape?: string
+    buildup_style?: string
+    transition_speed?: string
+    offside_trap?: boolean
+    creative_freedom?: string
+    defensive_width?: string
+    pressing_trigger?: string
+  }
 }
 
 import type { Player } from '../../types'
@@ -192,6 +344,12 @@ export default function Tactics() {
   const [searchQuery, setSearchQuery] = useState('')
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // New state for enhanced tactics
+  const [activeTab, setActiveTab] = useState('general')
+  const [playerInstructions, setPlayerInstructions] = useState<Record<string, PlayerInstruction>>({})
+  const [loadedTactic, setLoadedTactic] = useState<Tactic | null>(null)
+  const [roleModalOpen, setRoleModalOpen] = useState(false)
+  const [selectedPlayerForRole, setSelectedPlayerForRole] = useState<string | null>(null)
 
   const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
@@ -230,6 +388,7 @@ export default function Tactics() {
       ...data,
       captains,
       set_pieces: setPieces,
+      player_instructions: playerInstructions,
       starters: Object.values(pitchSlots).map((s) => s.playerId),
       substitutes: subs,
     }),
@@ -270,6 +429,9 @@ export default function Tactics() {
     setSetPieces({ ...EMPTY_SET_PIECES })
     setSelectedSlot(null)
     setGamePlan('balanced')
+    setActiveTab('general')
+    setPlayerInstructions({})
+    setLoadedTactic(null)
   }, [reset])
 
   const watchedFormation = watch('formation')
@@ -529,9 +691,20 @@ export default function Tactics() {
     setValue('play_space', preset.play_space ?? ins.play_space ?? 'mixed')
     setValue('gk_distribution', preset.gk_distribution ?? ins.gk_distribution ?? 'short')
     setValue('counter_pressing', preset.counter_pressing ?? ins.counter_pressing ?? false)
+    // NEW: Load new tactical parameters with defaults
+    setValue('mentality', preset.mentality ?? ins.mentality ?? 'balanced')
+    setValue('defensive_shape', preset.defensive_shape ?? ins.defensive_shape ?? 'normal')
+    setValue('buildup_style', preset.buildup_style ?? ins.buildup_style ?? 'mixed')
+    setValue('transition_speed', preset.transition_speed ?? ins.transition_speed ?? 'balanced')
+    setValue('offside_trap', preset.offside_trap ?? ins.offside_trap ?? false)
+    setValue('creative_freedom', preset.creative_freedom ?? ins.creative_freedom ?? 'balanced')
+    setValue('defensive_width', preset.defensive_width ?? ins.defensive_width ?? 'normal')
+    setValue('pressing_trigger', preset.pressing_trigger ?? ins.pressing_trigger ?? 'opponent_half')
     if (preset.description) setValue('description', preset.description)
     if (preset.captains) setCaptains([...preset.captains])
     if (preset.set_pieces) setSetPieces({ ...EMPTY_SET_PIECES, ...preset.set_pieces })
+    // NEW: Load player instructions
+    if (preset.player_instructions) setPlayerInstructions({ ...preset.player_instructions })
     // Populate pitch with starters
     if (preset.formation) {
       const starterIds: string[] = Array.isArray(preset.starters)
@@ -543,6 +716,7 @@ export default function Tactics() {
       }
     }
     if (preset.substitutes?.length) setSubs([...preset.substitutes])
+    setLoadedTactic(preset)
     setShowPresets(false)
     setCreating(true)
   }
@@ -1057,123 +1231,260 @@ export default function Tactics() {
       {/* ─── Create tactic form (collapsible) ─── */}
       {creating && (
         <form onSubmit={handleSubmit((d) => saveMutation.mutate(d))} className="card space-y-5 border-pitch-800">
+          {/* Loaded Tactic Display */}
+          {loadedTactic && (
+            <LoadedTacticDisplay
+              tacticName={loadedTactic.name ?? 'Tactique'}
+              formation={loadedTactic.formation ?? '4-3-3'}
+              mentality={watch('mentality') || 'balanced'}
+              instructions={watch() as Record<string, any>}
+              playerInstructions={playerInstructions}
+              onModify={() => setActiveTab('general')}
+              onApply={() => showToast('Appliquez la tactique via le menu du match')}
+              onDuplicate={() => { setValue('name', `${loadedTactic.name ?? 'Tactic'} (copie)`); setLoadedTactic(null) }}
+            />
+          )}
+
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-white text-lg flex items-center gap-2">
               <Settings2 size={18} className="text-pitch-400" /> Configuration Tactique
             </h2>
-            <button type="button" onClick={() => setShowAdvanced(!showAdvanced)} className="btn-secondary text-xs gap-1">
-              <Settings2 size={13} /> {showAdvanced ? 'Masquer avancé' : 'Config avancée'}
-            </button>
           </div>
 
+          {/* Tab Navigation */}
+          <TabNavigation
+            tabs={[
+              { id: 'general', label: 'Général', icon: '⚙️' },
+              { id: 'instructions', label: 'Instructions', icon: '🎯' },
+              { id: 'roles', label: 'Rôles', icon: '👤' },
+              { id: 'setpieces', label: 'Coups Arrêtés', icon: '⚽' },
+            ]}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+
+          {/* Tab Content */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Form fields — left */}
+            {/* Left Column - Tab Content */}
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-400 mb-1">Nom</label>
-                  <input {...register('name', { required: true })} placeholder="Ex: Pressing Haut" className="input" />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-400 mb-1">Formation</label>
-                  <select
-                    value={watchedFormation}
-                    onChange={(e) => handleFormationChange(e.target.value)}
-                    className="input"
-                  >
-                    <optgroup label="⚖️ Équilibré">
-                      {['4-3-3', '4-4-2', '4-2-3-1', '4-5-1'].map((f) => <option key={f} value={f}>{f}</option>)}
-                    </optgroup>
-                    <optgroup label="🛡️ Défensif">
-                      {['3-5-2', '5-3-2', '5-4-1'].map((f) => <option key={f} value={f}>{f}</option>)}
-                    </optgroup>
-                    <optgroup label="⚡ Offensif">
-                      {['4-1-2-1-2', '3-4-3', '4-1-4-1', '4-3-2-1'].map((f) => <option key={f} value={f}>{f}</option>)}
-                    </optgroup>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-400 mb-1">Style de passe</label>
-                  <select {...register('passing_style')} className="input">
-                    {Object.entries(PASSING_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-400 mb-1">Pressing</label>
-                  <select {...register('pressing')} className="input">
-                    {[['low', 'Bas'], ['medium', 'Médian'], ['high', 'Haut'], ['gegenpressing', 'Gegenpressing']].map(([v, l]) => (
-                      <option key={v} value={v}>{l}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs sm:text-sm text-gray-400 mb-1">Bloc défensif</label>
-                  <select {...register('defensive_block')} className="input text-xs sm:text-sm">
-                    {Object.entries(BLOCK_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs sm:text-sm text-gray-400 mb-1">Tempo</label>
-                  <select {...register('tempo')} className="input text-xs sm:text-sm">
-                    {Object.entries(TEMPO_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs sm:text-sm text-gray-400 mb-1">Largeur</label>
-                  <select {...register('width')} className="input text-xs sm:text-sm">
-                    {Object.entries(WIDTH_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              {/* Advanced tactical config */}
-              {showAdvanced && (
-                <div className="space-y-4 pt-3 border-t border-gray-800">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Configuration avancée</p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {/* GENERAL TAB */}
+              {activeTab === 'general' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs sm:text-sm text-gray-400 mb-1">Marquage</label>
-                      <select {...register('marking')} className="input text-xs sm:text-sm">
-                        <option value="zone">Zone</option>
-                        <option value="individual">Individuel</option>
-                      </select>
+                      <label className="block text-sm text-gray-400 mb-1">Nom</label>
+                      <input {...register('name', { required: true })} placeholder="Ex: Pressing Haut" className="input" />
                     </div>
                     <div>
-                      <label className="block text-xs sm:text-sm text-gray-400 mb-1">Espace de jeu</label>
-                      <select {...register('play_space')} className="input text-xs sm:text-sm">
-                        <option value="left">Couloir gauche</option>
-                        <option value="right">Couloir droit</option>
-                        <option value="center">Axe central</option>
-                        <option value="both_wings">Deux couloirs</option>
-                        <option value="mixed">Mixte</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs sm:text-sm text-gray-400 mb-1">Relance GK</label>
-                      <select {...register('gk_distribution')} className="input text-xs sm:text-sm">
-                        <option value="short">Courte</option>
-                        <option value="long">Longue</option>
-                        <option value="fast">Rapide</option>
+                      <label className="block text-sm text-gray-400 mb-1">Formation</label>
+                      <select
+                        value={watchedFormation}
+                        onChange={(e) => handleFormationChange(e.target.value)}
+                        className="input"
+                      >
+                        <optgroup label="⚖️ Équilibré">
+                          {['4-3-3', '4-4-2', '4-2-3-1', '4-5-1'].map((f) => <option key={f} value={f}>{f}</option>)}
+                        </optgroup>
+                        <optgroup label="🛡️ Défensif">
+                          {['3-5-2', '5-3-2', '5-4-1'].map((f) => <option key={f} value={f}>{f}</option>)}
+                        </optgroup>
+                        <optgroup label="⚡ Offensif">
+                          {['4-1-2-1-2', '3-4-3', '4-1-4-1', '4-3-2-1'].map((f) => <option key={f} value={f}>{f}</option>)}
+                        </optgroup>
                       </select>
                     </div>
                   </div>
-                  <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
-                    <input {...register('counter_pressing')} type="checkbox" className="accent-pitch-600 w-4 h-4" />
-                    Contre-pressing activé
-                  </label>
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-1">Description / Instructions</label>
+                    <textarea {...register('description')} rows={4} className="input resize-none" placeholder="Notes tactiques, consignes d'équipe..." />
+                  </div>
                 </div>
               )}
 
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Description / Instructions</label>
-                <textarea {...register('description')} rows={3} className="input resize-none" placeholder="Notes tactiques, consignes d'équipe..." />
-              </div>
+              {/* INSTRUCTIONS TAB */}
+              {activeTab === 'instructions' && (
+                <div className="space-y-4">
+                  {/* Mentality Slider */}
+                  <MentalitySlider
+                    value={watch('mentality')}
+                    onChange={(v) => setValue('mentality', v)}
+                  />
+
+                  {/* Offensive Phase */}
+                  <CollapsibleSection
+                    title="Phase Offensive"
+                    icon="🔴"
+                    color="red"
+                    defaultOpen={true}
+                  >
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Style de passe</label>
+                          <select {...register('passing_style')} className="input text-xs sm:text-sm">
+                            {Object.entries(PASSING_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Tempo</label>
+                          <select {...register('tempo')} className="input text-xs sm:text-sm">
+                            {Object.entries(TEMPO_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Largeur</label>
+                          <select {...register('width')} className="input text-xs sm:text-sm">
+                            {Object.entries(WIDTH_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Espace de jeu</label>
+                          <select {...register('play_space')} className="input text-xs sm:text-sm">
+                            <option value="left">Couloir gauche</option>
+                            <option value="right">Couloir droit</option>
+                            <option value="center">Axe central</option>
+                            <option value="both_wings">Deux couloirs</option>
+                            <option value="mixed">Mixte</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Construction du jeu</label>
+                          <select {...register('buildup_style')} className="input text-xs sm:text-sm">
+                            {Object.entries(BUILDUP_STYLE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Liberté créative</label>
+                          <select {...register('creative_freedom')} className="input text-xs sm:text-sm">
+                            {Object.entries(CREATIVE_FREEDOM_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </CollapsibleSection>
+
+                  {/* Defensive Phase */}
+                  <CollapsibleSection
+                    title="Phase Défensive"
+                    icon="🔵"
+                    color="blue"
+                    defaultOpen={true}
+                  >
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Pressing</label>
+                          <select {...register('pressing')} className="input text-xs sm:text-sm">
+                            {[['low', 'Bas'], ['medium', 'Médian'], ['high', 'Haut'], ['gegenpressing', 'Gegenpressing']].map(([v, l]) => (
+                              <option key={v} value={v}>{l}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Bloc défensif</label>
+                          <select {...register('defensive_block')} className="input text-xs sm:text-sm">
+                            {Object.entries(BLOCK_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Forme défensive</label>
+                          <select {...register('defensive_shape')} className="input text-xs sm:text-sm">
+                            {Object.entries(DEFENSIVE_SHAPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Largeur défensive</label>
+                          <select {...register('defensive_width')} className="input text-xs sm:text-sm">
+                            {Object.entries(DEFENSIVE_WIDTH_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Marquage</label>
+                          <select {...register('marking')} className="input text-xs sm:text-sm">
+                            <option value="zone">Zone</option>
+                            <option value="individual">Individuel</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Déclenchement pressing</label>
+                          <select {...register('pressing_trigger')} className="input text-xs sm:text-sm">
+                            {Object.entries(PRESSING_TRIGGER_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                      <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+                        <input {...register('offside_trap')} type="checkbox" className="accent-pitch-600 w-4 h-4" />
+                        Piège hors-jeu
+                      </label>
+                    </div>
+                  </CollapsibleSection>
+
+                  {/* Transitions */}
+                  <CollapsibleSection
+                    title="Transitions"
+                    icon="🟡"
+                    color="yellow"
+                    defaultOpen={false}
+                  >
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Vitesse transitions</label>
+                          <select {...register('transition_speed')} className="input text-xs sm:text-sm">
+                            {Object.entries(TRANSITION_SPEED_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs sm:text-sm text-gray-400 mb-1">Relance GK</label>
+                          <select {...register('gk_distribution')} className="input text-xs sm:text-sm">
+                            {Object.entries(GK_DIST_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                      <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+                        <input {...register('counter_pressing')} type="checkbox" className="accent-pitch-600 w-4 h-4" />
+                        Contre-pressing activé
+                      </label>
+                    </div>
+                  </CollapsibleSection>
+                </div>
+              )}
+
+              {/* ROLES TAB */}
+              {activeTab === 'roles' && (
+                <div className="space-y-3 text-sm text-gray-400">
+                  <p>Cliquez sur un joueur sur le terrain pour lui assigner un rôle spécialisé.</p>
+                  {Object.keys(playerInstructions).length > 0 && (
+                    <div className="p-3 bg-gray-800/50 rounded border border-gray-700 space-y-2">
+                      <p className="font-semibold text-gray-300">Rôles assignés:</p>
+                      {Object.entries(playerInstructions).map(([playerId, instr]) => {
+                        const player = getPlayer(playerId)
+                        return (
+                          <div key={playerId} className="text-xs">
+                            <div className="text-gray-300">#{player?.jersey_number} {player?.profile?.last_name} - {ROLE_LABELS[instr.role] || instr.role}</div>
+                            <div className="text-gray-500 ml-2">Devoir: {DUTY_LABELS[instr.duty]}</div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* SET PIECES TAB */}
+              {activeTab === 'setpieces' && (
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-400">Géré dans la section Coups Arrêtés à droite</p>
+                </div>
+              )}
             </div>
 
             {/* Pitch preview — center (click to enlarge) */}
@@ -1333,7 +1644,7 @@ export default function Tactics() {
             <button type="button" onClick={handleSavePreset} className="btn-secondary text-xs sm:text-sm">
               <Copy size={14} /> Preset
             </button>
-            <button type="button" onClick={() => { reset(); setCreating(false); setCaptains([]); setSetPieces({ ...EMPTY_SET_PIECES }); setPitchSlots({}); setSubs([]); setSelectedSlot(null); setGamePlan('balanced') }} className="btn-secondary text-xs sm:text-sm">
+            <button type="button" onClick={closeForm} className="btn-secondary text-xs sm:text-sm">
               Annuler
             </button>
             {Object.keys(pitchSlots).length > 0 && (
@@ -1717,6 +2028,23 @@ export default function Tactics() {
           </div>
         </div>
       )}
+
+      {/* Player Role Modal */}
+      <PlayerRoleModal
+        isOpen={roleModalOpen && activeTab === 'roles'}
+        playerName={selectedPlayerForRole ? (getPlayer(selectedPlayerForRole)?.profile?.last_name || 'Player') : 'Player'}
+        playerPosition={selectedPlayerForRole ? getPlayer(selectedPlayerForRole)?.position : 'ST'}
+        currentRole={selectedPlayerForRole ? playerInstructions[selectedPlayerForRole] : undefined}
+        onSave={(instructions) => {
+          if (selectedPlayerForRole) {
+            setPlayerInstructions((prev) => ({
+              ...prev,
+              [selectedPlayerForRole]: instructions,
+            }))
+          }
+        }}
+        onClose={() => setRoleModalOpen(false)}
+      />
     </div>
   )
 }

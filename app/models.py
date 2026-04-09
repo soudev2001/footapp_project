@@ -230,7 +230,16 @@ SAVED_TACTIC_SCHEMA = {
         'pressing': str,  # 'bas', 'median', 'haut', 'tout_terrain'
         'marking': str,   # 'individuel', 'zone'
         'counter_pressing': bool,
-        'goalkeeper_distribution': str # 'courte', 'longue', 'rapide'
+        'goalkeeper_distribution': str, # 'courte', 'longue', 'rapide'
+        # ── NEW FIELDS ──
+        'mentality': str,            # 'ultra_defensive', 'defensive', 'balanced', 'attacking', 'ultra_attacking'
+        'defensive_shape': str,      # 'compact', 'normal', 'spread'
+        'buildup_style': str,        # 'goalkeeper_short', 'defenders_build', 'midfield_drop', 'long_ball', 'mixed'
+        'transition_speed': str,     # 'slow', 'balanced', 'fast'
+        'offside_trap': bool,        # True/False
+        'creative_freedom': str,     # 'strict', 'balanced', 'high'
+        'defensive_width': str,      # 'narrow', 'normal', 'wide'
+        'pressing_trigger': str      # 'immediate', 'losing_ball', 'opponent_half', 'final_third'
     },
     'captains': [ObjectId],  # List of player_ids (ordered)
     'set_pieces': {          # List of player_ids (ordered)
@@ -239,6 +248,16 @@ SAVED_TACTIC_SCHEMA = {
         'corners_right': [ObjectId],
         'free_kicks_direct': [ObjectId],
         'free_kicks_indirect': [ObjectId]
+    },
+    'player_instructions': {  # NEW: Player-specific tactical instructions
+        # Structure: player_id (as string) → instructions dict
+        # Example:
+        # '507f1f77bcf86cd799439011': {
+        #     'role': 'false_nine',
+        #     'duty': 'attack',
+        #     'freedom': 'roam',
+        #     'specific_tasks': ['run_channels', 'dribble_more']
+        # }
     },
     'created_at': datetime,
     'updated_at': datetime
@@ -409,7 +428,7 @@ def create_message(sender_id, content, receiver_id=None, team_id=None, msg_type=
         'created_at': datetime.utcnow()
     }
 
-def create_saved_tactic(club_id, team_id, name, formation, starters, substitutes, instructions=None, description='', captains=None, set_pieces=None):
+def create_saved_tactic(club_id, team_id, name, formation, starters, substitutes, instructions=None, description='', captains=None, set_pieces=None, player_instructions=None):
     """Create a new saved tactic document"""
     now = datetime.utcnow()
 
@@ -462,6 +481,7 @@ def create_saved_tactic(club_id, team_id, name, formation, starters, substitutes
         'instructions': instructions or {},
         'captains': captains_list,
         'set_pieces': set_pieces_dict,
+        'player_instructions': player_instructions or {},
         'created_at': now,
         'updated_at': now
     }

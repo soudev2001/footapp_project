@@ -257,10 +257,10 @@ class PlayerService:
             upsert=True
         )
 
-    def save_tactic_preset(self, club_id, team_id, name, formation, starters, substitutes, instructions=None, description='', captains=None, set_pieces=None):
+    def save_tactic_preset(self, club_id, team_id, name, formation, starters, substitutes, instructions=None, description='', captains=None, set_pieces=None, player_instructions=None):
         """Save a new tactical preset (upsert by name/club/team)"""
         from app.models import create_saved_tactic
-        tactic = create_saved_tactic(club_id, team_id, name, formation, starters, substitutes, instructions, description, captains, set_pieces)
+        tactic = create_saved_tactic(club_id, team_id, name, formation, starters, substitutes, instructions, description, captains, set_pieces, player_instructions)
 
         query = {
             'club_id': ObjectId(club_id),

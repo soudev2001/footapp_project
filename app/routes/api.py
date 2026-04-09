@@ -1001,6 +1001,7 @@ def save_tactic():
             starters=data.get('starters', []),
             substitutes=data.get('substitutes', []),
             instructions={
+                # Existing fields
                 'passing_style': data.get('passing_style'),
                 'pressing': data.get('pressing'),
                 'defensive_block': data.get('defensive_block'),
@@ -1010,9 +1011,19 @@ def save_tactic():
                 'play_space': data.get('play_space'),
                 'gk_distribution': data.get('gk_distribution'),
                 'counter_pressing': data.get('counter_pressing', False),
+                # New team-level parameters
+                'mentality': data.get('mentality', 'balanced'),
+                'defensive_shape': data.get('defensive_shape', 'normal'),
+                'buildup_style': data.get('buildup_style', 'mixed'),
+                'transition_speed': data.get('transition_speed', 'balanced'),
+                'offside_trap': data.get('offside_trap', False),
+                'creative_freedom': data.get('creative_freedom', 'balanced'),
+                'defensive_width': data.get('defensive_width', 'normal'),
+                'pressing_trigger': data.get('pressing_trigger', 'opponent_half'),
             },
             captains=data.get('captains', []),
             set_pieces=data.get('set_pieces', {}),
+            player_instructions=data.get('player_instructions', {}),
         )
         return jsonify({'success': True, 'data': str(preset_id)})
     except Exception as e:
