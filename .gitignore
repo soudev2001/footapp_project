@@ -1,17 +1,39 @@
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+
+# Environnement
 .env
+.env.dev
 .env.prod
 .env.preprod
 .venv
 venv/
 ENV/
 env/
+
+# Éditeurs
 .idea/
 .vscode/
 *.swp
 *.bak
 *.tmp
+
+# Logs
 *.log
+
+# Base de données / données persistantes
 mongodb_data/
+
+# Frontend (React/Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+
+# Agent / outils internes
+.agent/
+
+# Fichiers sensibles
+server_access.txt

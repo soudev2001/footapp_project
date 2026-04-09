@@ -28,7 +28,7 @@ export default function EditPlayerScreen() {
         jersey_number: p?.jersey_number?.toString() || '',
         status: p?.status || 'active',
       });
-    } catch {} finally { setLoading(false); }
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   async function handleSave() {

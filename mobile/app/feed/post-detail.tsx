@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity,
   ActivityIndicator, KeyboardAvoidingView, Platform, FlatList,
 } from 'react-native';
@@ -19,14 +19,14 @@ export default function PostDetailScreen() {
 
   async function load() {
     try { const d = await getPost(id!); setPost(d); }
-    catch {} finally { setLoading(false); }
+    catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   async function handleLike() {
     try {
       await likePost(id!);
       setPost((p: any) => ({ ...p, liked: !p.liked, likes_count: (p.likes_count || 0) + (p.liked ? -1 : 1) }));
-    } catch {}
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); }
   }
 
   async function handleComment() {
@@ -36,7 +36,7 @@ export default function PostDetailScreen() {
       await commentPost(id!, comment.trim());
       setComment('');
       load();
-    } catch {} finally { setSending(false); }
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setSending(false); }
   }
 
   if (loading) return <View style={styles.centered}><ActivityIndicator size="large" color={Colors.primary} /></View>;

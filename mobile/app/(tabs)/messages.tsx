@@ -1,70 +1,114 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, FlatList, StyleSheet, RefreshControl,
   TouchableOpacity, ActivityIndicator, TextInput,
 } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { Colors, Spacing, FontSizes, BorderRadius } from '../../constants/theme';
-import { getConversations, getDirectMessages, sendMessage, getUnreadCount } from '../../services/messaging';
+import {
+  getConversations, getDirectMessages, sendMessage, getUnreadCount,
+  getTeamMessages, getChannelMessages, getChannels, markMessageRead,
+} from '../../services/messaging';
+import { getTeams } from '../../services/teams';
 import { Ionicons } from '@expo/vector-icons';
 
-type ViewMode = 'conversations' | 'chat';
+type Tab = 'dm' | 'team' | 'channel';
+type ViewMode = 'list' | 'chat';
 
 export default function MessagesScreen() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [tab, setTab] = useState<Tab>('dm');
   const [conversations, setConversations] = useState<any[]>([]);
-  const [viewMode, setViewMode] = useState<ViewMode>('conversations');
+  const [teams, setTeams] = useState<any[]>([]);
+  const [channels, setChannels] = useState<any[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [currentChat, setCurrentChat] = useState<any>(null);
+  const [chatType, setChatType] = useState<Tab>('dm');
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
 
-  useEffect(() => { loadConversations(); }, []);
+  useEffect(() => { loadAll(); }, []);
 
-  async function loadConversations() {
+  async function loadAll() {
     try {
-      const data = await getConversations();
-      setConversations(data || []);
-    } catch {} finally {
+      const [convos, teamList, channelList] = await Promise.all([
+        getConversations().catch(() => []),
+        getTeams().catch(() => []),
+        getChannels().catch(() => []),
+      ]);
+      setConversations(convos || []);
+      setTeams(teamList || []);
+      setChannels(channelList || []);
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally {
       setLoading(false);
     }
   }
 
   async function onRefresh() {
     setRefreshing(true);
-    if (viewMode === 'conversations') {
-      await loadConversations();
+    if (viewMode === 'list') {
+      await loadAll();
     } else if (currentChat) {
-      await openChat(currentChat);
+      await loadChatMessages(currentChat, chatType);
     }
     setRefreshing(false);
   }
 
-  async function openChat(conv: any) {
-    setCurrentChat(conv);
-    setViewMode('chat');
+  async function loadChatMessages(chat: any, type: Tab) {
     try {
-      const otherId = conv.receiver_id || conv.sender_id || conv._id;
-      const msgs = await getDirectMessages(otherId);
+      let msgs: any[] = [];
+      if (type === 'dm') {
+        const otherId = chat.receiver_id || chat.sender_id || chat._id;
+        msgs = await getDirectMessages(otherId);
+      } else if (type === 'team') {
+        msgs = await getTeamMessages(chat._id);
+      } else if (type === 'channel') {
+        msgs = await getChannelMessages(chat._id);
+      }
       setMessages(msgs || []);
-    } catch {}
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); }
+  }
+
+  async function openChat(chat: any, type: Tab) {
+    setCurrentChat(chat);
+    setChatType(type);
+    setViewMode('chat');
+    await loadChatMessages(chat, type);
   }
 
   async function handleSend() {
     if (!newMessage.trim() || !currentChat) return;
     setSending(true);
     try {
-      const otherId = currentChat.receiver_id || currentChat.sender_id || currentChat._id;
-      await sendMessage(newMessage.trim(), { receiver_id: otherId });
+      const opts: any = {};
+      if (chatType === 'dm') {
+        opts.receiver_id = currentChat.receiver_id || currentChat.sender_id || currentChat._id;
+      } else if (chatType === 'team') {
+        opts.team_id = currentChat._id;
+      } else if (chatType === 'channel') {
+        opts.channel_id = currentChat._id;
+      }
+      await sendMessage(newMessage.trim(), opts);
       setNewMessage('');
-      // Reload messages
-      const msgs = await getDirectMessages(otherId);
-      setMessages(msgs || []);
-    } catch {} finally {
+      await loadChatMessages(currentChat, chatType);
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally {
       setSending(false);
     }
+  }
+
+  function getChatTitle() {
+    if (chatType === 'team') return currentChat?.name || 'Équipe';
+    if (chatType === 'channel') return `#${currentChat?.name || 'channel'}`;
+    return currentChat?.sender_name || currentChat?.receiver_name || 'Chat';
+  }
+
+  function getListData() {
+    if (tab === 'dm') return conversations;
+    if (tab === 'team') return teams;
+    return channels;
   }
 
   if (loading) {
@@ -81,12 +125,10 @@ export default function MessagesScreen() {
       <View style={styles.container}>
         {/* Chat header */}
         <View style={styles.chatHeader}>
-          <TouchableOpacity onPress={() => setViewMode('conversations')}>
+          <TouchableOpacity onPress={() => setViewMode('list')}>
             <Ionicons name="arrow-back" size={24} color={Colors.text} />
           </TouchableOpacity>
-          <Text style={styles.chatHeaderTitle}>
-            {currentChat?.sender_name || currentChat?.receiver_name || 'Chat'}
-          </Text>
+          <Text style={styles.chatHeaderTitle}>{getChatTitle()}</Text>
         </View>
 
         {/* Messages */}
@@ -131,38 +173,91 @@ export default function MessagesScreen() {
     );
   }
 
-  // Conversation list
+  const listData = getListData();
+
+  // List view with tabs
   return (
     <View style={styles.container}>
+      {/* Tab bar */}
+      <View style={styles.tabBar}>
+        {([
+          { key: 'dm' as Tab, label: 'Messages', icon: 'chatbubble' },
+          { key: 'team' as Tab, label: 'Équipes', icon: 'people' },
+          { key: 'channel' as Tab, label: 'Channels', icon: 'megaphone' },
+        ]).map(t => (
+          <TouchableOpacity
+            key={t.key}
+            style={[styles.tabItem, tab === t.key && styles.tabItemActive]}
+            onPress={() => setTab(t.key)}
+          >
+            <Ionicons name={t.icon as any} size={18} color={tab === t.key ? Colors.primary : Colors.textLight} />
+            <Text style={[styles.tabLabel, tab === t.key && styles.tabLabelActive]}>{t.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
       <FlatList
-        data={conversations}
+        data={listData}
         keyExtractor={(item, i) => item._id || String(i)}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[Colors.primary]} />}
-        contentContainerStyle={conversations.length === 0 ? styles.emptyList : undefined}
+        contentContainerStyle={listData.length === 0 ? styles.emptyList : undefined}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="chatbubble-ellipses-outline" size={64} color={Colors.textLight} />
-            <Text style={styles.emptyText}>Aucune conversation</Text>
+            <Text style={styles.emptyText}>
+              {tab === 'dm' ? 'Aucune conversation' : tab === 'team' ? 'Aucune équipe' : 'Aucun channel'}
+            </Text>
           </View>
         }
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.convItem} onPress={() => openChat(item)}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {(item.sender_name || item.receiver_name || '?')[0].toUpperCase()}
-              </Text>
-            </View>
-            <View style={styles.convInfo}>
-              <Text style={styles.convName}>{item.sender_name || item.receiver_name || 'Utilisateur'}</Text>
-              <Text style={styles.convPreview} numberOfLines={1}>
-                {item.content || item.last_message || ''}
-              </Text>
-            </View>
-            <Text style={styles.convTime}>
-              {item.created_at ? new Date(item.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : ''}
-            </Text>
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => {
+          if (tab === 'dm') {
+            return (
+              <TouchableOpacity style={styles.convItem} onPress={() => openChat(item, 'dm')}>
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>
+                    {(item.sender_name || item.receiver_name || '?')[0].toUpperCase()}
+                  </Text>
+                </View>
+                <View style={styles.convInfo}>
+                  <Text style={styles.convName}>{item.sender_name || item.receiver_name || 'Utilisateur'}</Text>
+                  <Text style={styles.convPreview} numberOfLines={1}>
+                    {item.content || item.last_message || ''}
+                  </Text>
+                </View>
+                <Text style={styles.convTime}>
+                  {item.created_at ? new Date(item.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : ''}
+                </Text>
+              </TouchableOpacity>
+            );
+          }
+          if (tab === 'team') {
+            return (
+              <TouchableOpacity style={styles.convItem} onPress={() => openChat(item, 'team')}>
+                <View style={[styles.avatar, { backgroundColor: Colors.accent }]}>
+                  <Ionicons name="people" size={22} color={Colors.white} />
+                </View>
+                <View style={styles.convInfo}>
+                  <Text style={styles.convName}>{item.name || 'Équipe'}</Text>
+                  <Text style={styles.convPreview} numberOfLines={1}>{item.category || ''}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
+              </TouchableOpacity>
+            );
+          }
+          // channel
+          return (
+            <TouchableOpacity style={styles.convItem} onPress={() => openChat(item, 'channel')}>
+              <View style={[styles.avatar, { backgroundColor: Colors.secondary }]}>
+                <Ionicons name="megaphone" size={22} color={Colors.white} />
+              </View>
+              <View style={styles.convInfo}>
+                <Text style={styles.convName}>#{item.name || 'channel'}</Text>
+                <Text style={styles.convPreview} numberOfLines={1}>{item.description || ''}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
+            </TouchableOpacity>
+          );
+        }}
       />
     </View>
   );
@@ -171,6 +266,25 @@ export default function MessagesScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: Colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  tabItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing.sm + 2,
+    gap: 6,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabItemActive: { borderBottomColor: Colors.primary },
+  tabLabel: { fontSize: FontSizes.sm, color: Colors.textLight },
+  tabLabelActive: { color: Colors.primary, fontWeight: '600' },
   emptyList: { flex: 1 },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyText: { color: Colors.textSecondary, fontSize: FontSizes.lg, marginTop: Spacing.md },

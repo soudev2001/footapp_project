@@ -2,13 +2,10 @@ version: '3.8'
 
 services:
   mongodb:
-    image: mongo:latest
+    image: mongo:7
     container_name: footapp_mongodb
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-secret}
-      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-FootClubApp}
+    command: ["mongod", "--noauth", "--bind_ip_all"]
     volumes:
       - mongodb_data:/data/db
     ports:

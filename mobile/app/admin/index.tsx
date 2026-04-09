@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
   ActivityIndicator, RefreshControl,
 } from 'react-native';
@@ -20,7 +20,7 @@ export default function AdminDashboardScreen() {
     try {
       const data = await getAdminDashboard();
       setDashboard(data);
-    } catch {} finally { setLoading(false); }
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   async function onRefresh() { setRefreshing(true); await load(); setRefreshing(false); }

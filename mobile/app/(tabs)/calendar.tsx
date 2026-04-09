@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, ScrollView, StyleSheet, RefreshControl,
   TouchableOpacity, ActivityIndicator,
 } from 'react-native';
@@ -23,7 +23,7 @@ export default function CalendarScreen() {
       const data = await getUpcomingCalendar(undefined, 30);
       setEvents(data.events || []);
       setMatches(data.matches || []);
-    } catch {} finally {
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally {
       setLoading(false);
     }
   }
@@ -38,7 +38,7 @@ export default function CalendarScreen() {
     try {
       await rsvpEvent(eventId, status);
       loadData();
-    } catch {}
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); }
   }
 
   // Merge events & matches, sort by date

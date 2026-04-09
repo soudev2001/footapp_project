@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, ScrollView, StyleSheet, ActivityIndicator, RefreshControl,
 } from 'react-native';
 import { Colors, Spacing, FontSizes, BorderRadius } from '../../constants/theme';
@@ -15,7 +15,7 @@ export default function OnboardingScreen() {
 
   async function load() {
     try { const d = await getOnboarding(); setData(d); }
-    catch {} finally { setLoading(false); }
+    catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
   async function onRefresh() { setRefreshing(true); await load(); setRefreshing(false); }
 

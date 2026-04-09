@@ -23,7 +23,7 @@ export default function EditMemberScreen() {
       const { data } = await api.get(`/admin/members/${id}`);
       const m = data.data || data;
       setForm({ first_name: m.first_name || '', last_name: m.last_name || '', email: m.email || '', role: m.role || 'player', phone: m.phone || '' });
-    } catch {} finally { setLoading(false); }
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   async function handleSave() {

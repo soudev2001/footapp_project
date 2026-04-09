@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator,
   TextInput, RefreshControl, Image,
 } from 'react-native';
@@ -19,7 +19,7 @@ export default function FeedScreen() {
 
   async function load() {
     try { const d = await getPosts(); setPosts(d || []); }
-    catch {} finally { setLoading(false); }
+    catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
   async function onRefresh() { setRefreshing(true); await load(); setRefreshing(false); }
 
@@ -29,7 +29,7 @@ export default function FeedScreen() {
       setPosts(prev => prev.map(p =>
         p._id === postId ? { ...p, liked: !p.liked, likes_count: (p.likes_count || 0) + (p.liked ? -1 : 1) } : p
       ));
-    } catch {}
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); }
   }
 
   if (loading) return <View style={styles.centered}><ActivityIndicator size="large" color={Colors.primary} /></View>;

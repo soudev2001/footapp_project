@@ -17,7 +17,7 @@ export default function ContractsScreen() {
     try {
       const data = await getPlayerContracts();
       setContracts(data || []);
-    } catch {} finally { setLoading(false); }
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   async function onRefresh() { setRefreshing(true); await load(); setRefreshing(false); }

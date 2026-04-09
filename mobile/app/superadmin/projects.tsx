@@ -18,7 +18,7 @@ export default function ProjectsScreen() {
 
   async function load() {
     try { const d = await getProjects(); setProjects(d || []); }
-    catch {} finally { setLoading(false); }
+    catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
   async function onRefresh() { setRefreshing(true); await load(); setRefreshing(false); }
 

@@ -25,7 +25,7 @@ export default function ClubSettingsScreen() {
         name: c.name || '', address: c.address || '', phone: c.phone || '',
         email: c.email || '', website: c.website || '', description: c.description || '',
       });
-    } catch {} finally { setLoading(false); }
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   async function handleSave() {

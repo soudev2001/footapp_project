@@ -27,7 +27,7 @@ export default function DocumentsScreen() {
     try {
       const data = await getPlayerDocuments();
       setDocs(data || {});
-    } catch {} finally { setLoading(false); }
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   async function pickAndUpload(docKey: string, isImage: boolean) {

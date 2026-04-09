@@ -914,19 +914,39 @@ def send_convocation():
 
     notification_service = get_notification_service()
     event_service = get_event_service()
+    user_service = get_user_service()
     event = event_service.get_by_id(event_id)
+    event_title = event.get('title', 'Événement') if event else 'Événement'
 
+    emails_sent = 0
     for pid in player_ids:
         notification_service.create_notification(
             user_id=pid,
             title='Convocation',
-            message=f'Vous \u00eates convoqu\u00e9 pour: {event.get("title", "\u00c9v\u00e9nement") if event else "\u00c9v\u00e9nement"}',
+            message=f'Vous êtes convoqué pour: {event_title}',
             type='convocation',
             link='/player/calendar'
         )
         event_service.set_attendance(event_id, pid, 'convoked')
 
-    return jsonify({'success': True, 'message': f'{len(player_ids)} players convoked'})
+        # Send convocation email
+        try:
+            user = user_service.get_by_id(pid)
+            if user and user.get('email'):
+                from app.services.email_service import send_convocation_email
+                sent = send_convocation_email(
+                    to_email=user['email'],
+                    player_name=user.get('first_name', user.get('username', 'Joueur')),
+                    event_title=event_title,
+                    event_date=event.get('date') if event else None,
+                    event_location=event.get('location') if event else None,
+                )
+                if sent:
+                    emails_sent += 1
+        except Exception as e:
+            current_app.logger.warning(f"Email convocation failed for {pid}: {e}")
+
+    return jsonify({'success': True, 'message': f'{len(player_ids)} players convoked, {emails_sent} emails sent'})
 
 
 @api_bp.route('/coach/lineup', methods=['GET'])
@@ -960,7 +980,8 @@ def save_lineup():
         substitutes=data.get('substitutes', []),
         name=data.get('name', ''),
         captains=data.get('captains', []),
-        set_pieces=data.get('set_pieces', {})
+        set_pieces=data.get('set_pieces', {}),
+        positions=data.get('positions', {})
     )
     return jsonify({'success': True, 'data': str(result)})
 
@@ -976,6 +997,58 @@ def get_tactics():
     player_service = get_player_service()
     tactics = player_service.get_tactic_presets(club_id, team_id)
     return jsonify({'success': True, 'data': serialize_docs(tactics)})
+
+
+@api_bp.route('/coach/tactics', methods=['POST'])
+@role_required('coach')
+def save_tactic():
+    """Create or update a tactic preset."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'No club'}), 400
+    body = request.get_json(silent=True) or {}
+    name = body.get('name', '').strip()
+    formation = body.get('formation', '4-3-3').strip()
+    if not name:
+        return jsonify({'success': False, 'error': 'name is required'}), 400
+    from app.services.db import mongo
+    from bson import ObjectId
+    from datetime import datetime
+    doc = {
+        'club_id': ObjectId(club_id),
+        'team_id': ObjectId(body['team_id']) if body.get('team_id') else None,
+        'name': name,
+        'formation': formation,
+        'style': body.get('style', 'balanced'),
+        'description': body.get('description', ''),
+        'instructions': body.get('instructions', []),
+        'pressing': body.get('pressing', ''),
+        'tempo': body.get('tempo', ''),
+        'defensive_line': body.get('defensive_line', ''),
+        'width': body.get('width', ''),
+        'starters': body.get('starters', {}),
+        'substitutes': body.get('substitutes', []),
+        'captains': body.get('captains', []),
+        'set_pieces': body.get('set_pieces', {}),
+        'updated_at': datetime.utcnow(),
+    }
+    tactic_id = body.get('_id')
+    if tactic_id:
+        mongo.db.saved_tactics.update_one({'_id': ObjectId(tactic_id)}, {'$set': doc})
+        return jsonify({'success': True, 'data': tactic_id})
+    else:
+        doc['created_at'] = datetime.utcnow()
+        result = mongo.db.saved_tactics.insert_one(doc)
+        return jsonify({'success': True, 'data': str(result.inserted_id)}), 201
+
+
+@api_bp.route('/coach/tactics/<tactic_id>', methods=['DELETE'])
+@role_required('coach')
+def delete_tactic(tactic_id):
+    """Delete a tactic preset."""
+    player_service = get_player_service()
+    player_service.delete_tactic_preset(tactic_id)
+    return jsonify({'success': True})
 
 
 # ============================================================
@@ -1542,6 +1615,161 @@ def admin_update_subscription():
     return jsonify({'success': True, 'message': 'Subscription updated'})
 
 
+@api_bp.route('/admin/members-by-role', methods=['GET'])
+@role_required('admin')
+def admin_members_by_role():
+    """Get member count grouped by role."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': {}})
+    from app.services import get_analytics_service
+    analytics = get_analytics_service()
+    data = analytics.get_members_by_role(club_id)
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/admin/member-growth', methods=['GET'])
+@role_required('admin')
+def admin_member_growth():
+    """Get member growth over time."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': {}})
+    days = request.args.get('days', 90, type=int)
+    from app.services import get_analytics_service
+    analytics = get_analytics_service()
+    data = analytics.get_member_growth(club_id, days=days)
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/admin/engagement', methods=['GET'])
+@role_required('admin')
+def admin_engagement():
+    """Get engagement metrics."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': {}})
+    from app.services import get_analytics_service
+    analytics = get_analytics_service()
+    data = analytics.get_engagement_metrics(club_id)
+    if isinstance(data.get('top_active'), list):
+        data['top_active'] = serialize_docs(data['top_active'])
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/admin/team-stats', methods=['GET'])
+@role_required('admin')
+def admin_team_stats():
+    """Get team statistics."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': {}})
+    from app.services import get_analytics_service
+    analytics = get_analytics_service()
+    data = analytics.get_team_stats(club_id)
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/admin/financial', methods=['GET'])
+@role_required('admin')
+def admin_financial():
+    """Get financial metrics."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': {}})
+    from app.services import get_analytics_service
+    analytics = get_analytics_service()
+    data = analytics.get_financial_metrics(club_id)
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/admin/invite', methods=['POST'])
+@role_required('admin')
+def admin_invite():
+    """Invite a member by email."""
+    data = request.get_json()
+    if not data or not data.get('email'):
+        return jsonify({'success': False, 'error': 'Email required'}), 400
+    club_id = request.current_user.get('club_id')
+    user_service = get_user_service()
+    email = data['email'].strip().lower()
+    existing = user_service.get_by_email(email)
+    if existing:
+        return jsonify({'success': False, 'error': 'Email already registered'}), 409
+    profile = {'first_name': '', 'last_name': ''}
+    user_id = user_service.create(
+        email, 'changeme123',
+        role=data.get('role', 'player'),
+        club_id=club_id,
+        profile=profile,
+        account_status='pending'
+    )
+    return jsonify({'success': True, 'user_id': str(user_id)}), 201
+
+
+@api_bp.route('/admin/invitations', methods=['GET'])
+@role_required('admin')
+def admin_invitations():
+    """Get invitation dashboard."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': {}})
+    user_service = get_user_service()
+    members = user_service.get_by_club(club_id)
+    pending = [m for m in members if m.get('account_status') == 'pending']
+    accepted = [m for m in members if m.get('account_status') == 'active']
+    return jsonify({
+        'success': True,
+        'data': {
+            'pending': serialize_docs(pending),
+            'accepted': serialize_docs(accepted),
+            'pending_count': len(pending),
+            'accepted_count': len(accepted),
+        }
+    })
+
+
+@api_bp.route('/admin/announcement', methods=['POST'])
+@role_required('admin')
+def admin_send_announcement():
+    """Send an announcement."""
+    data = request.get_json()
+    if not data or not data.get('subject') or not data.get('message'):
+        return jsonify({'success': False, 'error': 'Subject and message required'}), 400
+    club_id = request.current_user.get('club_id')
+    sender_id = request.current_user.get('user_id')
+    from app.services import get_announcement_service
+    ann_service = get_announcement_service()
+    result = ann_service.send_announcement(
+        club_id,
+        data['subject'],
+        data['message'],
+        data.get('target', 'all'),
+        data.get('target_value', ''),
+        sender_id
+    )
+    return jsonify({
+        'success': True,
+        'data': {
+            'recipient_count': result.get('recipient_count', 0),
+            '_id': str(result.get('_id', ''))
+        }
+    }), 201
+
+
+@api_bp.route('/admin/announcements', methods=['GET'])
+@role_required('admin')
+def admin_announcements():
+    """Get announcements history."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': []})
+    from app.services import get_announcement_service
+    ann_service = get_announcement_service()
+    announcements = ann_service.get_announcements(club_id)
+    return jsonify({'success': True, 'data': serialize_docs(announcements)})
+
+
 # ============================================================
 # PARENT ENDPOINTS
 # ============================================================
@@ -1641,8 +1869,47 @@ def parent_child_roster(player_id):
 def generate_parent_code(player_id):
     """Generate a parent linking code for a player."""
     parent_link_service = get_parent_link_service()
-    code = parent_link_service.generate_link_code(player_id)
+    club_id = request.current_user.get('club_id', '')
+    user_id = request.current_user.get('user_id')
+    code = parent_link_service.generate_link_code(player_id, club_id, user_id)
     return jsonify({'success': True, 'code': code})
+
+
+@api_bp.route('/parent/linked-players', methods=['GET'])
+@role_required('parent')
+def parent_linked_players():
+    """Get all players linked to the current parent."""
+    user_id = request.current_user['user_id']
+    parent_link_service = get_parent_link_service()
+    players = parent_link_service.get_linked_players(user_id)
+    return jsonify({'success': True, 'data': serialize_docs(players)})
+
+
+@api_bp.route('/parent/linked-parents/<player_id>', methods=['GET'])
+@role_required('coach', 'admin')
+def parent_linked_parents(player_id):
+    """Get all parents linked to a player."""
+    parent_link_service = get_parent_link_service()
+    parents = parent_link_service.get_linked_parents(player_id)
+    return jsonify({'success': True, 'data': serialize_docs(parents)})
+
+
+@api_bp.route('/parent/pending-code/<player_id>', methods=['GET'])
+@role_required('coach', 'admin')
+def parent_pending_code(player_id):
+    """Get existing pending code for a player."""
+    parent_link_service = get_parent_link_service()
+    code = parent_link_service.get_pending_code(player_id)
+    return jsonify({'success': True, 'data': {'code': code}})
+
+
+@api_bp.route('/parent/link/<link_id>', methods=['DELETE'])
+@role_required('parent', 'admin')
+def parent_delete_link(link_id):
+    """Delete a parent-player link."""
+    parent_link_service = get_parent_link_service()
+    parent_link_service.delete_link(link_id)
+    return jsonify({'success': True, 'message': 'Link deleted'})
 
 
 # ============================================================

@@ -30,7 +30,7 @@ export default function ParentLinkScreen() {
         const code = await getPendingCode(user.player._id).catch(() => null);
         if (code?.link_code) setPendingCode(code.link_code);
       }
-    } catch {} finally {
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally {
       setLoading(false);
     }
   }

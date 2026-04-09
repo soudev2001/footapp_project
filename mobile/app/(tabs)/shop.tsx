@@ -45,7 +45,7 @@ export default function ShopScreen() {
     try {
       const data = await getProducts(undefined, filter || undefined);
       setProducts(data || []);
-    } catch {} finally {
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally {
       setLoading(false);
     }
   }

@@ -1,7 +1,7 @@
 import api from './api';
 
 export async function generateLinkCode(playerId: string) {
-  const { data } = await api.post('/parent/generate-code', { player_id: playerId });
+  const { data } = await api.post(`/parent/generate-code/${playerId}`);
   return data.data;
 }
 

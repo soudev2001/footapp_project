@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, FlatList, StyleSheet, RefreshControl,
   TouchableOpacity, ActivityIndicator, TextInput, Image,
 } from 'react-native';
@@ -30,7 +30,7 @@ export default function FeedScreen() {
     try {
       const data = await getPosts(undefined, filter || undefined);
       setPosts(data || []);
-    } catch {} finally {
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally {
       setLoading(false);
     }
   }
@@ -47,7 +47,7 @@ export default function FeedScreen() {
       setPosts(prev => prev.map(p =>
         p._id === postId ? { ...p, likes: (p.likes || 0) + 1 } : p
       ));
-    } catch {}
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); }
   }
 
   async function handleComment(postId: string) {
@@ -57,7 +57,7 @@ export default function FeedScreen() {
       setCommentText('');
       setActiveComment(null);
       await loadPosts();
-    } catch {}
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); }
   }
 
   function getCategoryColor(cat: string) {

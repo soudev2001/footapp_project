@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View, Text, ScrollView, StyleSheet, ActivityIndicator, TouchableOpacity,
+import { Alert,
+  View, Text, ScrollView, StyleSheet, ActivityIndicator, TouchableOpacity, TextInput,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Colors, Spacing, FontSizes, BorderRadius } from '../../constants/theme';
 import { getPlayer } from '../../services/player';
 import { updatePlayerRatings, addPlayerEvaluation, deletePlayer } from '../../services/coach';
 import { Ionicons } from '@expo/vector-icons';
-import { Alert, TextInput } from 'react-native';
 
 export default function PlayerDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -23,7 +22,7 @@ export default function PlayerDetailScreen() {
     try {
       const data = await getPlayer(id!);
       setPlayer(data);
-    } catch {} finally { setLoading(false); }
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   async function handleDelete() {

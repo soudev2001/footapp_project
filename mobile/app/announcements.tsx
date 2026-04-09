@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import {
+import { Alert,
   View, Text, ScrollView, StyleSheet, ActivityIndicator,
   RefreshControl, TouchableOpacity,
 } from 'react-native';
@@ -19,7 +19,7 @@ export default function AnnouncementsScreen() {
     try {
       const data = await getAnnouncements();
       setAnnouncements(Array.isArray(data) ? data : []);
-    } catch {} finally {
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally {
       setLoading(false);
       setRefreshing(false);
     }

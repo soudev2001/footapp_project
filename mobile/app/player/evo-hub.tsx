@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, ScrollView, StyleSheet, ActivityIndicator,
 } from 'react-native';
 import { Colors, Spacing, FontSizes, BorderRadius } from '../../constants/theme';
@@ -94,7 +94,7 @@ export default function EvoHubScreen() {
     try {
       const data = await getPlayerEvolution();
       setEvo(data);
-    } catch {} finally { setLoading(false); }
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   if (loading) return <View style={styles.centered}><ActivityIndicator size="large" color={Colors.primary} /></View>;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, ScrollView, StyleSheet, ActivityIndicator, TouchableOpacity,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -24,14 +24,14 @@ export default function EventDetailScreen() {
       ]);
       setEvent(evRes.data.data);
       setAttendance(attRes.data.data || []);
-    } catch {} finally { setLoading(false); }
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   async function handleRsvp(status: string) {
     try {
       await api.post(`/events/${id}/rsvp`, { status });
       await load();
-    } catch {}
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); }
   }
 
   if (loading) return <View style={styles.centered}><ActivityIndicator size="large" color={Colors.primary} /></View>;

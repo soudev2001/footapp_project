@@ -37,6 +37,7 @@ export async function saveLineup(lineupData: {
   name?: string;
   captains?: string[];
   set_pieces?: any;
+  positions?: Record<string, { x: number; y: number }>;
 }) {
   const { data } = await api.post('/coach/lineup', lineupData);
   return data;
@@ -47,6 +48,21 @@ export async function getTactics(teamId?: string) {
   if (teamId) params.team_id = teamId;
   const { data } = await api.get('/coach/tactics', { params });
   return data.data;
+}
+
+export async function saveTactic(tactic: {
+  _id?: string; name: string; formation: string; style: string;
+  description?: string; instructions?: string[];
+  pressing?: string; tempo?: string; defensive_line?: string; width?: string;
+  team_id?: string;
+}) {
+  const { data } = await api.post('/coach/tactics', tactic);
+  return data;
+}
+
+export async function deleteTactic(tacticId: string) {
+  const { data } = await api.delete(`/coach/tactics/${tacticId}`);
+  return data;
 }
 
 // ===== Player CRUD =====

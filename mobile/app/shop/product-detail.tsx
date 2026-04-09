@@ -20,7 +20,7 @@ export default function ProductDetailScreen() {
 
   async function load() {
     try { const d = await getProduct(id!); setProduct(d); }
-    catch {} finally { setLoading(false); }
+    catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   async function addToCart() {

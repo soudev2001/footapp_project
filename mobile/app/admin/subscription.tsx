@@ -26,7 +26,7 @@ export default function SubscriptionScreen() {
     try {
       const data = await getSubscription();
       setCurrentPlan(data);
-    } catch {} finally { setLoading(false); }
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   async function onRefresh() { setRefreshing(true); await load(); setRefreshing(false); }

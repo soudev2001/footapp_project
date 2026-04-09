@@ -52,6 +52,15 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="feed"
+        options={{
+          title: 'Actus',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="newspaper" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="calendar"
         options={{
           title: 'Calendrier',
@@ -66,6 +75,15 @@ export default function TabsLayout() {
           title: 'Messages',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="chatbubbles" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="shop"
+        options={{
+          title: 'Boutique',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="cart" size={size} color={color} />
           ),
         }}
       />

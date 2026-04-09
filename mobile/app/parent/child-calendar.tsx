@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
@@ -17,7 +17,7 @@ export default function ChildCalendarScreen() {
 
   async function load() {
     try { const d = await getChildCalendar(childId!); setEvents(d || []); }
-    catch {} finally { setLoading(false); }
+    catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
   async function onRefresh() { setRefreshing(true); await load(); setRefreshing(false); }
 

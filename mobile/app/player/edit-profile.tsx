@@ -32,7 +32,7 @@ export default function EditProfileScreen() {
         position: player?.position || '',
         jersey_number: player?.jersey_number?.toString() || '',
       });
-    } catch {} finally { setLoading(false); }
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
 
   async function handleSave() {

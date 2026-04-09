@@ -34,7 +34,7 @@ export default function SettingsScreen() {
     try {
       const raw = await SecureStore.getItemAsync(PREFS_KEY);
       if (raw) setPrefs(JSON.parse(raw));
-    } catch {}
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); }
     finally { setLoading(false); }
   }
 

@@ -25,7 +25,7 @@ export default function ProfileScreen() {
       ]);
       setPlayer(p);
       setStats(s);
-    } catch {} finally {
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally {
       setLoading(false);
     }
   }
@@ -117,12 +117,23 @@ export default function ProfileScreen() {
             <MenuItem icon="people" label="Mon équipe" onPress={() => router.push('/player/team')} />
           </>
         )}
-        {user?.role === 'coach' && (
+        {(user?.role === 'coach' || user?.role === 'admin') && (
           <MenuItem icon="clipboard" label="Espace Coach" onPress={() => router.push('/coach/')} />
         )}
         {user?.role === 'admin' && (
           <MenuItem icon="settings" label="Panel Admin" onPress={() => router.push('/admin/')} />
         )}
+        {user?.role === 'parent' && (
+          <MenuItem icon="people" label="Espace Parent" onPress={() => router.push('/parent/')} />
+        )}
+        {user?.role === 'superadmin' && (
+          <MenuItem icon="shield-checkmark" label="Super Admin" onPress={() => router.push('/superadmin/')} />
+        )}
+        {(user?.role === 'admin' || user?.role === 'coach') && (
+          <MenuItem icon="globe" label="ISY Hub" onPress={() => router.push('/isy/')} />
+        )}
+        <MenuItem icon="business" label="Mon Club" onPress={() => router.push('/club/')} />
+        <MenuItem icon="megaphone" label="Annonces" onPress={() => router.push('/announcements')} />
         <MenuItem icon="settings-outline" label="Paramètres" onPress={() => router.push('/player/settings')} />
       </View>
 

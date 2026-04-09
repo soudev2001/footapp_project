@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, FlatList, StyleSheet, RefreshControl,
   TouchableOpacity, ActivityIndicator,
 } from 'react-native';
@@ -18,7 +18,7 @@ export default function NotificationsScreen() {
     try {
       const data = await getNotifications();
       setNotifications(data || []);
-    } catch {} finally {
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally {
       setLoading(false);
     }
   }
@@ -35,14 +35,14 @@ export default function NotificationsScreen() {
       setNotifications(prev => prev.map(n =>
         n._id === id ? { ...n, read: true } : n
       ));
-    } catch {}
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); }
   }
 
   async function handleMarkAllRead() {
     try {
       await markAllNotificationsRead();
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    } catch {}
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); }
   }
 
   const unreadCount = notifications.filter(n => !n.read).length;

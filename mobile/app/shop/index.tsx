@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator,
   Image, RefreshControl,
 } from 'react-native';
@@ -18,7 +18,7 @@ export default function ShopScreen() {
 
   async function load() {
     try { const d = await getProducts(); setProducts(d || []); }
-    catch {} finally { setLoading(false); }
+    catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally { setLoading(false); }
   }
   async function onRefresh() { setRefreshing(true); await load(); setRefreshing(false); }
 

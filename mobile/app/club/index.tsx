@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { Alert,
   View, Text, ScrollView, StyleSheet, RefreshControl,
   ActivityIndicator, TouchableOpacity,
 } from 'react-native';
@@ -31,7 +31,7 @@ export default function ClubScreen() {
         setStats(clubStats);
         setCompetitions(comps || []);
       }
-    } catch {} finally {
+    } catch (e: any) { Alert.alert('Erreur', e?.message || 'Une erreur est survenue'); } finally {
       setLoading(false);
     }
   }
