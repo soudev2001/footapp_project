@@ -105,7 +105,7 @@ export default function LoadedTacticDisplay({
     return emojiMap[mentality] || '⚖️⚖️⚖️□□'
   }
 
-  const colorMap = {
+  const colorMap: Record<string, string> = {
     red: 'bg-red-900/20 border-red-800 text-red-300',
     blue: 'bg-blue-900/20 border-blue-800 text-blue-300',
     yellow: 'bg-yellow-900/20 border-yellow-800 text-yellow-300',
