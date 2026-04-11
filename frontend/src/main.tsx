@@ -3,13 +3,6 @@ import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
 import './index.css'
-import { isDemoMode, getDemoRole, installDemoMock } from './mocks/setup'
-
-// Re-install mock adapter on every page load if demo mode is active
-if (isDemoMode()) {
-  installDemoMock(getDemoRole())
-}
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

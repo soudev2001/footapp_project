@@ -1,17 +1,13 @@
 import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Navbar from './Navbar'
-import DemoBanner from './DemoBanner'
-import { isDemoMode } from '../mocks/setup'
 import { useState } from 'react'
 
 export default function Layout() {
-  const demo = isDemoMode()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
-      {demo && <DemoBanner />}
       <div className="flex flex-1 overflow-hidden">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <div className="flex flex-col flex-1 overflow-hidden min-w-0">
