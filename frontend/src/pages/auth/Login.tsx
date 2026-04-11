@@ -3,19 +3,16 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { authApi } from '../../api'
 import { useAuthStore } from '../../store/auth'
-import { Eye, EyeOff, Loader2, Zap, ShieldCheck, Users, User, Baby, Crown } from 'lucide-react'
-import { installDemoMock, removeDemoMock, DEMO_MODE_KEY, DEMO_ROLE_KEY } from '../../mocks/setup'
-import { DEMO_USERS } from '../../mocks/data'
+import { Eye, EyeOff, Loader2, ShieldCheck, Users, User, Crown } from 'lucide-react'
 import type { User as UserType } from '../../types'
 
 interface FormData { email: string; password: string }
 
-const DEMO_ROLES = [
-  { role: 'superadmin', label: 'Super Admin', desc: 'Toutes les clubs & projets', icon: <Crown size={20} />, color: 'from-yellow-700 to-yellow-900 border-yellow-600', badge: 'bg-yellow-500' },
-  { role: 'admin', label: 'Admin Club', desc: 'Gestion complète du club', icon: <ShieldCheck size={20} />, color: 'from-purple-700 to-purple-900 border-purple-600', badge: 'bg-purple-500' },
-  { role: 'coach', label: 'Entraîneur', desc: 'Effectif, tactiques, matchs', icon: <Users size={20} />, color: 'from-blue-700 to-blue-900 border-blue-600', badge: 'bg-blue-500' },
-  { role: 'player', label: 'Joueur', desc: 'Profil, stats, évolution', icon: <User size={20} />, color: 'from-pitch-700 to-pitch-900 border-pitch-600', badge: 'bg-pitch-500' },
-  { role: 'parent', label: 'Parent', desc: 'Suivi de l\'enfant', icon: <Baby size={20} />, color: 'from-orange-700 to-orange-900 border-orange-600', badge: 'bg-orange-500' },
+const QUICK_LOGINS = [
+  { role: 'admin', label: 'Admin', email: 'admin@footlogic.fr', password: 'admin123', icon: <ShieldCheck size={20} />, color: 'from-purple-700 to-purple-900 border-purple-600' },
+  { role: 'coach', label: 'Coach', email: 'coach@fcelite.fr', password: 'coach123', icon: <Users size={20} />, color: 'from-blue-700 to-blue-900 border-blue-600' },
+  { role: 'player', label: 'Joueur', email: 'player1@fcelite.fr', password: 'player123', icon: <User size={20} />, color: 'from-pitch-700 to-pitch-900 border-pitch-600' },
+  { role: 'superadmin', label: 'Super Admin', email: 'superadmin1@footlogic.com', password: 'super123', icon: <Crown size={20} />, color: 'from-yellow-700 to-yellow-900 border-yellow-600' },
 ]
 
 export default function Login() {
@@ -23,34 +20,28 @@ export default function Login() {
   const { setTokens, setUser } = useAuthStore()
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-  const [demoLoading, setDemoLoading] = useState<string | null>(null)
+  const [quickLoading, setQuickLoading] = useState<string | null>(null)
 
   const { register, handleSubmit, formState: { isSubmitting } } = useForm<FormData>()
 
-  const loginAsDemo = async (role: string) => {
-    setDemoLoading(role)
-    installDemoMock(role)
-    localStorage.setItem(DEMO_MODE_KEY, 'true')
-    localStorage.setItem(DEMO_ROLE_KEY, role)
+  const quickLogin = async (email: string, password: string, role: string) => {
+    setError('')
+    setQuickLoading(role)
     try {
-      const res = await authApi.login('demo@demo.fc', 'demo')
+      const res = await authApi.login(email, password)
       setTokens(res.data.access_token, res.data.refresh_token)
       setUser(res.data.user as UserType)
       navigate('/', { replace: true })
+    } catch (err: unknown) {
+      const errData = (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data
+      setError(errData?.error ?? errData?.message ?? 'Erreur de connexion')
     } finally {
-      setDemoLoading(null)
+      setQuickLoading(null)
     }
-  }
-
-  const exitDemo = () => {
-    localStorage.removeItem(DEMO_MODE_KEY)
-    localStorage.removeItem(DEMO_ROLE_KEY)
-    removeDemoMock()
   }
 
   const onSubmit = async (data: FormData) => {
     setError('')
-    exitDemo()
     try {
       const res = await authApi.login(data.email, data.password)
       setTokens(res.data.access_token, res.data.refresh_token)
@@ -146,34 +137,29 @@ export default function Login() {
           {/* Divider */}
           <div className="flex items-center gap-3">
             <hr className="flex-1 border-white/10" />
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-600">Accès Démo</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-600">Accès Rapide</span>
             <hr className="flex-1 border-white/10" />
           </div>
 
-          {/* Demo Roles */}
-          <div className="space-y-3">
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-              {DEMO_ROLES.map(({ role, label, icon, color }) => (
-                <button
-                  key={role}
-                  type="button"
-                  onClick={() => loginAsDemo(role)}
-                  disabled={demoLoading !== null}
-                  className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl border bg-gradient-to-br ${color} text-white hover:brightness-110 hover:scale-105 transition-all duration-200 disabled:opacity-60`}
-                >
-                  {demoLoading === role && (
-                    <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50">
-                      <Loader2 size={14} className="animate-spin" />
-                    </div>
-                  )}
-                  {icon}
-                  <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
-                </button>
-              ))}
-            </div>
-            <p className="text-[10px] text-gray-600 text-center">
-              Club démo : <span className="text-gray-400 font-medium">FC Les Aiglons — Lyon</span> · Données fictives
-            </p>
+          {/* Quick Login Roles */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {QUICK_LOGINS.map(({ role, label, email, password, icon, color }) => (
+              <button
+                key={role}
+                type="button"
+                onClick={() => quickLogin(email, password, role)}
+                disabled={quickLoading !== null}
+                className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl border bg-gradient-to-br ${color} text-white hover:brightness-110 hover:scale-105 transition-all duration-200 disabled:opacity-60`}
+              >
+                {quickLoading === role && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50">
+                    <Loader2 size={14} className="animate-spin" />
+                  </div>
+                )}
+                {icon}
+                <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
+              </button>
+            ))}
           </div>
 
           {/* Register CTA */}
