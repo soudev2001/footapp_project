@@ -1001,7 +1001,6 @@ def save_tactic():
             starters=data.get('starters', []),
             substitutes=data.get('substitutes', []),
             instructions={
-                # Existing fields
                 'passing_style': data.get('passing_style'),
                 'pressing': data.get('pressing'),
                 'defensive_block': data.get('defensive_block'),
@@ -1011,7 +1010,6 @@ def save_tactic():
                 'play_space': data.get('play_space'),
                 'gk_distribution': data.get('gk_distribution'),
                 'counter_pressing': data.get('counter_pressing', False),
-                # New team-level parameters
                 'mentality': data.get('mentality', 'balanced'),
                 'defensive_shape': data.get('defensive_shape', 'normal'),
                 'buildup_style': data.get('buildup_style', 'mixed'),
@@ -1024,6 +1022,7 @@ def save_tactic():
             captains=data.get('captains', []),
             set_pieces=data.get('set_pieces', {}),
             player_instructions=data.get('player_instructions', {}),
+            tactic_id=data.get('id'),
         )
         return jsonify({'success': True, 'data': str(preset_id)})
     except Exception as e:
@@ -1037,65 +1036,6 @@ def delete_tactic(tactic_id):
     player_service = get_player_service()
     player_service.delete_tactic_preset(tactic_id)
     return jsonify({'success': True, 'message': 'Tactique supprimée'})
-
-
-@api_bp.route('/coach/tactics/presets', methods=['GET'])
-@role_required('coach')
-def get_tactic_presets_api():
-    """Get tactic presets (alias)."""
-    club_id = request.current_user.get('club_id')
-    team_id = request.args.get('team_id')
-    if not club_id:
-        return jsonify({'success': True, 'data': []})
-    player_service = get_player_service()
-    presets = player_service.get_tactic_presets(club_id, team_id)
-    return jsonify({'success': True, 'data': serialize_docs(presets)})
-
-
-@api_bp.route('/coach/tactics/presets', methods=['POST'])
-@role_required('coach')
-def save_tactic_preset_api():
-    """Save a tactic preset."""
-    data = request.get_json()
-    if not data:
-        return jsonify({'success': False, 'error': 'Data required'}), 400
-    club_id = request.current_user.get('club_id')
-    player_service = get_player_service()
-    try:
-        preset_id = player_service.save_tactic_preset(
-            club_id=club_id,
-            team_id=data.get('team_id'),
-            name=data.get('name', 'Preset'),
-            description=data.get('description', ''),
-            formation=data.get('formation', '4-3-3'),
-            starters=data.get('starters', []),
-            substitutes=data.get('substitutes', []),
-            instructions=data.get('instructions') or {
-                'passing_style': data.get('passing_style'),
-                'pressing': data.get('pressing'),
-                'defensive_block': data.get('defensive_block'),
-                'marking': data.get('marking'),
-                'tempo': data.get('tempo'),
-                'width': data.get('width'),
-                'play_space': data.get('play_space'),
-                'gk_distribution': data.get('gk_distribution'),
-                'counter_pressing': data.get('counter_pressing', False),
-            },
-            captains=data.get('captains', []),
-            set_pieces=data.get('set_pieces', {}),
-        )
-        return jsonify({'success': True, 'data': str(preset_id)})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@api_bp.route('/coach/tactics/presets/<preset_id>', methods=['DELETE'])
-@role_required('coach')
-def delete_tactic_preset_api(preset_id):
-    """Delete a tactic preset."""
-    player_service = get_player_service()
-    player_service.delete_tactic_preset(preset_id)
-    return jsonify({'success': True, 'message': 'Preset supprimé'})
 
 
 @api_bp.route('/coach/events', methods=['GET'])

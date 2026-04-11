@@ -257,32 +257,40 @@ class PlayerService:
             upsert=True
         )
 
-    def save_tactic_preset(self, club_id, team_id, name, formation, starters, substitutes, instructions=None, description='', captains=None, set_pieces=None, player_instructions=None):
-        """Save a new tactical preset (upsert by name/club/team)"""
+    def save_tactic_preset(self, club_id, team_id, name, formation, starters, substitutes, instructions=None, description='', captains=None, set_pieces=None, player_instructions=None, tactic_id=None):
+        """Save a tactic. If tactic_id is provided, update by ID. Otherwise upsert by name/club/team."""
         from app.models import create_saved_tactic
         tactic = create_saved_tactic(club_id, team_id, name, formation, starters, substitutes, instructions, description, captains, set_pieces, player_instructions)
 
-        query = {
-            'club_id': ObjectId(club_id),
-            'name': name
-        }
-        if team_id:
-            query['team_id'] = ObjectId(team_id)
+        if tactic_id:
+            # Update existing tactic by ID
+            result = self.db.saved_tactics.update_one(
+                {'_id': ObjectId(tactic_id), 'club_id': ObjectId(club_id)},
+                {'$set': tactic}
+            )
+            return tactic_id
         else:
-            query['team_id'] = None
+            # Upsert by name/club/team for new tactics
+            query = {
+                'club_id': ObjectId(club_id),
+                'name': name
+            }
+            if team_id:
+                query['team_id'] = ObjectId(team_id)
+            else:
+                query['team_id'] = None
 
-        result = self.db.saved_tactics.update_one(
-            query,
-            {'$set': tactic},
-            upsert=True
-        )
+            result = self.db.saved_tactics.update_one(
+                query,
+                {'$set': tactic},
+                upsert=True
+            )
 
-        if result.upserted_id:
-            return str(result.upserted_id)
+            if result.upserted_id:
+                return str(result.upserted_id)
 
-        # If it was an update, we need to find the ID
-        existing = self.db.saved_tactics.find_one(query)
-        return str(existing['_id'])
+            existing = self.db.saved_tactics.find_one(query)
+            return str(existing['_id'])
 
     def get_tactic_presets(self, club_id, team_id=None):
         """Get all saved tactics for a club/team"""

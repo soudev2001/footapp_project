@@ -145,9 +145,6 @@ export const coachApi = {
   deletePlayer: (playerId: string) => client.delete(`/coach/players/${playerId}`),
   generateParentCode: (playerId: string) =>
     client.post(`/parent/generate-code/${playerId}`),
-  savePreset: (data: object) => client.post('/coach/tactics/presets', data),
-  loadPresets: () => client.get('/coach/tactics/presets'),
-  deletePreset: (id: string) => client.delete(`/coach/tactics/presets/${id}`),
   attendance: (params?: { event_id?: string }) =>
     client.get('/coach/attendance', { params }),
   events: () => client.get('/coach/events'),
