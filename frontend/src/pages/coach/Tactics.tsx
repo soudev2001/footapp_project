@@ -17,313 +17,25 @@ import {
   remapPlayersOnFormationChange, autoFillPlayers,
   GAME_PLANS, type GamePlan, type SlotData,
 } from '../../utils/fifaLogic'
-
-const POS_FR: Record<string, string> = {
-  GK: 'G', LB: 'AG', CB: 'DC', RB: 'AD', LWB: 'AG', RWB: 'AD',
-  CDM: 'MDC', CM: 'MC', CAM: 'MOC', LM: 'MG', RM: 'MD',
-  LW: 'AIG', RW: 'AID', ST: 'BU', CF: 'AC',
-}
-
-const PRESSING_COLORS: Record<string, string> = {
-  low: 'bg-blue-900 text-blue-300',
-  medium: 'bg-yellow-900 text-yellow-300',
-  high: 'bg-orange-900 text-orange-300',
-  gegenpressing: 'bg-red-900 text-red-300',
-}
-
-const PRESSING_LABELS: Record<string, string> = {
-  low: 'Bas',
-  medium: 'Médian',
-  high: 'Haut',
-  gegenpressing: 'Gegenpress',
-}
-
-const BLOCK_LABELS: Record<string, string> = {
-  low: 'Bloc bas',
-  medium: 'Bloc médian',
-  high: 'Bloc haut',
-}
-
-const PASSING_LABELS: Record<string, string> = {
-  short: 'Courtes',
-  direct: 'Directes',
-  long_ball: 'Longues',
-  long: 'Longues',
-  mixed: 'Mixtes',
-}
-
-const TEMPO_LABELS: Record<string, string> = {
-  slow: 'Lent',
-  balanced: 'Équilibré',
-  fast: 'Rapide',
-}
-
-const WIDTH_LABELS: Record<string, string> = {
-  narrow: 'Étroit',
-  normal: 'Normal',
-  wide: 'Large',
-}
-
-const PLAY_SPACE_LABELS: Record<string, string> = {
-  left: 'Couloir gauche',
-  right: 'Couloir droit',
-  center: 'Axe central',
-  both_wings: 'Deux couloirs',
-  mixed: 'Mixte',
-}
-
-const GK_DIST_LABELS: Record<string, string> = {
-  short: 'Courte',
-  long: 'Longue',
-  fast: 'Rapide',
-}
-
-// New tactical parameter labels
-const MENTALITY_LABELS: Record<string, string> = {
-  ultra_defensive: '🛡️ Ultra Déf',
-  defensive: '🔵 Défensif',
-  balanced: '⚖️ Équilibré',
-  attacking: '🔴 Offensif',
-  ultra_attacking: '⚡ Ultra Off',
-}
-
-const DEFENSIVE_SHAPE_LABELS: Record<string, string> = {
-  compact: 'Compacte',
-  normal: 'Normale',
-  spread: 'Étalée',
-}
-
-const BUILDUP_STYLE_LABELS: Record<string, string> = {
-  goalkeeper_short: 'Relance courte GK',
-  defenders_build: 'Construction défenseurs',
-  midfield_drop: 'Milieux décalés',
-  long_ball: 'Lancement direct',
-  mixed: 'Mixte',
-}
-
-const TRANSITION_SPEED_LABELS: Record<string, string> = {
-  slow: 'Lent',
-  balanced: 'Équilibré',
-  fast: 'Rapide',
-}
-
-const CREATIVE_FREEDOM_LABELS: Record<string, string> = {
-  strict: 'Stricte',
-  balanced: 'Équilibrée',
-  high: 'Libre',
-}
-
-const DEFENSIVE_WIDTH_LABELS: Record<string, string> = {
-  narrow: 'Étroit',
-  normal: 'Normal',
-  wide: 'Large',
-}
-
-const PRESSING_TRIGGER_LABELS: Record<string, string> = {
-  immediate: 'Immédiat',
-  losing_ball: 'Perte de balle',
-  opponent_half: 'Demi-terrain adverse',
-  final_third: 'Dernier tiers',
-}
-
-// Player role constants
-const GK_ROLES = ['sweeper_keeper', 'traditional']
-const DEFENDER_ROLES = ['ball_playing_defender', 'stopper', 'cover', 'wingback', 'fullback']
-const MIDFIELDER_ROLES = ['deep_playmaker', 'ball_winner', 'box_to_box', 'advanced_playmaker', 'attacking_midfielder']
-const WINGER_ROLES = ['inverted_winger', 'traditional_winger', 'inside_forward', 'wide_midfielder']
-const FORWARD_ROLES = ['target_man', 'poacher', 'false_nine', 'advanced_forward', 'complete_forward']
-
-const ROLE_LABELS: Record<string, string> = {
-  sweeper_keeper: 'Libéro',
-  traditional: 'Traditionnel',
-  ball_playing_defender: 'Défenseur qui joue',
-  stopper: 'Défenseur agressif',
-  cover: 'Défenseur de couverture',
-  wingback: 'Piston',
-  fullback: 'Arrière',
-  deep_playmaker: 'Créateur depuis la profondeur',
-  ball_winner: 'Récupérateur',
-  box_to_box: 'Milieu de terrain complet',
-  advanced_playmaker: 'Créateur avancé',
-  attacking_midfielder: 'Milieu offensif',
-  inverted_winger: 'Ailier inversé',
-  traditional_winger: 'Ailier traditionnel',
-  inside_forward: 'Avant intérieur',
-  wide_midfielder: 'Milieu large',
-  target_man: 'Pivot',
-  poacher: 'Renard des surfaces',
-  false_nine: 'Faux 9',
-  advanced_forward: 'Avant avancé',
-  complete_forward: 'Attaquant complet',
-}
-
-const DUTY_LABELS: Record<string, string> = {
-  defend: 'Défendre',
-  support: 'Soutenir',
-  attack: 'Attaquer',
-}
-
-const FREEDOM_LABELS: Record<string, string> = {
-  stay_position: 'Strictement positionnée',
-  roam: 'Peut se décaler',
-  free: 'Liberté totale',
-}
-
-const SPECIFIC_TASKS = [
-  { key: 'run_channels', label: 'Courses en profondeur' },
-  { key: 'take_long_shots', label: 'Tirs de loin' },
-  { key: 'dribble_more', label: 'Dribbler plus' },
-  { key: 'stay_wide', label: 'Rester large' },
-  { key: 'get_forward', label: 'Monter en attaque' },
-  { key: 'mark_specific', label: 'Marquer spécifique' },
-  { key: 'play_simple', label: 'Jeu simple' },
-  { key: 'crosses_often', label: 'Centrer souvent' },
-  { key: 'sit_narrow', label: 'Se rapprocher' },
-]
-
-const POS_FILTERS = [
-  { key: 'all', label: 'Tous' },
-  { key: 'GK', label: 'GK' },
-  { key: 'DEF', label: 'DÉF' },
-  { key: 'MID', label: 'MIL' },
-  { key: 'ATT', label: 'ATT' },
-] as const
-
-const posMatchesFilter = (pos: string | undefined, filter: string) => {
-  if (filter === 'all') return true
-  if (filter === 'GK') return pos === 'GK'
-  if (filter === 'DEF') return ['CB', 'LB', 'RB', 'LWB', 'RWB'].includes(pos ?? '')
-  if (filter === 'MID') return ['CDM', 'CM', 'CAM', 'LM', 'RM'].includes(pos ?? '')
-  if (filter === 'ATT') return ['LW', 'RW', 'ST', 'CF'].includes(pos ?? '')
-  return true
-}
-
-const PRESSING_BORDER: Record<string, string> = {
-  low: 'border-l-blue-500',
-  medium: 'border-l-yellow-500',
-  high: 'border-l-orange-500',
-  gegenpressing: 'border-l-red-500',
-}
-
-const formationCategory = (f: string) => {
-  if (['3-5-2', '5-3-2', '5-4-1'].includes(f)) return { label: '🛡️ Défensif', cls: 'bg-blue-900/40 text-blue-300' }
-  if (['4-1-2-1-2', '3-4-3', '4-1-4-1', '4-3-2-1'].includes(f)) return { label: '⚡ Offensif', cls: 'bg-red-900/40 text-red-300' }
-  return { label: '⚖️ Équilibré', cls: 'bg-gray-800 text-gray-300' }
-}
-
-interface PlayerInstruction {
-  role: string
-  duty: 'defend' | 'support' | 'attack'
-  freedom: 'stay_position' | 'roam' | 'free'
-  specific_tasks: string[]
-}
-
-interface TacticForm {
-  name: string
-  formation: string
-  passing_style: string
-  defensive_block: string
-  pressing: string
-  description: string
-  tempo: string
-  width: string
-  marking: string
-  play_space: string
-  gk_distribution: string
-  counter_pressing: boolean
-  // New team-level parameters
-  mentality: string
-  defensive_shape: string
-  buildup_style: string
-  transition_speed: string
-  offside_trap: boolean
-  creative_freedom: string
-  defensive_width: string
-  pressing_trigger: string
-  // Existing fields
-  captains: string[]
-  set_pieces: {
-    penalties: string[]
-    free_kicks_direct: string[]
-    free_kicks_indirect: string[]
-    corners_left: string[]
-    corners_right: string[]
-  }
-}
-
-interface Tactic {
-  id: string
-  formation?: string
-  name?: string
-  passing_style?: string
-  defensive_block?: string
-  pressing?: string
-  description?: string
-  style?: string
-  tempo?: string
-  width?: string
-  marking?: string
-  play_space?: string
-  gk_distribution?: string
-  counter_pressing?: boolean
-  mentality?: string
-  defensive_shape?: string
-  buildup_style?: string
-  transition_speed?: string
-  offside_trap?: boolean
-  creative_freedom?: string
-  defensive_width?: string
-  pressing_trigger?: string
-  captains?: string[]
-  set_pieces?: Record<string, string[]>
-  starters?: string[] | Record<string, string>
-  substitutes?: string[]
-  player_instructions?: Record<string, PlayerInstruction>
-  instructions?: {
-    passing_style?: string
-    pressing?: string
-    defensive_block?: string
-    marking?: string
-    tempo?: string
-    width?: string
-    play_space?: string
-    gk_distribution?: string
-    counter_pressing?: boolean
-    mentality?: string
-    defensive_shape?: string
-    buildup_style?: string
-    transition_speed?: string
-    offside_trap?: boolean
-    creative_freedom?: string
-    defensive_width?: string
-    pressing_trigger?: string
-  }
-}
-
+import TacticsSidebar from './TacticsSidebar'
+import {
+  POS_FR, PRESSING_COLORS, PRESSING_LABELS, PRESSING_BORDER,
+  BLOCK_LABELS, PASSING_LABELS, TEMPO_LABELS, WIDTH_LABELS,
+  PLAY_SPACE_LABELS, GK_DIST_LABELS, MENTALITY_LABELS,
+  DEFENSIVE_SHAPE_LABELS, BUILDUP_STYLE_LABELS, TRANSITION_SPEED_LABELS,
+  CREATIVE_FREEDOM_LABELS, DEFENSIVE_WIDTH_LABELS, PRESSING_TRIGGER_LABELS,
+  ROLE_LABELS, DUTY_LABELS, FREEDOM_LABELS, SPECIFIC_TASKS,
+  POS_FILTERS, posMatchesFilter, SET_PIECE_TYPES, EMPTY_SET_PIECES,
+  formationCategory,
+  type PlayerInstruction, type TacticForm, type Tactic,
+} from './tacticsConstants'
 import type { Player } from '../../types'
-
-const SET_PIECE_TYPES = [
-  { key: 'penalties', label: 'Pénaltys', icon: '⚽', max: 3 },
-  { key: 'free_kicks_direct', label: 'Coups francs directs', icon: '🎯', max: 3 },
-  { key: 'free_kicks_indirect', label: 'Coups francs indirects', icon: '🔄', max: 3 },
-  { key: 'corners_left', label: 'Corners gauche', icon: '↙️', max: 3 },
-  { key: 'corners_right', label: 'Corners droit', icon: '↘️', max: 3 },
-] as const
-
-const EMPTY_SET_PIECES = {
-  penalties: [] as string[],
-  free_kicks_direct: [] as string[],
-  free_kicks_indirect: [] as string[],
-  corners_left: [] as string[],
-  corners_right: [] as string[],
-}
 
 export default function Tactics() {
   const qc = useQueryClient()
   const [creating, setCreating] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [previewFormation, setPreviewFormation] = useState<string | null>(null)
+
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [showPresets, setShowPresets] = useState(false)
   const [captains, setCaptains] = useState<string[]>([])
@@ -341,9 +53,9 @@ export default function Tactics() {
   const [posFilter, setPosFilter] = useState('all')
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [confirmDeletePresetId, setConfirmDeletePresetId] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   // New state for enhanced tactics
   const [activeTab, setActiveTab] = useState('general')
   const [playerInstructions, setPlayerInstructions] = useState<Record<string, PlayerInstruction>>({})
@@ -940,7 +652,23 @@ export default function Tactics() {
   }, [pitchSlots, subs, triggerAutoSave])
 
   return (
-    <div className="space-y-4">
+    <div className="flex min-h-screen">
+      {/* ─── Left Sidebar: Tactics list ─── */}
+      <TacticsSidebar
+        tactics={tactics as Tactic[] | undefined}
+        isLoading={isLoading}
+        onNew={() => { setCreating(true); setEditingId(null); reset(); setCaptains([]); setSetPieces({ ...EMPTY_SET_PIECES }); setActiveTab('general'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+        onEdit={(t) => editTactic(t)}
+        onDuplicate={(t) => duplicateTactic(t)}
+        onDelete={(id) => deleteMutation.mutate(id)}
+        getPlayerLabel={getPlayerLabel}
+        activeTacticId={editingId}
+        sidebarOpen={sidebarOpen}
+        onToggleSidebar={() => setSidebarOpen((v) => !v)}
+      />
+
+      {/* ─── Main content ─── */}
+      <div className="flex-1 min-w-0 space-y-4 p-2 lg:p-4">
       {/* ─── Toast notification ─── */}
       {toast && (
         <div className={clsx(
@@ -1656,262 +1384,6 @@ export default function Tactics() {
         </form>
       )}
 
-      {/* ─── Saved tactics grid ─── */}
-      {isLoading && <p className="text-gray-400">Chargement des tactiques...</p>}
-
-      {/* Search and filter bar for tactics */}
-      {(tactics as Tactic[] | undefined)?.length ? (
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-            <input
-              value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-              className="input pl-9 text-sm" placeholder="Rechercher une tactique..."
-            />
-          </div>
-          <span className="text-xs text-gray-500">
-            {(tactics as Tactic[]).filter((t: Tactic) => {
-              if (!searchQuery) return true
-              const q = searchQuery.toLowerCase()
-              return (t.name ?? '').toLowerCase().includes(q) || (t.formation ?? '').includes(q)
-            }).length} tactique(s)
-          </span>
-        </div>
-      ) : null}
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {(tactics as Tactic[] | undefined)?.filter((t: Tactic) => {
-          if (!searchQuery) return true
-          const q = searchQuery.toLowerCase()
-          return (t.name ?? '').toLowerCase().includes(q) || (t.formation ?? '').includes(q)
-        }).map((t) => {
-          const pressing = t.pressing ?? t.instructions?.pressing ?? 'medium'
-          const passingStyle = t.passing_style ?? t.instructions?.passing_style ?? '—'
-          const block = t.defensive_block ?? t.instructions?.defensive_block ?? 'medium'
-          const tempo = t.tempo ?? t.instructions?.tempo ?? 'balanced'
-          const width = t.width ?? t.instructions?.width ?? 'normal'
-          const marking = t.marking ?? t.instructions?.marking ?? 'zone'
-          const playSpace = t.play_space ?? t.instructions?.play_space
-          const gkDist = t.gk_distribution ?? t.instructions?.gk_distribution
-          const counterPressing = t.counter_pressing ?? t.instructions?.counter_pressing ?? false
-          const expanded = expandedId === t.id
-          const showPreview = previewFormation === t.id
-
-          return (
-            <div key={t.id} className={clsx('card space-y-3 group border-l-4', PRESSING_BORDER[pressing] ?? 'border-l-gray-600')}>
-              {/* Header: name + actions */}
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-bold text-white text-lg">{t.formation ?? '—'}</p>
-                  {t.name && <p className="text-pitch-400 text-sm font-medium">{t.name}</p>}
-                </div>
-                <div className="flex items-center gap-1">
-                  <button type="button" onClick={() => editTactic(t)} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-yellow-400 transition-colors" title="Modifier">
-                    <Pencil size={14} />
-                  </button>
-                  <button type="button" onClick={() => duplicateTactic(t)} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-blue-400 transition-colors" title="Dupliquer">
-                    <Copy size={14} />
-                  </button>
-                  <button type="button" onClick={() => setPreviewFormation(showPreview ? null : t.id)} className={clsx('p-1.5 rounded-lg transition-colors', showPreview ? 'bg-pitch-900/40 text-pitch-400' : 'hover:bg-gray-800 text-gray-500 hover:text-pitch-400')} title="Aperçu pitch">
-                    <Eye size={14} />
-                  </button>
-                  {confirmDeleteId === t.id ? (
-                    <div className="flex items-center gap-1">
-                      <button type="button" onClick={() => deleteMutation.mutate(t.id)} className="p-1.5 rounded-lg bg-red-900/40 text-red-400 hover:bg-red-900/60 transition-colors" title="Confirmer">
-                        <Trash2 size={14} />
-                      </button>
-                      <button type="button" onClick={() => setConfirmDeleteId(null)} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 transition-colors" title="Annuler">
-                        <RotateCcw size={14} />
-                      </button>
-                    </div>
-                  ) : (
-                    <button type="button" onClick={() => setConfirmDeleteId(t.id)} className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-red-400 transition-colors" title="Supprimer">
-                      <Trash2 size={14} />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Pitch preview (toggle) — full tactical visualization */}
-              {showPreview && t.formation && FORMATION_POSITIONS[t.formation] && (() => {
-                const tacticSlots = buildTacticSlots(t)
-                const hasPlayers = Object.keys(tacticSlots).length > 0
-                const pr = pressing
-                const bl = block
-                const wid = width
-                const ps = playSpace
-                const pressingY = pr === 'gegenpressing' ? 30 : pr === 'high' ? 38 : pr === 'medium' ? 50 : 62
-                const blocY = bl === 'high' ? 42 : bl === 'medium' ? 55 : 68
-                return (
-                  <div className="bg-gray-900/60 rounded-xl p-2 border border-gray-800 space-y-2">
-                    {/* Tactical legend bar */}
-                    <div className="flex items-center gap-1.5 flex-wrap text-[9px]">
-                      <span className={clsx('px-1.5 py-0.5 rounded font-semibold', PRESSING_COLORS[pr] ?? 'bg-gray-700 text-gray-300')}>Pressing {PRESSING_LABELS[pr] ?? pr}</span>
-                      <span className="px-1.5 py-0.5 rounded bg-cyan-900/50 text-cyan-300 font-semibold">Bloc {BLOCK_LABELS[bl] ?? bl}</span>
-                      <span className="px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">{PASSING_LABELS[passingStyle] ?? '—'}</span>
-                      <span className="px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">{TEMPO_LABELS[tempo] ?? '—'}</span>
-                      {counterPressing && <span className="px-1.5 py-0.5 rounded bg-red-900/50 text-red-300 font-semibold">Contre-press</span>}
-                    </div>
-
-                    {/* Pitch with tactical overlays */}
-                    <div className="relative">
-                      <PitchSVG
-                        formation={t.formation}
-                        size="md"
-                        slots={hasPlayers ? tacticSlots : undefined}
-                        showLabels={hasPlayers}
-                        getPlayer={hasPlayers ? getPlayer : undefined}
-                      />
-                      {/* SVG overlays: pressing line, bloc line, width arrows, play space zones */}
-                      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-                        {/* Pressing line */}
-                        <line x1="10" y1={pressingY} x2="90" y2={pressingY} stroke="#ef4444" strokeWidth="0.4" strokeDasharray="2 1" opacity="0.6" />
-                        <text x="92" y={pressingY - 1} fill="#ef4444" fontSize="2.5" opacity="0.7">PRESS</text>
-                        {/* Defensive block line */}
-                        <line x1="10" y1={blocY} x2="90" y2={blocY} stroke="#06b6d4" strokeWidth="0.4" strokeDasharray="2 1" opacity="0.5" />
-                        <text x="92" y={blocY - 1} fill="#06b6d4" fontSize="2.5" opacity="0.7">BLOC</text>
-                        {/* Width arrows */}
-                        {wid === 'wide' && (
-                          <>
-                            <line x1="15" y1="50" x2="5" y2="50" stroke="#a3e635" strokeWidth="0.5" markerEnd="url(#arrowG)" opacity="0.5" />
-                            <line x1="85" y1="50" x2="95" y2="50" stroke="#a3e635" strokeWidth="0.5" markerEnd="url(#arrowG)" opacity="0.5" />
-                          </>
-                        )}
-                        {wid === 'narrow' && (
-                          <>
-                            <line x1="25" y1="50" x2="40" y2="50" stroke="#facc15" strokeWidth="0.5" markerEnd="url(#arrowY)" opacity="0.5" />
-                            <line x1="75" y1="50" x2="60" y2="50" stroke="#facc15" strokeWidth="0.5" markerEnd="url(#arrowY)" opacity="0.5" />
-                          </>
-                        )}
-                        {/* Play space zone highlight */}
-                        {ps === 'left' && <rect x="0" y="20" width="30" height="60" rx="2" fill="#a3e635" opacity="0.06" />}
-                        {ps === 'right' && <rect x="70" y="20" width="30" height="60" rx="2" fill="#a3e635" opacity="0.06" />}
-                        {ps === 'center' && <rect x="30" y="15" width="40" height="70" rx="2" fill="#a3e635" opacity="0.06" />}
-                        {ps === 'both_wings' && (
-                          <>
-                            <rect x="0" y="20" width="25" height="60" rx="2" fill="#a3e635" opacity="0.06" />
-                            <rect x="75" y="20" width="25" height="60" rx="2" fill="#a3e635" opacity="0.06" />
-                          </>
-                        )}
-                        {/* Arrow marker defs */}
-                        <defs>
-                          <marker id="arrowG" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4" fill="#a3e635" /></marker>
-                          <marker id="arrowY" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4" fill="#facc15" /></marker>
-                        </defs>
-                      </svg>
-                    </div>
-
-                    {/* Substitutes row */}
-                    {t.substitutes && t.substitutes.length > 0 && (
-                      <div className="flex items-center gap-1.5 flex-wrap pt-1 border-t border-gray-800/50">
-                        <span className="text-[9px] text-gray-500 font-semibold">Banc:</span>
-                        {t.substitutes.map((sid: string) => {
-                          const sp = getPlayer(sid)
-                          return (
-                            <span key={sid} className="inline-flex items-center gap-1 bg-gray-800/60 rounded px-1.5 py-0.5 text-[9px] text-gray-400">
-                              <span className={clsx('w-3.5 h-3.5 rounded-full flex items-center justify-center text-[8px] font-bold', posColor(sp?.position))}>{sp?.jersey_number ?? '?'}</span>
-                              {sp?.profile?.last_name?.slice(0, 6) ?? '?'}
-                            </span>
-                          )
-                        })}
-                      </div>
-                    )}
-
-                    {/* Captains */}
-                    {t.captains && t.captains.length > 0 && (
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {t.captains.slice(0, 3).map((cid: string, ci: number) => (
-                          <span key={cid} className="inline-flex items-center gap-0.5 text-[9px] text-yellow-400">
-                            <Crown size={8} /> {ci === 0 ? 'C' : `C${ci + 1}`} {getPlayerLabel(cid)}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              })()}
-
-              {/* Tactical config grid */}
-              <div className="grid grid-cols-3 gap-1.5 text-[11px]">
-                <div className="bg-gray-800/60 rounded-lg px-2 py-1.5">
-                  <p className="text-gray-500 text-[9px]">Passes</p>
-                  <p className="text-gray-200">{PASSING_LABELS[passingStyle] ?? passingStyle.replace('_', ' ')}</p>
-                </div>
-                <div className="bg-gray-800/60 rounded-lg px-2 py-1.5">
-                  <p className="text-gray-500 text-[9px]">Pressing</p>
-                  <span className={`inline-block rounded px-1 py-0.5 text-[10px] font-medium ${PRESSING_COLORS[pressing] ?? 'bg-gray-700 text-gray-300'}`}>{PRESSING_LABELS[pressing] ?? pressing}</span>
-                </div>
-                <div className="bg-gray-800/60 rounded-lg px-2 py-1.5">
-                  <p className="text-gray-500 text-[9px]">Bloc</p>
-                  <p className="text-gray-200">{BLOCK_LABELS[block] ?? block}</p>
-                </div>
-                <div className="bg-gray-800/60 rounded-lg px-2 py-1.5">
-                  <p className="text-gray-500 text-[9px]">Tempo</p>
-                  <p className="text-gray-200">{TEMPO_LABELS[tempo] ?? tempo}</p>
-                </div>
-                <div className="bg-gray-800/60 rounded-lg px-2 py-1.5">
-                  <p className="text-gray-500 text-[9px]">Largeur</p>
-                  <p className="text-gray-200">{WIDTH_LABELS[width] ?? width}</p>
-                </div>
-                <div className="bg-gray-800/60 rounded-lg px-2 py-1.5">
-                  <p className="text-gray-500 text-[9px]">Marquage</p>
-                  <p className="text-gray-200">{marking === 'individual' ? 'Individuel' : 'Zone'}</p>
-                </div>
-              </div>
-
-              {/* Advanced row */}
-              {(playSpace || gkDist || counterPressing) && (
-                <div className="flex items-center gap-1.5 text-xs flex-wrap">
-                  {playSpace && <span className="badge bg-gray-800 text-gray-400">{PLAY_SPACE_LABELS[playSpace] ?? playSpace}</span>}
-                  {gkDist && <span className="badge bg-gray-800 text-gray-400">GK: {GK_DIST_LABELS[gkDist] ?? gkDist}</span>}
-                  {counterPressing && <span className="badge bg-red-900/50 text-red-300">Contre-pressing</span>}
-                </div>
-              )}
-
-              {/* Captain & set-piece summary */}
-              {(t.captains?.length || Object.values(t.set_pieces ?? {}).some((a: string[]) => a.length > 0)) && (
-                <div className="flex items-center gap-2 text-xs flex-wrap pt-1 border-t border-gray-800/60">
-                  {t.captains?.slice(0, 3).map((id: string, i: number) => (
-                    <span key={id} className="inline-flex items-center gap-1 badge bg-yellow-900/30 text-yellow-300 border border-yellow-800/40">
-                      <Crown size={10} />{i === 0 ? 'C' : `C${i + 1}`} {getPlayerLabel(id)}
-                    </span>
-                  ))}
-                  {t.set_pieces && Object.entries(t.set_pieces).filter(([, v]) => (v as string[]).length > 0).map(([k, v]) => {
-                    const sp = SET_PIECE_TYPES.find((s) => s.key === k)
-                    return (
-                      <span key={k} className="inline-flex items-center gap-1 badge bg-pitch-900/40 text-pitch-300 border border-pitch-800/40">
-                        {sp?.icon} {sp?.label?.split(' ')[0]} ({(v as string[]).length})
-                      </span>
-                    )
-                  })}
-                </div>
-              )}
-
-              {t.description && (
-                <button
-                  type="button"
-                  onClick={() => setExpandedId(expanded ? null : t.id)}
-                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300 transition-colors"
-                >
-                  {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                  {expanded ? 'Masquer' : 'Instructions'}
-                </button>
-              )}
-              {expanded && t.description && (
-                <p className="text-sm text-gray-300 bg-gray-800/40 rounded-lg px-3 py-2 whitespace-pre-wrap">{t.description}</p>
-              )}
-            </div>
-          )
-        })}
-      </div>
-
-      {!isLoading && !tactics?.length && (
-        <div className="card text-center py-12 text-gray-400">
-          <Swords size={40} className="mx-auto mb-3 opacity-30" />
-          Aucune tactique enregistrée. Créez-en une !
-        </div>
-      )}
-
       {/* Modals */}
       <TacticalVisualizer
         open={showVisualizer}
@@ -2045,6 +1517,7 @@ export default function Tactics() {
         }}
         onClose={() => setRoleModalOpen(false)}
       />
+    </div>
     </div>
   )
 }
