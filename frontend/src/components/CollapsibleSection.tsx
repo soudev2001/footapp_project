@@ -46,6 +46,7 @@ export default function CollapsibleSection({
       )}
     >
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={clsx(
           'w-full px-4 py-3 flex items-center justify-between hover:bg-black/20 transition-colors',

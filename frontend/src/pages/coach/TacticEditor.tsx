@@ -156,21 +156,34 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
 
   // ── Save mutation ──
   const saveMutation = useMutation({
-    mutationFn: (formData: TacticForm) => coachApi.saveTactic({
-      ...(tactic?.id ? { id: tactic.id } : {}),
-      ...formData,
-      captains,
-      set_pieces: setPieces,
-      player_instructions: playerInstructions,
-      starters: Object.values(pitchSlots).map((s) => s.playerId),
-      substitutes: subs,
-    }),
+    mutationFn: (formData: TacticForm) => {
+      const payload = {
+        ...(tactic?.id ? { id: tactic.id } : {}),
+        ...formData,
+        captains,
+        set_pieces: setPieces,
+        player_instructions: playerInstructions,
+        starters: Object.values(pitchSlots).map((s) => s.playerId),
+        substitutes: subs,
+      }
+      console.log('[TacticEditor] API payload:', JSON.stringify(payload))
+      return coachApi.saveTactic(payload).then(r => {
+        console.log('[TacticEditor] API response:', r)
+        return r
+      }).catch(err => {
+        console.error('[TacticEditor] API error:', err.response?.status, err.response?.data, err.message)
+        throw err
+      })
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['tactics'] })
       showToast('Tactique enregistrée ✓')
       onSaved()
     },
-    onError: () => showToast('Erreur lors de l\'enregistrement', 'error'),
+    onError: (err) => {
+      console.error('[TacticEditor] mutation onError:', err)
+      showToast('Erreur lors de l\'enregistrement', 'error')
+    },
   })
 
   const deleteMutation = useMutation({
@@ -312,7 +325,7 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
   // RENDER
   // ══════════════════════════════════════════════════
   return (
-    <form onSubmit={handleSubmit((d) => saveMutation.mutate(d))} className="space-y-4 pb-8">
+    <form onSubmit={handleSubmit((d) => { console.log('[TacticEditor] submitting', d); saveMutation.mutate(d) }, (errors) => console.error('[TacticEditor] validation errors', errors))} className="space-y-4 pb-8">
       {/* Toast */}
       {toast && (
         <div className={clsx(
@@ -354,7 +367,7 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
             {formationCategory(watchedFormation).label}
           </span>
           <div className="flex items-center gap-1.5">
-            <button type="submit" className="btn-primary text-xs" disabled={saveMutation.isPending}>
+            <button type="submit" onClick={() => console.log('[TacticEditor] Save button clicked')} className="btn-primary text-xs" disabled={saveMutation.isPending}>
               <Save size={14} /> Sauvegarder
             </button>
             {tactic && onDuplicate && (

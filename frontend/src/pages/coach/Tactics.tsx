@@ -14,17 +14,15 @@ export default function Tactics() {
   const [isCreating, setIsCreating] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const { data: tacticsData, isLoading } = useQuery({
+  const { data: tactics = [], isLoading } = useQuery<Tactic[]>({
     queryKey: ['tactics'],
     queryFn: () => coachApi.tactics().then((r) => r.data),
   })
-  const tactics: Tactic[] = tacticsData?.data ?? []
 
-  const { data: playersData } = useQuery({
+  const { data: players = [] } = useQuery<Player[]>({
     queryKey: ['coach-roster'],
     queryFn: () => coachApi.roster().then((r) => r.data),
   })
-  const players: Player[] = playersData?.data ?? playersData ?? []
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => coachApi.deleteTactic(id),
@@ -130,6 +128,7 @@ export default function Tactics() {
         <main className="flex-1 p-4 overflow-y-auto">
           {showEditor ? (
             <TacticEditor
+              key={editorValue?.id ?? (isCreating ? 'new' : 'none')}
               tactic={editorValue}
               players={players}
               onSaved={handleSaved}
