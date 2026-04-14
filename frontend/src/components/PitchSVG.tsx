@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import clsx from 'clsx'
+import { X } from 'lucide-react'
 import { positionFit, fitColor, calcOVR, ovrColor } from '../utils/fifaLogic'
 import type { Player } from '../types'
 
@@ -212,7 +213,7 @@ export default function PitchSVG({
           <div
             key={key}
             className={clsx(
-              'absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 z-10 transition-transform',
+              'absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 z-10 transition-transform group',
               isInteractive && 'cursor-pointer',
               isHovered && 'scale-110',
               isSelected && 'scale-115',
@@ -268,6 +269,17 @@ export default function PitchSVG({
               <span className="bg-black/60 text-white text-[9px] px-1 rounded whitespace-nowrap max-w-16 truncate">
                 {slot.playerName}
               </span>
+            )}
+            {/* Remove button on hover */}
+            {filled && isInteractive && onSlotRemove && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onSlotRemove(key) }}
+                className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-500 hover:scale-110"
+                style={{ opacity: isHovered || isSelected ? 1 : undefined }}
+              >
+                <X size={10} />
+              </button>
             )}
             {!filled && (showLabels || size === 'lg') && (
               <span className="text-[8px] text-white/50 font-medium">{pos.name}</span>

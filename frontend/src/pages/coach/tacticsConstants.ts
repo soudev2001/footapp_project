@@ -281,7 +281,7 @@ export interface Tactic {
   pressing_trigger?: string
   captains?: string[]
   set_pieces?: Record<string, string[]>
-  starters?: string[] | Record<string, string>
+  starters?: (string | null)[] | Record<string, string>
   substitutes?: string[]
   player_instructions?: Record<string, PlayerInstruction>
   instructions?: {

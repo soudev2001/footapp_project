@@ -447,10 +447,13 @@ def create_saved_tactic(club_id, team_id, name, formation, starters, substitutes
             if oid:
                 starters_list.append(oid)
     elif isinstance(starters, list):
+        # Preserve position order - None values mark empty slots
         for pid in starters:
-            oid = safe_objectid(pid)
-            if oid:
-                starters_list.append(oid)
+            if pid is None:
+                starters_list.append(None)
+            else:
+                oid = safe_objectid(pid)
+                starters_list.append(oid if oid else None)
 
     # substitutes is a list of player_id strings
     substitutes_list = []

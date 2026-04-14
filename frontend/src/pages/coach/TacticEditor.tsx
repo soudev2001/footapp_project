@@ -129,15 +129,15 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
     setCaptains(tactic.captains ? [...tactic.captains] : [])
     setSetPieces({ ...EMPTY_SET_PIECES, ...(tactic.set_pieces ?? {}) })
     setPlayerInstructions(tactic.player_instructions ? { ...tactic.player_instructions } : {})
-    // Load starters into pitch slots
+    // Load starters into pitch slots (nulls in array mean empty slots)
     const formation = tactic.formation ?? '4-3-3'
     const positions = FORMATION_POSITIONS[formation] ?? []
-    const starterIds: string[] = Array.isArray(tactic.starters)
+    const starterIds: (string | null)[] = Array.isArray(tactic.starters)
       ? tactic.starters
       : tactic.starters ? Object.values(tactic.starters) : []
     const slots: Record<string, SlotData> = {}
     starterIds.forEach((pid, i) => {
-      if (i >= positions.length) return
+      if (i >= positions.length || !pid) return  // Skip empty slots (null)
       const p = players.find((pl: Player) => pl.id === pid)
       const pos = positions[i]
       slots[`${pos.name}-${i}`] = {
@@ -154,6 +154,15 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
     setConfirmDelete(false)
   }, [tactic?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Build starters array preserving position order (nulls for empty slots)
+  const buildStartersArray = useCallback(() => {
+    const positions = FORMATION_POSITIONS[watchedFormation] ?? []
+    return positions.map((pos, i) => {
+      const key = `${pos.name}-${i}`
+      return pitchSlots[key]?.playerId ?? null
+    })
+  }, [watchedFormation, pitchSlots])
+
   // ── Save mutation ──
   const saveMutation = useMutation({
     mutationFn: (formData: TacticForm) => coachApi.saveTactic({
@@ -162,7 +171,7 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
       captains,
       set_pieces: setPieces,
       player_instructions: playerInstructions,
-      starters: Object.values(pitchSlots).map((s) => s.playerId),
+      starters: buildStartersArray(),
       substitutes: subs,
     }),
     onSuccess: () => {
@@ -270,18 +279,63 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
   const handleSubDrop = (e: React.DragEvent) => {
     e.preventDefault()
     const playerId = e.dataTransfer.getData('playerId')
+    const fromSlot = e.dataTransfer.getData('fromSlot')
     if (!playerId || !getPlayer(playerId)) return
-    setPitchSlots((prev) => {
-      const next = { ...prev }
-      for (const [k, v] of Object.entries(next)) {
-        if (v.playerId === playerId) delete next[k]
-      }
-      return next
-    })
+    // If coming from bench already, no-op
+    if (fromSlot === 'bench') return
+    // Remove from specific pitch slot if known
+    if (fromSlot) {
+      setPitchSlots((prev) => {
+        const next = { ...prev }
+        delete next[fromSlot]
+        return next
+      })
+    } else {
+      // Fallback: scan all slots
+      setPitchSlots((prev) => {
+        const next = { ...prev }
+        for (const [k, v] of Object.entries(next)) {
+          if (v.playerId === playerId) delete next[k]
+        }
+        return next
+      })
+    }
     setSubs((prev) => prev.includes(playerId) ? prev : [...prev, playerId])
   }
 
   const handleSubRemove = (playerId: string) => setSubs((prev) => prev.filter((id) => id !== playerId))
+
+  // Drop handler to release player back to available pool
+  const handleReleasePlayer = (e: React.DragEvent) => {
+    e.preventDefault()
+    const playerId = e.dataTransfer.getData('playerId')
+    const fromSlot = e.dataTransfer.getData('fromSlot')
+    if (!playerId) return
+    // If from bench, just remove from subs
+    if (fromSlot === 'bench') {
+      setSubs((prev) => prev.filter((id) => id !== playerId))
+      return
+    }
+    // Remove from pitch if from slot
+    if (fromSlot) {
+      setPitchSlots((prev) => {
+        const next = { ...prev }
+        delete next[fromSlot]
+        return next
+      })
+    } else {
+      // Also check all pitch slots for this player
+      setPitchSlots((prev) => {
+        const next = { ...prev }
+        for (const [k, v] of Object.entries(next)) {
+          if (v.playerId === playerId) delete next[k]
+        }
+        return next
+      })
+    }
+    // Finally remove from subs just in case
+    setSubs((prev) => prev.filter((id) => id !== playerId))
+  }
 
   const handlePlayerDragStart = (e: React.DragEvent, player: Player) => {
     e.dataTransfer.setData('playerId', player.id)
@@ -457,13 +511,13 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
                   const p = getPlayer(id)
                   return (
                     <div key={id} draggable
-                      onDragStart={(e) => { e.dataTransfer.setData('playerId', id); e.dataTransfer.effectAllowed = 'move'; setDragPlayer({ id, name: p?.profile?.last_name ?? '', jerseyNumber: p?.jersey_number }) }}
+                      onDragStart={(e) => { e.dataTransfer.setData('playerId', id); e.dataTransfer.setData('fromSlot', 'bench'); e.dataTransfer.effectAllowed = 'move'; setDragPlayer({ id, name: p?.profile?.last_name ?? '', jerseyNumber: p?.jersey_number }) }}
                       onDragEnd={handleDragEnd}
                       className="inline-flex items-center gap-1.5 bg-gray-700/60 border border-gray-600 rounded-lg px-2 py-1.5 text-xs text-gray-200 cursor-grab active:cursor-grabbing hover:border-pitch-600 transition-colors group">
                       <GripVertical size={10} className="text-gray-500" />
                       <span className={clsx('w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold', posColor(p?.position))}>{p?.jersey_number ?? '?'}</span>
                       <span>{p?.profile?.last_name ?? 'Joueur'}</span>
-                      <button type="button" onClick={() => handleSubRemove(id)} className="ml-0.5 text-red-400/70 hover:text-red-400"><X size={12} /></button>
+                      <button type="button" onClick={() => handleSubRemove(id)} className="ml-0.5 text-red-400/70 hover:text-red-400 opacity-60 group-hover:opacity-100 transition-opacity"><X size={12} /></button>
                     </div>
                   )
                 })}
@@ -476,13 +530,25 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
 
         {/* Effectif column */}
         <div className="space-y-3">
-          <div className="bg-gray-900/60 border border-gray-800 rounded-xl p-3 space-y-2">
+          <div
+            className={clsx(
+              'border rounded-xl p-3 space-y-2 transition-colors',
+              dragPlayer ? 'bg-gray-900/80 border-pitch-700/40' : 'bg-gray-900/60 border-gray-800'
+            )}
+            onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move' }}
+            onDrop={handleReleasePlayer}
+          >
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-white text-sm flex items-center gap-2"><Users size={14} className="text-gray-400" /> Effectif ({availablePlayers.length})</h2>
               {availablePlayers.length > 0 && Object.keys(pitchSlots).length < 11 && (
                 <button type="button" onClick={autoFillPitch} className="text-[10px] text-pitch-400 hover:text-pitch-300 font-medium flex items-center gap-0.5"><Wand2 size={9} /> Compléter</button>
               )}
             </div>
+            {dragPlayer && (
+              <div className="text-[10px] text-pitch-400 bg-pitch-900/30 border border-dashed border-pitch-700/50 rounded-lg py-2 text-center animate-pulse">
+                Glissez ici pour libérer le joueur
+              </div>
+            )}
             <div className="flex gap-1">
               {POS_FILTERS.map((f) => (
                 <button key={f.key} type="button" onClick={() => setPosFilter(f.key)}
@@ -533,13 +599,17 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
                   <div key={key} className="flex items-center gap-1.5 group">
                     <span className={clsx('text-[9px] font-bold w-7 text-center py-0.5 rounded', posColor(pos.name))}>{POS_FR[pos.name] ?? pos.name}</span>
                     {slot?.playerId ? (
-                      <div className={clsx('flex-1 flex items-center gap-1.5 bg-gray-800/60 border rounded-lg px-2 py-1 transition-colors cursor-pointer',
-                        selectedSlot === key ? 'border-yellow-400/80 bg-yellow-900/20' : 'border-gray-700/50 hover:border-pitch-700/40'
-                      )} onClick={() => handleSlotClick(key)}>
+                      <div
+                        draggable
+                        onDragStart={(e) => { e.dataTransfer.setData('playerId', slot.playerId!); e.dataTransfer.setData('fromSlot', key); e.dataTransfer.effectAllowed = 'move'; setDragPlayer({ id: slot.playerId!, name: slot.playerName ?? '', jerseyNumber: slot.jerseyNumber }) }}
+                        onDragEnd={handleDragEnd}
+                        className={clsx('flex-1 flex items-center gap-1.5 bg-gray-800/60 border rounded-lg px-2 py-1 transition-colors cursor-grab active:cursor-grabbing',
+                          selectedSlot === key ? 'border-yellow-400/80 bg-yellow-900/20' : 'border-gray-700/50 hover:border-pitch-700/40'
+                        )} onClick={() => handleSlotClick(key)}>
                         <span className={clsx('text-[10px] font-bold w-4', ovrColor(ovr))}>{ovr}</span>
                         <span className="text-[10px] font-bold text-pitch-400 w-4">{slot.jerseyNumber ?? '?'}</span>
                         <span className="text-[11px] text-white flex-1 truncate">{slot.playerName}</span>
-                        <button type="button" onClick={(e) => { e.stopPropagation(); handleSlotRemove(key) }} className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 text-[10px]">✕</button>
+                        <button type="button" onClick={(e) => { e.stopPropagation(); handleSlotRemove(key) }} className="text-red-500/70 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><X size={12} /></button>
                       </div>
                     ) : (
                       <span className="flex-1 text-[10px] text-gray-700 italic px-2">—</span>
