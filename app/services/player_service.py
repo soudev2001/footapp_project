@@ -225,12 +225,13 @@ class PlayerService:
         if not lineup:
             return {'formation': '4-3-3', 'starters': [], 'substitutes': [], 'captains': [], 'tactical_config': {}}
 
-        # Normalize starters to a flat list of string IDs
+        # Normalize starters to a flat list of string IDs (preserve None for empty slots)
         raw_starters = lineup.get('starters', [])
         if isinstance(raw_starters, dict):
             starters = [str(v) for v in raw_starters.values() if v]
         elif isinstance(raw_starters, list):
-            starters = [str(s) for s in raw_starters if s]
+            # Preserve None values to maintain position order
+            starters = [str(s) if s else None for s in raw_starters]
         else:
             starters = []
         lineup['starters'] = starters
