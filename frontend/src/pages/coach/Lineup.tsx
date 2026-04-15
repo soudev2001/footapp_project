@@ -1,10 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi } from '../../api'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Save, RefreshCw, Star, Shield, GripVertical, UserMinus, ArrowRightLeft, ChevronDown, ChevronUp, Check, Cloud, BarChart3, Eye, Users, AlertTriangle, Swords, Wand2, Zap, Repeat2, Trophy, Heart, CheckCircle2, XCircle, X, Download, BookOpen, Mail, Crown, Target, Settings2 } from 'lucide-react'
+import { Save, RefreshCw, Star, Shield, GripVertical, UserMinus, ArrowRightLeft, ChevronDown, ChevronUp, Check, Cloud, Eye, Users, AlertTriangle, Swords, Wand2, Zap, Repeat2, Trophy, Heart, CheckCircle2, XCircle, X, Download, BookOpen, Mail, Crown, Target, Settings2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import PitchSVG, { FORMATIONS, FORMATION_POSITIONS, type DragPlayer } from '../../components/PitchSVG'
-import TacticalAnalytics from '../../components/TacticalAnalytics'
 import TacticalVisualizer from '../../components/TacticalVisualizer'
 import type { Player } from '../../types'
 import clsx from 'clsx'
@@ -71,7 +70,6 @@ export default function Lineup() {
   const [captainId, setCaptainId] = useState<string | null>(null)
   const [subs, setSubs] = useState<string[]>([])
   const [dragPlayer, setDragPlayer] = useState<DragPlayer | null>(null)
-  const [showAnalytics, setShowAnalytics] = useState(false)
   const [showVisualizer, setShowVisualizer] = useState(false)
   const [showAllPlayers, setShowAllPlayers] = useState(true)
   const [filterPos, setFilterPos] = useState<string>('all')
@@ -402,9 +400,6 @@ export default function Lineup() {
           <Link to="/coach/convocation" className="btn-secondary text-sm gap-1.5" title="Convocation">
             <Mail size={15} /> <span className="hidden sm:inline">Convoquer</span>
           </Link>
-          <button type="button" onClick={() => setShowAnalytics(true)} className="btn-secondary text-sm" title="Analyse Tactique">
-            <BarChart3 size={15} />
-          </button>
           <button type="button" onClick={() => setShowVisualizer(true)} className="btn-secondary text-sm" title="Visualisation">
             <Eye size={15} />
           </button>
@@ -806,11 +801,6 @@ export default function Lineup() {
       </div>
 
       {/* Modals */}
-      <TacticalAnalytics
-        open={showAnalytics}
-        onClose={() => setShowAnalytics(false)}
-        formation={formation}
-      />
       <TacticalVisualizer
         open={showVisualizer}
         onClose={() => setShowVisualizer(false)}
