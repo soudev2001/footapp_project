@@ -30,7 +30,7 @@ interface Tactic {
   counter_pressing?: boolean
   captains?: string[]
   set_pieces?: Record<string, string[]>
-  starters?: string[] | Record<string, string>
+  starters?: (string | null)[] | Record<string, string>
   substitutes?: string[]
   instructions?: { passing_style?: string; pressing?: string; defensive_block?: string; marking?: string; tempo?: string; width?: string; play_space?: string; gk_distribution?: string; counter_pressing?: boolean }
 }
@@ -114,19 +114,18 @@ export default function Lineup() {
     if (savedLineup.starters) {
       const positions = FORMATION_POSITIONS[savedLineup.formation ?? formation] ?? []
       const newSlots: Record<string, SlotData> = {}
-      const starterIds = Array.isArray(savedLineup.starters) ? savedLineup.starters : Object.values(savedLineup.starters)
-      starterIds.forEach((pid: string, i: number) => {
-        if (i < positions.length) {
-          const p = (players as Player[])?.find((pl: Player) => pl.id === pid)
-          if (p) {
-            const pos = positions[i]
-            newSlots[`${pos.name}-${i}`] = {
-              playerId: p.id,
-              playerName: p.profile?.last_name ?? '',
-              jerseyNumber: p.jersey_number,
-              isCaptain: savedLineup.captain === p.id,
-              position: p.position,
-            }
+      const starterIds: (string | null)[] = Array.isArray(savedLineup.starters) ? savedLineup.starters : Object.values(savedLineup.starters)
+      starterIds.forEach((pid: string | null, i: number) => {
+        if (i >= positions.length || !pid) return  // Skip empty slots
+        const p = (players as Player[])?.find((pl: Player) => pl.id === pid)
+        if (p) {
+          const pos = positions[i]
+          newSlots[`${pos.name}-${i}`] = {
+            playerId: p.id,
+            playerName: p.profile?.last_name ?? '',
+            jerseyNumber: p.jersey_number,
+            isCaptain: savedLineup.captain === p.id,
+            position: p.position,
           }
         }
       })
@@ -137,10 +136,11 @@ export default function Lineup() {
   const saveMutation = useMutation({
     mutationFn: () => {
       const positions = FORMATION_POSITIONS[formation] ?? []
+      // Preserve position order with nulls for empty slots
       const starters = positions.map((pos, i) => {
         const key = `${pos.name}-${i}`
         return slots[key]?.playerId ?? null
-      }).filter(Boolean)
+      })
       return coachApi.saveLineup({
         formation,
         starters,
@@ -166,22 +166,21 @@ export default function Lineup() {
     const form = tactic.formation
     setFormation(form)
     const positions = FORMATION_POSITIONS[form] ?? []
-    const starterIds: string[] = Array.isArray(tactic.starters)
+    const starterIds: (string | null)[] = Array.isArray(tactic.starters)
       ? tactic.starters
       : tactic.starters ? Object.values(tactic.starters) : []
     const newSlots: Record<string, SlotData> = {}
-    starterIds.forEach((pid: string, i: number) => {
-      if (i < positions.length) {
-        const p = (players as Player[])?.find((pl) => pl.id === pid)
-        if (p) {
-          const pos = positions[i]
-          newSlots[`${pos.name}-${i}`] = {
-            playerId: p.id,
-            playerName: p.profile?.last_name ?? '',
-            jerseyNumber: p.jersey_number,
-            isCaptain: tactic.captains?.includes(p.id),
-            position: p.position,
-          }
+    starterIds.forEach((pid: string | null, i: number) => {
+      if (i >= positions.length || !pid) return  // Skip empty slots
+      const p = (players as Player[])?.find((pl) => pl.id === pid)
+      if (p) {
+        const pos = positions[i]
+        newSlots[`${pos.name}-${i}`] = {
+          playerId: p.id,
+          playerName: p.profile?.last_name ?? '',
+          jerseyNumber: p.jersey_number,
+          isCaptain: tactic.captains?.includes(p.id),
+          position: p.position,
         }
       }
     })

@@ -189,8 +189,9 @@ class PlayerService:
             query['team_id'] = ObjectId(team_id)
 
         # Handle starters as list (from frontend) or dict (legacy)
+        # Preserve None values to maintain position order
         if isinstance(starters, list):
-            starters_data = [ObjectId(pid) for pid in starters if pid]
+            starters_data = [ObjectId(pid) if pid else None for pid in starters]
         elif isinstance(starters, dict):
             starters_data = [ObjectId(pid) for pid in starters.values() if pid]
         else:
