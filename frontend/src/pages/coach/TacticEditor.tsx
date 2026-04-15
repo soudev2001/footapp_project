@@ -251,16 +251,34 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
     setSelectedSlot(null)
   }, [selectedSlot, pitchSlots])
 
-  const handlePitchDrop = (slotKey: string, _posIndex: number, playerId: string) => {
+  const handlePitchDrop = (slotKey: string, _posIndex: number, playerId: string, fromSlot?: string) => {
     const p = getPlayer(playerId)
     if (!p) return
     setSelectedSlot(null)
     setSubs((prev) => prev.filter((id) => id !== playerId))
     setPitchSlots((prev) => {
       const next = { ...prev }
-      for (const [k, v] of Object.entries(next)) {
-        if (v.playerId === playerId) delete next[k]
+      const targetSlot = next[slotKey]
+
+      // If dropping on a filled slot from another pitch slot → SWAP
+      if (fromSlot && fromSlot !== slotKey && fromSlot !== 'bench' && targetSlot?.playerId) {
+        const targetPlayer = getPlayer(targetSlot.playerId)
+        // Put target player in source slot
+        next[fromSlot] = {
+          playerId: targetSlot.playerId,
+          playerName: targetPlayer?.profile?.last_name ?? targetPlayer?.profile?.first_name ?? '?',
+          jerseyNumber: targetPlayer?.jersey_number,
+          isCaptain: captains[0] === targetSlot.playerId,
+          position: targetPlayer?.position,
+        }
+      } else {
+        // Remove from old slot if not swapping
+        for (const [k, v] of Object.entries(next)) {
+          if (v.playerId === playerId) delete next[k]
+        }
       }
+
+      // Put dragged player in target slot
       next[slotKey] = {
         playerId: p.id,
         playerName: p.profile?.last_name ?? p.profile?.first_name ?? '?',

@@ -108,7 +108,7 @@ interface PitchSVGProps {
   slots?: Record<string, SlotData>
   size?: 'sm' | 'md' | 'lg'
   onSlotClick?: (slotKey: string, posIndex: number) => void
-  onSlotDrop?: (slotKey: string, posIndex: number, playerId: string) => void
+  onSlotDrop?: (slotKey: string, posIndex: number, playerId: string, fromSlot?: string) => void
   onSlotRemove?: (slotKey: string) => void
   interactive?: boolean
   className?: string
@@ -142,7 +142,8 @@ export default function PitchSVG({
     e.preventDefault()
     e.stopPropagation()
     const playerId = e.dataTransfer.getData('playerId')
-    if (playerId && onSlotDrop) onSlotDrop(slotKey, idx, playerId)
+    const fromSlot = e.dataTransfer.getData('fromSlot') || undefined
+    if (playerId && onSlotDrop) onSlotDrop(slotKey, idx, playerId, fromSlot)
     setHoveredSlot(null)
   }
 
