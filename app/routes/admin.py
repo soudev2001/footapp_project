@@ -476,6 +476,33 @@ def seed_demo():
         flash(f'Erreur: {str(e)}', 'error')
     return redirect(url_for('admin.dashboard'))
 
+
+@admin_bp.route('/seed-players', methods=['POST'])
+@login_required
+@role_required('admin')
+def seed_players():
+    """Seed 18 demo players with French names for the current club"""
+    from app.services.seed_data import seed_18_players
+    from app.services import get_user_service
+
+    user_service = get_user_service()
+    admin_user = user_service.get_by_id(session.get('user_id'))
+    club_id = admin_user.get('club_id')
+
+    if not club_id:
+        flash('Erreur: Aucun club associé.', 'error')
+        return redirect(url_for('admin.dashboard'))
+
+    team_id = request.form.get('team_id') or None
+
+    try:
+        players = seed_18_players(club_id, team_id)
+        flash(f'{len(players)} joueurs créés avec succès!', 'success')
+    except Exception as e:
+        flash(f'Erreur: {str(e)}', 'error')
+
+    return redirect(url_for('admin.dashboard') + '#members')
+
 @admin_bp.route('/architecture')
 @login_required
 @role_required('admin')

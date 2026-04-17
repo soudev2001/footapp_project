@@ -7,12 +7,12 @@ def seed_all():
     """Seed database with demo data"""
     from app.services.db import mongo, clear_all_collections
     from app.models import create_user, create_club, create_player, create_event, create_match, create_post
-    
+
     print("[Seed] Starting database seed...")
-    
+
     # Clear existing data
     clear_all_collections()
-    
+
     # ========================================
     # 1. CREATE CLUBS
     # ========================================
@@ -31,7 +31,7 @@ def seed_all():
         },
         'created_at': datetime.utcnow()
     }
-    
+
     club2 = {
         'name': 'Logic Rangers',
         'logo': 'https://ui-avatars.com/api/?name=Logic+Rangers&background=facc15&color=000&size=128',
@@ -42,7 +42,7 @@ def seed_all():
         'description': 'Le futur du football, aujourd\'hui.',
         'created_at': datetime.utcnow()
     }
-    
+
     club1_id = mongo.db.clubs.insert_one(club1).inserted_id
     club2_id = mongo.db.clubs.insert_one(club2).inserted_id
     print(f"[Seed] Created 2 clubs")
@@ -60,18 +60,18 @@ def seed_all():
     }
     team1_id = mongo.db.teams.insert_one(team1).inserted_id
     print(f"[Seed] Created 1 team")
-    
+
     # ========================================
     # 2. CREATE USERS
     # ========================================
     users = [
-        create_user('admin@footlogic.fr', generate_password_hash('admin123'), 'admin', club1_id, 
+        create_user('admin@footlogic.fr', generate_password_hash('admin123'), 'admin', club1_id,
                    {'first_name': 'Admin', 'last_name': 'System', 'avatar': '', 'phone': '0600000000'}),
-        create_user('superadmin1@footlogic.com', generate_password_hash('super123'), 'admin', None, 
+        create_user('superadmin1@footlogic.com', generate_password_hash('super123'), 'admin', None,
                    {'first_name': 'Super', 'last_name': 'User 1', 'avatar': '', 'phone': '0600000001'}),
-        create_user('superadmin2@footlogic.com', generate_password_hash('super123'), 'admin', None, 
+        create_user('superadmin2@footlogic.com', generate_password_hash('super123'), 'admin', None,
                    {'first_name': 'Super', 'last_name': 'User 2', 'avatar': '', 'phone': '0600000002'}),
-        create_user('superadmin3@footlogic.com', generate_password_hash('super123'), 'admin', None, 
+        create_user('superadmin3@footlogic.com', generate_password_hash('super123'), 'admin', None,
                    {'first_name': 'Super', 'last_name': 'User 3', 'avatar': '', 'phone': '0600000003'}),
         create_user('coach@fcelite.fr', generate_password_hash('coach123'), 'coach', club1_id,
                    {'first_name': 'Michel', 'last_name': 'Dupont', 'avatar': 'https://randomuser.me/api/portraits/men/1.jpg', 'phone': '0612345678'}),
@@ -80,7 +80,7 @@ def seed_all():
         create_user('fan@fcelite.fr', generate_password_hash('fan123'), 'fan', club1_id,
                    {'first_name': 'Sophie', 'last_name': 'Bernard', 'avatar': 'https://randomuser.me/api/portraits/women/1.jpg', 'phone': '0634567890'}),
     ]
-    
+
     user_ids = []
     for user in users:
         result = mongo.db.users.insert_one(user)
@@ -93,10 +93,10 @@ def seed_all():
     from app.models import create_project, create_ticket
     project1 = create_project('FootLogic V2 Core', 'Main application development and infrastructure', user_ids[0], 'in_progress')
     project2 = create_project('Marketing & Launch', 'Launch campaign and club onboarding', user_ids[1], 'planning')
-    
+
     p1_id = mongo.db.projects.insert_one(project1).inserted_id
     p2_id = mongo.db.projects.insert_one(project2).inserted_id
-    
+
     tickets = [
         create_ticket(p1_id, 'Finaliser le module superadmin', 'Ajouter les vues et services de gestion de projet', user_ids[0], 'feature', 'high', 'in_progress'),
         create_ticket(p1_id, 'Correction bug auth session', 'Le token ne se rafraichit pas correctement sur mobile', user_ids[0], 'bug', 'critical', 'todo'),
@@ -105,10 +105,10 @@ def seed_all():
     ]
     mongo.db.tickets.insert_many(tickets)
     print(f"[Seed] Created 2 projects and {len(tickets)} tickets")
-    
+
     # Link coach to team
     mongo.db.teams.update_one({'_id': team1_id}, {'$set': {'coach_ids': [user_ids[4]]}})
-    
+
     # ... lines 87-261 remain mostly same, adjusting user index if needed ...
     # (Checking user_ids[2] in line 106, it was player1, now user_ids[5] is player1)
     player_data = [
@@ -124,7 +124,7 @@ def seed_all():
         {'name': 'Pierre Dubois', 'jersey': 9, 'pos': 'ATT', 'goals': 15, 'assists': 5, 'matches': 22, 'status': 'active'},
         {'name': 'Olivier Laurent', 'jersey': 11, 'pos': 'ATT', 'goals': 12, 'assists': 8, 'matches': 21, 'status': 'active'},
     ]
-    
+
     for i, p in enumerate(player_data):
         player = create_player(
             user_id=user_ids[2] if i == 0 else None,  # Link first player to user
@@ -146,9 +146,9 @@ def seed_all():
             weight=65 + (i * 2)
         )
         mongo.db.players.insert_one(player)
-    
+
     print(f"[Seed] Created {len(player_data)} players for FC Elite")
-    
+
     # ========================================
     # 4. CREATE EVENTS
     # ========================================
@@ -160,16 +160,16 @@ def seed_all():
         create_event(club1_id, 'Match Amical', 'match', now + timedelta(days=7, hours=15), team_id=team1_id, location='Stade Municipal', description='Contre AS Montagne'),
         create_event(club1_id, 'Entrainement Gardiens', 'training', now + timedelta(days=2, hours=17), team_id=team1_id, location='Terrain B', description='Seance specifique gardiens'),
     ]
-    
+
     for event in events:
         mongo.db.events.insert_one(event)
     print(f"[Seed] Created {len(events)} events")
-    
+
     # ========================================
     # 5. CREATE MATCHES
     # ========================================
     matches = [
-        {**create_match(club1_id, 'AS Montagne', now - timedelta(days=7), True, 'Stade Municipal', 'completed'), 
+        {**create_match(club1_id, 'AS Montagne', now - timedelta(days=7), True, 'Stade Municipal', 'completed'),
          'score': {'home': 3, 'away': 1}},
         {**create_match(club1_id, 'Olympique Lyon B', now - timedelta(days=14), False, 'Stade de Lyon', 'completed'),
          'score': {'home': 2, 'away': 2}},
@@ -177,17 +177,17 @@ def seed_all():
         create_match(club1_id, 'Stade Rennais B', now + timedelta(days=14), False, 'Roazhon Park B', 'scheduled'),
         create_match(club1_id, 'FC Nantes Reserve', now + timedelta(days=21), True, 'Stade Municipal', 'scheduled'),
     ]
-    
+
     for match in matches:
         mongo.db.matches.insert_one(match)
     print(f"[Seed] Created {len(matches)} matches")
-    
+
     # ========================================
     # 6. CREATE POSTS (News Feed)
     # ========================================
     posts = [
-        create_post(club1_id, user_ids[1], 'Victoire eclatante en Coupe!', 
-                   'Notre equipe a realise une performance exceptionnelle hier soir avec une victoire 3-1 contre AS Montagne. Pierre Dubois auteur d un double.', 
+        create_post(club1_id, user_ids[1], 'Victoire eclatante en Coupe!',
+                   'Notre equipe a realise une performance exceptionnelle hier soir avec une victoire 3-1 contre AS Montagne. Pierre Dubois auteur d un double.',
                    'match_report', 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800'),
         create_post(club1_id, user_ids[1], 'Bienvenue a notre nouveau sponsor',
                    'Nous sommes fiers d annoncer notre partenariat avec SportEquip pour la saison 2024. De nouveaux maillots arrivent!',
@@ -199,11 +199,11 @@ def seed_all():
                    'Un stage intensif sera organise pendant les vacances de fevrier. Inscription obligatoire avant le 15 janvier.',
                    'announcement', 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800'),
     ]
-    
+
     for post in posts:
         mongo.db.posts.insert_one(post)
     print(f"[Seed] Created {len(posts)} posts")
-    
+
     # ========================================
     # 7. CREATE SHOP PRODUCTS
     # ========================================
@@ -238,7 +238,7 @@ def seed_all():
     ]
     mongo.db.products.insert_many(products)
     print(f"[Seed] Created {len(products)} products")
-    
+
     # ========================================
     # 8. CREATE GALLERY ITEMS
     # ========================================
@@ -267,7 +267,7 @@ def seed_all():
     ]
     mongo.db.gallery.insert_many(gallery)
     print(f"[Seed] Created {len(gallery)} gallery items")
-    
+
     # ========================================
     # SUMMARY
     # ========================================
@@ -288,21 +288,70 @@ def seed_all():
     print("  Coach:  coach@fcelite.fr / coach123")
     print("  Player: player1@fcelite.fr / player123")
     print("="*50 + "\n")
-    
+
     return True
+
+
+FRENCH_FIRST_NAMES = [
+    'Lucas', 'Thomas', 'Antoine', 'Hugo', 'Julien', 'Maxime',
+    'Alexandre', 'Romain', 'Pierre', 'Paul', 'Louis', 'Gabriel',
+    'Raphael', 'Arthur', 'Nathan', 'Theo', 'Clement', 'Baptiste'
+]
+
+FRENCH_LAST_NAMES = [
+    'Martin', 'Bernard', 'Dubois', 'Robert', 'Richard', 'Petit',
+    'Durand', 'Leroy', 'Moreau', 'Simon', 'Laurent', 'Lefebvre',
+    'Michel', 'Garcia', 'Bertrand', 'Roux', 'Vincent', 'Fournier'
+]
+
+
+def seed_18_players(club_id, team_id=None):
+    """Seed 18 players with French names for a club"""
+    import random
+    from app.services.db import mongo
+    from app.models import create_player
+
+    # Position distribution: 2 GK, 6 DEF, 6 MID, 4 ATT
+    positions = (
+        ['GK', 'GK'] +
+        ['CB', 'CB', 'LB', 'RB', 'CB', 'RB'] +
+        ['CDM', 'CM', 'CM', 'CAM', 'LM', 'RM'] +
+        ['ST', 'ST', 'LW', 'RW']
+    )
+
+    created = []
+    for i, pos in enumerate(positions):
+        first = random.choice(FRENCH_FIRST_NAMES)
+        last = random.choice(FRENCH_LAST_NAMES)
+        photo = f'https://randomuser.me/api/portraits/men/{random.randint(1, 99)}.jpg'
+
+        player = create_player(
+            user_id=None,
+            club_id=club_id,
+            team_id=team_id,
+            jersey_number=i + 1,
+            position=pos,
+            name=f"{first} {last}",
+            photo=photo,
+            status='active'
+        )
+        result = mongo.db.players.insert_one(player)
+        player['_id'] = result.inserted_id
+        created.append(player)
+
+    return created
 
 
 if __name__ == '__main__':
     # Standalone execution
     import sys
     import os
-    
+
     # Add current directory to path if needed (when running from root)
     sys.path.append(os.getcwd())
-    
+
     from app import create_app
     app = create_app()
-    
+
     with app.app_context():
         seed_all()
-

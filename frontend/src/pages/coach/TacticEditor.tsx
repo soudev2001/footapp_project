@@ -144,7 +144,7 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
         playerId: pid,
         playerName: p?.profile?.last_name ?? '?',
         jerseyNumber: p?.jersey_number,
-        isCaptain: tactic.captains?.includes(pid),
+        isCaptain: tactic.captains?.[0] === pid,
         position: p?.position,
       }
     })
@@ -637,232 +637,213 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
               })}
             </div>
           )}
-        </div>
-      </div>
 
-      {/* ═══ CONFIGURATION TABS ═══ */}
-      <div className="bg-gray-900/60 border border-gray-800 rounded-xl overflow-hidden">
-        <TabNavigation
-          tabs={[
-            { id: 'general', label: 'Général', icon: '⚙️' },
-            { id: 'instructions', label: 'Instructions', icon: '🎯' },
-            { id: 'roles', label: 'Rôles', icon: '👤' },
-            { id: 'setpieces', label: 'Coups Arrêtés', icon: '⚽' },
-          ]}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
+          {/* ═══ CONFIGURATION TABS ═══ */}
+          <div className="bg-gray-900/60 border border-gray-800 rounded-xl overflow-hidden">
+            <TabNavigation
+              tabs={[
+                { id: 'general', label: 'Général', icon: '⚙️' },
+                { id: 'instructions', label: 'Instructions', icon: '🎯' },
+                { id: 'roles', label: 'Rôles', icon: '👤' },
+                { id: 'setpieces', label: 'Coups Arrêtés', icon: '⚽' },
+              ]}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
 
-        <div className="p-4">
-          {/* GENERAL */}
-          {activeTab === 'general' && (
-            <div className="space-y-3 max-w-2xl">
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Description / Instructions</label>
-                <textarea {...register('description')} rows={3} className="input resize-none" placeholder="Notes tactiques, consignes d'équipe..." />
-              </div>
-            </div>
-          )}
-
-          {/* INSTRUCTIONS */}
-          {activeTab === 'instructions' && (
-            <div className="space-y-4 max-w-3xl">
-              <MentalitySlider value={watch('mentality')} onChange={(v) => setValue('mentality', v)} />
-
-              <CollapsibleSection title="Phase Offensive" icon="🔴" color="red" defaultOpen>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="p-3 max-h-[400px] overflow-y-auto">
+              {/* GENERAL */}
+              {activeTab === 'general' && (
+                <div className="space-y-3">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">Style de passe</label>
-                    <select {...register('passing_style')} className="input text-xs">{Object.entries(PASSING_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
+                    <label className="block text-sm text-gray-400 mb-1">Description / Instructions</label>
+                    <textarea {...register('description')} rows={3} className="input resize-none text-sm" placeholder="Notes tactiques, consignes d'équipe..." />
                   </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Tempo</label>
-                    <select {...register('tempo')} className="input text-xs">{Object.entries(TEMPO_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Largeur</label>
-                    <select {...register('width')} className="input text-xs">{Object.entries(WIDTH_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Espace de jeu</label>
-                    <select {...register('play_space')} className="input text-xs">
-                      <option value="left">Couloir gauche</option><option value="right">Couloir droit</option><option value="center">Axe central</option><option value="both_wings">Deux couloirs</option><option value="mixed">Mixte</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Construction</label>
-                    <select {...register('buildup_style')} className="input text-xs">{Object.entries(BUILDUP_STYLE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Liberté créative</label>
-                    <select {...register('creative_freedom')} className="input text-xs">{Object.entries(CREATIVE_FREEDOM_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
-                  </div>
-                </div>
-              </CollapsibleSection>
-
-              <CollapsibleSection title="Phase Défensive" icon="🔵" color="blue" defaultOpen>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Pressing</label>
-                    <select {...register('pressing')} className="input text-xs">
-                      {[['low', 'Bas'], ['medium', 'Médian'], ['high', 'Haut'], ['gegenpressing', 'Gegenpressing']].map(([v, l]) => <option key={v} value={v}>{l as string}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Bloc défensif</label>
-                    <select {...register('defensive_block')} className="input text-xs">{Object.entries(BLOCK_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Forme défensive</label>
-                    <select {...register('defensive_shape')} className="input text-xs">{Object.entries(DEFENSIVE_SHAPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Largeur déf.</label>
-                    <select {...register('defensive_width')} className="input text-xs">{Object.entries(DEFENSIVE_WIDTH_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Marquage</label>
-                    <select {...register('marking')} className="input text-xs"><option value="zone">Zone</option><option value="individual">Individuel</option></select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Déclenchement</label>
-                    <select {...register('pressing_trigger')} className="input text-xs">{Object.entries(PRESSING_TRIGGER_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
-                  </div>
-                </div>
-                <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer mt-2">
-                  <input {...register('offside_trap')} type="checkbox" className="accent-pitch-600 w-4 h-4" /> Piège hors-jeu
-                </label>
-              </CollapsibleSection>
-
-              <CollapsibleSection title="Transitions" icon="🟡" color="yellow">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Vitesse transitions</label>
-                    <select {...register('transition_speed')} className="input text-xs">{Object.entries(TRANSITION_SPEED_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Relance GK</label>
-                    <select {...register('gk_distribution')} className="input text-xs">{Object.entries(GK_DIST_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
-                  </div>
-                </div>
-                <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer mt-2">
-                  <input {...register('counter_pressing')} type="checkbox" className="accent-pitch-600 w-4 h-4" /> Contre-pressing activé
-                </label>
-              </CollapsibleSection>
-            </div>
-          )}
-
-          {/* ROLES */}
-          {activeTab === 'roles' && (
-            <div className="space-y-3 max-w-2xl">
-              <p className="text-sm text-gray-400">Cliquez sur un joueur du XI pour lui assigner un rôle spécialisé.</p>
-              {Object.keys(pitchSlots).length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {Object.entries(pitchSlots).filter(([, s]) => s.playerId).map(([key, slot]) => {
-                    const pid = slot.playerId!
-                    const player = getPlayer(pid)
-                    const instr = playerInstructions[pid]
-                    return (
-                      <button key={key} type="button"
-                        onClick={() => { setSelectedPlayerForRole(pid); setRoleModalOpen(true) }}
-                        className={clsx('text-left rounded-lg p-2 border transition-colors text-xs',
-                          instr ? 'bg-pitch-900/30 border-pitch-700/50 text-pitch-200' : 'bg-gray-800/60 border-gray-700 text-gray-300 hover:border-gray-600')}>
-                        <div className="font-semibold">#{player?.jersey_number} {player?.profile?.last_name}</div>
-                        {instr && <div className="text-[10px] text-pitch-400 mt-0.5">{ROLE_LABELS[instr.role] || instr.role} · {DUTY_LABELS[instr.duty]}</div>}
-                        {!instr && <div className="text-[10px] text-gray-600 mt-0.5">Aucun rôle</div>}
-                      </button>
-                    )
-                  })}
                 </div>
               )}
-              {Object.keys(pitchSlots).length === 0 && (
-                <p className="text-xs text-gray-600 text-center py-4">Placez d'abord des joueurs sur le terrain</p>
-              )}
-            </div>
-          )}
 
-          {/* SET PIECES */}
-          {activeTab === 'setpieces' && (
-            <div className="space-y-4 max-w-3xl">
-              {/* Captains */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Crown size={16} className="text-yellow-400" />
-                  <h3 className="text-sm font-semibold text-white">Capitaines</h3>
-                  <span className="text-xs text-gray-500">({captains.length}/5)</span>
-                </div>
-                {captains.length > 0 && (
-                  <div className="flex gap-2 flex-wrap">
-                    {captains.map((id, i) => (
-                      <span key={id} className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-900/30 border border-yellow-800/50 px-2 py-1.5 text-xs text-yellow-300">
-                        <span className="w-5 h-5 rounded-full bg-yellow-700/60 flex items-center justify-center text-xs font-bold text-yellow-200">{i + 1}</span>
-                        {getPlayerLabel(id)}
-                        <button type="button" onClick={() => toggleCaptain(id)} className="ml-1 text-yellow-500 hover:text-yellow-300"><X size={12} /></button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 max-h-32 overflow-y-auto">
-                  {players.map((p: Player) => (
-                    <button key={p.id} type="button" onClick={() => toggleCaptain(p.id)}
-                      className={clsx('text-xs rounded-md px-2 py-1.5 text-left truncate transition-colors',
-                        captains.includes(p.id) ? 'bg-yellow-800/40 text-yellow-300 ring-1 ring-yellow-700/50' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-200')}>
-                      #{p.jersey_number ?? '?'} {p.profile?.last_name}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              {/* INSTRUCTIONS */}
+              {activeTab === 'instructions' && (
+                <div className="space-y-3">
+                  <MentalitySlider value={watch('mentality')} onChange={(v) => setValue('mentality', v)} />
 
-              {/* Set-piece takers */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Target size={16} className="text-pitch-400" />
-                  <h3 className="text-sm font-semibold text-white">Tireurs</h3>
-                </div>
-                <div className="flex gap-1 flex-wrap">
-                  {SET_PIECE_TYPES.map((sp) => {
-                    const count = (setPieces[sp.key] || []).length
-                    return (
-                      <button key={sp.key} type="button" onClick={() => setActiveSetPieceTab(sp.key)}
-                        className={clsx('text-[10px] sm:text-xs rounded-lg px-2 sm:px-3 py-1.5 transition-colors flex items-center gap-1',
-                          activeSetPieceTab === sp.key ? 'bg-pitch-800 text-pitch-200 ring-1 ring-pitch-600/40' : 'bg-gray-800 text-gray-400 hover:text-gray-200')}>
-                        {sp.icon} <span className="hidden sm:inline">{sp.label}</span>
-                        {count > 0 && <span className="ml-0.5 w-4 h-4 rounded-full bg-pitch-600 text-white flex items-center justify-center text-[10px] font-bold">{count}</span>}
-                      </button>
-                    )
-                  })}
-                </div>
-                {SET_PIECE_TYPES.filter((sp) => sp.key === activeSetPieceTab).map((sp) => {
-                  const selected = setPieces[sp.key] || []
-                  return (
-                    <div key={sp.key} className="space-y-2">
-                      {selected.length > 0 && (
-                        <div className="flex gap-2 flex-wrap">
-                          {selected.map((id: string, idx: number) => (
-                            <span key={id} className="inline-flex items-center gap-1.5 rounded-lg bg-pitch-900/40 border border-pitch-800/50 px-2 py-1.5 text-xs text-pitch-300">
-                              <span className="w-5 h-5 rounded-full bg-pitch-700/60 flex items-center justify-center text-xs font-bold text-pitch-200">{idx + 1}</span>
-                              {getPlayerLabel(id)}
-                              <button type="button" onClick={() => toggleSetPiece(sp.key, id)} className="ml-1 text-pitch-500 hover:text-pitch-300"><X size={12} /></button>
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      <p className="text-[11px] text-gray-500">Sélectionner par priorité (max {sp.max})</p>
-                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 max-h-32 overflow-y-auto">
-                        {players.map((p: Player) => (
-                          <button key={p.id} type="button" onClick={() => toggleSetPiece(sp.key, p.id)}
-                            className={clsx('text-xs rounded-md px-2 py-1.5 text-left truncate transition-colors',
-                              selected.includes(p.id) ? 'bg-pitch-800/50 text-pitch-300 ring-1 ring-pitch-600/40' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-200')}>
-                            #{p.jersey_number ?? '?'} {p.profile?.last_name}
-                          </button>
-                        ))}
+                  <CollapsibleSection title="Phase Offensive" icon="🔴" color="red" defaultOpen>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[10px] text-gray-400 mb-1">Style de passe</label>
+                        <select {...register('passing_style')} className="input text-xs py-1">{Object.entries(PASSING_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-gray-400 mb-1">Tempo</label>
+                        <select {...register('tempo')} className="input text-xs py-1">{Object.entries(TEMPO_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-gray-400 mb-1">Largeur</label>
+                        <select {...register('width')} className="input text-xs py-1">{Object.entries(WIDTH_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-gray-400 mb-1">Construction</label>
+                        <select {...register('buildup_style')} className="input text-xs py-1">{Object.entries(BUILDUP_STYLE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
                       </div>
                     </div>
-                  )
-                })}
-              </div>
+                  </CollapsibleSection>
+
+                  <CollapsibleSection title="Phase Défensive" icon="🔵" color="blue" defaultOpen>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[10px] text-gray-400 mb-1">Pressing</label>
+                        <select {...register('pressing')} className="input text-xs py-1">
+                          {[['low', 'Bas'], ['medium', 'Médian'], ['high', 'Haut'], ['gegenpressing', 'Gegenpressing']].map(([v, l]) => <option key={v} value={v}>{l as string}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-gray-400 mb-1">Bloc défensif</label>
+                        <select {...register('defensive_block')} className="input text-xs py-1">{Object.entries(BLOCK_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-gray-400 mb-1">Marquage</label>
+                        <select {...register('marking')} className="input text-xs py-1"><option value="zone">Zone</option><option value="individual">Individuel</option></select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-gray-400 mb-1">Forme déf.</label>
+                        <select {...register('defensive_shape')} className="input text-xs py-1">{Object.entries(DEFENSIVE_SHAPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
+                      </div>
+                    </div>
+                    <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer mt-2">
+                      <input {...register('offside_trap')} type="checkbox" className="accent-pitch-600 w-3 h-3" /> Piège hors-jeu
+                    </label>
+                  </CollapsibleSection>
+
+                  <CollapsibleSection title="Transitions" icon="🟡" color="yellow">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[10px] text-gray-400 mb-1">Vitesse transitions</label>
+                        <select {...register('transition_speed')} className="input text-xs py-1">{Object.entries(TRANSITION_SPEED_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-gray-400 mb-1">Relance GK</label>
+                        <select {...register('gk_distribution')} className="input text-xs py-1">{Object.entries(GK_DIST_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
+                      </div>
+                    </div>
+                    <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer mt-2">
+                      <input {...register('counter_pressing')} type="checkbox" className="accent-pitch-600 w-3 h-3" /> Contre-pressing
+                    </label>
+                  </CollapsibleSection>
+                </div>
+              )}
+
+              {/* ROLES */}
+              {activeTab === 'roles' && (
+                <div className="space-y-2">
+                  <p className="text-xs text-gray-400">Cliquez sur un joueur pour assigner un rôle.</p>
+                  {Object.keys(pitchSlots).length > 0 && (
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {Object.entries(pitchSlots).filter(([, s]) => s.playerId).map(([key, slot]) => {
+                        const pid = slot.playerId!
+                        const player = getPlayer(pid)
+                        const instr = playerInstructions[pid]
+                        return (
+                          <button key={key} type="button"
+                            onClick={() => { setSelectedPlayerForRole(pid); setRoleModalOpen(true) }}
+                            className={clsx('text-left rounded-lg p-1.5 border transition-colors text-[10px]',
+                              instr ? 'bg-pitch-900/30 border-pitch-700/50 text-pitch-200' : 'bg-gray-800/60 border-gray-700 text-gray-300 hover:border-gray-600')}>
+                            <div className="font-semibold">#{player?.jersey_number} {player?.profile?.last_name}</div>
+                            {instr && <div className="text-[9px] text-pitch-400">{ROLE_LABELS[instr.role] || instr.role}</div>}
+                            {!instr && <div className="text-[9px] text-gray-600">Aucun rôle</div>}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+                  {Object.keys(pitchSlots).length === 0 && (
+                    <p className="text-xs text-gray-600 text-center py-2">Placez d'abord des joueurs</p>
+                  )}
+                </div>
+              )}
+
+              {/* SET PIECES */}
+              {activeTab === 'setpieces' && (
+                <div className="space-y-3">
+                  {/* Captains */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Crown size={14} className="text-yellow-400" />
+                      <h3 className="text-xs font-semibold text-white">Capitaines ({captains.length}/5)</h3>
+                    </div>
+                    {captains.length > 0 && (
+                      <div className="flex gap-1.5 flex-wrap">
+                        {captains.map((id, i) => (
+                          <span key={id} className="inline-flex items-center gap-1 rounded-lg bg-yellow-900/30 border border-yellow-800/50 px-1.5 py-1 text-[10px] text-yellow-300">
+                            <span className="w-4 h-4 rounded-full bg-yellow-700/60 flex items-center justify-center text-[9px] font-bold">{i + 1}</span>
+                            {getPlayerLabel(id)}
+                            <button type="button" onClick={() => toggleCaptain(id)} className="text-yellow-500 hover:text-yellow-300"><X size={10} /></button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-1 max-h-24 overflow-y-auto">
+                      {players.map((p: Player) => (
+                        <button key={p.id} type="button" onClick={() => toggleCaptain(p.id)}
+                          className={clsx('text-[10px] rounded-md px-1.5 py-1 text-left truncate transition-colors',
+                            captains.includes(p.id) ? 'bg-yellow-800/40 text-yellow-300 ring-1 ring-yellow-700/50' : 'bg-gray-800 text-gray-400 hover:bg-gray-700')}>
+                          #{p.jersey_number ?? '?'} {p.profile?.last_name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Set-piece takers */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Target size={14} className="text-pitch-400" />
+                      <h3 className="text-xs font-semibold text-white">Tireurs</h3>
+                    </div>
+                    <div className="flex gap-1 flex-wrap">
+                      {SET_PIECE_TYPES.map((sp) => {
+                        const count = (setPieces[sp.key] || []).length
+                        return (
+                          <button key={sp.key} type="button" onClick={() => setActiveSetPieceTab(sp.key)}
+                            className={clsx('text-[9px] rounded-lg px-2 py-1 transition-colors flex items-center gap-0.5',
+                              activeSetPieceTab === sp.key ? 'bg-pitch-800 text-pitch-200' : 'bg-gray-800 text-gray-400 hover:text-gray-200')}>
+                            {sp.icon}
+                            {count > 0 && <span className="ml-0.5 w-3.5 h-3.5 rounded-full bg-pitch-600 text-white flex items-center justify-center text-[8px] font-bold">{count}</span>}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    {SET_PIECE_TYPES.filter((sp) => sp.key === activeSetPieceTab).map((sp) => {
+                      const selected = setPieces[sp.key] || []
+                      return (
+                        <div key={sp.key} className="space-y-1.5">
+                          {selected.length > 0 && (
+                            <div className="flex gap-1 flex-wrap">
+                              {selected.map((id: string, idx: number) => (
+                                <span key={id} className="inline-flex items-center gap-1 rounded-lg bg-pitch-900/40 border border-pitch-800/50 px-1.5 py-1 text-[10px] text-pitch-300">
+                                  <span className="w-4 h-4 rounded-full bg-pitch-700/60 flex items-center justify-center text-[9px] font-bold">{idx + 1}</span>
+                                  {getPlayerLabel(id)}
+                                  <button type="button" onClick={() => toggleSetPiece(sp.key, id)} className="text-pitch-500 hover:text-pitch-300"><X size={10} /></button>
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          <p className="text-[9px] text-gray-500">Max {sp.max}</p>
+                          <div className="grid grid-cols-2 gap-1 max-h-24 overflow-y-auto">
+                            {players.map((p: Player) => (
+                              <button key={p.id} type="button" onClick={() => toggleSetPiece(sp.key, p.id)}
+                                className={clsx('text-[10px] rounded-md px-1.5 py-1 text-left truncate transition-colors',
+                                  selected.includes(p.id) ? 'bg-pitch-800/50 text-pitch-300 ring-1 ring-pitch-600/40' : 'bg-gray-800 text-gray-400 hover:bg-gray-700')}>
+                                #{p.jersey_number ?? '?'} {p.profile?.last_name}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 
