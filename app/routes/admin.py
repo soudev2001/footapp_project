@@ -491,7 +491,7 @@ def seed_players():
 
     if not club_id:
         flash('Erreur: Aucun club associé.', 'error')
-        return redirect(url_for('coach.roster'))
+        return redirect(url_for('admin.members_directory'))
 
     team_id = request.form.get('team_id') or None
 
@@ -501,7 +501,7 @@ def seed_players():
     except Exception as e:
         flash(f'Erreur: {str(e)}', 'error')
 
-    return redirect(url_for('coach.roster', team_id=team_id) if team_id else url_for('coach.roster'))
+    return redirect(url_for('admin.members_directory'))
 
 @admin_bp.route('/architecture')
 @login_required

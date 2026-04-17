@@ -17,10 +17,24 @@
                 {{ total }} membre{{ 's' if total != 1 else '' }} trouvé{{ 's' if total != 1 else '' }}
             </p>
         </div>
-        <a href="{{ url_for('admin.analytics_export', format='excel') }}"
-           class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors">
-            <i class="fa fa-file-excel"></i> Exporter
-        </a>
+        <div class="flex items-center gap-3">
+            <form action="{{ url_for('admin.seed_players') }}" method="POST" class="inline">
+                <select name="team_id" class="px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-surface-600 bg-slate-50 dark:bg-surface-800 text-slate-900 dark:text-white mr-2">
+                    <option value="">Toutes équipes</option>
+                    {% for t in teams %}
+                    <option value="{{ t._id }}">{{ t.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" onclick="return confirm('Créer 18 joueurs avec des noms français?')"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors">
+                    <i class="fa fa-seedling"></i> Seed 18 Joueurs
+                </button>
+            </form>
+            <a href="{{ url_for('admin.analytics_export', format='excel') }}"
+               class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
+                <i class="fa fa-file-excel"></i> Exporter
+            </a>
+        </div>
     </div>
 
     <!-- Search & Filters -->
