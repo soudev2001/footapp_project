@@ -185,11 +185,25 @@ def roster():
             player['account_status'] = 'no_account'
 
     # Simple grouping for the roster view by position
+    def get_position_group(pos):
+        if not pos:
+            return None
+        pos = pos.upper()
+        if pos in ['GK']:
+            return 'GK'
+        if pos in ['DEF', 'CB', 'LB', 'RB', 'LWB', 'RWB']:
+            return 'DEF'
+        if pos in ['MID', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'DM', 'AM']:
+            return 'MID'
+        if pos in ['ATT', 'ST', 'CF', 'LW', 'RW', 'SS']:
+            return 'ATT'
+        return None
+
     by_position = {
-        'GK': [p for p in players if p.get('position') == 'GK'],
-        'DEF': [p for p in players if p.get('position') == 'DEF'],
-        'MID': [p for p in players if p.get('position') == 'MID'],
-        'ATT': [p for p in players if p.get('position') == 'ATT'],
+        'GK': [p for p in players if get_position_group(p.get('position')) == 'GK'],
+        'DEF': [p for p in players if get_position_group(p.get('position')) == 'DEF'],
+        'MID': [p for p in players if get_position_group(p.get('position')) == 'MID'],
+        'ATT': [p for p in players if get_position_group(p.get('position')) == 'ATT'],
     }
 
     return render_template('coach/roster.html',
@@ -198,6 +212,7 @@ def roster():
         teams=teams,
         selected_team_id=selected_team_id
     )
+
 
 @coach_bp.route('/player/<player_id>')
 @login_required
