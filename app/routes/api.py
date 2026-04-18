@@ -1658,6 +1658,22 @@ def admin_delete_member(user_id):
     return jsonify({'success': True, 'message': 'Member deleted'})
 
 
+@api_bp.route('/admin/seed-players', methods=['POST'])
+@role_required('admin')
+def admin_seed_players():
+    """Seed 18 demo players with French names."""
+    from app.services.seed_data import seed_18_players
+    data = request.get_json() or {}
+    club_id = request.current_user.get('club_id')
+    team_id = data.get('team_id')
+
+    try:
+        players = seed_18_players(club_id, team_id)
+        return jsonify({'success': True, 'count': len(players), 'message': f'{len(players)} joueurs créés'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @api_bp.route('/admin/teams', methods=['POST'])
 @role_required('admin')
 def admin_add_team():

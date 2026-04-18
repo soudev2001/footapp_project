@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { adminApi } from '../../api'
 import { useState } from 'react'
-import { Users, UserPlus, Trash2, Search, Mail } from 'lucide-react'
+import { Users, UserPlus, Trash2, Search, Mail, Sprout } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import type { User } from '../../types'
 import clsx from 'clsx'
@@ -44,6 +44,14 @@ export default function Members() {
     },
   })
 
+  const seedMutation = useMutation({
+    mutationFn: () => adminApi.seedPlayers(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-members'] })
+      qc.invalidateQueries({ queryKey: ['players'] })
+    },
+  })
+
   const { register, handleSubmit, reset } = useForm<InviteForm>({
     defaultValues: { role: 'player' },
   })
@@ -70,6 +78,15 @@ export default function Members() {
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher..." className="input pl-9 w-48" />
           </div>
+          <button
+            onClick={() => {
+              if (confirm('Créer 18 joueurs avec des noms français ?')) seedMutation.mutate()
+            }}
+            disabled={seedMutation.isPending}
+            className="btn-secondary text-emerald-400 border-emerald-800 hover:bg-emerald-900/30"
+          >
+            <Sprout size={16} /> {seedMutation.isPending ? 'Création...' : 'Seed 18'}
+          </button>
           <button onClick={() => setInviting(true)} className="btn-primary">
             <UserPlus size={16} /> Inviter
           </button>
