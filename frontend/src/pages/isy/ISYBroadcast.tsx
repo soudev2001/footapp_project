@@ -113,13 +113,13 @@ export default function ISYBroadcast() {
           <h2 className="font-semibold text-white">Historique</h2>
           <div className="space-y-2">
             {(broadcasts as Record<string, unknown>[]).map((b) => (
-              <div key={b.id as string} className="p-3 rounded-xl bg-gray-800/50 space-y-1">
+              <div key={String(b.id)} className="p-3 rounded-xl bg-gray-800/50 space-y-1">
                 <div className="flex items-center justify-between">
-                  <p className="font-medium text-white text-sm">{b.subject as string ?? 'Sans objet'}</p>
-                  <span className="badge text-xs bg-gray-700 text-gray-400">{b.audience as string}</span>
+                  <p className="font-medium text-white text-sm">{String(b.subject ?? 'Sans objet')}</p>
+                  <span className="badge text-xs bg-gray-700 text-gray-400">{String(b.audience)}</span>
                 </div>
-                <p className="text-xs text-gray-400 line-clamp-2">{b.message as string}</p>
-                {b.sent_at && <p className="text-[10px] text-gray-600">{new Date(b.sent_at as string).toLocaleString('fr-FR')}</p>}
+                <p className="text-xs text-gray-400 line-clamp-2">{String(b.message)}</p>
+                {b.sent_at ? <p className="text-[10px] text-gray-600">{new Date(String(b.sent_at)).toLocaleString('fr-FR')}</p> : null}
               </div>
             ))}
           </div>

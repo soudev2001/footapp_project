@@ -177,17 +177,17 @@ export default function ProjectDetail() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-medium text-white text-sm">{ticket.title as string}</p>
-                    <span className={clsx('badge text-[10px]', TICKET_STATUS_STYLES[(ticket.status as string) ?? 'open'])}>
-                      {(ticket.status as string) === 'in_progress' ? 'En cours' : (ticket.status as string) === 'open' ? 'Ouvert' : (ticket.status as string) === 'done' ? 'Terminé' : ticket.status as string}
+                    <p className="font-medium text-white text-sm">{String(ticket.title)}</p>
+                    <span className={clsx('badge text-[10px]', TICKET_STATUS_STYLES[String(ticket.status ?? 'open')])}>
+                      {String(ticket.status) === 'in_progress' ? 'En cours' : String(ticket.status) === 'open' ? 'Ouvert' : String(ticket.status) === 'done' ? 'Terminé' : String(ticket.status)}
                     </span>
                   </div>
-                  {ticket.description && <p className="text-xs text-gray-500 mt-1 truncate">{ticket.description as string}</p>}
-                  {ticket.created_at && (
+                  {ticket.description ? <p className="text-xs text-gray-500 mt-1 truncate">{String(ticket.description)}</p> : null}
+                  {ticket.created_at ? (
                     <p className="text-[10px] text-gray-600 mt-1">
-                      {format(new Date(ticket.created_at as string), 'd MMM yyyy', { locale: fr })}
+                      {format(new Date(String(ticket.created_at)), 'd MMM yyyy', { locale: fr })}
                     </p>
-                  )}
+                  ) : null}
                 </div>
               </div>
             ))}

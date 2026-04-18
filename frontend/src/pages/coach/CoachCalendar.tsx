@@ -90,8 +90,8 @@ export default function CoachCalendar() {
                       {EVENT_TYPE_LABELS[type] ?? type}
                     </span>
                   </div>
-                  <p className="font-semibold text-white truncate">{event.title as string ?? event.opponent as string ?? 'Événement'}</p>
-                  {event.location && <p className="text-xs text-gray-500 truncate">{event.location as string}</p>}
+                  <p className="font-semibold text-white truncate">{String(event.title ?? event.opponent ?? 'Événement')}</p>
+                  {event.location ? <p className="text-xs text-gray-500 truncate">{String(event.location)}</p> : null}
                 </div>
                 {/* Time */}
                 <div className="text-right shrink-0">

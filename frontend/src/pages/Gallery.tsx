@@ -108,11 +108,11 @@ export default function Gallery() {
                 </div>
               </>
             )}
-            {item.title && (
+            {item.title ? (
               <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                <p className="text-xs text-white truncate">{item.title as string}</p>
+                <p className="text-xs text-white truncate">{String(item.title)}</p>
               </div>
-            )}
+            ) : null}
           </button>
         ))}
       </div>
@@ -129,7 +129,7 @@ export default function Gallery() {
             ) : (
               <img src={selected.url as string} alt={selected.name as string ?? ''} className="w-full max-h-[85vh] object-contain rounded-xl" />
             )}
-            {selected.title && <p className="text-center text-white/80 mt-3 text-sm">{selected.title as string}</p>}
+            {selected.title ? <p className="text-center text-white/80 mt-3 text-sm">{String(selected.title)}</p> : null}
           </div>
         </div>
       )}

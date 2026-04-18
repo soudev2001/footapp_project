@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi } from '../../api'
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
 import { useForm } from 'react-hook-form'
 import { Trash2, Save, Crown, Target, X, GripVertical, ArrowRightLeft, Shield, Wand2, Users, Trophy, Heart, Repeat2, CheckCircle2, XCircle, Copy, Move } from 'lucide-react'
 import TabNavigation from '../../components/TabNavigation'
@@ -35,7 +35,10 @@ interface TacticEditorProps {
   onDuplicate?: (tactic: Tactic) => void
 }
 
-export default function TacticEditor({ tactic, players, onSaved, onCancel, onDuplicate }: TacticEditorProps) {
+export type TacticEditorHandle = { save(): void }
+
+const TacticEditor = forwardRef<TacticEditorHandle, TacticEditorProps>(function TacticEditor(
+  { tactic, players, onSaved, onCancel, onDuplicate }, ref) {
   const qc = useQueryClient()
 
   // Toast
@@ -185,6 +188,10 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
     },
     onError: () => showToast('Erreur lors de l\'enregistrement', 'error'),
   })
+
+  useImperativeHandle(ref, () => ({
+    save() { handleSubmit((d) => saveMutation.mutate(d))() },
+  }), [handleSubmit, saveMutation])
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => coachApi.deleteTactic(id),
@@ -870,4 +877,6 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
       />
     </div>
   )
-}
+})
+
+export default TacticEditor

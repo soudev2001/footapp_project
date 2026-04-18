@@ -36,10 +36,10 @@ export default function EditProfile() {
   useEffect(() => {
     if (user) {
       reset({
-        first_name: user.first_name ?? '',
-        last_name: user.last_name ?? '',
-        phone: (user as Record<string, unknown>).phone as string ?? '',
-        bio: (user as Record<string, unknown>).bio as string ?? '',
+        first_name: user.profile?.first_name ?? '',
+        last_name: user.profile?.last_name ?? '',
+        phone: user.profile?.phone ?? '',
+        bio: (user as unknown as Record<string, unknown>).bio as string ?? '',
         nationality: (playerProfile as Record<string, unknown>)?.nationality as string ?? '',
         birth_date: (playerProfile as Record<string, unknown>)?.birth_date as string ?? '',
         position: (playerProfile as Record<string, unknown>)?.position as string ?? '',
@@ -82,10 +82,10 @@ export default function EditProfile() {
         {/* Avatar */}
         <div className="card flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-pitch-800 flex items-center justify-center text-2xl font-bold text-pitch-300 shrink-0">
-            {user?.first_name?.[0]}{user?.last_name?.[0]}
+            {user?.profile?.first_name?.[0]}{user?.profile?.last_name?.[0]}
           </div>
           <div>
-            <p className="font-medium text-white">{user?.first_name} {user?.last_name}</p>
+            <p className="font-medium text-white">{user?.profile?.first_name} {user?.profile?.last_name}</p>
             <p className="text-sm text-gray-500 capitalize">{user?.role}</p>
           </div>
         </div>

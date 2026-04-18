@@ -103,6 +103,8 @@ export default function Lineup() {
   const [roleModalSlot, setRoleModalSlot] = useState<string | null>(null)
   // Set pieces panel open
   const [showSetPieces, setShowSetPieces] = useState(false)
+  // Accordion header panel
+  const [activeAccordion, setActiveAccordion] = useState<'captains' | 'general' | 'instructions' | 'roles' | null>(null)
 
   const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
@@ -425,6 +427,16 @@ export default function Lineup() {
 
   const removeSub = (pid: string) => setSubs((prev) => prev.filter((id) => id !== pid))
 
+  const toggleSetPiece = (type: string, id: string) => {
+    setSetPieces((prev) => {
+      const current = prev[type] ?? []
+      const maxSlots = SET_PIECE_TYPES.find((t) => t.key === type)?.max ?? 3
+      if (current.includes(id)) return { ...prev, [type]: current.filter((p: string) => p !== id) }
+      if (current.length >= maxSlots) return prev
+      return { ...prev, [type]: [...current, id] }
+    })
+  }
+
   // Auto-save indicator
   const triggerAutoSave = useCallback(() => {
     if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current)
@@ -508,122 +520,295 @@ export default function Lineup() {
                 </div>
               ) : null}
             </div>
-            <button onClick={() => saveMutation.mutate()} className="btn-primary gap-1.5 text-sm" disabled={saveMutation.isPending}>
+            <button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-pitch-500 to-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
               <Save size={14} /> {saveMutation.isPending ? 'Sauvegarde...' : 'Sauvegarder'}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Loaded tactic config panel */}
-      {loadedTactic && (() => {
-        const ins = loadedTactic.instructions ?? {}
-        const pressing = loadedTactic.pressing ?? ins.pressing ?? 'medium'
-        const block = loadedTactic.defensive_block ?? ins.defensive_block ?? 'medium'
-        const passingStyle = loadedTactic.passing_style ?? ins.passing_style ?? 'short'
-        const tempo = loadedTactic.tempo ?? ins.tempo ?? 'balanced'
-        const width = loadedTactic.width ?? ins.width ?? 'normal'
-        const marking = loadedTactic.marking ?? ins.marking ?? 'zone'
-        const playSpace = loadedTactic.play_space ?? ins.play_space
-        const gkDist = loadedTactic.gk_distribution ?? ins.gk_distribution
-        const counterPressing = loadedTactic.counter_pressing ?? ins.counter_pressing ?? false
-        const tacticCaptains = loadedTactic.captains ?? []
-        const setPieces = loadedTactic.set_pieces ?? {}
-        const hasPieces = Object.values(setPieces).some((a) => a.length > 0)
-
-        return (
-          <div className="bg-gray-900/70 border border-pitch-800/60 rounded-xl p-3 space-y-3">
-            {/* Tactic name + dismiss */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Swords size={14} className="text-pitch-400" />
-                <span className="text-sm font-bold text-white">{loadedTactic.name || 'Tactique'}</span>
-                <span className="text-[10px] font-bold text-pitch-400 bg-pitch-900/60 px-2 py-0.5 rounded">{loadedTactic.formation}</span>
-              </div>
-              <button type="button" onClick={() => setLoadedTactic(null)} className="text-gray-600 hover:text-gray-400 transition-colors p-1" title="Masquer config">
-                <X size={14} />
-              </button>
+      {/* ─── Magic Accordion Header Bar ─── */}
+      <div className="bg-gray-900/80 backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden">
+        {/* Tab pills row */}
+        <div className="flex items-center gap-1 px-3 py-2 flex-wrap">
+          <span className="text-[9px] text-gray-600 uppercase font-bold tracking-widest mr-2 hidden sm:block">Réglages</span>
+          {([
+            { key: 'captains' as const, icon: '⚽', label: 'Capitaines & Tireurs' },
+            { key: 'general' as const, icon: '⚙️', label: 'Général' },
+            { key: 'instructions' as const, icon: '🎯', label: 'Instructions' },
+            { key: 'roles' as const, icon: '👤', label: 'Rôles' },
+          ]).map(({ key, icon, label }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setActiveAccordion(activeAccordion === key ? null : key)}
+              className={clsx(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border',
+                activeAccordion === key
+                  ? 'bg-gradient-to-r from-pitch-500/20 to-emerald-500/10 border-pitch-500/30 text-pitch-300'
+                  : 'text-gray-500 hover:text-gray-300 hover:bg-white/5 border-transparent'
+              )}
+            >
+              <span>{icon}</span>
+              <span className="hidden sm:inline">{label}</span>
+              {activeAccordion === key ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+            </button>
+          ))}
+          {loadedTactic && (
+            <div className="ml-auto flex items-center gap-1.5 px-2 py-1 rounded-lg bg-pitch-900/40 border border-pitch-800/40">
+              <Swords size={10} className="text-pitch-400" />
+              <span className="text-[10px] font-bold text-pitch-300 hidden sm:inline">{loadedTactic.name || 'Tactique'}</span>
+              <span className="text-[9px] font-bold text-pitch-400 bg-pitch-900/60 px-1 py-0.5 rounded">{loadedTactic.formation}</span>
+              <button type="button" onClick={() => setLoadedTactic(null)} className="text-gray-600 hover:text-gray-400 ml-1" title="Effacer config"><X size={10} /></button>
             </div>
+          )}
+        </div>
 
-            {/* Config grid */}
-            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-1.5 text-[10px]">
-              <div className="bg-gray-800/60 rounded-lg px-2 py-1.5">
-                <p className="text-gray-500 text-[9px]">Pressing</p>
-                <span className={clsx('inline-block rounded px-1 py-0.5 font-semibold', PRESSING_COLORS[pressing] ?? 'bg-gray-700 text-gray-300')}>{PRESSING_LABELS[pressing] ?? pressing}</span>
-              </div>
-              <div className="bg-gray-800/60 rounded-lg px-2 py-1.5">
-                <p className="text-gray-500 text-[9px]">Bloc défensif</p>
-                <p className="text-cyan-300 font-semibold">{BLOCK_LABELS[block] ?? block}</p>
-              </div>
-              <div className="bg-gray-800/60 rounded-lg px-2 py-1.5">
-                <p className="text-gray-500 text-[9px]">Passes</p>
-                <p className="text-gray-200 font-medium">{PASSING_LABELS[passingStyle] ?? passingStyle}</p>
-              </div>
-              <div className="bg-gray-800/60 rounded-lg px-2 py-1.5">
-                <p className="text-gray-500 text-[9px]">Tempo</p>
-                <p className="text-gray-200 font-medium">{TEMPO_LABELS[tempo] ?? tempo}</p>
-              </div>
-              <div className="bg-gray-800/60 rounded-lg px-2 py-1.5">
-                <p className="text-gray-500 text-[9px]">Largeur</p>
-                <p className="text-gray-200 font-medium">{WIDTH_LABELS[width] ?? width}</p>
-              </div>
-              <div className="bg-gray-800/60 rounded-lg px-2 py-1.5">
-                <p className="text-gray-500 text-[9px]">Marquage</p>
-                <p className="text-gray-200 font-medium">{MARKING_LABELS[marking] ?? marking}</p>
-              </div>
-            </div>
-
-            {/* Advanced row */}
-            <div className="flex items-center gap-1.5 flex-wrap text-[10px]">
-              {playSpace && playSpace !== 'mixed' && (
-                <span className="px-1.5 py-0.5 rounded bg-lime-900/40 text-lime-300 font-medium">{PLAY_SPACE_LABELS[playSpace] ?? playSpace}</span>
-              )}
-              {gkDist && (
-                <span className="px-1.5 py-0.5 rounded bg-amber-900/40 text-amber-300 font-medium">GK: {GK_DIST_LABELS[gkDist] ?? gkDist}</span>
-              )}
-              {counterPressing && (
-                <span className="px-1.5 py-0.5 rounded bg-red-900/50 text-red-300 font-semibold">Contre-pressing</span>
-              )}
-
-              {/* Captains */}
-              {tacticCaptains.length > 0 && (
-                <>
-                  <span className="text-gray-700 mx-1">|</span>
-                  {tacticCaptains.map((cid, ci) => {
-                    const cp = getPlayer(cid)
+        {/* Panel: Capitaines & Tireurs */}
+        {activeAccordion === 'captains' && (
+          <div className="border-t border-white/5 p-3 space-y-3 bg-gray-900/60">
+            <div>
+              <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-2 flex items-center gap-1">
+                <Crown size={10} className="text-yellow-400" /> Capitaines — cliquez pour désigner
+              </p>
+              {Object.keys(slots).length === 0 ? (
+                <p className="text-[11px] text-gray-600 italic">Remplissez le terrain d'abord</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {positions.map((pos, i) => {
+                    const key = `${pos.name}-${i}`
+                    const slot = slots[key]
+                    const player = slot?.playerId ? getPlayer(slot.playerId) : undefined
+                    if (!player) return null
+                    const isCap = captains.includes(player.id)
+                    const capOrder = captains.indexOf(player.id)
                     return (
-                      <span key={cid} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-yellow-900/30 text-yellow-300 border border-yellow-800/40 font-medium">
-                        <Crown size={9} /> {ci === 0 ? 'C' : `C${ci + 1}`} {cp ? `#${cp.jersey_number ?? '?'} ${cp.profile?.last_name ?? ''}` : cid.slice(0, 6)}
-                      </span>
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => {
+                          if (isCap) {
+                            setCaptains((prev) => prev.filter((c) => c !== player.id))
+                            if (captainId === player.id) setCaptainId(null)
+                          } else if (captains.length < 5) {
+                            setCaptains((prev) => [...prev, player.id])
+                            if (!captainId) setCaptainId(player.id)
+                          }
+                        }}
+                        className={clsx(
+                          'flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-medium transition-all',
+                          isCap
+                            ? 'bg-yellow-900/30 border-yellow-700/60 text-yellow-300 shadow-[0_0_12px_rgba(234,179,8,0.15)]'
+                            : 'bg-gray-800/60 border-gray-700/40 text-gray-400 hover:border-yellow-700/30 hover:text-gray-200'
+                        )}
+                      >
+                        <Crown size={11} className={isCap ? 'text-yellow-400' : 'text-gray-600'} />
+                        <span className={clsx('text-[9px] font-bold px-1 py-0.5 rounded', posColor(pos.name))}>{pos.name}</span>
+                        <span>#{player.jersey_number ?? '?'} {player.profile?.last_name ?? ''}</span>
+                        {isCap && <span className="text-[9px] font-bold text-yellow-500">{capOrder === 0 ? 'C' : `C${capOrder + 1}`}</span>}
+                      </button>
                     )
                   })}
-                </>
-              )}
-
-              {/* Set pieces summary */}
-              {hasPieces && (
-                <>
-                  <span className="text-gray-700 mx-1">|</span>
-                  <Target size={9} className="text-pitch-400" />
-                  {Object.entries(setPieces).filter(([, v]) => v.length > 0).map(([key, ids]) => {
-                    const labels: Record<string, string> = { penalties: '⚽Pén', free_kicks_direct: '🎯CFL D', free_kicks_indirect: '🔄CFL I', corners_left: '↙Cor G', corners_right: '↘Cor D' }
-                    return (
-                      <span key={key} className="px-1.5 py-0.5 rounded bg-pitch-900/40 text-pitch-300 font-medium">
-                        {labels[key] ?? key} ({ids.length})
-                      </span>
-                    )
-                  })}
-                </>
+                </div>
               )}
             </div>
+            <div>
+              <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-2 flex items-center gap-1">
+                <Target size={10} className="text-pitch-400" /> Tireurs aux coups de pied arrêtés
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {SET_PIECE_TYPES.map(({ key: spKey, label, max }) => {
+                  const assignedIds = setPieces[spKey] ?? []
+                  return (
+                    <div key={spKey} className="bg-gray-800/60 rounded-xl p-2 border border-gray-700/30">
+                      <p className="text-[9px] text-gray-500 font-bold uppercase mb-1.5">
+                        {label} <span className="text-gray-600">({assignedIds.length}/{max})</span>
+                      </p>
+                      <div className="flex flex-wrap gap-1 mb-1.5">
+                        {assignedIds.map((id) => {
+                          const p = getPlayer(id)
+                          if (!p) return null
+                          return (
+                            <button key={id} type="button" onClick={() => toggleSetPiece(spKey, id)}
+                              className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-pitch-900/60 border border-pitch-700/40 text-pitch-300 text-[10px] hover:bg-red-900/40 hover:border-red-700/40 hover:text-red-300 transition-colors group">
+                              #{p.jersey_number ?? '?'} {p.profile?.last_name ?? ''} <X size={9} className="opacity-0 group-hover:opacity-100" />
+                            </button>
+                          )
+                        })}
+                        {assignedIds.length === 0 && <span className="text-[10px] text-gray-600 italic">Non assigné</span>}
+                      </div>
+                      {assignedIds.length < max && (
+                        <select
+                          aria-label={`Ajouter tireur ${label}`}
+                          className="w-full text-[10px] bg-gray-900/60 border border-gray-700/40 rounded-lg px-1.5 py-1 text-gray-300 cursor-pointer focus:outline-none focus:border-pitch-600"
+                          value=""
+                          onChange={(e) => { if (e.target.value) toggleSetPiece(spKey, e.target.value) }}
+                        >
+                          <option value="">+ Ajouter joueur</option>
+                          {Object.values(slots).filter((s) => s.playerId && !assignedIds.includes(s.playerId!)).map((s) => {
+                            const p = getPlayer(s.playerId!)
+                            if (!p) return null
+                            return <option key={p.id} value={p.id}>#{p.jersey_number ?? '?'} {p.profile?.last_name ?? ''} ({p.position})</option>
+                          })}
+                        </select>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
-            {/* Description */}
-            {loadedTactic.description && (
-              <p className="text-xs text-gray-400 bg-gray-800/40 rounded-lg px-3 py-2 border-l-2 border-pitch-600/50">{loadedTactic.description}</p>
+        {/* Panel: Général */}
+        {activeAccordion === 'general' && (
+          <div className="border-t border-white/5 p-3 bg-gray-900/60">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-800/60 border border-gray-700/30">
+                <span className="text-[10px] text-gray-500 uppercase font-bold">Formation</span>
+                <span className="text-sm font-bold text-white">{formation}</span>
+              </div>
+              {starterCount > 0 && (
+                <>
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-800/60 border border-gray-700/30">
+                    <Trophy size={14} className="text-yellow-400" />
+                    <span className="text-[10px] text-gray-500 uppercase font-bold">OVR</span>
+                    <span className={clsx('text-sm font-bold', ovrColor(tRating))}>{tRating}</span>
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-800/60 border border-gray-700/30">
+                    <Heart size={14} className={clsx(tChemistry >= 80 ? 'text-green-400' : tChemistry >= 50 ? 'text-yellow-400' : 'text-red-400')} />
+                    <span className="text-[10px] text-gray-500 uppercase font-bold">CHM</span>
+                    <span className={clsx('text-sm font-bold', tChemistry >= 80 ? 'text-green-400' : tChemistry >= 50 ? 'text-yellow-400' : 'text-red-400')}>{tChemistry}</span>
+                  </div>
+                </>
+              )}
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-800/60 border border-gray-700/30">
+                <Shield size={14} className="text-pitch-400" />
+                <span className="text-[10px] text-gray-500 uppercase font-bold">Titulaires</span>
+                <span className={clsx('text-sm font-bold', starterCount === 11 ? 'text-green-400' : 'text-amber-400')}>{starterCount}/11</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-800/60 border border-gray-700/30">
+                <ArrowRightLeft size={14} className="text-yellow-400" />
+                <span className="text-[10px] text-gray-500 uppercase font-bold">Remplaçants</span>
+                <span className="text-sm font-bold text-white">{subs.length}</span>
+              </div>
+              {loadedTactic && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-pitch-900/40 border border-pitch-700/30">
+                  <Swords size={14} className="text-pitch-400" />
+                  <span className="text-[10px] text-gray-500 uppercase font-bold">Tactique</span>
+                  <span className="text-sm font-bold text-pitch-300">{loadedTactic.name || 'Sans nom'}</span>
+                  <span className="text-[9px] font-bold text-pitch-400 bg-pitch-900/60 px-1.5 py-0.5 rounded">{loadedTactic.formation}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Panel: Instructions */}
+        {activeAccordion === 'instructions' && (
+          <div className="border-t border-white/5 p-3 bg-gray-900/60">
+            {loadedTactic ? (() => {
+              const ins = loadedTactic.instructions ?? {}
+              const pressing = loadedTactic.pressing ?? ins.pressing ?? 'medium'
+              const block = loadedTactic.defensive_block ?? ins.defensive_block ?? 'medium'
+              const passingStyle = loadedTactic.passing_style ?? ins.passing_style ?? 'short'
+              const tempo = loadedTactic.tempo ?? ins.tempo ?? 'balanced'
+              const width = loadedTactic.width ?? ins.width ?? 'normal'
+              const marking = loadedTactic.marking ?? ins.marking ?? 'zone'
+              const playSpace = loadedTactic.play_space ?? ins.play_space
+              const gkDist = loadedTactic.gk_distribution ?? ins.gk_distribution
+              const counterPressing = loadedTactic.counter_pressing ?? ins.counter_pressing ?? false
+              return (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+                    <div className="bg-gray-800/60 rounded-xl px-3 py-2 border border-gray-700/30">
+                      <p className="text-[9px] text-gray-500 uppercase mb-1">Pressing</p>
+                      <span className={clsx('inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold', PRESSING_COLORS[pressing] ?? 'bg-gray-700 text-gray-300')}>{PRESSING_LABELS[pressing] ?? pressing}</span>
+                    </div>
+                    <div className="bg-gray-800/60 rounded-xl px-3 py-2 border border-gray-700/30">
+                      <p className="text-[9px] text-gray-500 uppercase mb-1">Bloc déf.</p>
+                      <p className="text-cyan-300 font-semibold text-[10px]">{BLOCK_LABELS[block] ?? block}</p>
+                    </div>
+                    <div className="bg-gray-800/60 rounded-xl px-3 py-2 border border-gray-700/30">
+                      <p className="text-[9px] text-gray-500 uppercase mb-1">Passes</p>
+                      <p className="text-gray-200 font-medium text-[10px]">{PASSING_LABELS[passingStyle] ?? passingStyle}</p>
+                    </div>
+                    <div className="bg-gray-800/60 rounded-xl px-3 py-2 border border-gray-700/30">
+                      <p className="text-[9px] text-gray-500 uppercase mb-1">Tempo</p>
+                      <p className="text-gray-200 font-medium text-[10px]">{TEMPO_LABELS[tempo] ?? tempo}</p>
+                    </div>
+                    <div className="bg-gray-800/60 rounded-xl px-3 py-2 border border-gray-700/30">
+                      <p className="text-[9px] text-gray-500 uppercase mb-1">Largeur</p>
+                      <p className="text-gray-200 font-medium text-[10px]">{WIDTH_LABELS[width] ?? width}</p>
+                    </div>
+                    <div className="bg-gray-800/60 rounded-xl px-3 py-2 border border-gray-700/30">
+                      <p className="text-[9px] text-gray-500 uppercase mb-1">Marquage</p>
+                      <p className="text-gray-200 font-medium text-[10px]">{MARKING_LABELS[marking] ?? marking}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 items-center">
+                    {playSpace && playSpace !== 'mixed' && (
+                      <span className="px-2 py-0.5 rounded-lg bg-lime-900/40 text-lime-300 text-[10px] font-medium border border-lime-900/30">{PLAY_SPACE_LABELS[playSpace] ?? playSpace}</span>
+                    )}
+                    {gkDist && (
+                      <span className="px-2 py-0.5 rounded-lg bg-amber-900/40 text-amber-300 text-[10px] font-medium border border-amber-900/30">GK: {GK_DIST_LABELS[gkDist] ?? gkDist}</span>
+                    )}
+                    {counterPressing && (
+                      <span className="px-2 py-0.5 rounded-lg bg-red-900/50 text-red-300 text-[10px] font-semibold border border-red-900/30">Contre-pressing ⚡</span>
+                    )}
+                    {loadedTactic.description && (
+                      <p className="w-full text-[11px] text-gray-400 bg-gray-800/40 rounded-lg px-3 py-2 border-l-2 border-pitch-600/50 mt-1">{loadedTactic.description}</p>
+                    )}
+                  </div>
+                </div>
+              )
+            })() : (
+              <div className="flex items-center gap-2 text-gray-600 text-sm py-1">
+                <Settings2 size={16} />
+                <span>Chargez une tactique pour voir les instructions</span>
+              </div>
             )}
           </div>
-        )
-      })()}
+        )}
+
+        {/* Panel: Rôles */}
+        {activeAccordion === 'roles' && (
+          <div className="border-t border-white/5 p-3 bg-gray-900/60">
+            {Object.keys(slots).length === 0 ? (
+              <p className="text-sm text-gray-600">Aucun titulaire — remplissez le terrain d'abord</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {positions.map((pos, i) => {
+                  const key = `${pos.name}-${i}`
+                  const slot = slots[key]
+                  const player = slot?.playerId ? getPlayer(slot.playerId) : undefined
+                  if (!player) return null
+                  const instruction = playerInstructions[player.id]
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setRoleModalSlot(key)}
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-gray-700/40 bg-gray-800/60 hover:border-pitch-600/40 hover:bg-gray-700/60 transition-all text-xs group"
+                    >
+                      <span className={clsx('text-[9px] font-bold px-1 py-0.5 rounded', posColor(pos.name))}>{pos.name}</span>
+                      <span className="text-gray-300 font-medium">#{player.jersey_number ?? '?'} {player.profile?.last_name ?? ''}</span>
+                      {instruction ? (
+                        <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-purple-900/40 border border-purple-700/30 text-purple-300 text-[9px] font-bold">
+                          {ROLE_LABELS[instruction.role] ?? instruction.role}
+                          {instruction.duty && <span className="text-purple-500">· {DUTY_LABELS[instruction.duty] ?? instruction.duty}</span>}
+                        </span>
+                      ) : (
+                        <span className="text-[9px] text-gray-600 italic group-hover:text-gray-400">Rôle <Settings2 size={9} className="inline" /></span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Status bar + Team Rating + Chemistry */}
       <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap bg-gray-900/50 rounded-lg px-3 py-2 border border-gray-800/60">

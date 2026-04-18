@@ -136,14 +136,14 @@ export default function ISYManageEvent() {
         {(events as Record<string, unknown>[]).map((event) => (
           <div key={event.id as string} className="card flex items-start gap-4">
             <div className="w-12 text-center shrink-0">
-              <p className="text-xs text-gray-500 uppercase">{format(new Date(event.date as string), 'MMM', { locale: fr })}</p>
-              <p className="text-xl font-bold text-white leading-none">{format(new Date(event.date as string), 'd')}</p>
+              <p className="text-xs text-gray-500 uppercase">{format(new Date(String(event.date)), 'MMM', { locale: fr })}</p>
+              <p className="text-xl font-bold text-white leading-none">{format(new Date(String(event.date)), 'd')}</p>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-white">{event.title as string}</p>
+              <p className="font-semibold text-white">{String(event.title)}</p>
               <div className="flex items-center gap-3 text-xs text-gray-500 mt-1 flex-wrap">
-                {event.location && <span className="flex items-center gap-1"><MapPin size={11} />{event.location as string}</span>}
-                {event.max_participants && <span className="flex items-center gap-1"><Users size={11} />Max {event.max_participants as number}</span>}
+                {event.location ? <span className="flex items-center gap-1"><MapPin size={11} />{String(event.location)}</span> : null}
+                {event.max_participants ? <span className="flex items-center gap-1"><Users size={11} />Max {Number(event.max_participants)}</span> : null}
               </div>
             </div>
             <div className="flex gap-2 shrink-0">

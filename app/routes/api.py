@@ -1826,7 +1826,7 @@ def admin_dashboard():
 @api_bp.route('/admin/members', methods=['GET'])
 @role_required('admin')
 def admin_members():
-    """Get all members of the club."""
+    """Get all members of the club with enriched player data."""
     club_id = request.current_user.get('club_id')
     if not club_id:
         return jsonify({'success': True, 'data': []})
@@ -1838,6 +1838,34 @@ def admin_members():
         members = [m for m in members if m.get('role') == role]
     if status:
         members = [m for m in members if m.get('account_status') == status]
+
+    # Enrich with player data
+    player_service = get_player_service()
+    user_ids = [m['_id'] for m in members]
+    players_list = list(player_service.collection.find({'user_id': {'$in': user_ids}}))
+    players_map = {str(p['user_id']): p for p in players_list}
+
+    for member in members:
+        player = players_map.get(str(member['_id']))
+        if player:
+            # Format birth_date for JSON
+            birth_date = player.get('birth_date')
+            if birth_date:
+                birth_date = birth_date.isoformat() if hasattr(birth_date, 'isoformat') else str(birth_date)
+            member['player_data'] = {
+                'player_id': str(player['_id']),
+                'team_id': str(player.get('team_id', '')) if player.get('team_id') else '',
+                'jersey_number': player.get('jersey_number'),
+                'position': player.get('position'),
+                'photo': player.get('photo'),
+                'birth_date': birth_date,
+                'height': player.get('height'),
+                'weight': player.get('weight'),
+                'documents': player.get('documents', {}),
+                'license_number': player.get('license_number'),
+                'status': player.get('status', 'active')
+            }
+
     return jsonify({'success': True, 'count': len(members), 'data': serialize_docs(members)})
 
 
@@ -1916,7 +1944,7 @@ def admin_invite_member():
 @api_bp.route('/admin/members/<user_id>', methods=['PUT'])
 @role_required('admin')
 def admin_edit_member(user_id):
-    """Edit a member."""
+    """Edit a member with full player data support."""
     data = request.get_json()
     if not data:
         return jsonify({'success': False, 'error': 'Data required'}), 400
@@ -1940,14 +1968,34 @@ def admin_edit_member(user_id):
     if update:
         user_service.collection.update_one({'_id': ObjectId(user_id)}, {'$set': update})
 
-    # Team assignment
-    if 'team_id' in data:
+    # Player fields
+    player_fields_to_update = {}
+    player_field_names = ['team_id', 'jersey_number', 'position', 'birth_date',
+                          'height', 'weight', 'license_number', 'status']
+    for field in player_field_names:
+        if field in data:
+            value = data[field]
+            if field == 'team_id' and value:
+                value = ObjectId(value)
+            elif field == 'team_id' and not value:
+                value = None
+            elif field == 'jersey_number' and value:
+                value = int(value)
+            elif field == 'birth_date' and value:
+                from datetime import datetime
+                if isinstance(value, str):
+                    value = datetime.fromisoformat(value.replace('Z', '+00:00').split('T')[0])
+            elif field in ('height', 'weight') and value:
+                value = int(value)
+            player_fields_to_update[field] = value
+
+    if player_fields_to_update:
         player_service = get_player_service()
         player = player_service.get_by_user(user_id)
         if player:
             player_service.collection.update_one(
                 {'_id': player['_id']},
-                {'$set': {'team_id': ObjectId(data['team_id']) if data['team_id'] else None}}
+                {'$set': player_fields_to_update}
             )
 
     return jsonify({'success': True, 'message': 'Member updated'})
@@ -1983,6 +2031,93 @@ def admin_delete_member(user_id):
     user_service = get_user_service()
     user_service.delete(user_id)
     return jsonify({'success': True, 'message': 'Member deleted'})
+
+
+@api_bp.route('/admin/check-jersey', methods=['POST'])
+@role_required('admin')
+def check_jersey_number():
+    """Check if jersey number is available in a team."""
+    data = request.get_json()
+    team_id = data.get('team_id')
+    jersey_number = data.get('jersey_number')
+    exclude_player_id = data.get('exclude_player_id')
+
+    if not team_id or jersey_number is None:
+        return jsonify({'success': True, 'available': True})
+
+    from bson import ObjectId
+    player_service = get_player_service()
+    query = {'team_id': ObjectId(team_id), 'jersey_number': int(jersey_number)}
+    if exclude_player_id:
+        query['_id'] = {'$ne': ObjectId(exclude_player_id)}
+
+    existing = player_service.collection.find_one(query)
+    if existing:
+        return jsonify({
+            'success': True,
+            'available': False,
+            'taken_by': existing.get('name', 'Un joueur')
+        })
+    return jsonify({'success': True, 'available': True})
+
+
+@api_bp.route('/admin/members/<user_id>/photo', methods=['POST'])
+@role_required('admin')
+def admin_upload_member_photo(user_id):
+    """Upload photo for a member (player)."""
+    file = request.files.get('file')
+    if not file:
+        return jsonify({'success': False, 'error': 'No file provided'}), 400
+
+    player_service = get_player_service()
+    player = player_service.get_by_user(user_id)
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+
+    ext = file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else 'jpg'
+    if ext not in {'jpg', 'jpeg', 'png', 'webp'}:
+        return jsonify({'success': False, 'error': 'Invalid file type'}), 400
+
+    upload_dir = os.path.join(current_app.static_folder, 'uploads', 'player_docs', str(player['_id']))
+    os.makedirs(upload_dir, exist_ok=True)
+    filename = f"photo.{ext}"
+    file.save(os.path.join(upload_dir, filename))
+
+    photo_url = f"/static/uploads/player_docs/{player['_id']}/{filename}"
+    player_service.update(str(player['_id']), {'photo': photo_url})
+
+    return jsonify({'success': True, 'photo': photo_url})
+
+
+@api_bp.route('/admin/members/<user_id>/documents/<doc_type>', methods=['POST'])
+@role_required('admin')
+def admin_upload_member_document(user_id, doc_type):
+    """Upload document for a member (player)."""
+    if doc_type not in {'license', 'medical_cert', 'id_card', 'insurance'}:
+        return jsonify({'success': False, 'error': 'Invalid document type'}), 400
+
+    file = request.files.get('file')
+    if not file:
+        return jsonify({'success': False, 'error': 'No file provided'}), 400
+
+    player_service = get_player_service()
+    player = player_service.get_by_user(user_id)
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+
+    ext = file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else 'pdf'
+    if ext not in {'jpg', 'jpeg', 'png', 'pdf', 'webp'}:
+        return jsonify({'success': False, 'error': 'Invalid file type'}), 400
+
+    upload_dir = os.path.join(current_app.static_folder, 'uploads', 'player_docs', str(player['_id']))
+    os.makedirs(upload_dir, exist_ok=True)
+    filename = f"{doc_type}.{ext}"
+    file.save(os.path.join(upload_dir, filename))
+
+    file_url = f"/static/uploads/player_docs/{player['_id']}/{filename}"
+    player_service.update_documents(str(player['_id']), doc_type, 'valid', file_url)
+
+    return jsonify({'success': True, 'file': file_url, 'status': 'valid'})
 
 
 @api_bp.route('/admin/seed-players', methods=['POST'])

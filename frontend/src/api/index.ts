@@ -229,6 +229,24 @@ export const adminApi = {
   // Billing
   billingDashboard: () => client.get('/admin/billing/dashboard'),
   billingInvoices: () => client.get('/admin/billing/invoices'),
+  // Jersey validation
+  checkJersey: (data: { team_id: string; jersey_number: number; exclude_player_id?: string }) =>
+    client.post('/admin/check-jersey', data),
+  // Photo/Document uploads
+  uploadMemberPhoto: (userId: string, file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return client.post(`/admin/members/${userId}/photo`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
+  uploadMemberDocument: (userId: string, docType: string, file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return client.post(`/admin/members/${userId}/documents/${docType}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
 }
 
 // ─── Parent ──────────────────────────────────────────────────────────────────

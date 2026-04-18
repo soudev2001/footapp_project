@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { adminApi } from '../../api'
 import { useTeam } from '../../contexts/TeamContext'
-import { useState, useCallback } from 'react'
-import { Users, UserPlus, Trash2, Search, Mail, Sprout, Edit3, Key, X, CheckCircle2, XCircle, Shield } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import { Users, UserPlus, Trash2, Search, Mail, Sprout, Edit3, Key, X, CheckCircle2, XCircle, Shield, Camera, FileText, AlertTriangle, Upload } from 'lucide-react'
+import { useForm, useWatch } from 'react-hook-form'
 import type { User } from '../../types'
 import clsx from 'clsx'
 
@@ -21,6 +21,28 @@ const ROLE_LABELS: Record<string, string> = {
   parent: 'Parent',
 }
 
+const POSITIONS = ['GK', 'DEF', 'MID', 'ATT']
+const POSITION_LABELS: Record<string, string> = {
+  GK: 'Gardien',
+  DEF: 'Défenseur',
+  MID: 'Milieu',
+  ATT: 'Attaquant',
+}
+
+const PLAYER_STATUS = ['active', 'injured', 'suspended']
+const STATUS_LABELS: Record<string, string> = {
+  active: 'Actif',
+  injured: 'Blessé',
+  suspended: 'Suspendu',
+}
+
+const DOC_TYPES = [
+  { key: 'license', label: 'Licence', icon: FileText },
+  { key: 'medical_cert', label: 'Certificat médical', icon: FileText },
+  { key: 'id_card', label: 'Pièce d\'identité', icon: FileText },
+  { key: 'insurance', label: 'Assurance', icon: FileText },
+]
+
 interface InviteForm {
   email: string
   role: string
@@ -33,9 +55,35 @@ interface EditForm {
   last_name: string
   email: string
   role: string
-  team_id: string
   phone: string
+  // Player fields
+  team_id: string
+  jersey_number: string
+  position: string
+  birth_date: string
+  height: string
+  weight: string
+  license_number: string
+  status: string
 }
+
+interface MemberWithPlayerData extends User {
+  player_data?: {
+    player_id: string
+    team_id: string
+    jersey_number: number | null
+    position: string
+    photo: string | null
+    birth_date: string | null
+    height: number | null
+    weight: number | null
+    documents: Record<string, { status: string; file: string }>
+    license_number: string | null
+    status: string
+  }
+}
+
+type EditTab = 'general' | 'player' | 'profile' | 'documents'
 
 export default function Members() {
   const qc = useQueryClient()
@@ -43,8 +91,12 @@ export default function Members() {
   const [search, setSearch] = useState('')
   const [inviting, setInviting] = useState(false)
   const [selectedTeamId, setSelectedTeamId] = useState<string>('')
-  const [editingMember, setEditingMember] = useState<User | null>(null)
+  const [editingMember, setEditingMember] = useState<MemberWithPlayerData | null>(null)
+  const [editTab, setEditTab] = useState<EditTab>('general')
+  const [jerseyWarning, setJerseyWarning] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
+  const docInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
 
   const showToast = useCallback((msg: string, type: 'success' | 'error' = 'success') => {
     setToast({ message: msg, type })
@@ -80,6 +132,7 @@ export default function Members() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-members'] })
       setEditingMember(null)
+      setEditTab('general')
       showToast('Membre mis à jour')
     },
     onError: () => showToast('Erreur lors de la mise à jour', 'error'),
@@ -102,25 +155,109 @@ export default function Members() {
     },
   })
 
+  const checkJerseyMutation = useMutation({
+    mutationFn: (data: { team_id: string; jersey_number: number; exclude_player_id?: string }) =>
+      adminApi.checkJersey(data),
+    onSuccess: (res) => {
+      if (!res.data.available) {
+        setJerseyWarning(`Numéro pris par ${res.data.taken_by}`)
+      } else {
+        setJerseyWarning(null)
+      }
+    },
+  })
+
+  const uploadPhotoMutation = useMutation({
+    mutationFn: ({ userId, file }: { userId: string; file: File }) =>
+      adminApi.uploadMemberPhoto(userId, file),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-members'] })
+      showToast('Photo mise à jour')
+    },
+    onError: () => showToast('Erreur upload photo', 'error'),
+  })
+
+  const uploadDocMutation = useMutation({
+    mutationFn: ({ userId, docType, file }: { userId: string; docType: string; file: File }) =>
+      adminApi.uploadMemberDocument(userId, docType, file),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-members'] })
+      showToast('Document mis à jour')
+    },
+    onError: () => showToast('Erreur upload document', 'error'),
+  })
+
   const { register: regInvite, handleSubmit: submitInvite, reset: resetInvite } = useForm<InviteForm>({
     defaultValues: { role: 'player' },
   })
 
-  const { register: regEdit, handleSubmit: submitEdit, reset: resetEdit } = useForm<EditForm>()
+  const { register: regEdit, handleSubmit: submitEdit, reset: resetEdit, control } = useForm<EditForm>()
 
-  const openEdit = (member: User) => {
+  const watchedJersey = useWatch({ control, name: 'jersey_number' })
+  const watchedTeam = useWatch({ control, name: 'team_id' })
+
+  // Check jersey availability on change
+  useEffect(() => {
+    const num = parseInt(watchedJersey)
+    if (num && watchedTeam && editingMember?.player_data) {
+      checkJerseyMutation.mutate({
+        team_id: watchedTeam,
+        jersey_number: num,
+        exclude_player_id: editingMember.player_data.player_id,
+      })
+    } else {
+      setJerseyWarning(null)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedJersey, watchedTeam])
+
+  const openEdit = (member: MemberWithPlayerData) => {
     setEditingMember(member)
+    setEditTab('general')
+    setJerseyWarning(null)
+    const pd = member.player_data
     resetEdit({
       first_name: member.profile?.first_name ?? '',
       last_name: member.profile?.last_name ?? '',
       email: member.email ?? '',
       role: member.role ?? 'player',
-      team_id: (member as any).team_id ?? '',
       phone: member.profile?.phone ?? '',
+      team_id: pd?.team_id ?? '',
+      jersey_number: pd?.jersey_number?.toString() ?? '',
+      position: pd?.position ?? '',
+      birth_date: pd?.birth_date ? pd.birth_date.split('T')[0] : '',
+      height: pd?.height?.toString() ?? '',
+      weight: pd?.weight?.toString() ?? '',
+      license_number: pd?.license_number ?? '',
+      status: pd?.status ?? 'active',
     })
   }
 
-  const filtered = members?.filter((m: User) => {
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file && editingMember) {
+      uploadPhotoMutation.mutate({ userId: editingMember.id, file })
+    }
+  }
+
+  const handleDocUpload = (docType: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file && editingMember) {
+      uploadDocMutation.mutate({ userId: editingMember.id, docType, file })
+    }
+  }
+
+  const calculateAge = (birthDate: string | null) => {
+    if (!birthDate) return null
+    const birth = new Date(birthDate)
+    const today = new Date()
+    let age = today.getFullYear() - birth.getFullYear()
+    const m = today.getMonth() - birth.getMonth()
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--
+    return age
+  }
+
+  const filtered = members?.filter((m: MemberWithPlayerData) => {
     const q = search.toLowerCase()
     return (
       !q ||
@@ -129,6 +266,8 @@ export default function Members() {
       m.email.toLowerCase().includes(q)
     )
   })
+
+  const isPlayerRole = editingMember?.role === 'player'
 
   return (
     <div className="space-y-6">
@@ -230,16 +369,25 @@ export default function Members() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
-            {filtered?.map((member: User) => (
+            {filtered?.map((member: MemberWithPlayerData) => (
               <tr key={member.id} className="hover:bg-gray-800/50 transition-colors">
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs font-medium uppercase">
-                      {member.profile.first_name?.[0]}{member.profile.last_name?.[0]}
+                    {member.player_data?.photo ? (
+                      <img src={member.player_data.photo} alt="" className="w-8 h-8 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs font-medium uppercase">
+                        {member.profile.first_name?.[0]}{member.profile.last_name?.[0]}
+                      </div>
+                    )}
+                    <div>
+                      <span className="font-medium text-white">
+                        {member.profile.first_name} {member.profile.last_name}
+                      </span>
+                      {member.player_data?.jersey_number && (
+                        <span className="ml-2 text-xs text-pitch-400">#{member.player_data.jersey_number}</span>
+                      )}
                     </div>
-                    <span className="font-medium text-white">
-                      {member.profile.first_name} {member.profile.last_name}
-                    </span>
                   </div>
                 </td>
                 <td className="px-5 py-3 text-gray-400 hidden md:table-cell">{member.email}</td>
@@ -305,92 +453,314 @@ export default function Members() {
 
       {/* Edit modal */}
       {editingMember && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setEditingMember(null)}>
-          <div className="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Shield size={18} className="text-pitch-400" />
-                Modifier — {editingMember.profile?.first_name} {editingMember.profile?.last_name}
-              </h2>
-              <button onClick={() => setEditingMember(null)} className="text-gray-500 hover:text-gray-300"><X size={18} /></button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setEditingMember(null); setEditTab('general') }}>
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+              <div className="flex items-center gap-4">
+                {/* Photo */}
+                <div
+                  className="relative group cursor-pointer"
+                  onClick={() => photoInputRef.current?.click()}
+                >
+                  {editingMember.player_data?.photo ? (
+                    <img src={editingMember.player_data.photo} alt="" className="w-16 h-16 rounded-xl object-cover" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-xl bg-gray-700 flex items-center justify-center text-xl font-bold uppercase">
+                      {editingMember.profile?.first_name?.[0]}{editingMember.profile?.last_name?.[0]}
+                    </div>
+                  )}
+                  <div className="absolute inset-0 rounded-xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Camera size={20} className="text-white" />
+                  </div>
+                  <input
+                    ref={photoInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePhotoUpload}
+                  />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white">
+                    {editingMember.profile?.first_name} {editingMember.profile?.last_name}
+                  </h2>
+                  <p className="text-sm text-gray-400">{editingMember.email}</p>
+                </div>
+              </div>
+              <button onClick={() => { setEditingMember(null); setEditTab('general') }} className="text-gray-500 hover:text-gray-300">
+                <X size={20} />
+              </button>
             </div>
 
+            {/* Tabs */}
+            <div className="flex border-b border-gray-800 px-6">
+              {(['general', 'player', 'profile', 'documents'] as EditTab[]).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setEditTab(tab)}
+                  className={clsx(
+                    'px-4 py-3 text-sm font-medium border-b-2 transition-colors',
+                    editTab === tab
+                      ? 'border-pitch-500 text-pitch-400'
+                      : 'border-transparent text-gray-400 hover:text-gray-200'
+                  )}
+                >
+                  {tab === 'general' && 'Général'}
+                  {tab === 'player' && 'Joueur'}
+                  {tab === 'profile' && 'Profil'}
+                  {tab === 'documents' && 'Documents'}
+                </button>
+              ))}
+            </div>
+
+            {/* Content */}
             <form onSubmit={submitEdit((d) => {
-              const payload: Record<string, any> = {
+              const payload: Record<string, unknown> = {
                 first_name: d.first_name,
                 last_name: d.last_name,
                 phone: d.phone,
                 role: d.role,
               }
-              if (d.team_id) payload.team_id = d.team_id
+              if (isPlayerRole) {
+                payload.team_id = d.team_id || null
+                payload.jersey_number = d.jersey_number ? parseInt(d.jersey_number) : null
+                payload.position = d.position || null
+                payload.birth_date = d.birth_date || null
+                payload.height = d.height ? parseInt(d.height) : null
+                payload.weight = d.weight ? parseInt(d.weight) : null
+                payload.license_number = d.license_number || null
+                payload.status = d.status || 'active'
+              }
               updateMutation.mutate({ id: editingMember.id, data: payload })
-            })} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">Prénom</label>
-                  <input {...regEdit('first_name')} className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">Nom</label>
-                  <input {...regEdit('last_name')} className="input" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs text-gray-400 mb-1">E-mail</label>
-                <input value={editingMember.email} disabled className="input opacity-60" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">Téléphone</label>
-                  <input {...regEdit('phone')} className="input" placeholder="+33 6 ..." />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">Rôle</label>
-                  <select {...regEdit('role')} className="input">
-                    {Object.entries(ROLE_LABELS).map(([k, v]) => (
-                      <option key={k} value={k}>{v}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs text-gray-400 mb-1">Équipe</label>
-                <select {...regEdit('team_id')} className="input">
-                  <option value="">Aucune équipe</option>
-                  {teamsList.map((t) => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
-              </div>
+            })} className="flex-1 overflow-y-auto p-6 space-y-5">
 
-              {/* Quick actions */}
-              <div className="flex items-center gap-2 pt-2 border-t border-gray-800">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirm(`Envoyer un email de réinitialisation à ${editingMember.email} ?`))
-                      resetPasswordMutation.mutate(editingMember.id)
-                  }}
-                  disabled={resetPasswordMutation.isPending}
-                  className="btn-secondary text-xs gap-1.5 text-blue-400 border-blue-800 hover:bg-blue-900/30"
-                >
-                  <Key size={13} /> {resetPasswordMutation.isPending ? 'Envoi...' : 'Réinitialiser MDP'}
+              {/* General Tab */}
+              {editTab === 'general' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Prénom</label>
+                      <input {...regEdit('first_name')} className="input" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Nom</label>
+                      <input {...regEdit('last_name')} className="input" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">E-mail</label>
+                    <input value={editingMember.email} disabled className="input opacity-60" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Téléphone</label>
+                      <input {...regEdit('phone')} className="input" placeholder="+33 6 ..." />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Rôle</label>
+                      <select {...regEdit('role')} className="input">
+                        {Object.entries(ROLE_LABELS).map(([k, v]) => (
+                          <option key={k} value={k}>{v}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Quick actions */}
+                  <div className="flex items-center gap-2 pt-4 border-t border-gray-800">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (confirm(`Envoyer un email de réinitialisation à ${editingMember.email} ?`))
+                          resetPasswordMutation.mutate(editingMember.id)
+                      }}
+                      disabled={resetPasswordMutation.isPending}
+                      className="btn-secondary text-xs gap-1.5 text-blue-400 border-blue-800 hover:bg-blue-900/30"
+                    >
+                      <Key size={13} /> {resetPasswordMutation.isPending ? 'Envoi...' : 'Réinit. MDP'}
+                    </button>
+                    {editingMember.account_status === 'pending' && (
+                      <button
+                        type="button"
+                        onClick={() => inviteMutation.mutate({ email: editingMember.email, role: editingMember.role, first_name: editingMember.profile?.first_name, last_name: editingMember.profile?.last_name })}
+                        disabled={inviteMutation.isPending}
+                        className="btn-secondary text-xs gap-1.5 text-amber-400 border-amber-800 hover:bg-amber-900/30"
+                      >
+                        <Mail size={13} /> Renvoyer invitation
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Player Tab */}
+              {editTab === 'player' && (
+                <div className="space-y-4">
+                  {!isPlayerRole && (
+                    <div className="bg-amber-900/30 border border-amber-800 rounded-lg p-3 text-sm text-amber-300 flex items-center gap-2">
+                      <AlertTriangle size={16} />
+                      Ce membre n'est pas un joueur. Changez le rôle pour accéder aux options joueur.
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Équipe</label>
+                      <select {...regEdit('team_id')} className="input" disabled={!isPlayerRole}>
+                        <option value="">Aucune équipe</option>
+                        {teamsList.map((t) => (
+                          <option key={t.id} value={t.id}>{t.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Numéro de maillot</label>
+                      <div className="relative">
+                        <input
+                          {...regEdit('jersey_number')}
+                          type="number"
+                          min="1"
+                          max="99"
+                          className={clsx('input', jerseyWarning && 'border-red-500')}
+                          disabled={!isPlayerRole}
+                        />
+                        {jerseyWarning && (
+                          <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                            <AlertTriangle size={16} className="text-red-500" />
+                          </div>
+                        )}
+                      </div>
+                      {jerseyWarning && (
+                        <p className="text-xs text-red-400 mt-1">{jerseyWarning}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Position</label>
+                      <select {...regEdit('position')} className="input" disabled={!isPlayerRole}>
+                        <option value="">Sélectionner</option>
+                        {POSITIONS.map((p) => (
+                          <option key={p} value={p}>{POSITION_LABELS[p]}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Statut joueur</label>
+                      <select {...regEdit('status')} className="input" disabled={!isPlayerRole}>
+                        {PLAYER_STATUS.map((s) => (
+                          <option key={s} value={s}>{STATUS_LABELS[s]}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Profile Tab */}
+              {editTab === 'profile' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Date de naissance</label>
+                      <input {...regEdit('birth_date')} type="date" className="input" disabled={!isPlayerRole} />
+                      {editingMember.player_data?.birth_date && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {calculateAge(editingMember.player_data.birth_date)} ans
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">N° de licence</label>
+                      <input {...regEdit('license_number')} className="input" placeholder="LIC-XXXX" disabled={!isPlayerRole} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Taille (cm)</label>
+                      <input {...regEdit('height')} type="number" className="input" placeholder="175" disabled={!isPlayerRole} />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">Poids (kg)</label>
+                      <input {...regEdit('weight')} type="number" className="input" placeholder="70" disabled={!isPlayerRole} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Documents Tab */}
+              {editTab === 'documents' && (
+                <div className="space-y-4">
+                  {!isPlayerRole && (
+                    <div className="bg-amber-900/30 border border-amber-800 rounded-lg p-3 text-sm text-amber-300 flex items-center gap-2">
+                      <AlertTriangle size={16} />
+                      Les documents ne sont disponibles que pour les joueurs.
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-4">
+                    {DOC_TYPES.map((doc) => {
+                      const docData = editingMember.player_data?.documents?.[doc.key]
+                      const status = docData?.status || 'missing'
+                      const file = docData?.file
+                      return (
+                        <div key={doc.key} className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <doc.icon size={16} className="text-gray-400" />
+                              <span className="text-sm font-medium text-white">{doc.label}</span>
+                            </div>
+                            <span className={clsx(
+                              'badge text-xs',
+                              status === 'valid' ? 'bg-green-900 text-green-300' : 'bg-red-900/50 text-red-400'
+                            )}>
+                              {status === 'valid' ? 'Valide' : 'Manquant'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {file && (
+                              <a
+                                href={file}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn-secondary text-xs flex-1"
+                              >
+                                Voir
+                              </a>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => docInputRefs.current[doc.key]?.click()}
+                              disabled={!isPlayerRole || uploadDocMutation.isPending}
+                              className="btn-secondary text-xs flex-1 gap-1"
+                            >
+                              <Upload size={12} />
+                              {file ? 'Remplacer' : 'Uploader'}
+                            </button>
+                            <input
+                              ref={(el) => { docInputRefs.current[doc.key] = el }}
+                              type="file"
+                              accept="image/*,.pdf"
+                              className="hidden"
+                              onChange={handleDocUpload(doc.key)}
+                            />
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Footer */}
+              <div className="flex justify-end gap-2 pt-4 border-t border-gray-800">
+                <button type="button" onClick={() => { setEditingMember(null); setEditTab('general') }} className="btn-secondary">
+                  Annuler
                 </button>
-                {editingMember.account_status === 'pending' && (
-                  <button
-                    type="button"
-                    onClick={() => inviteMutation.mutate({ email: editingMember.email, role: editingMember.role, first_name: editingMember.profile?.first_name, last_name: editingMember.profile?.last_name })}
-                    disabled={inviteMutation.isPending}
-                    className="btn-secondary text-xs gap-1.5 text-amber-400 border-amber-800 hover:bg-amber-900/30"
-                  >
-                    <Mail size={13} /> Renvoyer invitation
-                  </button>
-                )}
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setEditingMember(null)} className="btn-secondary">Annuler</button>
-                <button type="submit" className="btn-primary" disabled={updateMutation.isPending}>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={updateMutation.isPending || !!jerseyWarning}
+                >
                   {updateMutation.isPending ? 'Sauvegarde...' : 'Enregistrer'}
                 </button>
               </div>

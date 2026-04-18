@@ -76,11 +76,11 @@ export default function Settings() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs text-gray-400 mb-1">Prénom</label>
-              <p className="input bg-gray-800/30 text-gray-300 cursor-default">{user?.first_name ?? '—'}</p>
+              <p className="input bg-gray-800/30 text-gray-300 cursor-default">{user?.profile?.first_name ?? '—'}</p>
             </div>
             <div>
               <label className="block text-xs text-gray-400 mb-1">Nom</label>
-              <p className="input bg-gray-800/30 text-gray-300 cursor-default">{user?.last_name ?? '—'}</p>
+              <p className="input bg-gray-800/30 text-gray-300 cursor-default">{user?.profile?.last_name ?? '—'}</p>
             </div>
           </div>
           <div>

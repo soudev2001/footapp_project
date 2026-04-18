@@ -3,6 +3,7 @@ import { teamsApi, playersApi } from '../api'
 import { Trophy, Medal, TrendingUp, Target, Shield } from 'lucide-react'
 import clsx from 'clsx'
 import { useState } from 'react'
+import type { Player } from '../types'
 
 type RankType = 'scorers' | 'assistants' | 'players'
 
@@ -19,10 +20,12 @@ export default function Ranking() {
     queryFn: () => teamsApi.getAll().then((r) => r.data),
   })
 
-  const sortedPlayers = [...(players ?? [])].sort((a: Record<string, unknown>, b: Record<string, unknown>) => {
-    if (type === 'scorers') return ((b.goals as number) ?? 0) - ((a.goals as number) ?? 0)
-    if (type === 'assistants') return ((b.assists as number) ?? 0) - ((a.assists as number) ?? 0)
-    return ((b.matches_played as number) ?? 0) - ((a.matches_played as number) ?? 0)
+  const sortedPlayers = [...(players ?? [])].sort((a, b) => {
+    const aStats = a.stats || {} as Record<string, number>
+    const bStats = b.stats || {} as Record<string, number>
+    if (type === 'scorers') return (bStats.goals ?? 0) - (aStats.goals ?? 0)
+    if (type === 'assistants') return (bStats.assists ?? 0) - (aStats.assists ?? 0)
+    return (bStats.matches_played ?? 0) - (aStats.matches_played ?? 0)
   })
 
   const tabs: { key: RankType; label: string; icon: React.ReactNode }[] = [
@@ -38,10 +41,11 @@ export default function Ranking() {
     return <span className="text-sm font-bold text-gray-500 w-4 text-center">{rank + 1}</span>
   }
 
-  const getStatValue = (player: Record<string, unknown>) => {
-    if (type === 'scorers') return player.goals ?? 0
-    if (type === 'assistants') return player.assists ?? 0
-    return player.matches_played ?? 0
+  const getStatValue = (player: Player) => {
+    const stats = player.stats || {} as Record<string, number>
+    if (type === 'scorers') return stats.goals ?? 0
+    if (type === 'assistants') return stats.assists ?? 0
+    return stats.matches_played ?? 0
   }
 
   const getStatLabel = () => {
@@ -76,9 +80,9 @@ export default function Ranking() {
         <div className="lg:col-span-1 card">
           <h2 className="font-semibold text-white mb-4 text-center">Podium</h2>
           <div className="space-y-3">
-            {sortedPlayers.slice(0, 3).map((player: Record<string, unknown>, i: number) => (
+            {sortedPlayers.slice(0, 3).map((player, i) => (
               <div
-                key={player.id as string}
+                key={player.id}
                 className={clsx(
                   'flex items-center gap-3 p-3 rounded-xl',
                   i === 0 ? 'bg-yellow-900/20 border border-yellow-700/30' :
@@ -88,14 +92,14 @@ export default function Ranking() {
               >
                 <div className="w-6 flex items-center justify-center shrink-0">{getMedal(i)}</div>
                 <div className="w-9 h-9 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold text-gray-300 shrink-0">
-                  {(player.first_name as string)?.[0]}{(player.last_name as string)?.[0]}
+                  {player.profile?.first_name?.[0]}{player.profile?.last_name?.[0]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white text-sm truncate">{player.first_name as string} {player.last_name as string}</p>
-                  <p className="text-xs text-gray-500">{player.position as string}</p>
+                  <p className="font-semibold text-white text-sm truncate">{player.profile?.first_name} {player.profile?.last_name}</p>
+                  <p className="text-xs text-gray-500">{player.position}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-lg font-bold text-white">{getStatValue(player) as number}</p>
+                  <p className="text-lg font-bold text-white">{getStatValue(player)}</p>
                   <p className="text-[10px] text-gray-500">{getStatLabel()}</p>
                 </div>
               </div>
@@ -114,18 +118,18 @@ export default function Ranking() {
             </div>
           )}
           <div className="divide-y divide-gray-800/60">
-            {sortedPlayers.slice(0, 20).map((player: Record<string, unknown>, i: number) => (
-              <div key={player.id as string} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-800/40 transition-colors">
+            {sortedPlayers.slice(0, 20).map((player, i) => (
+              <div key={player.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-800/40 transition-colors">
                 <div className="w-6 flex items-center justify-center shrink-0">{getMedal(i)}</div>
                 <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-300 shrink-0">
-                  {(player.first_name as string)?.[0]}{(player.last_name as string)?.[0]}
+                  {player.profile?.first_name?.[0]}{player.profile?.last_name?.[0]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-white text-sm truncate">{player.first_name as string} {player.last_name as string}</p>
-                  <p className="text-xs text-gray-500">{player.team_name as string ?? player.position as string}</p>
+                  <p className="font-medium text-white text-sm truncate">{player.profile?.first_name} {player.profile?.last_name}</p>
+                  <p className="text-xs text-gray-500">{player.position}</p>
                 </div>
                 <div className="badge bg-pitch-900/30 text-pitch-300 border-pitch-700/30 text-sm font-bold">
-                  {getStatValue(player) as number} <span className="font-normal text-xs ml-1">{getStatLabel()}</span>
+                  {getStatValue(player)} <span className="font-normal text-xs ml-1">{getStatLabel()}</span>
                 </div>
               </div>
             ))}
