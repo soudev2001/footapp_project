@@ -24,6 +24,27 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 
 # ============================================================
+# HELPER FUNCTIONS
+# ============================================================
+
+def transform_player_for_frontend(player):
+    """Transform player document to include profile structure expected by frontend."""
+    doc = serialize_doc(player)
+    name_parts = (player.get('name') or '').split(' ', 1)
+    doc['profile'] = {
+        'first_name': name_parts[0] if name_parts else '',
+        'last_name': name_parts[1] if len(name_parts) > 1 else '',
+        'avatar': player.get('photo', '')
+    }
+    return doc
+
+
+def transform_players_for_frontend(players):
+    """Transform list of players for frontend."""
+    return [transform_player_for_frontend(p) for p in players]
+
+
+# ============================================================
 # JWT HELPERS
 # ============================================================
 
@@ -346,7 +367,7 @@ def get_players():
     return jsonify({
         'success': True,
         'count': len(players),
-        'data': serialize_docs(players)
+        'data': transform_players_for_frontend(players)
     })
 
 
@@ -898,7 +919,8 @@ def coach_roster():
         return jsonify({'success': True, 'data': []})
     player_service = get_player_service()
     players = player_service.get_by_club(club_id, team_id=team_id)
-    return jsonify({'success': True, 'data': serialize_docs(players)})
+
+    return jsonify({'success': True, 'data': transform_players_for_frontend(players)})
 
 
 @api_bp.route('/coach/convocation', methods=['POST'])
@@ -1560,7 +1582,7 @@ def admin_dashboard():
     event_service = get_event_service()
     match_service = get_match_service()
 
-    members = user_service.get_by_club(club_id)
+    members = user_service.get_members_by_club(club_id)
     teams = team_service.get_by_club(club_id)
     players = player_service.get_by_club(club_id)
     upcoming_events = event_service.get_upcoming(club_id, limit=5)
@@ -1666,9 +1688,10 @@ def admin_seed_players():
     data = request.get_json() or {}
     club_id = request.current_user.get('club_id')
     team_id = data.get('team_id')
+    delete_existing = data.get('delete_existing', True)
 
     try:
-        players = seed_18_players(club_id, team_id)
+        players = seed_18_players(club_id, team_id, delete_existing=delete_existing)
         return jsonify({'success': True, 'count': len(players), 'message': f'{len(players)} joueurs créés'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -1734,7 +1757,7 @@ def admin_onboarding():
     if not club_id:
         return jsonify({'success': True, 'data': {}})
     user_service = get_user_service()
-    members = user_service.get_by_club(club_id)
+    members = user_service.get_members_by_club(club_id)
     pending = [m for m in members if m.get('account_status') == 'pending']
     active = [m for m in members if m.get('account_status') == 'active']
     return jsonify({

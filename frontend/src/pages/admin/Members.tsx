@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { adminApi } from '../../api'
+import { adminApi, teamsApi } from '../../api'
 import { useState } from 'react'
 import { Users, UserPlus, Trash2, Search, Mail, Sprout } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import type { User } from '../../types'
+import type { User, Team } from '../../types'
 import clsx from 'clsx'
 
 const ROLE_BADGE: Record<string, string> = {
@@ -24,11 +24,18 @@ export default function Members() {
   const qc = useQueryClient()
   const [search, setSearch] = useState('')
   const [inviting, setInviting] = useState(false)
+  const [selectedTeamId, setSelectedTeamId] = useState<string>('')
 
   const { data: members, isLoading } = useQuery({
     queryKey: ['admin-members'],
     queryFn: () => adminApi.members().then((r) => r.data),
   })
+
+  const { data: teamsData } = useQuery({
+    queryKey: ['teams'],
+    queryFn: () => teamsApi.getAll().then((r) => r.data),
+  })
+  const teams = teamsData?.data as Team[] | undefined
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminApi.deleteMember(id),
@@ -45,10 +52,11 @@ export default function Members() {
   })
 
   const seedMutation = useMutation({
-    mutationFn: () => adminApi.seedPlayers(),
+    mutationFn: () => adminApi.seedPlayers(selectedTeamId || undefined),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-members'] })
       qc.invalidateQueries({ queryKey: ['players'] })
+      qc.invalidateQueries({ queryKey: ['coach-roster'] })
     },
   })
 
@@ -78,9 +86,19 @@ export default function Members() {
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher..." className="input pl-9 w-48" />
           </div>
+          <select
+            value={selectedTeamId}
+            onChange={(e) => setSelectedTeamId(e.target.value)}
+            className="input w-36 text-sm"
+          >
+            <option value="">Toutes équipes</option>
+            {teams?.map((t) => (
+              <option key={t.id} value={t.id}>{t.name}</option>
+            ))}
+          </select>
           <button
             onClick={() => {
-              if (confirm('Créer 18 joueurs avec des noms français ?')) seedMutation.mutate()
+              if (confirm('Supprimer les joueurs existants et créer 18 nouveaux joueurs ?')) seedMutation.mutate()
             }}
             disabled={seedMutation.isPending}
             className="btn-secondary text-emerald-400 border-emerald-800 hover:bg-emerald-900/30"

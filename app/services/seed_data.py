@@ -305,11 +305,25 @@ FRENCH_LAST_NAMES = [
 ]
 
 
-def seed_18_players(club_id, team_id=None):
+def seed_18_players(club_id, team_id=None, delete_existing=True):
     """Seed 18 players with French names for a club"""
     import random
+    from bson import ObjectId
     from app.services.db import mongo
     from app.models import create_player
+
+    # Convert to ObjectId if string
+    if isinstance(club_id, str):
+        club_id = ObjectId(club_id)
+    if team_id and isinstance(team_id, str):
+        team_id = ObjectId(team_id)
+
+    # Delete existing players if requested
+    if delete_existing:
+        query = {'club_id': club_id}
+        if team_id:
+            query['team_id'] = team_id
+        mongo.db.players.delete_many(query)
 
     # Position distribution: 2 GK, 6 DEF, 6 MID, 4 ATT
     positions = (
