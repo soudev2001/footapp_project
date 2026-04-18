@@ -1697,6 +1697,18 @@ def admin_seed_players():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@api_bp.route('/admin/seed-all', methods=['POST'])
+@role_required('admin')
+def admin_seed_all():
+    """Seed full demo dataset (resets all data)."""
+    from app.services.seed_data import seed_all
+    try:
+        seed_all()
+        return jsonify({'success': True, 'message': 'Données de démo injectées avec succès'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @api_bp.route('/admin/teams', methods=['POST'])
 @role_required('admin')
 def admin_add_team():
