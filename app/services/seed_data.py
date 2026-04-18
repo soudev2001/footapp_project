@@ -127,7 +127,7 @@ def seed_all():
 
     for i, p in enumerate(player_data):
         player = create_player(
-            user_id=user_ids[2] if i == 0 else None,  # Link first player to user
+            user_id=user_ids[5] if i == 0 else None,  # Link first player to player1 user
             club_id=club1_id,
             team_id=team1_id,
             jersey_number=p['jersey'],
@@ -347,7 +347,7 @@ def seed_all():
 
     tactic_ids = []
     for tactic in tactics:
-        result = mongo.db.tactics.insert_one(tactic)
+        result = mongo.db.saved_tactics.insert_one(tactic)
         tactic_ids.append(result.inserted_id)
     print(f"[Seed] Created {len(tactics)} tactics")
 
@@ -651,7 +651,7 @@ def seed_coach_data(club_id=None, team_id=None):
                 print(f"    [!] Only {len(player_ids)} players, need 11 for lineups")
 
             # Check if tactics already exist
-            existing_tactics = mongo.db.tactics.count_documents({'club_id': club_id, 'team_id': team_id_obj})
+            existing_tactics = mongo.db.saved_tactics.count_documents({'club_id': club_id, 'team_id': team_id_obj})
             if existing_tactics == 0:
                 # Create tactics
                 tactics = [
@@ -709,13 +709,13 @@ def seed_coach_data(club_id=None, team_id=None):
                 ]
                 tactic_ids = []
                 for t in tactics:
-                    result = mongo.db.tactics.insert_one(t)
+                    result = mongo.db.saved_tactics.insert_one(t)
                     tactic_ids.append(result.inserted_id)
                 total_tactics += len(tactics)
                 print(f"    [+] Created {len(tactics)} tactics")
             else:
                 print(f"    [=] {existing_tactics} tactics already exist")
-                tactic_ids = [t['_id'] for t in mongo.db.tactics.find({'club_id': club_id, 'team_id': team_id_obj})]
+                tactic_ids = [t['_id'] for t in mongo.db.saved_tactics.find({'club_id': club_id, 'team_id': team_id_obj})]
 
             # Check if lineups already exist
             existing_lineups = mongo.db.lineups.count_documents({'club_id': club_id, 'team_id': team_id_obj})
