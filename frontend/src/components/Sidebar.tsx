@@ -60,6 +60,7 @@ const SECTIONS: NavSection[] = [
       { to: '/admin/teams', label: 'Équipes', icon: <Clipboard size={17} />, roles: ['admin', 'superadmin'] },
       { to: '/admin/analytics', label: 'Analyse', icon: <BarChart3 size={17} />, roles: ['admin', 'superadmin'] },
       { to: '/admin/announcements', label: 'Annonces', icon: <Megaphone size={17} />, roles: ['admin', 'superadmin'] },
+      { to: '/admin/events', label: 'Événements', icon: <Calendar size={17} />, roles: ['admin', 'superadmin'] },
       { to: '/admin/club-settings', label: 'Paramètres du Club', icon: <Settings size={17} />, roles: ['admin', 'superadmin'] },
       { to: '/admin/subscription', label: 'Abonnement', icon: <CreditCard size={17} />, roles: ['admin', 'superadmin'] },
     ],

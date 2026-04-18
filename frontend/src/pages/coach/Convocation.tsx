@@ -60,10 +60,12 @@ export default function Convocation() {
     queryFn: () => coachApi.roster().then((r) => r.data),
   })
 
-  const { data: events } = useQuery({
+  const { data: eventsData } = useQuery({
     queryKey: ['events-upcoming'],
     queryFn: () => eventsApi.upcoming().then((r) => r.data),
   })
+
+  const events = Array.isArray(eventsData) ? eventsData : (eventsData as any)?.events ?? (eventsData as any)?.data?.events ?? []
 
   const { data: savedLineup } = useQuery({
     queryKey: ['coach-lineup'],
@@ -83,8 +85,12 @@ export default function Convocation() {
         starters: Array.from(selectedPlayers),
         substitutes: Array.from(substitutes),
         captain_id: captainId,
+        captains: captainId ? [captainId] : [],
         formation,
         message,
+        set_pieces: savedLineup?.set_pieces ?? {},
+        player_instructions: savedLineup?.player_instructions ?? {},
+        match_date: selectedEventObj?.date ?? null,
       }),
     onSuccess: () => {
       setSent(true)

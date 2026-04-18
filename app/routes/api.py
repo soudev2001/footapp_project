@@ -926,7 +926,7 @@ def coach_roster():
 @api_bp.route('/coach/convocation', methods=['POST'])
 @role_required('coach')
 def send_convocation():
-    """Send convocation for a match/event."""
+    """Send convocation for a match/event with tactical instructions."""
     data = request.get_json()
     if not data:
         return jsonify({'success': False, 'error': 'Data required'}), 400
@@ -937,22 +937,110 @@ def send_convocation():
     if not event_id or not player_ids:
         return jsonify({'success': False, 'error': 'event_id and player_ids required'}), 400
 
+    club_id = request.current_user.get('club_id')
     notification_service = get_notification_service()
     event_service = get_event_service()
+    player_service = get_player_service()
     event = event_service.get_by_id(event_id)
 
-    event_title = event.get("title", "\u00c9v\u00e9nement") if event else "\u00c9v\u00e9nement"
+    event_title = event.get("title", "Événement") if event else "Événement"
+    event_date = event.get("date", "") if event else ""
+    event_location = event.get("location", "") if event else ""
+
+    # Save convocation document
+    convocation_id = player_service.save_convocation(club_id, event_id, {
+        'formation': data.get('formation', '4-3-3'),
+        'starters': data.get('starters', []),
+        'substitutes': data.get('substitutes', []),
+        'captains': data.get('captains', []),
+        'set_pieces': data.get('set_pieces', {}),
+        'player_instructions': data.get('player_instructions', {}),
+        'message': data.get('message', ''),
+        'match_date': data.get('match_date'),
+        'player_ids': player_ids,
+    })
+
+    # Per-player: notification + email
+    starters_list = data.get('starters', [])
+    player_instructions = data.get('player_instructions', {})
+    set_pieces = data.get('set_pieces', {})
+    formation = data.get('formation', '4-3-3')
+
+    SET_PIECE_LABELS = {
+        'penalties': 'Tireur de pénaltys',
+        'free_kicks_direct': 'Coups francs directs',
+        'free_kicks_indirect': 'Coups francs indirects',
+        'corners_left': 'Corners gauche',
+        'corners_right': 'Corners droit',
+    }
+
     for pid in player_ids:
+        # Find player's position in the lineup
+        position = None
+        slot_key = None
+        if isinstance(starters_list, list):
+            for i, sid in enumerate(starters_list):
+                if sid == pid:
+                    position = f"Titulaire (poste {i + 1})"
+                    slot_key = str(i)
+                    break
+        if not position and pid in data.get('substitutes', []):
+            position = "Remplaçant"
+
+        # Get player's role instructions
+        role_info = None
+        if slot_key and slot_key in player_instructions:
+            role_info = player_instructions[slot_key]
+        # Also check by player ID key
+        if not role_info and pid in player_instructions:
+            role_info = player_instructions[pid]
+        # Check all keys (slot keys like "ST-0")
+        for k, v in player_instructions.items():
+            if isinstance(starters_list, list):
+                # Find which slot this player is in
+                for skey, sdata in (data.get('slot_map', {}) or {}).items():
+                    if sdata == pid and k == skey:
+                        role_info = v
+                        break
+
+        # Set piece duties for this player
+        sp_duties = []
+        for sp_key, sp_ids in set_pieces.items():
+            if pid in sp_ids:
+                label = SET_PIECE_LABELS.get(sp_key, sp_key)
+                idx = sp_ids.index(pid) + 1
+                sp_duties.append(f"{label} (priorité {idx})")
+
+        # Create notification with link to match prep
         notification_service.create_notification(
             user_id=pid,
             title='Convocation',
-            message=f'Vous \u00eates convoqu\u00e9 pour: {event_title}',
+            message=f'Vous êtes convoqué pour: {event_title}',
             type='convocation',
-            link='/player/calendar'
+            link=f'/player/match-prep/{convocation_id}'
         )
         event_service.set_attendance(event_id, pid, 'convoked')
 
-    return jsonify({'success': True, 'message': f'{len(player_ids)} players convoked'})
+        # Send email
+        try:
+            player = player_service.get_by_id(pid)
+            if player:
+                email = player.get('email') or (player.get('user', {}) or {}).get('email')
+                player_name = f"{(player.get('profile', {}) or {}).get('first_name', '')} {(player.get('profile', {}) or {}).get('last_name', '')}".strip() or 'Joueur'
+                if email:
+                    from app.services.email_service import send_convocation_email
+                    send_convocation_email(
+                        to_email=email,
+                        player_name=player_name,
+                        event_info={'title': event_title, 'date': str(event_date), 'location': event_location},
+                        position=position,
+                        role_info=role_info,
+                        set_piece_duties=sp_duties if sp_duties else None,
+                    )
+        except Exception as e:
+            current_app.logger.error(f"Erreur envoi email convocation à {pid}: {e}")
+
+    return jsonify({'success': True, 'message': f'{len(player_ids)} players convoked', 'convocation_id': convocation_id})
 
 
 @api_bp.route('/coach/lineup', methods=['GET'])
@@ -1347,6 +1435,119 @@ def player_training_drills():
     svc = get_training_service()
     drills = svc.get_drills({})
     return jsonify({'success': True, 'data': drills})
+
+
+@api_bp.route('/player/match-prep/<convocation_id>', methods=['GET'])
+@token_required
+def player_match_prep(convocation_id):
+    """Get match preparation data for a player. Lineup is time-gated (24h before match)."""
+    player_service = get_player_service()
+    convocation = player_service.get_convocation(convocation_id)
+
+    if not convocation:
+        return jsonify({'success': False, 'error': 'Convocation not found'}), 404
+
+    user_id = request.current_user.get('user_id') or str(request.current_user.get('_id', ''))
+    player_id = request.current_user.get('player_id') or user_id
+
+    # Check if lineup should be visible (24h before match_date)
+    lineup_visible = False
+    match_date = convocation.get('match_date')
+    if match_date:
+        if isinstance(match_date, str):
+            try:
+                from datetime import datetime
+                match_date = datetime.fromisoformat(match_date)
+            except (ValueError, TypeError):
+                match_date = None
+        if match_date:
+            from datetime import datetime, timedelta
+            now = datetime.utcnow()
+            if now >= match_date - timedelta(hours=24):
+                lineup_visible = True
+
+    # Find this player's slot info
+    my_slot = None
+    my_instructions = None
+    my_set_pieces = []
+    starters = convocation.get('starters', [])
+    player_instructions = convocation.get('player_instructions', {})
+    set_pieces = convocation.get('set_pieces', {})
+
+    # Check if player is in starters
+    if isinstance(starters, list):
+        for i, sid in enumerate(starters):
+            if str(sid) == str(player_id):
+                my_slot = {'index': i, 'type': 'starter'}
+                break
+    # Check subs
+    if not my_slot:
+        for sid in convocation.get('substitutes', []):
+            if str(sid) == str(player_id):
+                my_slot = {'type': 'substitute'}
+                break
+
+    # Get player instructions (try multiple key formats)
+    for key, val in player_instructions.items():
+        if isinstance(starters, list):
+            try:
+                idx = int(key.split('-')[-1]) if '-' in key else int(key)
+                if idx < len(starters) and str(starters[idx]) == str(player_id):
+                    my_instructions = val
+                    break
+            except (ValueError, IndexError):
+                pass
+        if key == str(player_id):
+            my_instructions = val
+            break
+
+    # Set piece duties
+    SP_LABELS = {
+        'penalties': 'Pénaltys', 'free_kicks_direct': 'Coups francs directs',
+        'free_kicks_indirect': 'Coups francs indirects',
+        'corners_left': 'Corners gauche', 'corners_right': 'Corners droit',
+    }
+    for sp_key, sp_ids in set_pieces.items():
+        if str(player_id) in [str(x) for x in sp_ids]:
+            idx = [str(x) for x in sp_ids].index(str(player_id))
+            my_set_pieces.append({'key': sp_key, 'label': SP_LABELS.get(sp_key, sp_key), 'priority': idx + 1})
+
+    # Build response
+    response = {
+        'id': convocation.get('id'),
+        'event_id': convocation.get('event_id'),
+        'formation': convocation.get('formation'),
+        'match_date': str(convocation.get('match_date', '')),
+        'message': convocation.get('message', ''),
+        'sent_at': str(convocation.get('sent_at', '')),
+        'captains': convocation.get('captains', []),
+        'my_slot': my_slot,
+        'my_instructions': my_instructions,
+        'my_set_pieces': my_set_pieces,
+        'lineup_visible': lineup_visible,
+    }
+
+    # Only include full lineup if time-gated check passes
+    if lineup_visible:
+        response['starters'] = [str(s) if s else None for s in starters]
+        response['substitutes'] = [str(s) for s in convocation.get('substitutes', [])]
+        response['set_pieces'] = {k: [str(x) for x in v] for k, v in set_pieces.items()}
+        response['player_instructions'] = player_instructions
+
+    # Get event info
+    event_id = convocation.get('event_id')
+    if event_id:
+        event_service = get_event_service()
+        event = event_service.get_by_id(event_id)
+        if event:
+            response['event'] = {
+                'title': event.get('title', ''),
+                'date': str(event.get('date', '')),
+                'location': event.get('location', ''),
+                'type': event.get('type', event.get('event_type', '')),
+            }
+
+    return jsonify({'success': True, 'data': response})
 
 
 # ============================================================

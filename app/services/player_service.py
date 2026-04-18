@@ -242,6 +242,39 @@ class PlayerService:
             lineup['captain'] = lineup['captains'][0]
         return lineup
 
+    def save_convocation(self, club_id, event_id, data):
+        """Save a convocation document for a match/event"""
+        doc = {
+            'club_id': ObjectId(club_id),
+            'event_id': ObjectId(event_id) if event_id else None,
+            'formation': data.get('formation', '4-3-3'),
+            'starters': data.get('starters', []),
+            'substitutes': data.get('substitutes', []),
+            'captains': data.get('captains', []),
+            'set_pieces': data.get('set_pieces', {}),
+            'player_instructions': data.get('player_instructions', {}),
+            'message': data.get('message', ''),
+            'match_date': data.get('match_date'),
+            'player_ids': data.get('player_ids', []),
+            'sent_at': datetime.utcnow(),
+        }
+        result = self.db.convocations.insert_one(doc)
+        return str(result.inserted_id)
+
+    def get_convocation(self, convocation_id):
+        """Get a convocation by ID"""
+        try:
+            doc = self.db.convocations.find_one({'_id': ObjectId(convocation_id)})
+            if doc:
+                doc['id'] = str(doc.pop('_id'))
+                if doc.get('club_id'):
+                    doc['club_id'] = str(doc['club_id'])
+                if doc.get('event_id'):
+                    doc['event_id'] = str(doc['event_id'])
+            return doc
+        except Exception:
+            return None
+
     def save_tactical_config(self, club_id, team_id=None, config=None):
         """Save tactical configuration for a club/team"""
         query = {'club_id': ObjectId(club_id)}

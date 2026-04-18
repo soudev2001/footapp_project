@@ -48,6 +48,7 @@ import Announcements from './pages/admin/Announcements'
 import ClubSettings from './pages/admin/ClubSettings'
 import Onboarding from './pages/admin/Onboarding'
 import Financial from './pages/admin/Financial'
+import AdminEvents from './pages/admin/Events'
 
 // Player
 import PlayerDashboard from './pages/player/PlayerDashboard'
@@ -58,6 +59,7 @@ import PlayerTeam from './pages/player/PlayerTeam'
 import EventDetail from './pages/player/EventDetail'
 import PlayerGoals from './pages/player/Goals'
 import PlayerTraining from './pages/player/Training'
+import MatchPrep from './pages/player/MatchPrep'
 
 // Parent
 import ParentDashboard from './pages/parent/ParentDashboard'
@@ -170,6 +172,7 @@ export default function App() {
           <Route path="/admin/club-settings" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><ClubSettings /></ProtectedRoute>} />
           <Route path="/admin/onboarding" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><Onboarding /></ProtectedRoute>} />
           <Route path="/admin/financial" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><Financial /></ProtectedRoute>} />
+          <Route path="/admin/events" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminEvents /></ProtectedRoute>} />
 
           {/* Player */}
           <Route path="/player" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerDashboard /></ProtectedRoute>} />
@@ -180,6 +183,7 @@ export default function App() {
           <Route path="/player/event/:id" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><EventDetail /></ProtectedRoute>} />
           <Route path="/player/goals" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerGoals /></ProtectedRoute>} />
           <Route path="/player/training" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerTraining /></ProtectedRoute>} />
+          <Route path="/player/match-prep/:id" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><MatchPrep /></ProtectedRoute>} />
 
           {/* Parent */}
           <Route path="/parent" element={<ProtectedRoute allowedRoles={PARENT_ROLES}><ParentDashboard /></ProtectedRoute>} />

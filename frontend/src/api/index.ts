@@ -287,6 +287,7 @@ export const playerApi = {
   deleteGoal: (id: string) => client.delete(`/player/goals/${id}`),
   trainingSchedule: () => client.get('/player/training/schedule'),
   trainingDrills: () => client.get('/player/training/drills'),
+  matchPrep: (id: string) => client.get(`/player/match-prep/${id}`),
 }
 
 // ─── Fan ─────────────────────────────────────────────────────────────────────
