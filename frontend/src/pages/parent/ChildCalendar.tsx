@@ -3,6 +3,7 @@ import { parentApi } from '../../api'
 import { useParams } from 'react-router-dom'
 import { Calendar, MapPin, Clock } from 'lucide-react'
 import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
 export default function ChildCalendar() {
   const { playerId } = useParams<{ playerId: string }>()
@@ -29,7 +30,7 @@ export default function ChildCalendar() {
               <span className="badge bg-gray-800 text-gray-300 text-xs capitalize">{event.type}</span>
             </div>
             <div className="flex gap-4 text-sm text-gray-400">
-              <span className="flex items-center gap-1"><Clock size={13} /> {format(new Date(event.date), 'EEE, MMM d · HH:mm')}</span>
+              <span className="flex items-center gap-1"><Clock size={13} /> {format(new Date(event.date), 'EEE d MMM · HH:mm', { locale: fr })}</span>
               {event.location && <span className="flex items-center gap-1"><MapPin size={13} /> {event.location}</span>}
             </div>
           </div>

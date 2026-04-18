@@ -1,7 +1,7 @@
 import React from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { playersApi, coachApi } from '../../api'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Star, TrendingUp, BarChart3, Key, Trash2, PieChart, Edit, Save, X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { useState } from 'react'
@@ -126,9 +126,9 @@ export default function PlayerDetail() {
         }} className="btn-secondary text-xs gap-1">
           <Edit size={13} /> Modifier
         </button>
-        <a href={`#/coach/analytics`} className="btn-secondary text-xs gap-1">
+        <Link to="/coach/analytics" className="btn-secondary text-xs gap-1">
           <PieChart size={13} /> Analyse
-        </a>
+        </Link>
         <button type="button" onClick={() => { if (confirm('Supprimer ce joueur de l\'effectif ?')) deleteMutation.mutate() }} className="btn-secondary text-xs gap-1 text-red-400 hover:text-red-300">
           <Trash2 size={13} /> Supprimer
         </button>

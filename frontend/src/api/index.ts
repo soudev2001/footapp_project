@@ -12,6 +12,11 @@ export const authApi = {
   me: () => client.get<User>('/auth/me'),
 
   refresh: () => client.post<{ access_token: string }>('/auth/refresh'),
+  forgotPassword: (email: string) => client.post('/auth/forgot-password', { email }),
+  resetPassword: (token: string, password: string) => client.post(`/auth/reset-password/${token}`, { password }),
+  completeProfile: (token: string, data: object) => client.post(`/auth/complete-profile/${token}`, data),
+  changePassword: (data: object) => client.post('/auth/change-password', data),
+  updateProfile: (data: object) => client.put('/auth/profile', data),
 }
 
 // ─── Matches ─────────────────────────────────────────────────────────────────
@@ -52,6 +57,7 @@ export const postsApi = {
     client.post(`/posts/${id}/comment`, { text }),
 
   search: (q: string) => client.get<Post[]>('/posts/search', { params: { q } }),
+  create: (data: object) => client.post('/posts', data),
 }
 
 // ─── Players ─────────────────────────────────────────────────────────────────
@@ -116,7 +122,7 @@ export const notificationsApi = {
 
 // ─── Coach ───────────────────────────────────────────────────────────────────
 export const coachApi = {
-  dashboard: () => client.get('/coach/dashboard'),
+  dashboard: (params?: { team_id?: string }) => client.get('/coach/dashboard', { params }),
   roster: (params?: { team_id?: string }) => client.get('/coach/roster', { params }),
   lineup: (params?: { team_id?: string }) => client.get('/coach/lineup', { params }),
   saveLineup: (data: object) => client.post('/coach/lineup', data),
@@ -248,8 +254,15 @@ export const shopApi = {
   products: (params?: { category?: string }) => client.get('/shop/products', { params }),
   product: (id: string) => client.get(`/shop/products/${id}`),
   orders: () => client.get('/shop/orders'),
+  order: (id: string) => client.get(`/shop/orders/${id}`),
   createOrder: (data: object) => client.post('/shop/orders', data),
   categories: () => client.get('/shop/categories'),
+  cart: () => client.get('/shop/cart'),
+  addToCart: (data: object) => client.post('/shop/cart', data),
+  removeFromCart: (itemId: string) => client.delete(`/shop/cart/${itemId}`),
+  updateCart: (itemId: string, qty: number) => client.put(`/shop/cart/${itemId}`, { quantity: qty }),
+  reservations: () => client.get('/shop/reservations'),
+  cancelReservation: (id: string) => client.post(`/shop/reservations/${id}/cancel`),
 }
 
 // ─── SuperAdmin ──────────────────────────────────────────────────────────────
@@ -291,6 +304,22 @@ export const playerApi = {
   trainingSchedule: () => client.get('/player/training/schedule'),
   trainingDrills: () => client.get('/player/training/drills'),
   matchPrep: (id: string) => client.get(`/player/match-prep/${id}`),
+}
+
+// ─── ISY ─────────────────────────────────────────────────────────────────────
+export const isyApi = {
+  broadcasts: () => client.get('/isy/broadcasts'),
+  broadcast: (data: object) => client.post('/isy/broadcast', data),
+  members: () => client.get('/isy/members'),
+  updateMemberStatus: (id: string, status: string) => client.put(`/isy/members/${id}/status`, { status }),
+  events: () => client.get('/isy/events'),
+  createEvent: (data: object) => client.post('/isy/events', data),
+  updateEvent: (id: string, data: object) => client.put(`/isy/events/${id}`, data),
+  deleteEvent: (id: string) => client.delete(`/isy/events/${id}`),
+  partners: () => client.get('/isy/partners'),
+  createPartner: (data: object) => client.post('/isy/partners', data),
+  updatePartner: (id: string, data: object) => client.put(`/isy/partners/${id}`, data),
+  deletePartner: (id: string) => client.delete(`/isy/partners/${id}`),
 }
 
 // ─── Fan ─────────────────────────────────────────────────────────────────────

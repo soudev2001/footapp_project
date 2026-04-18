@@ -84,24 +84,24 @@ export default function ParentDashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-3 border-t border-gray-800 text-center text-sm">
               <div>
                 <p className="font-bold text-white">{player.stats?.goals ?? 0}</p>
-                <p className="text-gray-500 text-xs">Goals</p>
+                <p className="text-gray-500 text-xs">Buts</p>
               </div>
               <div>
                 <p className="font-bold text-white">{player.stats?.assists ?? 0}</p>
-                <p className="text-gray-500 text-xs">Assists</p>
+                <p className="text-gray-500 text-xs">Passes D.</p>
               </div>
               <div>
                 <p className="font-bold text-white">{player.stats?.matches_played ?? 0}</p>
-                <p className="text-gray-500 text-xs">Matches</p>
+                <p className="text-gray-500 text-xs">Matchs</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <Link to={`/parent/calendar/${player.id}`} className="btn-secondary text-sm justify-center gap-1.5">
-                <Calendar size={14} /> Calendar
+                <Calendar size={14} /> Calendrier
               </Link>
               <Link to={`/parent/roster/${player.id}`} className="btn-secondary text-sm justify-center gap-1.5">
-                <Clipboard size={14} /> Roster
+                <Clipboard size={14} /> Effectif
               </Link>
             </div>
           </div>

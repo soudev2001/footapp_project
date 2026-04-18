@@ -3,6 +3,7 @@ import { postsApi } from '../../api'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Heart, Send } from 'lucide-react'
 import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 import { useState } from 'react'
 import type { Post } from '../../types'
 
@@ -50,7 +51,7 @@ export default function PostDetail() {
           </div>
           <div>
             <p className="font-semibold text-white">{p.author?.name}</p>
-            <p className="text-xs text-gray-400">{format(new Date(p.created_at), 'MMMM d, yyyy · HH:mm')}</p>
+            <p className="text-xs text-gray-400">{format(new Date(p.created_at), 'd MMMM yyyy · HH:mm', { locale: fr })}</p>
             {p.category && <span className="badge bg-gray-800 text-gray-300 text-xs mt-1">{p.category}</span>}
           </div>
         </div>

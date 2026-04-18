@@ -12,6 +12,15 @@ import {
 import type { Role } from '../types'
 import clsx from 'clsx'
 
+const ROLE_LABELS: Record<string, string> = {
+  admin: 'Admin',
+  coach: 'Coach',
+  player: 'Joueur',
+  parent: 'Parent',
+  superadmin: 'Super Admin',
+  fan: 'Supporter',
+}
+
 interface NavSection {
   title?: string
   items: NavItem[]
@@ -145,7 +154,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
               <p className="text-sm font-medium text-white truncate">
                 {user.profile.first_name} {user.profile.last_name}
               </p>
-              <p className="text-xs text-gray-400 capitalize">{role}</p>
+              <p className="text-xs text-gray-400">{ROLE_LABELS[role ?? ''] ?? role}</p>
             </div>
           </div>
         </div>

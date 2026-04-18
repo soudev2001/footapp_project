@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import { coachApi } from '../../api'
 import { useTeam } from '../../contexts/TeamContext'
 import {
@@ -83,8 +84,8 @@ export default function TrainingPlans() {
           </h1>
           <p className="text-gray-400 mt-1">Planifiez vos séances et suivez la progression</p>
           <div className="flex gap-2 mt-2 text-xs">
-            <a href="#/coach/drills" className="text-emerald-400 hover:text-emerald-300">Exercices →</a>
-            <a href="#/coach/attendance" className="text-orange-400 hover:text-orange-300">Présences →</a>
+            <Link to="/coach/drills" className="text-emerald-400 hover:text-emerald-300">Exercices →</Link>
+            <Link to="/coach/attendance" className="text-orange-400 hover:text-orange-300">Présences →</Link>
           </div>
         </div>
         <button onClick={() => setShowCreate(true)}
@@ -151,9 +152,9 @@ export default function TrainingPlans() {
                   <button onClick={() => openEdit(plan)} className="p-1.5 text-gray-400 hover:text-blue-400 transition"><Edit className="w-4 h-4" /></button>
                   <button onClick={() => deleteMutation.mutate(plan.id)} className="p-1.5 text-gray-400 hover:text-red-400 transition"><Trash2 className="w-4 h-4" /></button>
                 </div>
-                <a href={`#/coach/training-session?plan=${plan.id}`} className="flex items-center gap-1 text-green-400 text-sm hover:text-green-300 transition">
+                <Link to={`/coach/training-session?plan=${plan.id}`} className="flex items-center gap-1 text-green-400 text-sm hover:text-green-300 transition">
                   Voir séances <ChevronRight className="w-4 h-4" />
-                </a>
+                </Link>
               </div>
             </div>
           ))}

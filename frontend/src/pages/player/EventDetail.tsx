@@ -3,6 +3,7 @@ import { eventsApi } from '../../api'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, MapPin, Clock, Users, CheckCircle, XCircle } from 'lucide-react'
 import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 import type { Event as ClubEvent } from '../../types'
 
 export default function EventDetail() {
@@ -50,7 +51,7 @@ export default function EventDetail() {
         <div className="space-y-3 text-sm text-gray-300">
           <div className="flex items-center gap-2">
             <Clock size={16} className="text-gray-500 shrink-0" />
-            {format(new Date(event.date), 'EEEE, MMMM d, yyyy · HH:mm')}
+            {format(new Date(event.date), 'EEEE d MMMM yyyy · HH:mm', { locale: fr })}
           </div>
           {event.location && (
             <div className="flex items-center gap-2">

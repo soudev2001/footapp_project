@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { messagesApi } from '../api'
 import { Send } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import { fr } from 'date-fns/locale'
 import type { Conversation, Message } from '../types'
 
 export default function Messages() {
@@ -92,7 +93,7 @@ export default function Messages() {
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium text-gray-400">{msg.sender_name}</span>
                     <span className="text-xs text-gray-600">
-                      {formatDistanceToNow(new Date(msg.created_at), { addSuffix: true })}
+                      {formatDistanceToNow(new Date(msg.created_at), { addSuffix: true, locale: fr })}
                     </span>
                   </div>
                   <p className="text-sm text-gray-200 bg-gray-800 rounded-lg px-3 py-2 w-fit max-w-[70%]">

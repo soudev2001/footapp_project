@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Megaphone, Plus, Send } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { formatDistanceToNow } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
 interface AnnouncementForm {
   title: string
@@ -81,7 +82,7 @@ export default function Announcements() {
             <div className="flex items-start justify-between gap-2">
               <p className="font-semibold text-white">{a.title}</p>
               <p className="text-xs text-gray-500 shrink-0">
-                {formatDistanceToNow(new Date(a.created_at), { addSuffix: true })}
+                {formatDistanceToNow(new Date(a.created_at), { addSuffix: true, locale: fr })}
               </p>
             </div>
             <p className="text-sm text-gray-300">{a.content}</p>

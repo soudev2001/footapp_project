@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { coachApi } from '../../api'
+import { useTeam } from '../../contexts/TeamContext'
 import {
   Clock, MapPin, Users, Plus, ChevronLeft, CheckCircle, XCircle,
   AlertCircle, Dumbbell, X, Save
@@ -20,6 +21,7 @@ interface Player { id: string; name: string; jersey_number?: number; position?: 
 
 export default function TrainingSession() {
   const queryClient = useQueryClient()
+  const { activeTeamId } = useTeam()
   const [searchParams] = useSearchParams()
   const planId = searchParams.get('plan') || ''
   const [showCreate, setShowCreate] = useState(false)
@@ -28,20 +30,20 @@ export default function TrainingSession() {
 
   const { data: planData } = useQuery({
     queryKey: ['coach-training-plan', planId],
-    queryFn: () => coachApi.trainingPlan(planId).then(r => r.data?.data),
+    queryFn: () => coachApi.trainingPlan(planId).then(r => r.data),
     enabled: !!planId,
   })
 
   const sessions: TSession[] = planData?.sessions || []
 
   const { data: roster } = useQuery({
-    queryKey: ['coach-roster'],
-    queryFn: () => coachApi.roster().then(r => r.data?.data || []),
+    queryKey: ['coach-roster', activeTeamId],
+    queryFn: () => coachApi.roster(activeTeamId ? { team_id: activeTeamId } : undefined).then(r => r.data),
   })
 
   const { data: sessionDetail } = useQuery({
     queryKey: ['coach-session', selectedSession],
-    queryFn: () => coachApi.session(selectedSession!).then(r => r.data?.data),
+    queryFn: () => coachApi.session(selectedSession!).then(r => r.data),
     enabled: !!selectedSession,
   })
 
@@ -66,9 +68,9 @@ export default function TrainingSession() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <a href="#/coach/training-plans" className="text-gray-400 hover:text-white text-sm flex items-center gap-1 mb-2">
+          <Link to="/coach/training-plans" className="text-gray-400 hover:text-white text-sm flex items-center gap-1 mb-2">
             <ChevronLeft className="w-4 h-4" /> Retour aux plans
-          </a>
+          </Link>
           <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
             <Dumbbell className="w-7 h-7 text-green-400" /> {planData?.name || 'Séances'}
           </h1>

@@ -86,6 +86,44 @@ import FanMatchCenter from './pages/fan/MatchCenter'
 import Community from './pages/fan/Community'
 import FanMedia from './pages/fan/Media'
 
+// ── New pages ──────────────────────────────────────────────────────────────
+// Auth
+import ForgotPassword from './pages/auth/ForgotPassword'
+import ResetPassword from './pages/auth/ResetPassword'
+import CompleteProfile from './pages/auth/CompleteProfile'
+// Coach
+import CoachCalendar from './pages/coach/CoachCalendar'
+import AddPlayer from './pages/coach/AddPlayer'
+import EditPlayer from './pages/coach/EditPlayer'
+import CreateEvent from './pages/coach/CreateEvent'
+// Admin
+import AdminUsers from './pages/admin/AdminUsers'
+// Global
+import Settings from './pages/Settings'
+import Gallery from './pages/Gallery'
+import Ranking from './pages/Ranking'
+import EditProfile from './pages/EditProfile'
+import CreatePost from './pages/CreatePost'
+import LiveMatch from './pages/LiveMatch'
+// Shop
+import Cart from './pages/shop/Cart'
+import Checkout from './pages/shop/Checkout'
+import Invoice from './pages/shop/Invoice'
+import Reservations from './pages/shop/Reservations'
+// SuperAdmin
+import ProjectDetail from './pages/superadmin/ProjectDetail'
+// ISY
+import ISYBroadcast from './pages/isy/ISYBroadcast'
+import ISYMembers from './pages/isy/ISYMembers'
+import ISYManageEvent from './pages/isy/ISYManageEvent'
+import ISYPartners from './pages/isy/ISYPartners'
+import ISYAbout from './pages/isy/ISYAbout'
+// Public
+import LandingPage from './pages/public/LandingPage'
+import PublicClub from './pages/public/PublicClub'
+import Terms from './pages/public/Terms'
+import Help from './pages/public/Help'
+
 import type { Role } from './types'
 
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: Role[] }) {
@@ -123,7 +161,16 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public */}
+        {/* Fully public */}
+        <Route path="/home" element={<LandingPage />} />
+        <Route path="/club/:id" element={<PublicClub />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/help" element={<Help />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/complete-profile/:token" element={<CompleteProfile />} />
+
+        {/* Auth */}
         <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
         <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <Register />} />
 
@@ -135,15 +182,25 @@ export default function App() {
           {/* Shared */}
           <Route path="/feed" element={<Feed />} />
           <Route path="/feed/:id" element={<PostDetail />} />
+          <Route path="/feed/create" element={<CreatePost />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/ranking" element={<Ranking />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/match/:id" element={<LiveMatch />} />
 
           {/* Shop */}
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/product/:id" element={<ProductDetail />} />
           <Route path="/shop/orders" element={<Orders />} />
+          <Route path="/shop/cart" element={<Cart />} />
+          <Route path="/shop/checkout" element={<Checkout />} />
+          <Route path="/shop/invoice/:id" element={<Invoice />} />
+          <Route path="/shop/reservations" element={<Reservations />} />
 
           {/* Coach */}
           <Route path="/coach" element={<ProtectedRoute allowedRoles={COACH_ROLES}><CoachDashboard /></ProtectedRoute>} />
@@ -161,6 +218,10 @@ export default function App() {
           <Route path="/coach/injuries" element={<ProtectedRoute allowedRoles={COACH_ROLES}><Injuries /></ProtectedRoute>} />
           <Route path="/coach/analytics" element={<ProtectedRoute allowedRoles={COACH_ROLES}><PlayerAnalytics /></ProtectedRoute>} />
           <Route path="/coach/player-comparison" element={<ProtectedRoute allowedRoles={COACH_ROLES}><PlayerComparison /></ProtectedRoute>} />
+          <Route path="/coach/calendar" element={<ProtectedRoute allowedRoles={COACH_ROLES}><CoachCalendar /></ProtectedRoute>} />
+          <Route path="/coach/player/add" element={<ProtectedRoute allowedRoles={COACH_ROLES}><AddPlayer /></ProtectedRoute>} />
+          <Route path="/coach/player/:id/edit" element={<ProtectedRoute allowedRoles={COACH_ROLES}><EditPlayer /></ProtectedRoute>} />
+          <Route path="/coach/create-event" element={<ProtectedRoute allowedRoles={COACH_ROLES}><CreateEvent /></ProtectedRoute>} />
 
           {/* Admin */}
           <Route path="/admin" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminDashboard /></ProtectedRoute>} />
@@ -173,6 +234,7 @@ export default function App() {
           <Route path="/admin/onboarding" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><Onboarding /></ProtectedRoute>} />
           <Route path="/admin/financial" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><Financial /></ProtectedRoute>} />
           <Route path="/admin/events" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminEvents /></ProtectedRoute>} />
+          <Route path="/admin/users" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminUsers /></ProtectedRoute>} />
 
           {/* Player */}
           <Route path="/player" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerDashboard /></ProtectedRoute>} />
@@ -197,6 +259,11 @@ export default function App() {
           <Route path="/isy" element={<ProtectedRoute allowedRoles={ISY_ROLES}><ISYDashboard /></ProtectedRoute>} />
           <Route path="/isy/payments" element={<ProtectedRoute allowedRoles={ISY_ROLES}><Payments /></ProtectedRoute>} />
           <Route path="/isy/sponsors" element={<ProtectedRoute allowedRoles={ISY_ROLES}><Sponsors /></ProtectedRoute>} />
+          <Route path="/isy/broadcast" element={<ProtectedRoute allowedRoles={ISY_ROLES}><ISYBroadcast /></ProtectedRoute>} />
+          <Route path="/isy/members" element={<ProtectedRoute allowedRoles={ISY_ROLES}><ISYMembers /></ProtectedRoute>} />
+          <Route path="/isy/events" element={<ProtectedRoute allowedRoles={ISY_ROLES}><ISYManageEvent /></ProtectedRoute>} />
+          <Route path="/isy/partners" element={<ProtectedRoute allowedRoles={ISY_ROLES}><ISYPartners /></ProtectedRoute>} />
+          <Route path="/isy/about" element={<ProtectedRoute allowedRoles={ISY_ROLES}><ISYAbout /></ProtectedRoute>} />
 
           {/* Superadmin */}
           <Route path="/superadmin" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><SuperAdminDashboard /></ProtectedRoute>} />
@@ -204,6 +271,7 @@ export default function App() {
           <Route path="/superadmin/projects" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><Projects /></ProtectedRoute>} />
           <Route path="/superadmin/analytics" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><PlatformAnalytics /></ProtectedRoute>} />
           <Route path="/superadmin/billing" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><PlatformBilling /></ProtectedRoute>} />
+          <Route path="/superadmin/projects/:id" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><ProjectDetail /></ProtectedRoute>} />
 
           {/* Fan */}
           <Route path="/fan/matches" element={<ProtectedRoute allowedRoles={FAN_ROLES}><FanMatchCenter /></ProtectedRoute>} />

@@ -24,9 +24,13 @@ export function TeamProvider({ children }: { children: ReactNode }) {
     return localStorage.getItem('activeTeamId') ?? ''
   })
 
+  const isAuthenticated = !!localStorage.getItem('access_token')
+
   const { data: teamsData } = useQuery({
     queryKey: ['teams'],
     queryFn: () => teamsApi.getAll().then((r) => r.data),
+    enabled: isAuthenticated,
+    retry: false,
   })
   const teams = (Array.isArray(teamsData) ? teamsData : (teamsData as any)?.data ?? []) as Team[]
 

@@ -3,7 +3,7 @@
 import jwt
 import os
 import datetime
-from flask import Blueprint, jsonify, request, current_app, render_template
+from flask import Blueprint, jsonify, request, current_app, render_template, url_for
 from app.models import serialize_doc, serialize_docs
 from app.services import (
     get_player_service, get_club_service, get_event_service,
@@ -438,6 +438,11 @@ def get_teams():
     """Get teams for current user's club."""
     club_id = request.current_user.get('club_id')
     if not club_id:
+        # Fallback: lookup user's club_id from database
+        user_service = get_user_service()
+        user = user_service.get_by_id(request.current_user.get('user_id'))
+        club_id = str(user.get('club_id')) if user and user.get('club_id') else None
+    if not club_id:
         return jsonify({'success': True, 'data': []})
     team_service = get_team_service()
     teams = team_service.get_by_club(club_id)
@@ -459,12 +464,17 @@ def get_team(team_id):
 @token_required
 def get_team_players(team_id):
     """Get players of a specific team."""
-    team_service = get_team_service()
-    players = team_service.get_players(team_id)
+    player_service = get_player_service()
+    club_id = request.current_user.get('club_id')
+    # Try team_id filter first; fall back to all club players if empty
+    players = player_service.get_by_club(club_id, team_id=team_id) if club_id else []
+    if not players:
+        team_service = get_team_service()
+        players = team_service.get_players(team_id)
     return jsonify({
         'success': True,
         'count': len(players),
-        'data': serialize_docs(players)
+        'data': transform_players_for_frontend(players)
     })
 
 
@@ -1957,9 +1967,7 @@ def admin_reset_password(user_id):
         {'_id': user['_id']},
         {'$set': {'reset_token': token}}
     )
-    from flask import request as req
-    base_url = req.host_url.rstrip('/')
-    reset_link = f"{base_url}/reset-password?token={token}"
+    reset_link = url_for('auth.reset_password', token=token, _external=True)
     from app.services.email_service import send_reset_password_email
     success = send_reset_password_email(user['email'], reset_link)
     if success:

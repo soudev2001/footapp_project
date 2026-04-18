@@ -179,7 +179,7 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
       substitutes: subs,
     }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['tactics'] })
+      qc.invalidateQueries({ queryKey: ['coach-tactics'] })
       showToast('Tactique enregistrée ✓')
       onSaved()
     },
@@ -189,7 +189,7 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
   const deleteMutation = useMutation({
     mutationFn: (id: string) => coachApi.deleteTactic(id),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['tactics'] })
+      qc.invalidateQueries({ queryKey: ['coach-tactics'] })
       showToast('Tactique supprimée')
       onSaved()
     },

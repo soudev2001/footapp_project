@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { notificationsApi } from '../api'
 import { Bell, CheckCheck } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import { fr } from 'date-fns/locale'
 import type { Notification } from '../types'
 import clsx from 'clsx'
 
@@ -64,7 +65,7 @@ export default function Notifications() {
                 <p className="font-medium text-white text-sm">{notif.title}</p>
                 <p className="text-gray-400 text-sm mt-0.5">{notif.message}</p>
                 <p className="text-gray-500 text-xs mt-1">
-                  {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
+                  {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: fr })}
                 </p>
               </div>
             </div>

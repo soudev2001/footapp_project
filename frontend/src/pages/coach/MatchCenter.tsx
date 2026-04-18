@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import { matchesApi, coachApi } from '../../api'
 import { useTeam } from '../../contexts/TeamContext'
 import { useState } from 'react'
@@ -148,15 +149,15 @@ export default function MatchCenter() {
 
       {/* Quick nav */}
       <div className="flex gap-2 flex-wrap text-xs">
-        <a href="#/coach/lineup" className="btn-ghost gap-1"><ClipboardList size={12} /> Composition</a>
-        <a href="#/coach/convocation" className="btn-ghost gap-1"><ArrowLeftRight size={12} /> Convocation</a>
-        <a href="#/coach/injuries" className="btn-ghost gap-1"><CircleDot size={12} /> Blessures</a>
+        <Link to="/coach/lineup" className="btn-ghost gap-1"><ClipboardList size={12} /> Composition</Link>
+        <Link to="/coach/convocation" className="btn-ghost gap-1"><ArrowLeftRight size={12} /> Convocation</Link>
+        <Link to="/coach/injuries" className="btn-ghost gap-1"><CircleDot size={12} /> Blessures</Link>
       </div>
 
       {/* Horizontal match selector */}
       {allMatches.length > 0 && (
         <div className="flex items-center gap-2">
-          <button onClick={scrollPrev} disabled={matchIdx === 0} className="p-1 text-gray-500 hover:text-white disabled:opacity-30">
+          <button type="button" title="Match précédent" onClick={scrollPrev} disabled={matchIdx === 0} className="p-1 text-gray-500 hover:text-white disabled:opacity-30">
             <ChevronLeft size={20} />
           </button>
           <div className="flex-1 overflow-hidden">
@@ -179,7 +180,7 @@ export default function MatchCenter() {
               ))}
             </div>
           </div>
-          <button onClick={scrollNext} disabled={matchIdx >= allMatches.length - 1} className="p-1 text-gray-500 hover:text-white disabled:opacity-30">
+          <button type="button" title="Match suivant" onClick={scrollNext} disabled={matchIdx >= allMatches.length - 1} className="p-1 text-gray-500 hover:text-white disabled:opacity-30">
             <ChevronRight size={20} />
           </button>
         </div>

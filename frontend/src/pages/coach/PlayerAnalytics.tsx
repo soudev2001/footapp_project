@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import { coachApi } from '../../api'
 import { useTeam } from '../../contexts/TeamContext'
 import {
@@ -221,9 +222,9 @@ export default function PlayerAnalytics() {
               )}
 
               {/* Compare link */}
-              <a href="#/coach/player-comparison" className="flex items-center justify-center gap-2 text-blue-400 hover:text-blue-300 text-sm py-3">
+              <Link to="/coach/player-comparison" className="flex items-center justify-center gap-2 text-blue-400 hover:text-blue-300 text-sm py-3">
                 Comparer avec d'autres joueurs <ChevronRight className="w-4 h-4" />
-              </a>
+              </Link>
             </div>
           )}
         </div>

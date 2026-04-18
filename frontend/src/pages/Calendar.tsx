@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { eventsApi, matchesApi } from '../api'
 import { Calendar as CalendarIcon, MapPin, Clock } from 'lucide-react'
 import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 import type { Event, Match } from '../types'
 import clsx from 'clsx'
 
@@ -10,6 +11,13 @@ const TYPE_COLORS: Record<string, string> = {
   match: 'bg-pitch-900/50 border-pitch-700 text-pitch-300',
   meeting: 'bg-purple-900/50 border-purple-700 text-purple-300',
   other: 'bg-gray-800 border-gray-700 text-gray-300',
+}
+
+const TYPE_LABELS: Record<string, string> = {
+  training: 'Entraînement',
+  match: 'Match',
+  meeting: 'Réunion',
+  other: 'Autre',
 }
 
 export default function Calendar() {
@@ -29,7 +37,7 @@ export default function Calendar() {
     <div className="max-w-3xl mx-auto space-y-6">
       <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
         <CalendarIcon size={24} className="text-pitch-500" />
-        Calendar
+        Calendrier
       </h1>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -51,11 +59,11 @@ export default function Calendar() {
                     </p>
                   )}
                 </div>
-                <span className="badge bg-black/20 text-current text-xs shrink-0 capitalize">{event.type}</span>
+                <span className="badge bg-black/20 text-current text-xs shrink-0">{TYPE_LABELS[event.type] ?? event.type}</span>
               </div>
               <p className="text-xs mt-2 flex items-center gap-1 opacity-75">
                 <Clock size={12} />
-                {format(new Date(event.date), 'EEE, MMM d · HH:mm')}
+                {format(new Date(event.date), 'EEE d MMM · HH:mm', { locale: fr })}
               </p>
             </div>
           ))}
@@ -85,7 +93,7 @@ export default function Calendar() {
               </div>
               <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
                 <Clock size={12} />
-                {format(new Date(match.date), 'EEE, MMM d · HH:mm')}
+                {format(new Date(match.date), 'EEE d MMM · HH:mm', { locale: fr })}
               </p>
               {match.competition && (
                 <p className="text-xs text-gray-500 mt-1">{match.competition}</p>

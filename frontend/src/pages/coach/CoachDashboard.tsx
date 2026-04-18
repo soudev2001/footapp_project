@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { coachApi, matchesApi } from '../../api'
+import { useTeam } from '../../contexts/TeamContext'
 import { Users, Calendar, Shield, BarChart3, ClipboardList, Target, UserCheck, Search, ChevronRight, Swords, Dumbbell, BookOpen, Heart, PieChart, GitCompare, Mail, ListOrdered, AlertTriangle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
@@ -22,23 +23,27 @@ const QUICK_LINKS = [
 ]
 
 export default function CoachDashboard() {
+  const { activeTeamId } = useTeam()
+
   const { data, isLoading } = useQuery({
-    queryKey: ['coach-dashboard'],
-    queryFn: () => coachApi.dashboard().then((r) => r.data),
+    queryKey: ['coach-dashboard', activeTeamId],
+    queryFn: () => coachApi.dashboard(activeTeamId ? { team_id: activeTeamId } : undefined).then((r) => r.data),
   })
 
   const { data: upcoming } = useQuery({
-    queryKey: ['matches-upcoming'],
-    queryFn: () => matchesApi.upcoming().then((r) => r.data),
+    queryKey: ['matches-upcoming', activeTeamId],
+    queryFn: () => matchesApi.upcoming(activeTeamId ? { team_id: activeTeamId } : undefined).then((r) => r.data),
   })
 
-  const nextMatch = data?.next_match ?? upcoming?.[0]
+  const nextMatch = data?.upcoming_matches?.[0] ?? upcoming?.[0]
+  const seasonStats = data?.season_stats
+  const winRate = seasonStats?.played ? Math.round((seasonStats.wins / seasonStats.played) * 100) : null
 
   const stats = [
-    { label: 'Joueurs', value: data?.player_count ?? '—', icon: <Users size={22} />, to: '/coach/roster', color: 'text-blue-400' },
-    { label: 'Événements', value: data?.upcoming_events ?? '—', icon: <Calendar size={22} />, to: '/calendar', color: 'text-yellow-400' },
-    { label: 'Prochain match', value: nextMatch?.opponent ?? 'TBD', icon: <Shield size={22} />, to: '/coach/match-center', color: 'text-pitch-400' },
-    { label: 'Taux victoire', value: data?.win_rate ? `${data.win_rate}%` : '—', icon: <BarChart3 size={22} />, to: '/coach/match-center', color: 'text-purple-400' },
+    { label: 'Joueurs', value: data?.total_players ?? '—', icon: <Users size={22} />, to: '/coach/roster', color: 'text-blue-400' },
+    { label: 'Événements', value: data?.upcoming_events?.length ?? '—', icon: <Calendar size={22} />, to: '/calendar', color: 'text-yellow-400' },
+    { label: 'Prochain match', value: nextMatch?.opponent ?? 'Aucun', icon: <Shield size={22} />, to: '/coach/match-center', color: 'text-pitch-400' },
+    { label: 'Taux victoire', value: winRate != null ? `${winRate}%` : '—', icon: <BarChart3 size={22} />, to: '/coach/match-center', color: 'text-purple-400' },
   ]
 
   return (

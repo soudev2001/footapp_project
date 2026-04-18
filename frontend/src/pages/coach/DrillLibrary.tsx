@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import { coachApi } from '../../api'
 import { BookOpen, Plus, Search, Filter, Clock, Users, X, Star } from 'lucide-react'
 import type { Drill } from '../../types'
@@ -42,7 +43,7 @@ export default function DrillLibrary() {
 
   const { data: drills, isLoading } = useQuery({
     queryKey: ['coach-drills', category, difficulty],
-    queryFn: () => coachApi.drills({ category: category || undefined, difficulty: difficulty || undefined }).then(r => r.data?.data || []),
+    queryFn: () => coachApi.drills({ category: category || undefined, difficulty: difficulty || undefined }).then(r => r.data),
   })
 
   const createMutation = useMutation({
@@ -73,7 +74,7 @@ export default function DrillLibrary() {
           </h1>
           <p className="text-gray-400 mt-1">{filtered.length} exercice(s) disponible(s)</p>
           <div className="flex gap-2 mt-2 text-xs">
-            <a href="#/coach/training-plans" className="text-lime-400 hover:text-lime-300">Plans d'entraînement →</a>
+            <Link to="/coach/training-plans" className="text-lime-400 hover:text-lime-300">Plans d'entraînement →</Link>
           </div>
         </div>
         <button onClick={() => setShowCreate(true)}

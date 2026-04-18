@@ -3,6 +3,7 @@ import { postsApi } from '../api'
 import { Heart, MessageCircle, Search } from 'lucide-react'
 import { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
+import { fr } from 'date-fns/locale'
 import type { Post } from '../types'
 
 export default function Feed() {
@@ -70,7 +71,7 @@ export default function Feed() {
             <div className="flex-1 min-w-0">
               <p className="font-medium text-white text-sm">{post.author?.name}</p>
               <p className="text-xs text-gray-400">
-                {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: fr })}
                 {post.category && <span className="ml-2 badge bg-gray-800 text-gray-300">{post.category}</span>}
               </p>
             </div>

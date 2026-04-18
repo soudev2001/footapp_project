@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi } from '../../api'
+import { useTeam } from '../../contexts/TeamContext'
 import { useState, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Swords, LayoutDashboard, Users, CalendarDays, Trophy, ClipboardList } from 'lucide-react'
@@ -10,18 +11,21 @@ import type { Player } from '../../types'
 
 export default function Tactics() {
   const qc = useQueryClient()
+  const { activeTeamId } = useTeam()
   const [selectedTacticId, setSelectedTacticId] = useState<string | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  const teamParams = activeTeamId ? { team_id: activeTeamId } : undefined
+
   const { data: tactics = [], isLoading } = useQuery<Tactic[]>({
-    queryKey: ['tactics'],
-    queryFn: () => coachApi.tactics().then((r) => r.data),
+    queryKey: ['coach-tactics', activeTeamId],
+    queryFn: () => coachApi.tactics(teamParams).then((r) => r.data),
   })
 
   const { data: players = [] } = useQuery<Player[]>({
-    queryKey: ['coach-roster'],
-    queryFn: () => coachApi.roster().then((r) => r.data),
+    queryKey: ['coach-roster', activeTeamId],
+    queryFn: () => coachApi.roster(teamParams).then((r) => r.data),
   })
 
   // Auto-load first tactic when page opens
@@ -34,7 +38,7 @@ export default function Tactics() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => coachApi.deleteTactic(id),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['tactics'] })
+      qc.invalidateQueries({ queryKey: ['coach-tactics'] })
       if (selectedTacticId) setSelectedTacticId(null)
     },
   })

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { shopApi } from '../../api'
 import { ShoppingCart } from 'lucide-react'
 import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 import clsx from 'clsx'
 
 const STATUS_STYLE: Record<string, string> = {
@@ -35,7 +36,7 @@ export default function Orders() {
                 <span className={clsx('badge text-xs capitalize', STATUS_STYLE[order.status] ?? 'bg-gray-800 text-gray-400')}>
                   {order.status}
                 </span>
-                <p className="text-xs text-gray-500">{format(new Date(order.created_at), 'MMM d, yyyy')}</p>
+                <p className="text-xs text-gray-500">{format(new Date(order.created_at), 'd MMM yyyy', { locale: fr })}</p>
               </div>
             </div>
 

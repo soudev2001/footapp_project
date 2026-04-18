@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import { eventsApi, coachApi } from '../../api'
 import { useTeam } from '../../contexts/TeamContext'
 import { useState, useMemo } from 'react'
@@ -111,8 +112,8 @@ export default function Attendance() {
 
       {/* Quick nav */}
       <div className="flex gap-2 flex-wrap text-xs">
-        <a href="#/coach" className="btn-ghost gap-1"><Users size={12} /> Dashboard</a>
-        <a href="#/coach/training-plans" className="btn-ghost gap-1"><Clock size={12} /> Entraînements</a>
+        <Link to="/coach" className="btn-ghost gap-1"><Users size={12} /> Dashboard</Link>
+        <Link to="/coach/training-plans" className="btn-ghost gap-1"><Clock size={12} /> Entraînements</Link>
       </div>
 
       {saved && (
