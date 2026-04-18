@@ -2157,6 +2157,21 @@ def admin_seed_all():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@api_bp.route('/admin/seed-coach-data', methods=['POST'])
+@role_required('admin')
+def admin_seed_coach_data():
+    """Seed coach data (tactics, lineups, drills) WITHOUT deleting existing data."""
+    from app.services.seed_data import seed_coach_data
+    club_id = request.current_user.get('club_id')
+    data = request.get_json() or {}
+    team_id = data.get('team_id')
+    try:
+        seed_coach_data(club_id=club_id, team_id=team_id)
+        return jsonify({'success': True, 'message': 'Données coach injectées (données existantes préservées)'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @api_bp.route('/admin/teams', methods=['POST'])
 @role_required('admin')
 def admin_add_team():

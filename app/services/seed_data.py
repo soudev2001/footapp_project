@@ -269,22 +269,257 @@ def seed_all():
     print(f"[Seed] Created {len(gallery)} gallery items")
 
     # ========================================
+    # 9. CREATE TACTICS
+    # ========================================
+    # Get player IDs for lineup
+    players_cursor = mongo.db.players.find({'club_id': club1_id, 'team_id': team1_id})
+    player_list = list(players_cursor)
+    player_ids = [str(p['_id']) for p in player_list]
+
+    tactics = [
+        {
+            'club_id': club1_id,
+            'team_id': team1_id,
+            'name': '4-3-3 Offensif',
+            'formation': '4-3-3',
+            'description': 'Formation offensive avec ailiers rapides',
+            'positions': {
+                'GK': {'x': 50, 'y': 90},
+                'LB': {'x': 15, 'y': 70},
+                'CB1': {'x': 35, 'y': 75},
+                'CB2': {'x': 65, 'y': 75},
+                'RB': {'x': 85, 'y': 70},
+                'CM1': {'x': 30, 'y': 50},
+                'CM2': {'x': 50, 'y': 55},
+                'CM3': {'x': 70, 'y': 50},
+                'LW': {'x': 15, 'y': 25},
+                'ST': {'x': 50, 'y': 15},
+                'RW': {'x': 85, 'y': 25}
+            },
+            'is_default': True,
+            'created_at': now - timedelta(days=30)
+        },
+        {
+            'club_id': club1_id,
+            'team_id': team1_id,
+            'name': '4-4-2 Classique',
+            'formation': '4-4-2',
+            'description': 'Formation équilibrée classique',
+            'positions': {
+                'GK': {'x': 50, 'y': 90},
+                'LB': {'x': 15, 'y': 70},
+                'CB1': {'x': 35, 'y': 75},
+                'CB2': {'x': 65, 'y': 75},
+                'RB': {'x': 85, 'y': 70},
+                'LM': {'x': 15, 'y': 45},
+                'CM1': {'x': 35, 'y': 50},
+                'CM2': {'x': 65, 'y': 50},
+                'RM': {'x': 85, 'y': 45},
+                'ST1': {'x': 35, 'y': 20},
+                'ST2': {'x': 65, 'y': 20}
+            },
+            'is_default': False,
+            'created_at': now - timedelta(days=20)
+        },
+        {
+            'club_id': club1_id,
+            'team_id': team1_id,
+            'name': '3-5-2 Pressing',
+            'formation': '3-5-2',
+            'description': 'Formation haute pression avec pistons',
+            'positions': {
+                'GK': {'x': 50, 'y': 90},
+                'CB1': {'x': 25, 'y': 75},
+                'CB2': {'x': 50, 'y': 78},
+                'CB3': {'x': 75, 'y': 75},
+                'LWB': {'x': 10, 'y': 50},
+                'CM1': {'x': 35, 'y': 55},
+                'CM2': {'x': 50, 'y': 45},
+                'CM3': {'x': 65, 'y': 55},
+                'RWB': {'x': 90, 'y': 50},
+                'ST1': {'x': 35, 'y': 18},
+                'ST2': {'x': 65, 'y': 18}
+            },
+            'is_default': False,
+            'created_at': now - timedelta(days=10)
+        }
+    ]
+
+    tactic_ids = []
+    for tactic in tactics:
+        result = mongo.db.tactics.insert_one(tactic)
+        tactic_ids.append(result.inserted_id)
+    print(f"[Seed] Created {len(tactics)} tactics")
+
+    # ========================================
+    # 10. CREATE LINEUPS (Compositions)
+    # ========================================
+    # Create starters mapping using actual player IDs
+    starters_433 = {}
+    if len(player_ids) >= 11:
+        slots = ['GK', 'LB', 'CB1', 'CB2', 'RB', 'CM1', 'CM2', 'CM3', 'LW', 'ST', 'RW']
+        for i, slot in enumerate(slots):
+            starters_433[slot] = player_ids[i]
+
+    starters_442 = {}
+    if len(player_ids) >= 11:
+        slots = ['GK', 'LB', 'CB1', 'CB2', 'RB', 'LM', 'CM1', 'CM2', 'RM', 'ST1', 'ST2']
+        for i, slot in enumerate(slots):
+            starters_442[slot] = player_ids[i]
+
+    lineups = [
+        {
+            'club_id': club1_id,
+            'team_id': team1_id,
+            'name': 'Compo vs Racing FC',
+            'formation': '4-3-3',
+            'tactic_id': tactic_ids[0],
+            'starters': starters_433,
+            'substitutes': player_ids[11:14] if len(player_ids) > 11 else [],
+            'captains': {
+                'captain': player_ids[8] if len(player_ids) > 8 else None,
+                'vice_captain': player_ids[5] if len(player_ids) > 5 else None
+            },
+            'set_pieces': {
+                'corners_left': player_ids[6] if len(player_ids) > 6 else None,
+                'corners_right': player_ids[7] if len(player_ids) > 7 else None,
+                'free_kicks': player_ids[8] if len(player_ids) > 8 else None,
+                'penalties': player_ids[9] if len(player_ids) > 9 else None
+            },
+            'player_instructions': {},
+            'is_template': False,
+            'created_at': now - timedelta(days=3),
+            'updated_at': now - timedelta(days=3)
+        },
+        {
+            'club_id': club1_id,
+            'team_id': team1_id,
+            'name': 'Template 4-4-2',
+            'formation': '4-4-2',
+            'tactic_id': tactic_ids[1],
+            'starters': starters_442,
+            'substitutes': player_ids[11:14] if len(player_ids) > 11 else [],
+            'captains': {
+                'captain': player_ids[8] if len(player_ids) > 8 else None,
+                'vice_captain': player_ids[5] if len(player_ids) > 5 else None
+            },
+            'set_pieces': {},
+            'player_instructions': {},
+            'is_template': True,
+            'created_at': now - timedelta(days=15),
+            'updated_at': now - timedelta(days=15)
+        }
+    ]
+
+    for lineup in lineups:
+        mongo.db.lineups.insert_one(lineup)
+    print(f"[Seed] Created {len(lineups)} lineups")
+
+    # ========================================
+    # 11. CREATE TRAINING PLANS & DRILLS
+    # ========================================
+    drills = [
+        {
+            'club_id': club1_id,
+            'name': 'Rondo 4v2',
+            'description': 'Conservation de balle en petit espace',
+            'category': 'Technique',
+            'sub_category': 'Passes',
+            'duration': 15,
+            'players_needed': 6,
+            'equipment': ['Coupelles', 'Ballons'],
+            'difficulty': 'intermediate',
+            'coaching_points': ['Garder la tête haute', 'Passes à une touche', 'Mouvement constant'],
+            'is_public': True,
+            'created_at': now - timedelta(days=60)
+        },
+        {
+            'club_id': club1_id,
+            'name': 'Jeu de position 6v6',
+            'description': 'Travail de la possession orientée',
+            'category': 'Tactique',
+            'sub_category': 'Possession',
+            'duration': 20,
+            'players_needed': 12,
+            'equipment': ['Coupelles', 'Chasubles', 'Ballons'],
+            'difficulty': 'advanced',
+            'coaching_points': ['Triangulations', 'Appels en profondeur', 'Changements de jeu'],
+            'is_public': True,
+            'created_at': now - timedelta(days=45)
+        },
+        {
+            'club_id': club1_id,
+            'name': 'Finitions en 1v1',
+            'description': 'Situations de duel face au gardien',
+            'category': 'Technique',
+            'sub_category': 'Tir',
+            'duration': 15,
+            'players_needed': 8,
+            'equipment': ['Buts', 'Ballons', 'Coupelles'],
+            'difficulty': 'intermediate',
+            'coaching_points': ['Garder son calme', 'Observer le gardien', 'Frapper tôt'],
+            'is_public': True,
+            'created_at': now - timedelta(days=30)
+        }
+    ]
+    drill_ids = []
+    for drill in drills:
+        result = mongo.db.drills.insert_one(drill)
+        drill_ids.append(result.inserted_id)
+    print(f"[Seed] Created {len(drills)} drills")
+
+    training_plans = [
+        {
+            'club_id': club1_id,
+            'team_id': team1_id,
+            'name': 'Préparation Match Coupe',
+            'type': 'weekly',
+            'start_date': now,
+            'end_date': now + timedelta(days=7),
+            'focus_area': 'Tactique offensive',
+            'description': 'Semaine axée sur le jeu offensif avant la coupe',
+            'status': 'active',
+            'created_at': now - timedelta(days=2)
+        },
+        {
+            'club_id': club1_id,
+            'team_id': team1_id,
+            'name': 'Programme Janvier',
+            'type': 'monthly',
+            'start_date': now - timedelta(days=15),
+            'end_date': now + timedelta(days=15),
+            'focus_area': 'Condition physique',
+            'description': 'Reprise après trêve - remise en forme',
+            'status': 'active',
+            'created_at': now - timedelta(days=20)
+        }
+    ]
+    for plan in training_plans:
+        mongo.db.training_plans.insert_one(plan)
+    print(f"[Seed] Created {len(training_plans)} training plans")
+
+    # ========================================
     # SUMMARY
     # ========================================
     print("\n" + "="*50)
     print("[Seed] DATABASE SEEDED SUCCESSFULLY!")
     print("="*50)
-    print(f"  Clubs:   2")
-    print(f"  Users:   {len(users)}")
-    print(f"  Players: {len(player_data)}")
-    print(f"  Events:  {len(events)}")
-    print(f"  Matches: {len(matches)}")
-    print(f"  Posts:   {len(posts)}")
-    print(f"  Shop:    {len(products)}")
-    print(f"  Gallery: {len(gallery)}")
+    print(f"  Clubs:    2")
+    print(f"  Teams:    1")
+    print(f"  Users:    {len(users)}")
+    print(f"  Players:  {len(player_data)}")
+    print(f"  Events:   {len(events)}")
+    print(f"  Matches:  {len(matches)}")
+    print(f"  Posts:    {len(posts)}")
+    print(f"  Shop:     {len(products)}")
+    print(f"  Gallery:  {len(gallery)}")
+    print(f"  Tactics:  {len(tactics)}")
+    print(f"  Lineups:  {len(lineups)}")
+    print(f"  Drills:   {len(drills)}")
+    print(f"  Plans:    {len(training_plans)}")
     print("="*50)
     print("\nDemo credentials:")
-    print("  Admin:  admin@FootLogic.fr / admin123")
+    print("  Admin:  admin@footlogic.fr / admin123")
     print("  Coach:  coach@fcelite.fr / coach123")
     print("  Player: player1@fcelite.fr / player123")
     print("="*50 + "\n")
@@ -354,6 +589,235 @@ def seed_18_players(club_id, team_id=None, delete_existing=True):
         created.append(player)
 
     return created
+
+
+def seed_coach_data(club_id=None, team_id=None):
+    """
+    Seed coach data (tactics, lineups, drills, training plans) for existing clubs.
+    DOES NOT delete any existing data - only adds new items.
+
+    If club_id is None, seed for all clubs.
+    """
+    from bson import ObjectId
+    from app.services.db import mongo
+    from datetime import datetime, timedelta
+
+    now = datetime.utcnow()
+
+    # Get clubs to seed
+    if club_id:
+        if isinstance(club_id, str):
+            club_id = ObjectId(club_id)
+        clubs = [mongo.db.clubs.find_one({'_id': club_id})]
+    else:
+        clubs = list(mongo.db.clubs.find({}))
+
+    if not clubs or clubs[0] is None:
+        print("[Seed] No clubs found")
+        return False
+
+    total_tactics = 0
+    total_lineups = 0
+    total_drills = 0
+    total_plans = 0
+
+    for club in clubs:
+        club_id = club['_id']
+        club_name = club.get('name', 'Unknown')
+        print(f"\n[Seed] Processing club: {club_name}")
+
+        # Get teams for this club
+        if team_id:
+            if isinstance(team_id, str):
+                team_id = ObjectId(team_id)
+            teams = [mongo.db.teams.find_one({'_id': team_id, 'club_id': club_id})]
+        else:
+            teams = list(mongo.db.teams.find({'club_id': club_id}))
+
+        if not teams or teams[0] is None:
+            print(f"  [!] No teams found for {club_name}, skipping...")
+            continue
+
+        for team in teams:
+            team_id_obj = team['_id']
+            team_name = team.get('name', 'Unknown')
+            print(f"  [Team] {team_name}")
+
+            # Get players for lineup
+            players = list(mongo.db.players.find({'club_id': club_id, 'team_id': team_id_obj}))
+            player_ids = [str(p['_id']) for p in players]
+
+            if len(player_ids) < 11:
+                print(f"    [!] Only {len(player_ids)} players, need 11 for lineups")
+
+            # Check if tactics already exist
+            existing_tactics = mongo.db.tactics.count_documents({'club_id': club_id, 'team_id': team_id_obj})
+            if existing_tactics == 0:
+                # Create tactics
+                tactics = [
+                    {
+                        'club_id': club_id,
+                        'team_id': team_id_obj,
+                        'name': '4-3-3 Offensif',
+                        'formation': '4-3-3',
+                        'description': 'Formation offensive avec ailiers rapides',
+                        'positions': {
+                            'GK': {'x': 50, 'y': 90}, 'LB': {'x': 15, 'y': 70},
+                            'CB1': {'x': 35, 'y': 75}, 'CB2': {'x': 65, 'y': 75},
+                            'RB': {'x': 85, 'y': 70}, 'CM1': {'x': 30, 'y': 50},
+                            'CM2': {'x': 50, 'y': 55}, 'CM3': {'x': 70, 'y': 50},
+                            'LW': {'x': 15, 'y': 25}, 'ST': {'x': 50, 'y': 15},
+                            'RW': {'x': 85, 'y': 25}
+                        },
+                        'is_default': True,
+                        'created_at': now
+                    },
+                    {
+                        'club_id': club_id,
+                        'team_id': team_id_obj,
+                        'name': '4-4-2 Classique',
+                        'formation': '4-4-2',
+                        'description': 'Formation équilibrée classique',
+                        'positions': {
+                            'GK': {'x': 50, 'y': 90}, 'LB': {'x': 15, 'y': 70},
+                            'CB1': {'x': 35, 'y': 75}, 'CB2': {'x': 65, 'y': 75},
+                            'RB': {'x': 85, 'y': 70}, 'LM': {'x': 15, 'y': 45},
+                            'CM1': {'x': 35, 'y': 50}, 'CM2': {'x': 65, 'y': 50},
+                            'RM': {'x': 85, 'y': 45}, 'ST1': {'x': 35, 'y': 20},
+                            'ST2': {'x': 65, 'y': 20}
+                        },
+                        'is_default': False,
+                        'created_at': now
+                    },
+                    {
+                        'club_id': club_id,
+                        'team_id': team_id_obj,
+                        'name': '3-5-2 Pressing',
+                        'formation': '3-5-2',
+                        'description': 'Formation haute pression avec pistons',
+                        'positions': {
+                            'GK': {'x': 50, 'y': 90}, 'CB1': {'x': 25, 'y': 75},
+                            'CB2': {'x': 50, 'y': 78}, 'CB3': {'x': 75, 'y': 75},
+                            'LWB': {'x': 10, 'y': 50}, 'CM1': {'x': 35, 'y': 55},
+                            'CM2': {'x': 50, 'y': 45}, 'CM3': {'x': 65, 'y': 55},
+                            'RWB': {'x': 90, 'y': 50}, 'ST1': {'x': 35, 'y': 18},
+                            'ST2': {'x': 65, 'y': 18}
+                        },
+                        'is_default': False,
+                        'created_at': now
+                    }
+                ]
+                tactic_ids = []
+                for t in tactics:
+                    result = mongo.db.tactics.insert_one(t)
+                    tactic_ids.append(result.inserted_id)
+                total_tactics += len(tactics)
+                print(f"    [+] Created {len(tactics)} tactics")
+            else:
+                print(f"    [=] {existing_tactics} tactics already exist")
+                tactic_ids = [t['_id'] for t in mongo.db.tactics.find({'club_id': club_id, 'team_id': team_id_obj})]
+
+            # Check if lineups already exist
+            existing_lineups = mongo.db.lineups.count_documents({'club_id': club_id, 'team_id': team_id_obj})
+            if existing_lineups == 0 and len(player_ids) >= 11:
+                # Create lineups
+                slots_433 = ['GK', 'LB', 'CB1', 'CB2', 'RB', 'CM1', 'CM2', 'CM3', 'LW', 'ST', 'RW']
+                starters = {slot: player_ids[i] for i, slot in enumerate(slots_433)}
+
+                lineups = [
+                    {
+                        'club_id': club_id,
+                        'team_id': team_id_obj,
+                        'name': 'Composition par défaut',
+                        'formation': '4-3-3',
+                        'tactic_id': tactic_ids[0] if tactic_ids else None,
+                        'starters': starters,
+                        'substitutes': player_ids[11:14] if len(player_ids) > 11 else [],
+                        'captains': {
+                            'captain': player_ids[8] if len(player_ids) > 8 else None,
+                            'vice_captain': player_ids[5] if len(player_ids) > 5 else None
+                        },
+                        'set_pieces': {
+                            'corners_left': player_ids[6] if len(player_ids) > 6 else None,
+                            'corners_right': player_ids[7] if len(player_ids) > 7 else None,
+                            'free_kicks': player_ids[8] if len(player_ids) > 8 else None,
+                            'penalties': player_ids[9] if len(player_ids) > 9 else None
+                        },
+                        'player_instructions': {},
+                        'is_template': True,
+                        'created_at': now,
+                        'updated_at': now
+                    }
+                ]
+                for lineup in lineups:
+                    mongo.db.lineups.insert_one(lineup)
+                total_lineups += len(lineups)
+                print(f"    [+] Created {len(lineups)} lineups")
+            elif existing_lineups > 0:
+                print(f"    [=] {existing_lineups} lineups already exist")
+
+        # Check if drills already exist for this club
+        existing_drills = mongo.db.drills.count_documents({'club_id': club_id})
+        if existing_drills == 0:
+            drills = [
+                {
+                    'club_id': club_id,
+                    'name': 'Rondo 4v2',
+                    'description': 'Conservation de balle en petit espace',
+                    'category': 'Technique',
+                    'sub_category': 'Passes',
+                    'duration': 15,
+                    'players_needed': 6,
+                    'equipment': ['Coupelles', 'Ballons'],
+                    'difficulty': 'intermediate',
+                    'coaching_points': ['Garder la tête haute', 'Passes à une touche', 'Mouvement constant'],
+                    'is_public': True,
+                    'created_at': now
+                },
+                {
+                    'club_id': club_id,
+                    'name': 'Jeu de position 6v6',
+                    'description': 'Travail de la possession orientée',
+                    'category': 'Tactique',
+                    'sub_category': 'Possession',
+                    'duration': 20,
+                    'players_needed': 12,
+                    'equipment': ['Coupelles', 'Chasubles', 'Ballons'],
+                    'difficulty': 'advanced',
+                    'coaching_points': ['Triangulations', 'Appels en profondeur', 'Changements de jeu'],
+                    'is_public': True,
+                    'created_at': now
+                },
+                {
+                    'club_id': club_id,
+                    'name': 'Finitions en 1v1',
+                    'description': 'Situations de duel face au gardien',
+                    'category': 'Technique',
+                    'sub_category': 'Tir',
+                    'duration': 15,
+                    'players_needed': 8,
+                    'equipment': ['Buts', 'Ballons', 'Coupelles'],
+                    'difficulty': 'intermediate',
+                    'coaching_points': ['Garder son calme', 'Observer le gardien', 'Frapper tôt'],
+                    'is_public': True,
+                    'created_at': now
+                }
+            ]
+            mongo.db.drills.insert_many(drills)
+            total_drills += len(drills)
+            print(f"  [+] Created {len(drills)} drills")
+        else:
+            print(f"  [=] {existing_drills} drills already exist")
+
+    print("\n" + "="*50)
+    print("[Seed] COACH DATA SEEDED (existing data preserved)")
+    print("="*50)
+    print(f"  Tactics added:  {total_tactics}")
+    print(f"  Lineups added:  {total_lineups}")
+    print(f"  Drills added:   {total_drills}")
+    print("="*50 + "\n")
+
+    return True
 
 
 if __name__ == '__main__':

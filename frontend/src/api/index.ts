@@ -203,6 +203,7 @@ export const adminApi = {
   deleteMember: (id: string) => client.delete(`/admin/members/${id}`),
   seedPlayers: (teamId?: string) => client.post('/admin/seed-players', { team_id: teamId }),
   seedAll: () => client.post('/admin/seed-all', {}),
+  seedCoachData: (teamId?: string) => client.post('/admin/seed-coach-data', { team_id: teamId }),
   createTeam: (data: object) => client.post('/admin/teams', data),
   updateTeam: (id: string, data: object) => client.put(`/admin/teams/${id}`, data),
   deleteTeam: (id: string) => client.delete(`/admin/teams/${id}`),
