@@ -986,7 +986,8 @@ def save_lineup():
         substitutes=data.get('substitutes', []),
         name=data.get('name', ''),
         captains=data.get('captains', []),
-        set_pieces=data.get('set_pieces', {})
+        set_pieces=data.get('set_pieces', {}),
+        player_instructions=data.get('player_instructions', {})
     )
     return jsonify({'success': True, 'data': str(result)})
 

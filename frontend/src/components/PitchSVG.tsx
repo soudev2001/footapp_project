@@ -171,6 +171,54 @@ export default function PitchSVG({
     e.dataTransfer.effectAllowed = 'move'
   }
 
+  // Pitch-level drop: find nearest slot to drop point
+  const handlePitchDrop = useCallback((e: React.DragEvent) => {
+    if (!containerRef.current || !onSlotDrop) return
+    const playerId = e.dataTransfer.getData('playerId')
+    const fromSlot = e.dataTransfer.getData('fromSlot') || undefined
+    if (!playerId) return
+    e.preventDefault()
+    const rect = containerRef.current.getBoundingClientRect()
+    const dropX = ((e.clientX - rect.left) / rect.width) * 100
+    const dropY = ((e.clientY - rect.top) / rect.height) * 100
+    // Find nearest slot
+    let bestKey = ''
+    let bestIdx = 0
+    let bestDist = Infinity
+    positions.forEach((pos, i) => {
+      const key = `${pos.name}-${i}`
+      const cx = customPositions?.[key]?.x ?? pos.x
+      const cy = customPositions?.[key]?.y ?? pos.y
+      const d = Math.hypot(cx - dropX, cy - dropY)
+      if (d < bestDist) { bestDist = d; bestKey = key; bestIdx = i }
+    })
+    if (bestKey && bestDist < 25) {
+      onSlotDrop(bestKey, bestIdx, playerId, fromSlot)
+    }
+    setHoveredSlot(null)
+  }, [positions, customPositions, onSlotDrop])
+
+  const handlePitchDragOver = useCallback((e: React.DragEvent) => {
+    if (!interactive || editMode) return
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    // Find nearest slot for hover highlight
+    if (!containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
+    const dropX = ((e.clientX - rect.left) / rect.width) * 100
+    const dropY = ((e.clientY - rect.top) / rect.height) * 100
+    let bestKey = ''
+    let bestDist = Infinity
+    positions.forEach((pos, i) => {
+      const key = `${pos.name}-${i}`
+      const cx = customPositions?.[key]?.x ?? pos.x
+      const cy = customPositions?.[key]?.y ?? pos.y
+      const d = Math.hypot(cx - dropX, cy - dropY)
+      if (d < bestDist) { bestDist = d; bestKey = key }
+    })
+    setHoveredSlot(bestDist < 25 ? bestKey : null)
+  }, [interactive, editMode, positions, customPositions])
+
   // Edit mode: free repositioning via pointer events
   const handleEditPointerDown = useCallback((e: React.PointerEvent, slotKey: string) => {
     if (!editMode || !onPositionChange) return
@@ -192,10 +240,20 @@ export default function PitchSVG({
     setDraggingEdit(null)
   }, [])
 
+  // Hit zone size in px for each slot (larger = easier to drop on)
+  const hitSize = size === 'sm' ? 28 : size === 'md' ? 44 : 56
+
   return (
-    <div ref={containerRef} className={clsx('relative rounded-xl overflow-hidden select-none', editMode && 'ring-2 ring-dashed ring-yellow-500/40', className)} style={{ height: h }}>
+    <div
+      ref={containerRef}
+      className={clsx('relative rounded-xl overflow-hidden', editMode && 'ring-2 ring-dashed ring-yellow-500/40', className)}
+      style={{ height: h }}
+      onDragOver={interactive && !editMode ? handlePitchDragOver : undefined}
+      onDragLeave={interactive ? () => setHoveredSlot(null) : undefined}
+      onDrop={interactive && !editMode ? handlePitchDrop : undefined}
+    >
       {/* Pitch background */}
-      <svg viewBox="0 0 680 1050" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+      <svg viewBox="0 0 680 1050" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid slice">
         <defs>
           <pattern id="grass" patternUnits="userSpaceOnUse" width="680" height="80">
             <rect width="680" height="40" fill="#14532d" />
@@ -203,22 +261,16 @@ export default function PitchSVG({
           </pattern>
         </defs>
         <rect width="680" height="1050" fill="url(#grass)" />
-        {/* Field border */}
         <rect x="30" y="30" width="620" height="990" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2" />
-        {/* Center line */}
         <line x1="30" y1="525" x2="650" y2="525" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
-        {/* Center circle */}
         <circle cx="340" cy="525" r="91.5" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
         <circle cx="340" cy="525" r="3" fill="rgba(255,255,255,0.3)" />
-        {/* Top penalty area */}
         <rect x="165" y="30" width="350" height="165" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="2" />
         <rect x="228" y="30" width="224" height="55" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="2" />
         <circle cx="340" cy="145" r="3" fill="rgba(255,255,255,0.3)" />
-        {/* Bottom penalty area */}
         <rect x="165" y="855" width="350" height="165" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="2" />
         <rect x="228" y="965" width="224" height="55" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="2" />
         <circle cx="340" cy="905" r="3" fill="rgba(255,255,255,0.3)" />
-        {/* Corner arcs */}
         <path d="M30,42 A12,12 0 0,1 42,30" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
         <path d="M638,30 A12,12 0 0,1 650,42" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
         <path d="M30,1008 A12,12 0 0,0 42,1020" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
@@ -227,7 +279,7 @@ export default function PitchSVG({
 
       {/* Edit mode badge */}
       {editMode && (
-        <div className="absolute top-2 left-2 z-20 bg-yellow-500/90 text-black text-[10px] font-bold px-2 py-0.5 rounded-md">
+        <div className="absolute top-2 left-2 z-20 bg-yellow-500/90 text-black text-[10px] font-bold px-2 py-0.5 rounded-md pointer-events-none">
           Mode édition — Glissez les joueurs
         </div>
       )}
@@ -254,18 +306,15 @@ export default function PitchSVG({
           <div
             key={key}
             className={clsx(
-              'absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 z-10 transition-transform group',
+              'absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10 transition-transform group',
               isInteractive && !editMode && 'cursor-pointer',
               editMode && filled && 'cursor-move',
               isHovered && 'scale-110',
               isSelected && 'scale-115',
               draggingEdit === key && 'z-20 scale-115',
             )}
-            style={{ left: `${effectiveX}%`, top: `${effectiveY}%` }}
+            style={{ left: `${effectiveX}%`, top: `${effectiveY}%`, width: hitSize, height: hitSize + 16 }}
             onClick={() => !editMode && isInteractive && onSlotClick?.(key, i)}
-            onDragOver={!editMode && isInteractive ? (e) => handleDragOver(e, key) : undefined}
-            onDragLeave={!editMode && isInteractive ? handleDragLeave : undefined}
-            onDrop={!editMode && isInteractive ? (e) => handleDrop(e, key, i) : undefined}
             draggable={!editMode && isInteractive && filled}
             onDragStart={!editMode && isInteractive && filled ? (e) => handleDragStart(e, key, slot!) : undefined}
             onContextMenu={isInteractive && filled && onSlotRemove ? (e) => { e.preventDefault(); onSlotRemove(key) } : undefined}
@@ -275,19 +324,18 @@ export default function PitchSVG({
           >
             {/* Selected glow */}
             {isSelected && (
-              <div className="absolute inset-0 -m-3 rounded-full border-2 border-yellow-400 animate-pulse bg-yellow-400/10" />
+              <div className="absolute inset-0 -m-3 rounded-full border-2 border-yellow-400 animate-pulse bg-yellow-400/10 pointer-events-none" />
             )}
             {/* Glow ring for drag target */}
             {isHovered && (
-              <div className="absolute inset-0 -m-2 rounded-full animate-ping bg-pitch-400/30" />
+              <div className="absolute inset-0 -m-2 rounded-full animate-ping bg-pitch-400/30 pointer-events-none" />
             )}
             {highlightEmpty && !filled && (
-              <div className="absolute inset-0 -m-1 rounded-full animate-pulse border-2 border-dashed border-pitch-500/40" />
+              <div className="absolute inset-0 -m-1 rounded-full animate-pulse border-2 border-dashed border-pitch-500/40 pointer-events-none" />
             )}
             <div
               className={clsx(
-                'rounded-full flex items-center justify-center font-bold text-white transition-all relative overflow-hidden',
-                // FIFA-style: position-fit colored border
+                'rounded-full flex items-center justify-center font-bold text-white transition-all relative overflow-hidden mx-auto',
                 filled ? `border-2 ${fitRing}` : 'border-2',
                 size === 'sm' ? 'w-6 h-6 text-[9px]' : size === 'md' ? 'w-9 h-9 text-[11px]' : 'w-11 h-11 text-xs',
                 filled
@@ -313,6 +361,7 @@ export default function PitchSVG({
                       src={imgSrc}
                       alt=""
                       className="w-full h-full object-cover rounded-full"
+                      draggable={false}
                       onError={() => {
                         if (avatar) setBrokenAvatars(prev => new Set(prev).add(avatar))
                       }}
@@ -326,7 +375,6 @@ export default function PitchSVG({
                   C
                 </span>
               )}
-              {/* OVR badge */}
               {filled && ovr > 0 && size !== 'sm' && (
                 <span className={clsx('absolute -bottom-1.5 -left-1.5 text-[7px] font-black px-1 rounded-sm bg-black/80', ovrColor(ovr))}>
                   {ovr}
@@ -334,17 +382,15 @@ export default function PitchSVG({
               )}
             </div>
             {filled && slot.playerName && size !== 'sm' && (
-              <span className="bg-black/60 text-white text-[9px] px-1 rounded whitespace-nowrap max-w-16 truncate">
+              <span className="bg-black/60 text-white text-[9px] px-1 rounded whitespace-nowrap max-w-16 truncate text-center">
                 {slot.playerName}
               </span>
             )}
-            {/* Remove button on hover */}
             {filled && isInteractive && onSlotRemove && (
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onSlotRemove(key) }}
-                className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-500 hover:scale-110"
-                style={{ opacity: isHovered || isSelected ? 1 : undefined }}
+                className="absolute top-0 right-0 w-4 h-4 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-500 hover:scale-110 z-20"
               >
                 <X size={10} />
               </button>

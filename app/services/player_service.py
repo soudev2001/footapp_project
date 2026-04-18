@@ -182,7 +182,7 @@ class PlayerService:
 
         return lineup
 
-    def save_lineup(self, club_id, formation, starters, team_id=None, substitutes=None, name=None, captains=None, set_pieces=None):
+    def save_lineup(self, club_id, formation, starters, team_id=None, substitutes=None, name=None, captains=None, set_pieces=None, player_instructions=None):
         """Save a custom lineup for a club/team"""
         query = {'club_id': ObjectId(club_id)}
         if team_id:
@@ -204,6 +204,7 @@ class PlayerService:
             'team_id': ObjectId(team_id) if team_id else None,
             'captains': [ObjectId(p) for p in (captains or []) if p],
             'set_pieces': {k: [ObjectId(p) for p in (v or []) if p] for k, v in (set_pieces or {}).items()},
+            'player_instructions': player_instructions or {},
             'updated_at': datetime.utcnow()
         }
         if name:

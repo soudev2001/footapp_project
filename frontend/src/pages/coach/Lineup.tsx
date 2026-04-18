@@ -5,6 +5,7 @@ import { Save, RefreshCw, Star, Shield, GripVertical, UserMinus, ArrowRightLeft,
 import { Link } from 'react-router-dom'
 import PitchSVG, { FORMATIONS, FORMATION_POSITIONS, type DragPlayer } from '../../components/PitchSVG'
 import TacticalVisualizer from '../../components/TacticalVisualizer'
+import PlayerRoleModal from '../../components/PlayerRoleModal'
 import type { Player } from '../../types'
 import clsx from 'clsx'
 import {
@@ -13,6 +14,7 @@ import {
   positionFit, fitColor,
   type SlotData,
 } from '../../utils/fifaLogic'
+import { SET_PIECE_TYPES, EMPTY_SET_PIECES, ROLE_LABELS, DUTY_LABELS, type PlayerInstruction } from './tacticsConstants'
 
 interface Tactic {
   id: string
@@ -30,6 +32,7 @@ interface Tactic {
   counter_pressing?: boolean
   captains?: string[]
   set_pieces?: Record<string, string[]>
+  player_instructions?: Record<string, PlayerInstruction>
   starters?: (string | null)[] | Record<string, string>
   substitutes?: string[]
   instructions?: { passing_style?: string; pressing?: string; defensive_block?: string; marking?: string; tempo?: string; width?: string; play_space?: string; gk_distribution?: string; counter_pressing?: boolean }
@@ -88,6 +91,16 @@ export default function Lineup() {
   const [loadedTactic, setLoadedTactic] = useState<Tactic | null>(null)
   const [editMode, setEditMode] = useState(false)
   const [customPositions, setCustomPositions] = useState<Record<string, { x: number; y: number }>>({})
+  // Multiple captains (priority order)
+  const [captains, setCaptains] = useState<string[]>([])
+  // Set pieces
+  const [setPieces, setSetPieces] = useState<Record<string, string[]>>({ ...EMPTY_SET_PIECES })
+  // Player instructions
+  const [playerInstructions, setPlayerInstructions] = useState<Record<string, PlayerInstruction>>({})
+  // Role modal
+  const [roleModalSlot, setRoleModalSlot] = useState<string | null>(null)
+  // Set pieces panel open
+  const [showSetPieces, setShowSetPieces] = useState(false)
 
   const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
@@ -152,6 +165,9 @@ export default function Lineup() {
         if (draft.slots && Object.keys(draft.slots).length > 0) setSlots(draft.slots)
         if (draft.subs) setSubs(draft.subs)
         if (draft.captainId !== undefined) setCaptainId(draft.captainId)
+        if (draft.captains) setCaptains(draft.captains)
+        if (draft.setPieces) setSetPieces({ ...EMPTY_SET_PIECES, ...draft.setPieces })
+        if (draft.playerInstructions) setPlayerInstructions(draft.playerInstructions)
         draftLoaded.current = true
       }
     } catch { /* ignore corrupt data */ }
@@ -162,12 +178,12 @@ export default function Lineup() {
     if (draftTimer.current) clearTimeout(draftTimer.current)
     draftTimer.current = setTimeout(() => {
       try {
-        const draft = { formation, slots, subs, captainId, timestamp: Date.now() }
+        const draft = { formation, slots, subs, captainId, captains, setPieces, playerInstructions, timestamp: Date.now() }
         localStorage.setItem(LINEUP_DRAFT_KEY, JSON.stringify(draft))
       } catch { /* quota exceeded */ }
     }, 500)
     return () => { if (draftTimer.current) clearTimeout(draftTimer.current) }
-  }, [formation, slots, subs, captainId])
+  }, [formation, slots, subs, captainId, captains, setPieces, playerInstructions])
 
   const saveMutation = useMutation({
     mutationFn: () => {
@@ -181,7 +197,9 @@ export default function Lineup() {
         formation,
         starters,
         substitutes: subs,
-        captains: captainId ? [captainId] : [],
+        captains: captains.length > 0 ? captains : captainId ? [captainId] : [],
+        set_pieces: setPieces,
+        player_instructions: playerInstructions,
       })
     },
     onSuccess: () => {
@@ -224,7 +242,12 @@ export default function Lineup() {
     })
     setSlots(newSlots)
     if (tactic.substitutes?.length) setSubs([...tactic.substitutes])
-    if (tactic.captains?.length) setCaptainId(tactic.captains[0])
+    if (tactic.captains?.length) {
+      setCaptains([...tactic.captains])
+      setCaptainId(tactic.captains[0])
+    }
+    if (tactic.set_pieces) setSetPieces({ ...EMPTY_SET_PIECES, ...tactic.set_pieces })
+    if (tactic.player_instructions) setPlayerInstructions({ ...tactic.player_instructions })
     setSelectedSlot(null)
     setShowTacticPicker(false)
     // Store full tactic config for display
@@ -263,33 +286,38 @@ export default function Lineup() {
     setSelectedSlot(null)
   }, [formation, slots])
 
-  // FIFA: swap mode — click on slot to select, click another to swap
+  // FIFA: click on slot — if swap mode, swap; otherwise open role modal
   const handleSlotClick = useCallback((slotKey: string, _posIndex: number) => {
-    if (!selectedSlot) {
-      // First click: select this slot (only if filled)
-      if (slots[slotKey]?.playerId) setSelectedSlot(slotKey)
-      return
-    }
-    if (selectedSlot === slotKey) {
-      // Deselect
+    if (selectedSlot && selectedSlot !== '__pick__') {
+      if (selectedSlot === slotKey) {
+        setSelectedSlot(null)
+        return
+      }
+      // Swap the two slots
+      setSlots((prev) => {
+        const next = { ...prev }
+        const a = next[selectedSlot] ?? {}
+        const b = next[slotKey] ?? {}
+        if (a.playerId || b.playerId) {
+          next[selectedSlot] = b.playerId ? { ...b } : {}
+          next[slotKey] = a.playerId ? { ...a } : {}
+          if (!next[selectedSlot].playerId) delete next[selectedSlot]
+          if (!next[slotKey]?.playerId) delete next[slotKey]
+        }
+        return next
+      })
       setSelectedSlot(null)
       return
     }
-    // Second click: swap the two slots
-    setSlots((prev) => {
-      const next = { ...prev }
-      const a = next[selectedSlot] ?? {}
-      const b = next[slotKey] ?? {}
-      if (a.playerId || b.playerId) {
-        next[selectedSlot] = b.playerId ? { ...b } : {}
-        next[slotKey] = a.playerId ? { ...a } : {}
-        // Clean up empty
-        if (!next[selectedSlot].playerId) delete next[selectedSlot]
-        if (!next[slotKey]?.playerId) delete next[slotKey]
-      }
-      return next
-    })
-    setSelectedSlot(null)
+    if (selectedSlot === '__pick__') {
+      // Enter swap: pick first slot
+      if (slots[slotKey]?.playerId) setSelectedSlot(slotKey)
+      return
+    }
+    // Open role modal if filled
+    if (slots[slotKey]?.playerId) {
+      setRoleModalSlot(slotKey)
+    }
   }, [selectedSlot, slots])
 
   // Team stats (FIFA-style)
@@ -369,12 +397,20 @@ export default function Lineup() {
   const handleDragEnd = () => setDragPlayer(null)
 
   const toggleCaptain = (playerId: string) => {
-    const newCaptain = captainId === playerId ? null : playerId
-    setCaptainId(newCaptain)
+    setCaptains((prev) => {
+      if (prev.includes(playerId)) {
+        const next = prev.filter((id) => id !== playerId)
+        setCaptainId(next[0] ?? null)
+        return next
+      }
+      const next = [...prev, playerId]
+      setCaptainId(next[0])
+      return next
+    })
     setSlots((prev) => {
       const next = { ...prev }
       for (const key of Object.keys(next)) {
-        next[key] = { ...next[key], isCaptain: next[key].playerId === playerId ? newCaptain !== null : false }
+        next[key] = { ...next[key], isCaptain: next[key].playerId === playerId ? !captains.includes(playerId) : captains.includes(next[key].playerId!) }
       }
       return next
     })
@@ -440,7 +476,10 @@ export default function Lineup() {
           <button type="button" onClick={() => setShowVisualizer(true)} className="btn-secondary text-sm" title="Visualisation">
             <Eye size={15} />
           </button>
-          <button onClick={() => { setSlots({}); setSubs([]); setCaptainId(null); setSelectedSlot(null); setLoadedTactic(null) }} className="btn-secondary gap-1.5 text-sm text-red-400 hover:text-red-300 border-red-900/50 hover:border-red-700/50">
+          <button type="button" onClick={() => setSelectedSlot(selectedSlot ? null : '__pick__')} className={clsx('btn-secondary text-sm gap-1', selectedSlot ? 'text-yellow-400 border-yellow-700' : '')} title="Mode échange">
+            <Repeat2 size={14} />
+          </button>
+          <button onClick={() => { setSlots({}); setSubs([]); setCaptainId(null); setCaptains([]); setSetPieces({ ...EMPTY_SET_PIECES }); setPlayerInstructions({}); setSelectedSlot(null); setLoadedTactic(null) }} className="btn-secondary gap-1.5 text-sm text-red-400 hover:text-red-300 border-red-900/50 hover:border-red-700/50">
             <RefreshCw size={14} /> Vider
           </button>
           {/* Right group: Charger + Sauvegarder */}
@@ -606,13 +645,26 @@ export default function Lineup() {
         </div>
         <span className="text-gray-700">|</span>
         <span className="flex items-center gap-1"><ArrowRightLeft size={11} /> {subs.length} remplaçants</span>
-        {captainId && (
+        {captains.length > 0 && (
+          <>
+            <span className="text-gray-700">|</span>
+            {captains.map((cid, ci) => {
+              const cp = getPlayer(cid)
+              return (
+                <span key={cid} className="flex items-center gap-1 text-yellow-400">
+                  <Crown size={10} /> {ci === 0 ? 'C' : `C${ci + 1}`} {cp?.profile?.last_name ?? '?'}
+                </span>
+              )
+            })}
+          </>
+        )}
+        {captains.length === 0 && captainId && (
           <>
             <span className="text-gray-700">|</span>
             <span className="flex items-center gap-1 text-yellow-400"><Star size={11} className="fill-yellow-400" /> {getPlayer(captainId)?.profile?.last_name ?? 'Capitaine'}</span>
           </>
         )}
-        {starterCount === 11 && !captainId && (
+        {starterCount === 11 && captains.length === 0 && !captainId && (
           <>
             <span className="text-gray-700">|</span>
             <span className="flex items-center gap-1 text-amber-400"><AlertTriangle size={11} /> Aucun capitaine</span>
@@ -749,9 +801,14 @@ export default function Lineup() {
                       <span className="text-[10px] font-bold text-pitch-400 w-4">{slot.jerseyNumber ?? '?'}</span>
                       <span className="text-[11px] text-white flex-1 truncate">{slot.playerName}</span>
                       {fit < 0.9 && <span className="text-[8px] text-gray-500" title={`Position naturelle: ${player?.position}`}>{player?.position}</span>}
+                      {playerInstructions[key] && (
+                        <span className="text-[8px] px-1 py-0.5 rounded bg-purple-900/40 text-purple-300 font-medium" title={ROLE_LABELS[playerInstructions[key].role] ?? playerInstructions[key].role}>
+                          {ROLE_LABELS[playerInstructions[key].role]?.slice(0, 8) ?? '⚙'}
+                        </span>
+                      )}
                       <button onClick={(e) => { e.stopPropagation(); toggleCaptain(slot.playerId!) }}
-                        className={clsx('p-0.5 transition-all', captainId === slot.playerId ? 'text-yellow-400 scale-110' : 'text-gray-600 hover:text-yellow-400 opacity-0 group-hover:opacity-100')}>
-                        <Star size={10} className={captainId === slot.playerId ? 'fill-yellow-400' : ''} />
+                        className={clsx('p-0.5 transition-all', captains.includes(slot.playerId!) ? 'text-yellow-400 scale-110' : 'text-gray-600 hover:text-yellow-400 opacity-0 group-hover:opacity-100')}>
+                        <Star size={10} className={captains.includes(slot.playerId!) ? 'fill-yellow-400' : ''} />
                       </button>
                       <button onClick={(e) => { e.stopPropagation(); handleSlotRemove(key) }} className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all text-[10px]">✕</button>
                     </div>
@@ -850,6 +907,103 @@ export default function Lineup() {
         onClose={() => setShowVisualizer(false)}
         formation={formation}
       />
+
+      {/* Set Pieces & Captains Panel */}
+      {starterCount > 0 && (
+        <div className="bg-gray-900/60 border border-gray-800 rounded-xl p-3 space-y-3">
+          <button type="button" onClick={() => setShowSetPieces(!showSetPieces)} className="w-full flex items-center justify-between">
+            <h2 className="font-semibold text-white text-sm flex items-center gap-2">
+              <Target size={14} className="text-pitch-400" /> Capitaines & Tireurs
+            </h2>
+            {showSetPieces ? <ChevronUp size={14} className="text-gray-500" /> : <ChevronDown size={14} className="text-gray-500" />}
+          </button>
+
+          {showSetPieces && (
+            <div className="space-y-4">
+              {/* Multiple Captains */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-gray-400 flex items-center gap-1.5"><Crown size={12} className="text-yellow-400" /> Capitaines (par priorité)</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {Object.values(slots).filter(s => s.playerId).map((slot) => {
+                    const p = getPlayer(slot.playerId!)
+                    if (!p) return null
+                    const idx = captains.indexOf(p.id)
+                    return (
+                      <button key={p.id} type="button" onClick={() => toggleCaptain(p.id)}
+                        className={clsx('inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium transition-all border',
+                          idx >= 0 ? 'bg-yellow-900/40 border-yellow-700/60 text-yellow-300' : 'bg-gray-800/60 border-gray-700/40 text-gray-400 hover:border-yellow-700/40 hover:text-yellow-400'
+                        )}>
+                        {idx >= 0 && <span className="w-4 h-4 rounded-full bg-yellow-600 text-[8px] font-black flex items-center justify-center text-black">{idx === 0 ? 'C' : `${idx + 1}`}</span>}
+                        #{p.jersey_number ?? '?'} {p.profile?.last_name ?? ''}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Set Pieces */}
+              {SET_PIECE_TYPES.map((sp) => (
+                <div key={sp.key} className="space-y-1.5">
+                  <p className="text-xs font-semibold text-gray-400 flex items-center gap-1.5">
+                    <span>{sp.icon}</span> {sp.label}
+                    <span className="text-[9px] text-gray-600">(max {sp.max})</span>
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {Object.values(slots).filter(s => s.playerId).map((slot) => {
+                      const p = getPlayer(slot.playerId!)
+                      if (!p) return null
+                      const isSelected = (setPieces[sp.key] ?? []).includes(p.id)
+                      const currentCount = (setPieces[sp.key] ?? []).length
+                      return (
+                        <button key={p.id} type="button"
+                          disabled={!isSelected && currentCount >= sp.max}
+                          onClick={() => {
+                            setSetPieces((prev) => {
+                              const arr = prev[sp.key] ?? []
+                              return {
+                                ...prev,
+                                [sp.key]: isSelected ? arr.filter((id) => id !== p.id) : [...arr, p.id],
+                              }
+                            })
+                          }}
+                          className={clsx('inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium transition-all border',
+                            isSelected ? 'bg-pitch-900/60 border-pitch-600/60 text-pitch-300' : 'bg-gray-800/60 border-gray-700/40 text-gray-500 hover:border-pitch-700/40 hover:text-pitch-400',
+                            !isSelected && currentCount >= sp.max && 'opacity-30 cursor-not-allowed'
+                          )}>
+                          {isSelected && <span className="text-[8px]">✓</span>}
+                          #{p.jersey_number ?? '?'} {p.profile?.last_name ?? ''}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Player Role Modal */}
+      {roleModalSlot && (() => {
+        const slot = slots[roleModalSlot]
+        if (!slot?.playerId) return null
+        const player = getPlayer(slot.playerId)
+        if (!player) return null
+        const posName = roleModalSlot.split('-')[0]
+        return (
+          <PlayerRoleModal
+            isOpen
+            playerName={`#${player.jersey_number ?? '?'} ${player.profile?.last_name ?? ''}`}
+            playerPosition={posName}
+            currentRole={playerInstructions[roleModalSlot]}
+            onSave={(instr) => {
+              setPlayerInstructions((prev) => ({ ...prev, [roleModalSlot]: instr }))
+              setRoleModalSlot(null)
+            }}
+            onClose={() => setRoleModalSlot(null)}
+          />
+        )
+      })()}
     </div>
   )
 }
