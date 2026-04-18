@@ -1599,7 +1599,7 @@ def admin_members():
     role = request.args.get('role')
     status = request.args.get('status')
     user_service = get_user_service()
-    members = user_service.get_by_club(club_id)
+    members = user_service.get_members_by_club(club_id)
     if role:
         members = [m for m in members if m.get('role') == role]
     if status:
