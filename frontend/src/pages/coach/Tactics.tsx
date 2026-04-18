@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi } from '../../api'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Swords, LayoutDashboard, Users, CalendarDays, Trophy, ClipboardList } from 'lucide-react'
 import TacticsSidebar from './TacticsSidebar'
@@ -23,6 +23,13 @@ export default function Tactics() {
     queryKey: ['coach-roster'],
     queryFn: () => coachApi.roster().then((r) => r.data),
   })
+
+  // Auto-load first tactic when page opens
+  useEffect(() => {
+    if (tactics.length > 0 && !selectedTacticId && !isCreating) {
+      setSelectedTacticId(tactics[0].id)
+    }
+  }, [tactics]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => coachApi.deleteTactic(id),

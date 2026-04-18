@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi } from '../../api'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Save, RefreshCw, Star, Shield, GripVertical, UserMinus, ArrowRightLeft, ChevronDown, ChevronUp, Check, Cloud, Eye, Users, AlertTriangle, Swords, Wand2, Zap, Repeat2, Trophy, Heart, CheckCircle2, XCircle, X, Download, BookOpen, Mail, Crown, Target, Settings2 } from 'lucide-react'
+import { Save, RefreshCw, Star, Shield, GripVertical, UserMinus, ArrowRightLeft, ChevronDown, ChevronUp, Check, Cloud, Eye, Users, AlertTriangle, Swords, Wand2, Zap, Repeat2, Trophy, Heart, CheckCircle2, XCircle, X, Download, BookOpen, Mail, Crown, Target, Settings2, Move } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import PitchSVG, { FORMATIONS, FORMATION_POSITIONS, type DragPlayer } from '../../components/PitchSVG'
 import TacticalVisualizer from '../../components/TacticalVisualizer'
@@ -9,7 +9,7 @@ import type { Player } from '../../types'
 import clsx from 'clsx'
 import {
   posColor, calcOVR, ovrColor, ovrBg, teamRating, teamChemistry,
-  remapPlayersOnFormationChange, autoFillPlayers, GAME_PLANS,
+  remapPlayersOnFormationChange, autoFillPlayers,
   positionFit, fitColor,
   type SlotData,
 } from '../../utils/fifaLogic'
@@ -63,6 +63,8 @@ const PRESSING_COLORS: Record<string, string> = {
   low: 'bg-blue-900/40 text-blue-300', medium: 'bg-yellow-900/40 text-yellow-300', high: 'bg-orange-900/40 text-orange-300', gegenpressing: 'bg-red-900/40 text-red-300',
 }
 
+const LINEUP_DRAFT_KEY = 'footapp-lineup-draft'
+
 export default function Lineup() {
   const qc = useQueryClient()
   const [formation, setFormation] = useState('4-3-3')
@@ -75,14 +77,17 @@ export default function Lineup() {
   const [filterPos, setFilterPos] = useState<string>('all')
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const draftTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const draftLoaded = useRef(false)
   // FIFA additions
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null) // swap mode
-  const [gamePlan, setGamePlan] = useState('balanced')
   const [showTacticPicker, setShowTacticPicker] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [loadedTactic, setLoadedTactic] = useState<Tactic | null>(null)
+  const [editMode, setEditMode] = useState(false)
+  const [customPositions, setCustomPositions] = useState<Record<string, { x: number; y: number }>>({})
 
   const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
@@ -105,9 +110,11 @@ export default function Lineup() {
     queryFn: () => coachApi.tactics().then((r) => r.data).catch(() => []),
   })
 
-  // Load saved lineup
+  // Load saved lineup (API data, used as fallback if no local draft)
   useEffect(() => {
     if (!savedLineup || !players) return
+    // If a local draft was already loaded, skip API hydration
+    if (draftLoaded.current) return
     if (savedLineup.formation) setFormation(savedLineup.formation)
     if (savedLineup.captain) setCaptainId(savedLineup.captain)
     if (savedLineup.substitutes) setSubs(Array.isArray(savedLineup.substitutes) ? savedLineup.substitutes : [])
@@ -133,6 +140,35 @@ export default function Lineup() {
     }
   }, [savedLineup, players])
 
+  // Load draft from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(LINEUP_DRAFT_KEY)
+      if (!raw) return
+      const draft = JSON.parse(raw)
+      // Only use draft if less than 24h old
+      if (draft.timestamp && Date.now() - draft.timestamp < 24 * 60 * 60 * 1000) {
+        if (draft.formation) setFormation(draft.formation)
+        if (draft.slots && Object.keys(draft.slots).length > 0) setSlots(draft.slots)
+        if (draft.subs) setSubs(draft.subs)
+        if (draft.captainId !== undefined) setCaptainId(draft.captainId)
+        draftLoaded.current = true
+      }
+    } catch { /* ignore corrupt data */ }
+  }, [])
+
+  // Auto-save draft to localStorage on every change (debounced)
+  useEffect(() => {
+    if (draftTimer.current) clearTimeout(draftTimer.current)
+    draftTimer.current = setTimeout(() => {
+      try {
+        const draft = { formation, slots, subs, captainId, timestamp: Date.now() }
+        localStorage.setItem(LINEUP_DRAFT_KEY, JSON.stringify(draft))
+      } catch { /* quota exceeded */ }
+    }, 500)
+    return () => { if (draftTimer.current) clearTimeout(draftTimer.current) }
+  }, [formation, slots, subs, captainId])
+
   const saveMutation = useMutation({
     mutationFn: () => {
       const positions = FORMATION_POSITIONS[formation] ?? []
@@ -150,6 +186,8 @@ export default function Lineup() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['coach-lineup'] })
+      localStorage.removeItem(LINEUP_DRAFT_KEY)
+      draftLoaded.current = false
       setAutoSaveStatus('saved')
       setLastSaveTime(new Date())
       showToast('Composition sauvegardée')
@@ -393,24 +431,6 @@ export default function Lineup() {
           <button onClick={autoFill} className="btn-secondary gap-1.5 text-sm bg-gradient-to-r from-pitch-900/80 to-pitch-800/60 border-pitch-700 hover:border-pitch-500 text-pitch-300 hover:text-pitch-200" title="Remplir automatiquement les 11 postes">
             <Wand2 size={14} /> Auto XI
           </button>
-          {/* Load from tactic */}
-          <div className="relative">
-            <button type="button" onClick={() => setShowTacticPicker(!showTacticPicker)} className="btn-secondary text-sm gap-1.5" title="Charger depuis une tactique">
-              <Download size={14} /> <span className="hidden sm:inline">Tactique</span>
-            </button>
-            {showTacticPicker && (tactics as Tactic[] | undefined)?.length ? (
-              <div className="absolute right-0 top-full mt-1 z-30 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl p-2 min-w-[200px] max-h-[300px] overflow-y-auto">
-                <p className="text-[10px] text-gray-500 uppercase font-semibold px-2 py-1">Charger tactique</p>
-                {(tactics as Tactic[]).map((t) => (
-                  <button key={t.id} type="button" onClick={() => loadFromTactic(t)}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800 text-sm text-gray-300 hover:text-white transition-colors">
-                    <span className="text-xs font-bold text-pitch-400">{t.formation}</span>
-                    <span className="truncate">{t.name || 'Sans nom'}</span>
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
           <Link to="/coach/tactics" className="btn-secondary text-sm gap-1.5" title="Tableau Tactique">
             <Swords size={15} /> <span className="hidden sm:inline">Tactiques</span>
           </Link>
@@ -423,31 +443,30 @@ export default function Lineup() {
           <button onClick={() => { setSlots({}); setSubs([]); setCaptainId(null); setSelectedSlot(null); setLoadedTactic(null) }} className="btn-secondary gap-1.5 text-sm text-red-400 hover:text-red-300 border-red-900/50 hover:border-red-700/50">
             <RefreshCw size={14} /> Vider
           </button>
-          <button onClick={() => saveMutation.mutate()} className="btn-primary gap-1.5 text-sm" disabled={saveMutation.isPending}>
-            <Save size={14} /> {saveMutation.isPending ? 'Sauvegarde...' : 'Sauvegarder'}
-          </button>
+          {/* Right group: Charger + Sauvegarder */}
+          <div className="flex items-center gap-2 ml-auto">
+            <div className="relative">
+              <button type="button" onClick={() => setShowTacticPicker(!showTacticPicker)} className="btn-secondary text-sm gap-1.5" title="Charger depuis une tactique">
+                <Download size={14} /> <span className="hidden sm:inline">Charger</span>
+              </button>
+              {showTacticPicker && (tactics as Tactic[] | undefined)?.length ? (
+                <div className="absolute right-0 top-full mt-1 z-30 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl p-2 min-w-[200px] max-h-[300px] overflow-y-auto">
+                  <p className="text-[10px] text-gray-500 uppercase font-semibold px-2 py-1">Charger tactique</p>
+                  {(tactics as Tactic[]).map((t) => (
+                    <button key={t.id} type="button" onClick={() => loadFromTactic(t)}
+                      className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800 text-sm text-gray-300 hover:text-white transition-colors">
+                      <span className="text-xs font-bold text-pitch-400">{t.formation}</span>
+                      <span className="truncate">{t.name || 'Sans nom'}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+            <button onClick={() => saveMutation.mutate()} className="btn-primary gap-1.5 text-sm" disabled={saveMutation.isPending}>
+              <Save size={14} /> {saveMutation.isPending ? 'Sauvegarde...' : 'Sauvegarder'}
+            </button>
+          </div>
         </div>
-      </div>
-
-      {/* FIFA Game Plan bar */}
-      <div className="flex items-center gap-1 bg-gray-900/70 rounded-xl px-3 py-2 border border-gray-800/60 overflow-x-auto">
-        <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mr-2 shrink-0">Plan de jeu</span>
-        {GAME_PLANS.map((gp) => (
-          <button
-            key={gp.key}
-            onClick={() => setGamePlan(gp.key)}
-            className={clsx(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap',
-              gamePlan === gp.key
-                ? 'bg-pitch-600 text-white shadow-lg shadow-pitch-600/30 ring-1 ring-pitch-400/40'
-                : 'bg-gray-800/60 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
-            )}
-          >
-            <span>{gp.icon}</span>
-            <span className="hidden sm:inline">{gp.label}</span>
-            <span className="sm:hidden">{gp.shortLabel}</span>
-          </button>
-        ))}
       </div>
 
       {/* Loaded tactic config panel */}
@@ -624,6 +643,11 @@ export default function Lineup() {
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Pitch — main area */}
         <div className="lg:col-span-2 space-y-3">
+          <div className="flex items-center justify-end mb-1">
+            <button type="button" onClick={() => setEditMode(!editMode)} className={clsx('flex items-center gap-1 text-xs font-medium transition-colors', editMode ? 'text-yellow-400 hover:text-yellow-300' : 'text-gray-500 hover:text-gray-300')} title="Mode repositionnement libre">
+              <Move size={11} /> {editMode ? 'Quitter édition' : 'Éditer positions'}
+            </button>
+          </div>
           <div className="relative">
             <PitchSVG
               formation={formation}
@@ -638,6 +662,9 @@ export default function Lineup() {
               onSlotRemove={handleSlotRemove}
               getPlayer={getPlayer}
               selectedSlot={selectedSlot}
+              editMode={editMode}
+              customPositions={customPositions}
+              onPositionChange={(key, x, y) => setCustomPositions(prev => ({ ...prev, [key]: { x, y } }))}
             />
             {/* Overlay hint when empty */}
             {starterCount === 0 && (

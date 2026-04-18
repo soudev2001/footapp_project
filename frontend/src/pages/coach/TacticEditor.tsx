@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi } from '../../api'
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { Trash2, Save, Crown, Target, X, GripVertical, ArrowRightLeft, Shield, Wand2, Users, Trophy, Heart, Repeat2, CheckCircle2, XCircle, Copy } from 'lucide-react'
+import { Trash2, Save, Crown, Target, X, GripVertical, ArrowRightLeft, Shield, Wand2, Users, Trophy, Heart, Repeat2, CheckCircle2, XCircle, Copy, Move } from 'lucide-react'
 import TabNavigation from '../../components/TabNavigation'
 import CollapsibleSection from '../../components/CollapsibleSection'
 import MentalitySlider from '../../components/MentalitySlider'
@@ -70,6 +70,10 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
 
   // Delete confirm
   const [confirmDelete, setConfirmDelete] = useState(false)
+
+  // Edit mode (free repositioning)
+  const [editMode, setEditMode] = useState(false)
+  const [customPositions, setCustomPositions] = useState<Record<string, { x: number; y: number }>>({})
 
   // Form
   const { register, handleSubmit, reset, watch, setValue } = useForm<TacticForm>({
@@ -384,7 +388,7 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
   // RENDER
   // ══════════════════════════════════════════════════
   return (
-    <form onSubmit={handleSubmit((d) => saveMutation.mutate(d))} className="space-y-4 pb-8">
+    <div className="space-y-4 pb-8">
       {/* Toast */}
       {toast && (
         <div className={clsx(
@@ -426,7 +430,7 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
             {formationCategory(watchedFormation).label}
           </span>
           <div className="flex items-center gap-1.5">
-            <button type="submit" className="btn-primary text-xs" disabled={saveMutation.isPending}>
+            <button type="button" onClick={handleSubmit((d) => saveMutation.mutate(d))} className="btn-primary text-xs" disabled={saveMutation.isPending}>
               <Save size={14} /> Sauvegarder
             </button>
             {tactic && onDuplicate && (
@@ -484,6 +488,9 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
           <div className="flex items-center justify-between">
             <span className="text-xs text-gray-400"><Users size={12} className="inline" /> {Object.keys(pitchSlots).length}/11</span>
             <div className="flex items-center gap-2 text-xs">
+              <button type="button" onClick={() => setEditMode(!editMode)} className={clsx('flex items-center gap-1 font-medium transition-colors', editMode ? 'text-yellow-400 hover:text-yellow-300' : 'text-gray-500 hover:text-gray-300')} title="Mode repositionnement libre">
+                <Move size={11} /> {editMode ? 'Quitter édition' : 'Éditer positions'}
+              </button>
               <button type="button" onClick={autoFillPitch} className="flex items-center gap-1 text-pitch-400 hover:text-pitch-300 font-medium"><Wand2 size={11} /> Auto XI</button>
               {selectedSlot && <span className="flex items-center gap-1 text-yellow-400 animate-pulse"><Repeat2 size={10} /> Échange</span>}
             </div>
@@ -511,6 +518,9 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
             onSlotRemove={handleSlotRemove}
             getPlayer={getPlayer}
             selectedSlot={selectedSlot}
+            editMode={editMode}
+            customPositions={customPositions}
+            onPositionChange={(key, x, y) => setCustomPositions(prev => ({ ...prev, [key]: { x, y } }))}
           />
 
           {/* Substitutes bench */}
@@ -858,6 +868,6 @@ export default function TacticEditor({ tactic, players, onSaved, onCancel, onDup
         }}
         onClose={() => setRoleModalOpen(false)}
       />
-    </form>
+    </div>
   )
 }

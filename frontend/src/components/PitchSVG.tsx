@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import clsx from 'clsx'
 import { X } from 'lucide-react'
 import { positionFit, fitColor, calcOVR, ovrColor } from '../utils/fifaLogic'
@@ -15,75 +15,75 @@ export interface PitchPosition {
 
 export const FORMATION_POSITIONS: Record<string, PitchPosition[]> = {
   '4-3-3': [
-    { name: 'GK', x: 50, y: 90 },
-    { name: 'RB', x: 80, y: 70 }, { name: 'CB', x: 62, y: 72 }, { name: 'CB', x: 38, y: 72 }, { name: 'LB', x: 20, y: 70 },
-    { name: 'CM', x: 70, y: 50 }, { name: 'CDM', x: 50, y: 52 }, { name: 'CM', x: 30, y: 50 },
-    { name: 'RW', x: 80, y: 25 }, { name: 'ST', x: 50, y: 18 }, { name: 'LW', x: 20, y: 25 },
+    { name: 'GK', x: 50, y: 92 },
+    { name: 'RB', x: 85, y: 74 }, { name: 'CB', x: 65, y: 76 }, { name: 'CB', x: 35, y: 76 }, { name: 'LB', x: 15, y: 74 },
+    { name: 'CM', x: 72, y: 50 }, { name: 'CDM', x: 50, y: 54 }, { name: 'CM', x: 28, y: 50 },
+    { name: 'RW', x: 84, y: 24 }, { name: 'ST', x: 50, y: 16 }, { name: 'LW', x: 16, y: 24 },
   ],
   '4-4-2': [
-    { name: 'GK', x: 50, y: 90 },
-    { name: 'RB', x: 80, y: 70 }, { name: 'CB', x: 62, y: 72 }, { name: 'CB', x: 38, y: 72 }, { name: 'LB', x: 20, y: 70 },
-    { name: 'RM', x: 80, y: 48 }, { name: 'CM', x: 62, y: 48 }, { name: 'CM', x: 38, y: 48 }, { name: 'LM', x: 20, y: 48 },
-    { name: 'ST', x: 62, y: 20 }, { name: 'ST', x: 38, y: 20 },
-  ],
-  '3-5-2': [
-    { name: 'GK', x: 50, y: 90 },
-    { name: 'CB', x: 70, y: 72 }, { name: 'CB', x: 50, y: 72 }, { name: 'CB', x: 30, y: 72 },
-    { name: 'RM', x: 85, y: 50 }, { name: 'CM', x: 67, y: 50 }, { name: 'CDM', x: 50, y: 52 }, { name: 'CM', x: 33, y: 50 }, { name: 'LM', x: 15, y: 50 },
-    { name: 'ST', x: 62, y: 20 }, { name: 'ST', x: 38, y: 20 },
-  ],
-  '4-2-3-1': [
-    { name: 'GK', x: 50, y: 90 },
-    { name: 'RB', x: 80, y: 70 }, { name: 'CB', x: 62, y: 72 }, { name: 'CB', x: 38, y: 72 }, { name: 'LB', x: 20, y: 70 },
-    { name: 'CDM', x: 62, y: 54 }, { name: 'CDM', x: 38, y: 54 },
-    { name: 'RAM', x: 75, y: 35 }, { name: 'CAM', x: 50, y: 33 }, { name: 'LAM', x: 25, y: 35 },
-    { name: 'ST', x: 50, y: 16 },
-  ],
-  '5-3-2': [
-    { name: 'GK', x: 50, y: 90 },
-    { name: 'RWB', x: 85, y: 62 }, { name: 'CB', x: 68, y: 72 }, { name: 'CB', x: 50, y: 74 }, { name: 'CB', x: 32, y: 72 }, { name: 'LWB', x: 15, y: 62 },
-    { name: 'CM', x: 67, y: 48 }, { name: 'CM', x: 50, y: 46 }, { name: 'CM', x: 33, y: 48 },
-    { name: 'ST', x: 62, y: 20 }, { name: 'ST', x: 38, y: 20 },
-  ],
-  '3-4-3': [
-    { name: 'GK', x: 50, y: 90 },
-    { name: 'CB', x: 70, y: 72 }, { name: 'CB', x: 50, y: 74 }, { name: 'CB', x: 30, y: 72 },
-    { name: 'RM', x: 82, y: 48 }, { name: 'CM', x: 62, y: 50 }, { name: 'CM', x: 38, y: 50 }, { name: 'LM', x: 18, y: 48 },
-    { name: 'RW', x: 78, y: 22 }, { name: 'ST', x: 50, y: 18 }, { name: 'LW', x: 22, y: 22 },
-  ],
-  '4-1-4-1': [
-    { name: 'GK', x: 50, y: 90 },
-    { name: 'RB', x: 80, y: 70 }, { name: 'CB', x: 62, y: 72 }, { name: 'CB', x: 38, y: 72 }, { name: 'LB', x: 20, y: 70 },
-    { name: 'CDM', x: 50, y: 56 },
-    { name: 'RM', x: 80, y: 38 }, { name: 'CM', x: 62, y: 40 }, { name: 'CM', x: 38, y: 40 }, { name: 'LM', x: 20, y: 38 },
-    { name: 'ST', x: 50, y: 18 },
-  ],
-  '4-5-1': [
-    { name: 'GK', x: 50, y: 90 },
-    { name: 'RB', x: 80, y: 70 }, { name: 'CB', x: 62, y: 72 }, { name: 'CB', x: 38, y: 72 }, { name: 'LB', x: 20, y: 70 },
-    { name: 'RM', x: 82, y: 48 }, { name: 'CM', x: 67, y: 50 }, { name: 'CDM', x: 50, y: 52 }, { name: 'CM', x: 33, y: 50 }, { name: 'LM', x: 18, y: 48 },
-    { name: 'ST', x: 50, y: 18 },
-  ],
-  '4-1-2-1-2': [
-    { name: 'GK', x: 50, y: 90 },
-    { name: 'RB', x: 80, y: 70 }, { name: 'CB', x: 62, y: 72 }, { name: 'CB', x: 38, y: 72 }, { name: 'LB', x: 20, y: 70 },
-    { name: 'CDM', x: 50, y: 56 },
-    { name: 'CM', x: 68, y: 42 }, { name: 'CM', x: 32, y: 42 },
-    { name: 'CAM', x: 50, y: 30 },
+    { name: 'GK', x: 50, y: 92 },
+    { name: 'RB', x: 85, y: 74 }, { name: 'CB', x: 65, y: 76 }, { name: 'CB', x: 35, y: 76 }, { name: 'LB', x: 15, y: 74 },
+    { name: 'RM', x: 85, y: 48 }, { name: 'CM', x: 62, y: 50 }, { name: 'CM', x: 38, y: 50 }, { name: 'LM', x: 15, y: 48 },
     { name: 'ST', x: 62, y: 18 }, { name: 'ST', x: 38, y: 18 },
   ],
+  '3-5-2': [
+    { name: 'GK', x: 50, y: 92 },
+    { name: 'CB', x: 72, y: 76 }, { name: 'CB', x: 50, y: 78 }, { name: 'CB', x: 28, y: 76 },
+    { name: 'RM', x: 88, y: 50 }, { name: 'CM', x: 68, y: 50 }, { name: 'CDM', x: 50, y: 54 }, { name: 'CM', x: 32, y: 50 }, { name: 'LM', x: 12, y: 50 },
+    { name: 'ST', x: 62, y: 18 }, { name: 'ST', x: 38, y: 18 },
+  ],
+  '4-2-3-1': [
+    { name: 'GK', x: 50, y: 92 },
+    { name: 'RB', x: 85, y: 74 }, { name: 'CB', x: 65, y: 76 }, { name: 'CB', x: 35, y: 76 }, { name: 'LB', x: 15, y: 74 },
+    { name: 'CDM', x: 62, y: 56 }, { name: 'CDM', x: 38, y: 56 },
+    { name: 'RAM', x: 78, y: 34 }, { name: 'CAM', x: 50, y: 32 }, { name: 'LAM', x: 22, y: 34 },
+    { name: 'ST', x: 50, y: 14 },
+  ],
+  '5-3-2': [
+    { name: 'GK', x: 50, y: 92 },
+    { name: 'RWB', x: 88, y: 64 }, { name: 'CB', x: 70, y: 76 }, { name: 'CB', x: 50, y: 78 }, { name: 'CB', x: 30, y: 76 }, { name: 'LWB', x: 12, y: 64 },
+    { name: 'CM', x: 68, y: 48 }, { name: 'CM', x: 50, y: 46 }, { name: 'CM', x: 32, y: 48 },
+    { name: 'ST', x: 62, y: 18 }, { name: 'ST', x: 38, y: 18 },
+  ],
+  '3-4-3': [
+    { name: 'GK', x: 50, y: 92 },
+    { name: 'CB', x: 72, y: 76 }, { name: 'CB', x: 50, y: 78 }, { name: 'CB', x: 28, y: 76 },
+    { name: 'RM', x: 85, y: 48 }, { name: 'CM', x: 62, y: 50 }, { name: 'CM', x: 38, y: 50 }, { name: 'LM', x: 15, y: 48 },
+    { name: 'RW', x: 80, y: 20 }, { name: 'ST', x: 50, y: 16 }, { name: 'LW', x: 20, y: 20 },
+  ],
+  '4-1-4-1': [
+    { name: 'GK', x: 50, y: 92 },
+    { name: 'RB', x: 85, y: 74 }, { name: 'CB', x: 65, y: 76 }, { name: 'CB', x: 35, y: 76 }, { name: 'LB', x: 15, y: 74 },
+    { name: 'CDM', x: 50, y: 58 },
+    { name: 'RM', x: 85, y: 38 }, { name: 'CM', x: 62, y: 40 }, { name: 'CM', x: 38, y: 40 }, { name: 'LM', x: 15, y: 38 },
+    { name: 'ST', x: 50, y: 16 },
+  ],
+  '4-5-1': [
+    { name: 'GK', x: 50, y: 92 },
+    { name: 'RB', x: 85, y: 74 }, { name: 'CB', x: 65, y: 76 }, { name: 'CB', x: 35, y: 76 }, { name: 'LB', x: 15, y: 74 },
+    { name: 'RM', x: 85, y: 48 }, { name: 'CM', x: 68, y: 50 }, { name: 'CDM', x: 50, y: 54 }, { name: 'CM', x: 32, y: 50 }, { name: 'LM', x: 15, y: 48 },
+    { name: 'ST', x: 50, y: 16 },
+  ],
+  '4-1-2-1-2': [
+    { name: 'GK', x: 50, y: 92 },
+    { name: 'RB', x: 85, y: 74 }, { name: 'CB', x: 65, y: 76 }, { name: 'CB', x: 35, y: 76 }, { name: 'LB', x: 15, y: 74 },
+    { name: 'CDM', x: 50, y: 58 },
+    { name: 'CM', x: 70, y: 42 }, { name: 'CM', x: 30, y: 42 },
+    { name: 'CAM', x: 50, y: 30 },
+    { name: 'ST', x: 62, y: 16 }, { name: 'ST', x: 38, y: 16 },
+  ],
   '5-4-1': [
-    { name: 'GK', x: 50, y: 90 },
-    { name: 'RWB', x: 85, y: 62 }, { name: 'CB', x: 68, y: 72 }, { name: 'CB', x: 50, y: 74 }, { name: 'CB', x: 32, y: 72 }, { name: 'LWB', x: 15, y: 62 },
-    { name: 'RM', x: 75, y: 48 }, { name: 'CM', x: 58, y: 50 }, { name: 'CM', x: 42, y: 50 }, { name: 'LM', x: 25, y: 48 },
-    { name: 'ST', x: 50, y: 18 },
+    { name: 'GK', x: 50, y: 92 },
+    { name: 'RWB', x: 88, y: 64 }, { name: 'CB', x: 70, y: 76 }, { name: 'CB', x: 50, y: 78 }, { name: 'CB', x: 30, y: 76 }, { name: 'LWB', x: 12, y: 64 },
+    { name: 'RM', x: 78, y: 48 }, { name: 'CM', x: 58, y: 50 }, { name: 'CM', x: 42, y: 50 }, { name: 'LM', x: 22, y: 48 },
+    { name: 'ST', x: 50, y: 16 },
   ],
   '4-3-2-1': [
-    { name: 'GK', x: 50, y: 90 },
-    { name: 'RB', x: 80, y: 70 }, { name: 'CB', x: 62, y: 72 }, { name: 'CB', x: 38, y: 72 }, { name: 'LB', x: 20, y: 70 },
-    { name: 'CM', x: 70, y: 50 }, { name: 'CM', x: 50, y: 52 }, { name: 'CM', x: 30, y: 50 },
-    { name: 'RF', x: 65, y: 30 }, { name: 'LF', x: 35, y: 30 },
-    { name: 'ST', x: 50, y: 16 },
+    { name: 'GK', x: 50, y: 92 },
+    { name: 'RB', x: 85, y: 74 }, { name: 'CB', x: 65, y: 76 }, { name: 'CB', x: 35, y: 76 }, { name: 'LB', x: 15, y: 74 },
+    { name: 'CM', x: 72, y: 50 }, { name: 'CM', x: 50, y: 54 }, { name: 'CM', x: 28, y: 50 },
+    { name: 'RF', x: 66, y: 30 }, { name: 'LF', x: 34, y: 30 },
+    { name: 'ST', x: 50, y: 14 },
   ],
 }
 
@@ -117,6 +117,9 @@ interface PitchSVGProps {
   dragPlayer?: DragPlayer | null
   getPlayer?: (id: string) => Player | undefined
   selectedSlot?: string | null
+  editMode?: boolean
+  customPositions?: Record<string, { x: number; y: number }>
+  onPositionChange?: (slotKey: string, x: number, y: number) => void
 }
 
 export default function PitchSVG({
@@ -133,10 +136,16 @@ export default function PitchSVG({
   dragPlayer,
   getPlayer,
   selectedSlot,
+  editMode = false,
+  customPositions,
+  onPositionChange,
 }: PitchSVGProps) {
   const positions = FORMATION_POSITIONS[formation] ?? FORMATION_POSITIONS['4-3-3']
   const h = size === 'sm' ? 180 : size === 'md' ? 320 : 440
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null)
+  const [brokenAvatars, setBrokenAvatars] = useState<Set<string>>(new Set())
+  const [draggingEdit, setDraggingEdit] = useState<string | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const handleDrop = (e: React.DragEvent, slotKey: string, idx: number) => {
     e.preventDefault()
@@ -162,8 +171,29 @@ export default function PitchSVG({
     e.dataTransfer.effectAllowed = 'move'
   }
 
+  // Edit mode: free repositioning via pointer events
+  const handleEditPointerDown = useCallback((e: React.PointerEvent, slotKey: string) => {
+    if (!editMode || !onPositionChange) return
+    e.preventDefault()
+    e.stopPropagation()
+    setDraggingEdit(slotKey)
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+  }, [editMode, onPositionChange])
+
+  const handleEditPointerMove = useCallback((e: React.PointerEvent, slotKey: string) => {
+    if (!editMode || draggingEdit !== slotKey || !containerRef.current || !onPositionChange) return
+    const rect = containerRef.current.getBoundingClientRect()
+    const x = Math.max(5, Math.min(95, ((e.clientX - rect.left) / rect.width) * 100))
+    const y = Math.max(5, Math.min(95, ((e.clientY - rect.top) / rect.height) * 100))
+    onPositionChange(slotKey, Math.round(x * 10) / 10, Math.round(y * 10) / 10)
+  }, [editMode, draggingEdit, onPositionChange])
+
+  const handleEditPointerUp = useCallback(() => {
+    setDraggingEdit(null)
+  }, [])
+
   return (
-    <div className={clsx('relative rounded-xl overflow-hidden select-none', className)} style={{ height: h }}>
+    <div ref={containerRef} className={clsx('relative rounded-xl overflow-hidden select-none', editMode && 'ring-2 ring-dashed ring-yellow-500/40', className)} style={{ height: h }}>
       {/* Pitch background */}
       <svg viewBox="0 0 680 1050" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
         <defs>
@@ -195,9 +225,19 @@ export default function PitchSVG({
         <path d="M638,1020 A12,12 0 0,0 650,1008" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
       </svg>
 
+      {/* Edit mode badge */}
+      {editMode && (
+        <div className="absolute top-2 left-2 z-20 bg-yellow-500/90 text-black text-[10px] font-bold px-2 py-0.5 rounded-md">
+          Mode édition — Glissez les joueurs
+        </div>
+      )}
+
       {/* Player slots */}
       {positions.map((pos, i) => {
         const key = `${pos.name}-${i}`
+        const customPos = customPositions?.[key]
+        const effectiveX = customPos?.x ?? pos.x
+        const effectiveY = customPos?.y ?? pos.y
         const slot = slots[key]
         const filled = !!slot?.playerId
         const isInteractive = interactive && (onSlotClick || onSlotDrop)
@@ -215,18 +255,23 @@ export default function PitchSVG({
             key={key}
             className={clsx(
               'absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 z-10 transition-transform group',
-              isInteractive && 'cursor-pointer',
+              isInteractive && !editMode && 'cursor-pointer',
+              editMode && filled && 'cursor-move',
               isHovered && 'scale-110',
               isSelected && 'scale-115',
+              draggingEdit === key && 'z-20 scale-115',
             )}
-            style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-            onClick={() => isInteractive && onSlotClick?.(key, i)}
-            onDragOver={isInteractive ? (e) => handleDragOver(e, key) : undefined}
-            onDragLeave={isInteractive ? handleDragLeave : undefined}
-            onDrop={isInteractive ? (e) => handleDrop(e, key, i) : undefined}
-            draggable={isInteractive && filled}
-            onDragStart={isInteractive && filled ? (e) => handleDragStart(e, key, slot!) : undefined}
+            style={{ left: `${effectiveX}%`, top: `${effectiveY}%` }}
+            onClick={() => !editMode && isInteractive && onSlotClick?.(key, i)}
+            onDragOver={!editMode && isInteractive ? (e) => handleDragOver(e, key) : undefined}
+            onDragLeave={!editMode && isInteractive ? handleDragLeave : undefined}
+            onDrop={!editMode && isInteractive ? (e) => handleDrop(e, key, i) : undefined}
+            draggable={!editMode && isInteractive && filled}
+            onDragStart={!editMode && isInteractive && filled ? (e) => handleDragStart(e, key, slot!) : undefined}
             onContextMenu={isInteractive && filled && onSlotRemove ? (e) => { e.preventDefault(); onSlotRemove(key) } : undefined}
+            onPointerDown={editMode && filled ? (e) => handleEditPointerDown(e, key) : undefined}
+            onPointerMove={editMode && draggingEdit === key ? (e) => handleEditPointerMove(e, key) : undefined}
+            onPointerUp={editMode ? handleEditPointerUp : undefined}
           >
             {/* Selected glow */}
             {isSelected && (
@@ -241,7 +286,7 @@ export default function PitchSVG({
             )}
             <div
               className={clsx(
-                'rounded-full flex items-center justify-center font-bold text-white transition-all relative',
+                'rounded-full flex items-center justify-center font-bold text-white transition-all relative overflow-hidden',
                 // FIFA-style: position-fit colored border
                 filled ? `border-2 ${fitRing}` : 'border-2',
                 size === 'sm' ? 'w-6 h-6 text-[9px]' : size === 'md' ? 'w-9 h-9 text-[11px]' : 'w-11 h-11 text-xs',
@@ -253,7 +298,29 @@ export default function PitchSVG({
                 isInteractive && !filled && !isHovered && 'hover:border-pitch-400/60 hover:bg-gray-700/80'
               )}
             >
-              {filled ? (slot.jerseyNumber ?? slot.playerName?.[0] ?? '?') : pos.name.slice(0, 2)}
+              {(() => {
+                const avatar = player?.profile?.avatar
+                const firstName = player?.profile?.first_name ?? ''
+                const lastName = player?.profile?.last_name ?? ''
+                const fallbackUrl = firstName || lastName
+                  ? `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName + ' ' + lastName)}&size=44&background=14532d&color=fff`
+                  : null
+                const imgSrc = avatar && !brokenAvatars.has(avatar) ? avatar : fallbackUrl
+
+                if (filled && imgSrc) {
+                  return (
+                    <img
+                      src={imgSrc}
+                      alt=""
+                      className="w-full h-full object-cover rounded-full"
+                      onError={() => {
+                        if (avatar) setBrokenAvatars(prev => new Set(prev).add(avatar))
+                      }}
+                    />
+                  )
+                }
+                return filled ? (slot.jerseyNumber ?? slot.playerName?.[0] ?? '?') : pos.name.slice(0, 2)
+              })()}
               {slot?.isCaptain && (
                 <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-yellow-500 text-[7px] font-black rounded-full flex items-center justify-center text-gray-900">
                   C
