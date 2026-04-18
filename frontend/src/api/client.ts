@@ -5,10 +5,18 @@ const client = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+const isDev = import.meta.env.DEV
+
+// ─── Auth token injection ───────────────────────────────────────────────────
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
+  }
+  if (isDev) {
+    const method = (config.method ?? 'get').toUpperCase()
+    const url = `${config.baseURL ?? ''}${config.url ?? ''}`
+    console.log(`%c API → ${method} ${url} `, 'color: #38bdf8', config.data ?? '')
   }
   return config
 })
@@ -34,18 +42,30 @@ client.interceptors.response.use(
       if ('data' in res.data) {
         res.data = transformIds(res.data.data)
       } else {
-        // Auth-style responses ({ success, access_token, ... }) — keep as-is but transform _id
         res.data = transformIds(res.data)
       }
+    }
+    if (isDev) {
+      const method = (res.config.method ?? 'get').toUpperCase()
+      const url = `${res.config.baseURL ?? ''}${res.config.url ?? ''}`
+      console.log(`%c ✓ ${res.status} ${method} ${url}`, 'color: #16a34a', res.data)
     }
     return res
   },
 )
 
+// ─── Error handling & token refresh ─────────────────────────────────────────
 client.interceptors.response.use(
   undefined,
   async (error) => {
     const originalRequest = error.config
+
+    if (isDev) {
+      const method = (originalRequest?.method ?? 'get').toUpperCase()
+      const url = `${originalRequest?.baseURL ?? ''}${originalRequest?.url ?? ''}`
+      const status = error.response?.status ?? 'NETWORK'
+      console.log(`%c ✗ ${status} ${method} ${url}`, 'color: #dc2626', error.response?.data ?? error.message)
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
@@ -59,11 +79,13 @@ client.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${data.access_token}`
           return client(originalRequest)
         } catch {
-          localStorage.removeItem('access_token')
-          localStorage.removeItem('refresh_token')
-          window.location.href = '/login'
+          // Refresh failed — clear tokens and redirect
         }
       }
+      // No refresh token or refresh failed — force logout
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      window.location.href = '/login'
     }
 
     return Promise.reject(error)

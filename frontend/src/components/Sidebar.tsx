@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useAuthStore } from '../store/auth'
+import { useTeam } from '../contexts/TeamContext'
 import {
   LayoutDashboard, Rss, Calendar, MessageSquare, Bell,
   User, ShoppingBag, Users, Settings, BarChart3,
@@ -105,6 +106,7 @@ const SECTIONS: NavSection[] = [
 export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { user } = useAuthStore()
   const role = user?.role
+  const { teams, activeTeamId, setActiveTeamId } = useTeam()
 
   return (
     <>
@@ -163,6 +165,19 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                 <p className="px-3 text-[10px] font-semibold uppercase tracking-widest text-gray-500 mb-1">
                   {section.title}
                 </p>
+              )}
+              {section.title === 'Coach' && teams.length > 1 && (
+                <div className="px-2 mb-2">
+                  <select
+                    value={activeTeamId}
+                    onChange={(e) => setActiveTeamId(e.target.value)}
+                    className="w-full text-xs bg-gray-800 border border-gray-700 rounded-lg px-2 py-1.5 text-gray-300 focus:border-pitch-500 focus:outline-none"
+                  >
+                    {teams.map((t) => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
               )}
               {visibleItems.map((item) => (
                 <NavLink

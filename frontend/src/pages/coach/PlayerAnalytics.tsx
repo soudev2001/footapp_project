@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { coachApi } from '../../api'
+import { useTeam } from '../../contexts/TeamContext'
 import {
   BarChart3, TrendingUp, Target, User, Activity,
   ChevronRight, Award, Heart
@@ -13,22 +14,23 @@ const RATING_LABELS: Record<string, string> = {
 }
 
 export default function PlayerAnalytics() {
+  const { activeTeamId } = useTeam()
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null)
 
   const { data: rankings, isLoading } = useQuery({
-    queryKey: ['coach-analytics-players'],
-    queryFn: () => coachApi.analyticsPlayers().then(r => r.data?.data || []),
+    queryKey: ['coach-analytics-players', activeTeamId],
+    queryFn: () => coachApi.analyticsPlayers(activeTeamId ? { team_id: activeTeamId } : undefined).then(r => r.data),
   })
 
   const { data: dashboard } = useQuery({
     queryKey: ['coach-analytics-player', selectedPlayer],
-    queryFn: () => coachApi.analyticsPlayer(selectedPlayer!).then(r => r.data?.data as PlayerDashboard),
+    queryFn: () => coachApi.analyticsPlayer(selectedPlayer!).then(r => r.data as PlayerDashboard),
     enabled: !!selectedPlayer,
   })
 
   const { data: trends } = useQuery({
     queryKey: ['coach-analytics-trends', selectedPlayer],
-    queryFn: () => coachApi.analyticsTrends(selectedPlayer!).then(r => r.data?.data),
+    queryFn: () => coachApi.analyticsTrends(selectedPlayer!).then(r => r.data),
     enabled: !!selectedPlayer,
   })
 

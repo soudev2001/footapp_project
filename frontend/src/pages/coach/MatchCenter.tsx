@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { matchesApi, coachApi } from '../../api'
+import { useTeam } from '../../contexts/TeamContext'
 import { useState } from 'react'
 import { Shield, Plus, Goal, CreditCard, ArrowLeftRight, Save, Play, Square, Clock, ChevronLeft, ChevronRight, CircleDot, Zap, ClipboardList } from 'lucide-react'
 import { format } from 'date-fns'
@@ -69,20 +70,23 @@ interface MatchEventForm {
 
 export default function MatchCenter() {
   const qc = useQueryClient()
+  const { activeTeamId } = useTeam()
   const [creatingMatch, setCreatingMatch] = useState(false)
   const [scoringMatch, setScoringMatch] = useState<Match | null>(null)
   const [eventMatch, setEventMatch] = useState<Match | null>(null)
   const [activeMatch, setActiveMatch] = useState<Match | null>(null)
   const [matchIdx, setMatchIdx] = useState(0)
 
+  const teamParams = activeTeamId ? { team_id: activeTeamId } : undefined
+
   const { data: upcoming } = useQuery({
-    queryKey: ['matches-upcoming'],
-    queryFn: () => matchesApi.upcoming().then((r) => r.data),
+    queryKey: ['matches-upcoming', activeTeamId],
+    queryFn: () => matchesApi.upcoming(teamParams).then((r) => r.data),
   })
 
   const { data: results } = useQuery({
-    queryKey: ['matches-results'],
-    queryFn: () => matchesApi.results().then((r) => r.data),
+    queryKey: ['matches-results', activeTeamId],
+    queryFn: () => matchesApi.results(teamParams).then((r) => r.data),
   })
 
   const allMatches = [...(upcoming ?? []), ...(results ?? [])] as Match[]
@@ -99,7 +103,8 @@ export default function MatchCenter() {
   const scoreMutation = useMutation({
     mutationFn: (data: ScoreForm) => coachApi.updateScore(scoringMatch!.id, data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['matches-upcoming', 'matches-results'] })
+      qc.invalidateQueries({ queryKey: ['matches-upcoming'] })
+      qc.invalidateQueries({ queryKey: ['matches-results'] })
       setScoringMatch(null)
       resetScore()
     },
@@ -108,7 +113,8 @@ export default function MatchCenter() {
   const eventMutation = useMutation({
     mutationFn: (data: object) => coachApi.addMatchEvent(eventMatch!.id, data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['matches-upcoming', 'matches-results'] })
+      qc.invalidateQueries({ queryKey: ['matches-upcoming'] })
+      qc.invalidateQueries({ queryKey: ['matches-results'] })
       resetEvent()
     },
   })

@@ -19,7 +19,7 @@ export const matchesApi = {
   upcoming: (params?: { club_id?: string; team_id?: string }) =>
     client.get<Match[]>('/matches/upcoming', { params }),
 
-  results: (params?: { club_id?: string }) =>
+  results: (params?: { club_id?: string; team_id?: string }) =>
     client.get<Match[]>('/matches/results', { params }),
 
   getById: (id: string) => client.get<Match>(`/matches/${id}`),
@@ -118,9 +118,9 @@ export const notificationsApi = {
 export const coachApi = {
   dashboard: () => client.get('/coach/dashboard'),
   roster: (params?: { team_id?: string }) => client.get('/coach/roster', { params }),
-  lineup: () => client.get('/coach/lineup'),
+  lineup: (params?: { team_id?: string }) => client.get('/coach/lineup', { params }),
   saveLineup: (data: object) => client.post('/coach/lineup', data),
-  tactics: () => client.get('/coach/tactics'),
+  tactics: (params?: { team_id?: string }) => client.get('/coach/tactics', { params }),
   saveTactic: (data: object) => client.post('/coach/tactics', data),
   deleteTactic: (id: string) => client.delete(`/coach/tactics/${id}`),
   sendConvocation: (data: object) => client.post('/coach/convocation', data),
@@ -200,10 +200,13 @@ export const adminApi = {
   createTeam: (data: object) => client.post('/admin/teams', data),
   updateTeam: (id: string, data: object) => client.put(`/admin/teams/${id}`, data),
   deleteTeam: (id: string) => client.delete(`/admin/teams/${id}`),
+  addCoachToTeam: (teamId: string, coachId: string) => client.post(`/admin/teams/${teamId}/add-coach`, { coach_id: coachId }),
+  removeCoachFromTeam: (teamId: string, coachId: string) => client.post(`/admin/teams/${teamId}/remove-coach`, { coach_id: coachId }),
   updateClub: (data: object) => client.put('/admin/club', data),
   analytics: () => client.get('/admin/analytics'),
   subscription: () => client.get('/admin/subscription'),
   invite: (data: object) => client.post('/admin/invite', data),
+  resetPassword: (id: string) => client.post(`/admin/members/${id}/reset-password`),
   announcements: () => client.get('/admin/announcements'),
   createAnnouncement: (data: object) => client.post('/admin/announcement', data),
   onboarding: () => client.get('/admin/onboarding'),

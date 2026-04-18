@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { coachApi } from '../../api'
+import { useTeam } from '../../contexts/TeamContext'
 import { GitCompare, Plus, X, User, Target } from 'lucide-react'
 import type { PlayerRanking } from '../../types'
 
@@ -15,16 +16,17 @@ interface ComparedPlayer {
 }
 
 export default function PlayerComparison() {
+  const { activeTeamId } = useTeam()
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   const { data: rankings } = useQuery({
-    queryKey: ['coach-analytics-players'],
-    queryFn: () => coachApi.analyticsPlayers().then(r => r.data?.data || []),
+    queryKey: ['coach-analytics-players', activeTeamId],
+    queryFn: () => coachApi.analyticsPlayers(activeTeamId ? { team_id: activeTeamId } : undefined).then(r => r.data),
   })
 
   const { data: comparison } = useQuery({
     queryKey: ['coach-compare', selectedIds],
-    queryFn: () => coachApi.analyticsCompare(selectedIds).then(r => r.data?.data || []),
+    queryFn: () => coachApi.analyticsCompare(selectedIds).then(r => r.data),
     enabled: selectedIds.length >= 2,
   })
 

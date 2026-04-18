@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi, teamsApi } from '../../api'
+import { useTeam } from '../../contexts/TeamContext'
 import { Users, Search, Plus, X, Save, PieChart, GitCompare, CheckCircle, Trash2, Pencil } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
@@ -48,6 +49,7 @@ const EMPTY_FORM = {
 
 export default function Roster() {
   const qc = useQueryClient()
+  const { teams, activeTeamId } = useTeam()
   const [search, setSearch] = useState('')
   const [posFilter, setPosFilter] = useState<string | null>(null)
   const [adding, setAdding] = useState(false)
@@ -55,22 +57,17 @@ export default function Roster() {
   const [form, setForm] = useState(EMPTY_FORM)
 
   const { data: players, isLoading } = useQuery({
-    queryKey: ['coach-roster'],
-    queryFn: () => coachApi.roster().then((r) => r.data),
+    queryKey: ['coach-roster', activeTeamId],
+    queryFn: () => coachApi.roster(activeTeamId ? { team_id: activeTeamId } : undefined).then((r) => r.data),
   })
-
-  const { data: teamsData } = useQuery({
-    queryKey: ['teams'],
-    queryFn: () => teamsApi.getAll().then((r) => r.data),
-  })
-  const teams = teamsData?.data ?? []
 
   const addMutation = useMutation({
     mutationFn: (data: object) => coachApi.addPlayer(data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['coach-roster'] })
+      qc.invalidateQueries({ queryKey: ['team-players'] })
       setAdding(false)
-      setForm(EMPTY_FORM)
+      setForm({ ...EMPTY_FORM, team_id: activeTeamId })
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     },
@@ -168,9 +165,9 @@ export default function Roster() {
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Équipe</label>
-                <select value={form.team_id} onChange={(e) => setForm({ ...form, team_id: e.target.value })} className="input">
+                <select value={form.team_id || activeTeamId} onChange={(e) => setForm({ ...form, team_id: e.target.value })} className="input">
                   <option value="">Aucune</option>
-                  {teams.map((t: any) => (
+                  {teams.map((t) => (
                     <option key={t.id} value={t.id}>{t.name}</option>
                   ))}
                 </select>

@@ -1158,7 +1158,7 @@ def coach_get_events():
     if not club_id:
         return jsonify({'success': True, 'data': []})
     event_service = get_event_service()
-    events = event_service.get_upcoming(club_id, team_id=team_id, limit=50)
+    events = event_service.get_by_club(club_id)
     return jsonify({'success': True, 'data': serialize_docs(events)})
 
 
@@ -1696,7 +1696,7 @@ def coach_create_event():
         location=data.get('location', ''),
         description=data.get('description', ''),
     )
-    return jsonify({'success': True, 'event_id': str(event_id)}), 201
+    return jsonify({'success': True, 'event_id': str(event_id['_id'])}), 201
 
 
 @api_bp.route('/coach/events/<event_id>', methods=['PUT'])
@@ -1859,6 +1859,50 @@ def admin_add_member():
     return jsonify({'success': True, 'user_id': str(user_id)}), 201
 
 
+@api_bp.route('/admin/invite', methods=['POST'])
+@role_required('admin')
+def admin_invite_member():
+    """Invite a new member by email with invitation token."""
+    import secrets
+    data = request.get_json()
+    if not data or not data.get('email'):
+        return jsonify({'success': False, 'error': 'Email required'}), 400
+
+    club_id = request.current_user.get('club_id')
+    user_service = get_user_service()
+    notification_service = get_notification_service()
+    email = data['email'].strip().lower()
+
+    existing = user_service.get_by_email(email)
+    if existing:
+        if existing.get('account_status') == 'active':
+            return jsonify({'success': False, 'error': 'Cet utilisateur est déjà actif'}), 409
+        # Resend invitation
+        if not existing.get('invitation_token'):
+            token = secrets.token_urlsafe(32)
+            user_service.collection.update_one(
+                {'_id': existing['_id']},
+                {'$set': {'invitation_token': token}}
+            )
+            existing['invitation_token'] = token
+        notification_service.send_invitation(existing)
+        return jsonify({'success': True, 'message': 'Invitation renvoyée'})
+
+    # Create new pending user with invitation token
+    profile = {
+        'first_name': data.get('first_name', ''),
+        'last_name': data.get('last_name', ''),
+    }
+    user = user_service.create_pending_user(
+        email=email,
+        role=data.get('role', 'player'),
+        club_id=club_id,
+        profile=profile,
+    )
+    notification_service.send_invitation(user)
+    return jsonify({'success': True, 'message': 'Invitation envoyée', 'user_id': str(user['_id'])}), 201
+
+
 @api_bp.route('/admin/members/<user_id>', methods=['PUT'])
 @role_required('admin')
 def admin_edit_member(user_id):
@@ -1867,10 +1911,61 @@ def admin_edit_member(user_id):
     if not data:
         return jsonify({'success': False, 'error': 'Data required'}), 400
     user_service = get_user_service()
-    user_service.update_profile(user_id, data)
+    from bson import ObjectId
+
+    update = {}
+    # Profile fields
+    profile_fields = {}
+    for key in ('first_name', 'last_name', 'phone', 'avatar'):
+        if key in data:
+            profile_fields[f'profile.{key}'] = data[key]
+    if profile_fields:
+        update.update(profile_fields)
+
+    # Role
     if 'role' in data:
-        user_service.update_role(user_id, data['role'])
+        update['role'] = data['role']
+        update['roles'] = [data['role']]
+
+    if update:
+        user_service.collection.update_one({'_id': ObjectId(user_id)}, {'$set': update})
+
+    # Team assignment
+    if 'team_id' in data:
+        player_service = get_player_service()
+        player = player_service.get_by_user(user_id)
+        if player:
+            player_service.collection.update_one(
+                {'_id': player['_id']},
+                {'$set': {'team_id': ObjectId(data['team_id']) if data['team_id'] else None}}
+            )
+
     return jsonify({'success': True, 'message': 'Member updated'})
+
+
+@api_bp.route('/admin/members/<user_id>/reset-password', methods=['POST'])
+@role_required('admin')
+def admin_reset_password(user_id):
+    """Send password reset email to a member."""
+    import secrets
+    user_service = get_user_service()
+    user = user_service.get_by_id(user_id)
+    if not user:
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+    token = secrets.token_urlsafe(32)
+    user_service.collection.update_one(
+        {'_id': user['_id']},
+        {'$set': {'reset_token': token}}
+    )
+    from flask import request as req
+    base_url = req.host_url.rstrip('/')
+    reset_link = f"{base_url}/reset-password?token={token}"
+    from app.services.email_service import send_reset_password_email
+    success = send_reset_password_email(user['email'], reset_link)
+    if success:
+        return jsonify({'success': True, 'message': 'Email de réinitialisation envoyé'})
+    else:
+        return jsonify({'success': False, 'error': 'Erreur envoi email — vérifiez la config SMTP'}), 500
 
 
 @api_bp.route('/admin/members/<user_id>', methods=['DELETE'])
@@ -1891,6 +1986,14 @@ def admin_seed_players():
     club_id = request.current_user.get('club_id')
     team_id = data.get('team_id')
     delete_existing = data.get('delete_existing', True)
+
+    # Auto-assign to the first team if none specified
+    if not team_id and club_id:
+        from app.services.team_service import get_team_service
+        ts = get_team_service()
+        teams = ts.get_by_club(club_id)
+        if teams:
+            team_id = str(teams[0]['_id'])
 
     try:
         players = seed_18_players(club_id, team_id, delete_existing=delete_existing)
@@ -1948,6 +2051,30 @@ def admin_delete_team(team_id):
     team_service = get_team_service()
     team_service.delete(team_id)
     return jsonify({'success': True, 'message': 'Team deleted'})
+
+
+@api_bp.route('/admin/teams/<team_id>/add-coach', methods=['POST'])
+@role_required('admin')
+def admin_add_coach_to_team(team_id):
+    """Add a coach to a team."""
+    data = request.get_json()
+    if not data or not data.get('coach_id'):
+        return jsonify({'success': False, 'error': 'coach_id required'}), 400
+    team_service = get_team_service()
+    team_service.add_coach(team_id, data['coach_id'])
+    return jsonify({'success': True, 'message': 'Coach added to team'})
+
+
+@api_bp.route('/admin/teams/<team_id>/remove-coach', methods=['POST'])
+@role_required('admin')
+def admin_remove_coach_from_team(team_id):
+    """Remove a coach from a team."""
+    data = request.get_json()
+    if not data or not data.get('coach_id'):
+        return jsonify({'success': False, 'error': 'coach_id required'}), 400
+    team_service = get_team_service()
+    team_service.remove_coach(team_id, data['coach_id'])
+    return jsonify({'success': True, 'message': 'Coach removed from team'})
 
 
 @api_bp.route('/admin/club', methods=['PUT'])

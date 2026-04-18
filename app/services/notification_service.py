@@ -70,7 +70,7 @@ class NotificationService:
 
         # Check if user_id is actually a player_id (Coach roster sends player_id)
         # Verify if it's a valid player
-        player_service = get_player_service(self.db) if hasattr(self, 'db') else None
+        player_service = get_player_service()
 
         # If player_service exists, verify if user_id matches a player
         is_player = False
@@ -86,7 +86,7 @@ class NotificationService:
                 pass
 
         if is_player:
-            link_service = get_parent_link_service(self.db) if hasattr(self, 'db') else None
+            link_service = get_parent_link_service()
             if link_service:
                 parents = link_service.get_linked_parents(user_id)
                 for parent in parents:

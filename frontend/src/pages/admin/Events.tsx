@@ -29,20 +29,29 @@ export default function AdminEvents() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<EventForm>(EMPTY_FORM)
   const [filterType, setFilterType] = useState<string>('all')
+  const [error, setError] = useState<string | null>(null)
 
-  const { data: events, isLoading } = useQuery({
+  const { data: events, isLoading, error: fetchError } = useQuery({
     queryKey: ['coach-events'],
     queryFn: () => coachApi.events().then((r) => r.data),
   })
 
   const createMutation = useMutation({
     mutationFn: (data: object) => coachApi.createEvent(data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['coach-events'] }); closeModal() },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['coach-events'] }); closeModal()
+    },
+    onError: (err: any) => {
+      setError(err.response?.data?.error ?? err.message ?? 'Erreur de création')
+    },
   })
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: object }) => coachApi.updateEvent(id, data),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['coach-events'] }); closeModal() },
+    onError: (err: any) => {
+      setError(err.response?.data?.error ?? err.message ?? 'Erreur de mise à jour')
+    },
   })
 
   const deleteMutation = useMutation({
@@ -89,6 +98,15 @@ export default function AdminEvents() {
           <Plus size={16} /> Nouvel événement
         </button>
       </div>
+
+      {/* Error display */}
+      {(error || fetchError) && (
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-900/40 border border-red-700/50 text-red-300 text-sm">
+          <span>❌</span>
+          <span>{error ?? (fetchError as any)?.message ?? 'Erreur'}</span>
+          <button onClick={() => setError(null)} className="ml-auto text-red-400 hover:text-red-200"><X size={14} /></button>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex gap-2 flex-wrap">

@@ -15,6 +15,7 @@ import {
   type SlotData,
 } from '../../utils/fifaLogic'
 import { SET_PIECE_TYPES, EMPTY_SET_PIECES, ROLE_LABELS, DUTY_LABELS, type PlayerInstruction } from './tacticsConstants'
+import { useTeam } from '../../contexts/TeamContext'
 
 interface Tactic {
   id: string
@@ -70,6 +71,7 @@ const LINEUP_DRAFT_KEY = 'footapp-lineup-draft'
 
 export default function Lineup() {
   const qc = useQueryClient()
+  const { activeTeamId } = useTeam()
   const [formation, setFormation] = useState('4-3-3')
   const [slots, setSlots] = useState<Record<string, SlotData>>({})
   const [captainId, setCaptainId] = useState<string | null>(null)
@@ -108,19 +110,21 @@ export default function Lineup() {
     toastTimer.current = setTimeout(() => setToast(null), 3000)
   }, [])
 
+  const teamParams = activeTeamId ? { team_id: activeTeamId } : undefined
+
   const { data: players } = useQuery({
-    queryKey: ['coach-roster'],
-    queryFn: () => coachApi.roster().then((r) => r.data),
+    queryKey: ['coach-roster', activeTeamId],
+    queryFn: () => coachApi.roster(teamParams).then((r) => r.data),
   })
 
   const { data: savedLineup } = useQuery({
-    queryKey: ['coach-lineup'],
-    queryFn: () => coachApi.lineup().then((r) => r.data),
+    queryKey: ['coach-lineup', activeTeamId],
+    queryFn: () => coachApi.lineup(teamParams).then((r) => r.data),
   })
 
   const { data: tactics } = useQuery({
-    queryKey: ['tactics'],
-    queryFn: () => coachApi.tactics().then((r) => r.data).catch(() => []),
+    queryKey: ['coach-tactics', activeTeamId],
+    queryFn: () => coachApi.tactics(teamParams).then((r) => r.data).catch(() => []),
   })
 
   // Load saved lineup (API data, used as fallback if no local draft)
@@ -188,19 +192,20 @@ export default function Lineup() {
   const saveMutation = useMutation({
     mutationFn: () => {
       const positions = FORMATION_POSITIONS[formation] ?? []
-      // Preserve position order with nulls for empty slots
       const starters = positions.map((pos, i) => {
         const key = `${pos.name}-${i}`
         return slots[key]?.playerId ?? null
       })
-      return coachApi.saveLineup({
+      const payload = {
         formation,
         starters,
         substitutes: subs,
+        team_id: activeTeamId || undefined,
         captains: captains.length > 0 ? captains : captainId ? [captainId] : [],
         set_pieces: setPieces,
         player_instructions: playerInstructions,
-      })
+      }
+      return coachApi.saveLineup(payload)
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['coach-lineup'] })
@@ -211,7 +216,9 @@ export default function Lineup() {
       showToast('Composition sauvegardée')
       setTimeout(() => setAutoSaveStatus('idle'), 2000)
     },
-    onError: () => showToast('Erreur lors de la sauvegarde', 'error'),
+    onError: () => {
+      showToast('Erreur lors de la sauvegarde', 'error')
+    },
   })
 
   const getPlayer = (id: string) => (players as Player[] | undefined)?.find((pl) => pl.id === id)

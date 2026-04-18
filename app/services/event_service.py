@@ -52,7 +52,7 @@ class EventService:
             'club_id': ObjectId(club_id),
             'title': title,
             'type': event_type,
-            'date': date,
+            'date': datetime.fromisoformat(date) if isinstance(date, str) else date,
             'location': kwargs.get('location', ''),
             'description': kwargs.get('description', ''),
             'category': kwargs.get('category', ''),

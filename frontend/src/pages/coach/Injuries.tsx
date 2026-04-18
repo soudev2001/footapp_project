@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import { coachApi } from '../../api'
+import { useTeam } from '../../contexts/TeamContext'
 import {
   HeartPulse, Plus, AlertTriangle, CheckCircle, Clock,
   X, TrendingUp, User, Activity
@@ -37,6 +39,7 @@ interface Player { id: string; name: string; jersey_number?: number; position?: 
 
 export default function Injuries() {
   const queryClient = useQueryClient()
+  const { activeTeamId } = useTeam()
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [showLog, setShowLog] = useState(false)
   const [selectedInjury, setSelectedInjury] = useState<Injury | null>(null)
@@ -46,19 +49,21 @@ export default function Injuries() {
     severity: 'minor', description: '', injury_date: new Date().toISOString().slice(0, 10)
   })
 
+  const teamParams = activeTeamId ? { team_id: activeTeamId } : undefined
+
   const { data: injuries, isLoading } = useQuery({
-    queryKey: ['coach-injuries', statusFilter],
-    queryFn: () => coachApi.injuries({ status: statusFilter || undefined }).then(r => r.data?.data || []),
+    queryKey: ['coach-injuries', activeTeamId, statusFilter],
+    queryFn: () => coachApi.injuries({ ...teamParams, status: statusFilter || undefined }).then(r => r.data),
   })
 
   const { data: stats } = useQuery({
-    queryKey: ['coach-injury-stats'],
-    queryFn: () => coachApi.injuryStats().then(r => r.data?.data as InjuryStats),
+    queryKey: ['coach-injury-stats', activeTeamId],
+    queryFn: () => coachApi.injuryStats(teamParams).then(r => r.data as InjuryStats),
   })
 
   const { data: roster } = useQuery({
-    queryKey: ['coach-roster'],
-    queryFn: () => coachApi.roster().then(r => r.data?.data || []),
+    queryKey: ['coach-roster', activeTeamId],
+    queryFn: () => coachApi.roster(teamParams).then(r => r.data),
   })
 
   const logMutation = useMutation({
@@ -97,8 +102,8 @@ export default function Injuries() {
           </h1>
           <p className="text-gray-400 mt-1">Gestion des blessures et récupération</p>
           <div className="flex gap-2 mt-2 text-xs">
-            <a href="#/coach/roster" className="text-blue-400 hover:text-blue-300">Effectif →</a>
-            <a href="#/coach/attendance" className="text-orange-400 hover:text-orange-300">Présences →</a>
+            <Link to="/coach/roster" className="text-blue-400 hover:text-blue-300">Effectif →</Link>
+            <Link to="/coach/attendance" className="text-orange-400 hover:text-orange-300">Présences →</Link>
           </div>
         </div>
         <button onClick={() => setShowLog(true)}
@@ -175,7 +180,7 @@ export default function Injuries() {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-xs text-gray-500 mt-2 ml-13">
+              <div className="flex items-center gap-4 text-xs text-gray-500 mt-2 ml-12">
                 <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Blessé le {inj.injury_date?.slice(0, 10)}</span>
                 {inj.expected_return && <span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Retour prévu : {inj.expected_return.slice(0, 10)}</span>}
               </div>

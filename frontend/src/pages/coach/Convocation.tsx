@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { coachApi, eventsApi } from '../../api'
+import { coachApi } from '../../api'
+import { useTeam } from '../../contexts/TeamContext'
 import { useState, useEffect, useCallback } from 'react'
 import { Mail, Users, CheckSquare, Square, Search, Star, ArrowRightLeft, Shield, Calendar, MapPin, Send, Download, Wand2, CheckCircle2, XCircle, X, Trophy, Heart, Clock, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react'
 import { format } from 'date-fns'
@@ -38,6 +39,7 @@ function groupByPosition(players: Player[]) {
 
 export default function Convocation() {
   const qc = useQueryClient()
+  const { activeTeamId } = useTeam()
   const [selectedEvent, setSelectedEvent] = useState<string>('')
   const [selectedPlayers, setSelectedPlayers] = useState<Set<string>>(new Set())
   const [substitutes, setSubstitutes] = useState<Set<string>>(new Set())
@@ -55,22 +57,32 @@ export default function Convocation() {
     setTimeout(() => setToast(null), 3500)
   }, [])
 
+  const teamParams = activeTeamId ? { team_id: activeTeamId } : undefined
+
   const { data: players } = useQuery({
-    queryKey: ['coach-roster'],
-    queryFn: () => coachApi.roster().then((r) => r.data),
+    queryKey: ['coach-roster', activeTeamId],
+    queryFn: () => coachApi.roster(teamParams).then((r) => r.data),
   })
 
   const { data: eventsData } = useQuery({
-    queryKey: ['events-upcoming'],
-    queryFn: () => eventsApi.upcoming().then((r) => r.data),
+    queryKey: ['coach-events'],
+    queryFn: () => coachApi.events().then((r) => r.data),
   })
 
   const events = Array.isArray(eventsData) ? eventsData : (eventsData as any)?.events ?? (eventsData as any)?.data?.events ?? []
 
   const { data: savedLineup } = useQuery({
-    queryKey: ['coach-lineup'],
-    queryFn: () => coachApi.lineup().then((r) => r.data),
+    queryKey: ['coach-lineup', activeTeamId],
+    queryFn: () => coachApi.lineup(teamParams).then((r) => r.data),
   })
+
+  const { data: tacticsData } = useQuery({
+    queryKey: ['coach-tactics', activeTeamId],
+    queryFn: () => coachApi.tactics(teamParams).then((r) => r.data),
+  })
+
+  const tactics = Array.isArray(tacticsData) ? tacticsData : []
+  const [selectedTacticId, setSelectedTacticId] = useState<string>('')
 
   const { data: convocations } = useQuery({
     queryKey: ['coach-convocations'],
@@ -78,8 +90,8 @@ export default function Convocation() {
   })
 
   const sendMutation = useMutation({
-    mutationFn: () =>
-      coachApi.sendConvocation({
+    mutationFn: () => {
+      const payload = {
         event_id: selectedEvent,
         player_ids: [...Array.from(selectedPlayers), ...Array.from(substitutes)],
         starters: Array.from(selectedPlayers),
@@ -91,18 +103,23 @@ export default function Convocation() {
         set_pieces: savedLineup?.set_pieces ?? {},
         player_instructions: savedLineup?.player_instructions ?? {},
         match_date: selectedEventObj?.date ?? null,
-      }),
+      }
+      return coachApi.sendConvocation(payload)
+    },
     onSuccess: () => {
       setSent(true)
       showToast(`Convocation envoyée à ${totalConvoked} joueur(s) !`)
       qc.invalidateQueries({ queryKey: ['coach-convocations'] })
     },
-    onError: () => showToast('Erreur lors de l\'envoi', 'error'),
+    onError: () => {
+      showToast('Erreur lors de l\'envoi', 'error')
+    },
   })
 
-  // Load from saved lineup
-  const loadFromLineup = useCallback(() => {
+  // Load lineup composition + tactic instructions
+  const loadFromTactic = useCallback((tacticId?: string) => {
     if (!savedLineup || !players) return
+    // Load starters/subs/captain from existing lineup (compo)
     const starterIds: string[] = Array.isArray(savedLineup.starters)
       ? savedLineup.starters
       : savedLineup.starters ? Object.values(savedLineup.starters) : []
@@ -110,8 +127,21 @@ export default function Convocation() {
     if (savedLineup.substitutes?.length) setSubstitutes(new Set(savedLineup.substitutes))
     if (savedLineup.captain) setCaptainId(savedLineup.captain)
     if (savedLineup.formation) setFormation(savedLineup.formation)
-    showToast('Composition chargée depuis la feuille de match')
-  }, [savedLineup, players, showToast])
+
+    // Overlay tactic instructions (player_instructions, captains, set_pieces) if tactic selected
+    const tactic = tacticId ? tactics.find((t: any) => (t.id ?? t._id) === tacticId) : tactics[0]
+    if (tactic) {
+      if (tactic.player_instructions) savedLineup.player_instructions = tactic.player_instructions
+      if (tactic.set_pieces) savedLineup.set_pieces = tactic.set_pieces
+      if (tactic.captains?.length) {
+        setCaptainId(tactic.captains[0])
+      }
+      if (tactic.formation) setFormation(tactic.formation)
+      showToast(`Composition chargée + tactique "${tactic.name ?? 'par défaut'}"`)
+    } else {
+      showToast('Composition chargée depuis la feuille de match')
+    }
+  }, [savedLineup, players, tactics, showToast])
 
   const toggle = (id: string) => {
     setSelectedPlayers((prev) => {
@@ -216,9 +246,17 @@ export default function Convocation() {
         </h1>
         <div className="flex items-center gap-2 flex-wrap">
           {savedLineup?.starters && (
-            <button onClick={loadFromLineup} className="btn-secondary text-xs sm:text-sm gap-1.5 bg-gradient-to-r from-pitch-900/80 to-pitch-800/60 border-pitch-700 hover:border-pitch-500 text-pitch-300 hover:text-pitch-200">
-              <Download size={14} /> Charger Compo
-            </button>
+            <div className="flex items-center gap-1.5">
+              {tactics.length > 1 && (
+                <select value={selectedTacticId} onChange={(e) => setSelectedTacticId(e.target.value)} className="input text-xs w-auto py-1 px-2 bg-gray-800 border-gray-700">
+                  <option value="">Tactique par défaut</option>
+                  {tactics.map((t: any) => <option key={t.id ?? t._id} value={t.id ?? t._id}>{t.name}</option>)}
+                </select>
+              )}
+              <button onClick={() => loadFromTactic(selectedTacticId || undefined)} className="btn-secondary text-xs sm:text-sm gap-1.5 bg-gradient-to-r from-pitch-900/80 to-pitch-800/60 border-pitch-700 hover:border-pitch-500 text-pitch-300 hover:text-pitch-200">
+                <Download size={14} /> Charger Tactique
+              </button>
+            </div>
           )}
           {totalConvoked > 0 && (
             <button onClick={clearAll} className="btn-secondary text-xs sm:text-sm gap-1.5 text-red-400 hover:text-red-300 border-red-900/50 hover:border-red-700/50">
@@ -421,8 +459,8 @@ export default function Convocation() {
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                 <p className="text-white/30 text-sm font-medium mb-2">Sélectionnez des joueurs</p>
                 {savedLineup?.starters && (
-                  <button onClick={loadFromLineup} className="btn-primary text-sm gap-1.5 pointer-events-auto animate-pulse">
-                    <Download size={14} /> Charger la composition
+                  <button onClick={() => loadFromTactic()} className="btn-primary text-sm gap-1.5 pointer-events-auto animate-pulse">
+                    <Download size={14} /> Charger la tactique
                   </button>
                 )}
               </div>

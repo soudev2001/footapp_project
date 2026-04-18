@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { eventsApi, coachApi } from '../../api'
+import { useTeam } from '../../contexts/TeamContext'
 import { useState, useMemo } from 'react'
 import { UserCheck, Save, CheckCircle, XCircle, Clock, Search, Heart, RotateCcw, Users } from 'lucide-react'
 import { format } from 'date-fns'
@@ -21,6 +22,7 @@ const STATUS_CYCLE: AttendanceStatus[] = ['present', 'absent', 'late', 'excused'
 
 export default function Attendance() {
   const qc = useQueryClient()
+  const { activeTeamId } = useTeam()
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [attendance, setAttendance] = useState<Record<string, AttendanceStatus>>({})
   const [saved, setSaved] = useState(false)
@@ -32,8 +34,8 @@ export default function Attendance() {
   })
 
   const { data: players } = useQuery({
-    queryKey: ['coach-roster'],
-    queryFn: () => coachApi.roster().then((r) => r.data),
+    queryKey: ['coach-roster', activeTeamId],
+    queryFn: () => coachApi.roster(activeTeamId ? { team_id: activeTeamId } : undefined).then((r) => r.data),
   })
 
   const updateMutation = useMutation({

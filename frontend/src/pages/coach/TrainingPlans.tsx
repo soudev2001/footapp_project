@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { coachApi } from '../../api'
+import { useTeam } from '../../contexts/TeamContext'
 import {
   CalendarDays, Plus, Dumbbell, Clock, MapPin, ChevronRight,
   Trash2, Edit, Filter, Target, X
@@ -22,14 +23,15 @@ const FOCUS_AREAS = [
 
 export default function TrainingPlans() {
   const queryClient = useQueryClient()
+  const { activeTeamId } = useTeam()
   const [showCreate, setShowCreate] = useState(false)
   const [editingPlan, setEditingPlan] = useState<TrainingPlan | null>(null)
   const [form, setForm] = useState({ name: '', type: 'weekly', focus_area: 'mixed', description: '', start_date: '', end_date: '' })
   const [statusFilter, setStatusFilter] = useState<string>('')
 
   const { data: plans, isLoading } = useQuery({
-    queryKey: ['coach-training-plans', statusFilter],
-    queryFn: () => coachApi.trainingPlans({ status: statusFilter || undefined }).then(r => r.data?.data || []),
+    queryKey: ['coach-training-plans', activeTeamId, statusFilter],
+    queryFn: () => coachApi.trainingPlans({ team_id: activeTeamId || undefined, status: statusFilter || undefined }).then(r => r.data),
   })
 
   const createMutation = useMutation({
