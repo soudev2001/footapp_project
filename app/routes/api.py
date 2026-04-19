@@ -734,7 +734,40 @@ def get_conversations():
     user_id = request.current_user['user_id']
     svc = MessagingService(mongo.db)
     previews = svc.get_last_messages_preview(user_id, club_id)
-    return jsonify({'success': True, 'data': serialize_docs(previews)})
+
+    # Convert dict previews to a list with proper id/name/type for the frontend
+    conversations = []
+    for key, preview in previews.items():
+        parts = key.split('_', 1)
+        conv_type = parts[0]  # direct, team, channel
+        ref_id = parts[1] if len(parts) > 1 else key
+        conv = {
+            '_id': key,
+            'id': key,
+            'type': conv_type,
+            'last_message': preview.get('content', ''),
+            'last_message_at': str(preview.get('time', '')),
+            'unread_count': 0,
+        }
+        if conv_type == 'direct':
+            conv['other_user_id'] = ref_id
+            other_user = mongo.db.users.find_one({'_id': ObjectId(ref_id)})
+            if other_user:
+                profile = other_user.get('profile', {})
+                conv['name'] = f"{profile.get('first_name', '')} {profile.get('last_name', '')}".strip() or other_user.get('email', 'Utilisateur')
+                conv['avatar'] = profile.get('avatar', '')
+            else:
+                conv['name'] = 'Utilisateur'
+        elif conv_type == 'team':
+            conv['team_id'] = ref_id
+            team = mongo.db.teams.find_one({'_id': ObjectId(ref_id)})
+            conv['name'] = team.get('name', 'Équipe') if team else 'Équipe'
+        else:
+            conv['name'] = ref_id
+        conversations.append(conv)
+
+    conversations.sort(key=lambda c: c.get('last_message_at', ''), reverse=True)
+    return jsonify({'success': True, 'data': conversations})
 
 
 @api_bp.route('/messages/direct/<other_user_id>', methods=['GET'])
@@ -826,10 +859,14 @@ def get_channels():
 def get_notifications():
     """Get notifications for current user."""
     user_id = request.current_user['user_id']
-    notifications = mongo.db.notifications.find(
-        {'user_id': user_id}
-    ).sort('created_at', -1).limit(50)
-    return jsonify({'success': True, 'data': serialize_docs(list(notifications))})
+    raw = list(mongo.db.notifications.find(
+        {'$or': [{'user_id': user_id}, {'user_id': ObjectId(user_id)}]}
+    ).sort('sent_at', -1).limit(50))
+    # Ensure created_at exists for frontend compatibility
+    for n in raw:
+        if 'created_at' not in n and 'sent_at' in n:
+            n['created_at'] = n['sent_at']
+    return jsonify({'success': True, 'data': serialize_docs(raw)})
 
 
 @api_bp.route('/notifications/mark-read/<notification_id>', methods=['POST'])
@@ -849,7 +886,7 @@ def mark_all_notifications_read():
     """Mark all notifications as read for current user."""
     user_id = request.current_user['user_id']
     mongo.db.notifications.update_many(
-        {'user_id': user_id, 'read': False},
+        {'$or': [{'user_id': user_id}, {'user_id': ObjectId(user_id)}], 'read': False},
         {'$set': {'read': True}}
     )
     return jsonify({'success': True})
@@ -1021,9 +1058,14 @@ def send_convocation():
                 idx = sp_ids.index(pid) + 1
                 sp_duties.append(f"{label} (priorité {idx})")
 
-        # Create notification with link to match prep
+        # Resolve the player's linked user_id for notification + email
+        player = player_service.get_by_id(pid)
+        player_user_id = str(player.get('user_id', '')) if player and player.get('user_id') else None
+        notify_user_id = player_user_id or pid
+
+        # Create notification with link to match prep (target the USER, not the player doc)
         notification_service.create_notification(
-            user_id=pid,
+            user_id=notify_user_id,
             title='Convocation',
             message=f'Vous êtes convoqué pour: {event_title}',
             type='convocation',
@@ -1031,12 +1073,19 @@ def send_convocation():
         )
         event_service.set_attendance(event_id, pid, 'convoked')
 
-        # Send email
+        # Send email — look up user doc for email
         try:
-            player = player_service.get_by_id(pid)
             if player:
-                email = player.get('email') or (player.get('user', {}) or {}).get('email')
-                player_name = f"{(player.get('profile', {}) or {}).get('first_name', '')} {(player.get('profile', {}) or {}).get('last_name', '')}".strip() or 'Joueur'
+                email = None
+                player_name = player.get('name', 'Joueur')
+                if player_user_id:
+                    from app.services import get_user_service
+                    user_svc = get_user_service()
+                    user_doc = user_svc.get_by_id(player_user_id)
+                    if user_doc:
+                        email = user_doc.get('email')
+                        profile = user_doc.get('profile', {})
+                        player_name = f"{profile.get('first_name', '')} {profile.get('last_name', '')}".strip() or player_name
                 if email:
                     from app.services.email_service import send_convocation_email
                     send_convocation_email(

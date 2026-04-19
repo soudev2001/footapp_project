@@ -47,6 +47,7 @@ class NotificationService:
             'type': 'info',
             'message': f"Le joueur {player_name} a été ajouté à votre équipe.",
             'sent_at': datetime.utcnow(),
+            'created_at': datetime.utcnow(),
             'read': False
         }
         self.collection.insert_one(notification)
@@ -64,6 +65,7 @@ class NotificationService:
             'type': type,
             'link': link,
             'sent_at': datetime.utcnow(),
+            'created_at': datetime.utcnow(),
             'read': False
         }
         self.collection.insert_one(notification)
@@ -95,8 +97,9 @@ class NotificationService:
                         'title': title,
                         'message': f"[{player_name}] {message}",
                         'type': type,
-                        'link': link, # Parent might not have access to the exact link if it's player specific, but we'll try
+                        'link': link,
                         'sent_at': datetime.utcnow(),
+                        'created_at': datetime.utcnow(),
                         'read': False
                     }
                     self.collection.insert_one(parent_notif)
