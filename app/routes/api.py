@@ -1,6 +1,72 @@
+
 # =====================
 # ADMIN SEED ENDPOINTS
 # =====================
+
+import jwt
+import os
+import datetime
+from flask import Blueprint, jsonify, request, current_app, render_template, url_for
+from app.models import serialize_doc, serialize_docs
+from app.services import (
+    get_player_service, get_club_service, get_event_service,
+    get_match_service, get_post_service, get_user_service,
+    get_team_service, get_notification_service, get_contract_service,
+    get_shop_service, get_project_service, get_parent_link_service,
+    get_subscription_service, get_isy_service,
+    get_analytics_service, get_member_onboarding_service, get_billing_service,
+    get_platform_management_service, get_platform_analytics_service,
+    get_parent_monitoring_service, get_fan_engagement_service, get_media_service,
+)
+from app.services.messaging_service import MessagingService
+from app.services.db import mongo
+from functools import wraps
+from bson import ObjectId
+
+api_bp = Blueprint('api', __name__, url_prefix='/api')
+
+
+# ============================================================
+# JWT HELPERS
+# ============================================================
+
+def token_required(f):
+    """Decorator that requires a valid JWT Bearer token."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get('Authorization', None)
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'success': False, 'message': 'Token manquant'}), 401
+        token = auth_header.split(' ')[1]
+        try:
+            payload = jwt.decode(
+                token,
+                current_app.config['JWT_SECRET_KEY'],
+                algorithms=['HS256']
+            )
+            if payload.get('type') == 'refresh':
+                return jsonify({'success': False, 'message': 'Cannot use refresh token for API calls'}), 401
+            request.current_user = payload
+        except jwt.ExpiredSignatureError:
+            return jsonify({'success': False, 'message': 'Token has expired!'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'success': False, 'message': 'Token is invalid!'}), 401
+
+        return f(*args, **kwargs)
+    return decorated
+
+def role_required(*roles):
+    """Decorator that requires specific user roles."""
+    def decorator(f):
+        @wraps(f)
+        @token_required
+        def decorated(*args, **kwargs):
+            user_role = request.current_user.get('role', '')
+            if user_role == 'admin' or user_role in roles:
+                return f(*args, **kwargs)
+            return jsonify({'success': False, 'message': 'Insufficient permissions'}), 403
+        return decorated
+    return decorator
 
 @api_bp.route('/admin/seed-players', methods=['POST'])
 @role_required('admin')
