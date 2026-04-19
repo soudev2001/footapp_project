@@ -1,3 +1,43 @@
+# =====================
+# ADMIN SEED ENDPOINTS
+# =====================
+
+@api_bp.route('/admin/seed-players', methods=['POST'])
+@role_required('admin')
+def api_seed_players():
+    """Seed 18 joueurs démo pour le club de l'admin connecté"""
+    from app.services.seed_data import seed_18_players
+    club_id = request.current_user.get('club_id')
+    team_id = request.json.get('team_id') if request.is_json else None
+    try:
+        players = seed_18_players(club_id, team_id)
+        return jsonify({'success': True, 'message': f'{len(players)} joueurs créés', 'count': len(players)})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@api_bp.route('/admin/seed-all', methods=['POST'])
+@role_required('admin')
+def api_seed_all():
+    """Seed complet de la base (données démo)"""
+    from app.services.seed_data import seed_all
+    try:
+        seed_all()
+        return jsonify({'success': True, 'message': 'Seed complet effectué'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@api_bp.route('/admin/seed-coach-data', methods=['POST'])
+@role_required('admin')
+def api_seed_coach_data():
+    """Seed des données coach (tactiques, lineups, drills, plans) pour le club de l'admin connecté"""
+    from app.services.seed_data import seed_coach_data
+    club_id = request.current_user.get('club_id')
+    team_id = request.json.get('team_id') if request.is_json else None
+    try:
+        seed_coach_data(club_id, team_id)
+        return jsonify({'success': True, 'message': 'Seed coach data effectué'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 # FootLogic V2 - API Routes (Real JWT + Complete Endpoints)
 
 import jwt
