@@ -125,27 +125,69 @@ def seed_all():
         {'name': 'Olivier Laurent', 'jersey': 11, 'pos': 'ATT', 'goals': 12, 'assists': 8, 'matches': 21, 'status': 'active'},
     ]
 
+
+    # Pour chaque joueur, créer un user lié avec avatar (photo)
     for i, p in enumerate(player_data):
-        player = create_player(
-            user_id=user_ids[5] if i == 0 else None,  # Link first player to player1 user
-            club_id=club1_id,
-            team_id=team1_id,
-            jersey_number=p['jersey'],
-            position=p['pos'],
-            stats={
-                'goals': p['goals'],
-                'assists': p['assists'],
-                'matches_played': p['matches'],
-                'yellow_cards': i % 3,
-                'red_cards': 0
-            },
-            name=p['name'],
-            status=p['status'],
-            photo=f'https://randomuser.me/api/portraits/men/{i+10}.jpg',
-            height=170 + (i * 2),
-            weight=65 + (i * 2)
-        )
-        mongo.db.players.insert_one(player)
+        photo_url = f'https://randomuser.me/api/portraits/men/{i+10}.jpg'
+        # Premier joueur = player1 existant
+        if i == 0:
+            # Mettre à jour le user player1 pour forcer l'avatar
+            mongo.db.users.update_one({'_id': user_ids[5]}, {'$set': {'profile.avatar': photo_url}})
+            player = create_player(
+                user_id=user_ids[5],
+                club_id=club1_id,
+                team_id=team1_id,
+                jersey_number=p['jersey'],
+                position=p['pos'],
+                stats={
+                    'goals': p['goals'],
+                    'assists': p['assists'],
+                    'matches_played': p['matches'],
+                    'yellow_cards': i % 3,
+                    'red_cards': 0
+                },
+                name=p['name'],
+                status=p['status'],
+                photo=photo_url,
+                height=170 + (i * 2),
+                weight=65 + (i * 2)
+            )
+            mongo.db.players.insert_one(player)
+        else:
+            # Créer un user fantôme pour chaque joueur
+            user = create_user(
+                f'player{i+1}@fcelite.fr',
+                generate_password_hash('player123'),
+                'player',
+                club1_id,
+                {
+                    'first_name': p['name'].split()[0],
+                    'last_name': p['name'].split()[1],
+                    'avatar': photo_url,
+                    'phone': f'06{i:08d}'
+                }
+            )
+            user_id = mongo.db.users.insert_one(user).inserted_id
+            player = create_player(
+                user_id=user_id,
+                club_id=club1_id,
+                team_id=team1_id,
+                jersey_number=p['jersey'],
+                position=p['pos'],
+                stats={
+                    'goals': p['goals'],
+                    'assists': p['assists'],
+                    'matches_played': p['matches'],
+                    'yellow_cards': i % 3,
+                    'red_cards': 0
+                },
+                name=p['name'],
+                status=p['status'],
+                photo=photo_url,
+                height=170 + (i * 2),
+                weight=65 + (i * 2)
+            )
+            mongo.db.players.insert_one(player)
 
     print(f"[Seed] Created {len(player_data)} players for FC Elite")
 
