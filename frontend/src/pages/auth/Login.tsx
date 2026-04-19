@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { authApi } from '../../api'
 import { useAuthStore } from '../../store/auth'
-import { Eye, EyeOff, Loader2, ShieldCheck, Users, User, Crown } from 'lucide-react'
+import { Eye, EyeOff, Loader2, ShieldCheck, Users, User, Crown, Trophy } from 'lucide-react'
 import type { User as UserType } from '../../types'
 
 interface FormData { email: string; password: string }
@@ -54,7 +54,24 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col">
+      {/* Public Navbar */}
+      <nav className="sticky top-0 z-50 border-b border-gray-800/60 bg-gray-950/80 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="p-1.5 bg-pitch-600 rounded-lg">
+              <Trophy size={16} className="text-white" />
+            </div>
+            <span className="text-lg font-bold text-white">FootApp</span>
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link to="/" className="text-sm text-gray-400 hover:text-white transition-colors">Accueil</Link>
+            <Link to="/register" className="btn-primary text-sm">S'inscrire</Link>
+          </div>
+        </div>
+      </nav>
+
+      <div className="flex-1 flex">
       {/* Left Panel — Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-950 via-pitch-950 to-gray-950 relative items-center justify-center overflow-hidden">
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.15\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }} />
@@ -170,6 +187,7 @@ export default function Login() {
             </p>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )

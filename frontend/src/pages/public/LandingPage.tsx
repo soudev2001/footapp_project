@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Trophy, Users, Calendar, Star, ArrowRight, Shield, Zap, Globe } from 'lucide-react'
+import { Trophy, Users, Calendar, Star, ArrowRight, Shield, Zap, Globe, ShieldCheck, User, Crown } from 'lucide-react'
 
 const FEATURES = [
   { icon: Users, title: 'Suivi d\'équipe', desc: 'Gérez vos joueurs, staffs et convocations en quelques clics.' },
@@ -8,6 +8,19 @@ const FEATURES = [
   { icon: Zap, title: 'Analyses avancées', desc: "Statistiques, rapports et tendances pour optimiser vos résultats." },
   { icon: Shield, title: 'Sécurisé', desc: 'Données chiffrées et confidentielles protégées côté serveur.' },
   { icon: Globe, title: 'Multi-clubs', desc: 'Une plateforme utilisée par des centaines de clubs à travers le pays.' },
+]
+
+const DEMO_ACCOUNTS = [
+  { role: 'Admin', email: 'admin@footlogic.fr', password: 'admin123', icon: <ShieldCheck size={18} />, color: 'border-purple-700 bg-purple-900/20 text-purple-400' },
+  { role: 'Coach', email: 'coach@fcelite.fr', password: 'coach123', icon: <Users size={18} />, color: 'border-blue-700 bg-blue-900/20 text-blue-400' },
+  { role: 'Joueur', email: 'player1@fcelite.fr', password: 'player123', icon: <User size={18} />, color: 'border-pitch-700 bg-pitch-900/20 text-pitch-400' },
+  { role: 'Super Admin', email: 'superadmin1@footlogic.com', password: 'super123', icon: <Crown size={18} />, color: 'border-yellow-700 bg-yellow-900/20 text-yellow-400' },
+]
+
+const STEPS = [
+  { num: '1', title: 'Créez votre club', desc: 'Inscrivez-vous et configurez votre club en quelques minutes.' },
+  { num: '2', title: 'Invitez votre staff', desc: 'Ajoutez coaches, joueurs et parents via un simple email.' },
+  { num: '3', title: 'Dominez la saison', desc: 'Gérez tout depuis un seul tableau de bord intelligent.' },
 ]
 
 export default function LandingPage() {
@@ -66,6 +79,46 @@ export default function LandingPage() {
                 </div>
                 <h3 className="font-semibold text-white mb-1">{title}</h3>
                 <p className="text-sm text-gray-500">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-center text-white mb-10">Comment ça marche ?</h2>
+          <div className="grid sm:grid-cols-3 gap-8">
+            {STEPS.map(({ num, title, desc }) => (
+              <div key={num} className="text-center space-y-3">
+                <div className="mx-auto w-12 h-12 rounded-full bg-pitch-600 flex items-center justify-center text-white font-bold text-lg">{num}</div>
+                <h3 className="font-semibold text-white">{title}</h3>
+                <p className="text-sm text-gray-500">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Demo */}
+      <section className="py-16 px-4 bg-gray-900/40">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-center text-white mb-2">Démo Live</h2>
+          <p className="text-gray-400 text-center mb-8 text-sm">Testez la plateforme avec un compte démo :</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {DEMO_ACCOUNTS.map(({ role, email, password, icon, color }) => (
+              <div key={role} className={`rounded-lg border p-4 space-y-2 ${color}`}>
+                <div className="flex items-center gap-2 font-semibold">
+                  {icon} {role}
+                </div>
+                <div className="text-xs space-y-1 text-gray-300">
+                  <p><span className="text-gray-500">Email :</span> {email}</p>
+                  <p><span className="text-gray-500">Mot de passe :</span> {password}</p>
+                </div>
+                <Link to="/login" className="block text-center text-xs font-medium py-1.5 rounded bg-white/10 hover:bg-white/20 transition-colors">
+                  Se connecter →
+                </Link>
               </div>
             ))}
           </div>

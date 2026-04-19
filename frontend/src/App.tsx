@@ -174,6 +174,9 @@ export default function App() {
         <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
         <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <Register />} />
 
+        {/* Landing page for non-authenticated at / */}
+        {!isAuthenticated && <Route path="/" element={<LandingPage />} />}
+
         {/* Protected — wrapped in Layout */}
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           {/* Home — role-based */}
