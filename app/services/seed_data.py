@@ -19,6 +19,7 @@ def seed_all():
     club1 = {
         'name': 'FootLogic Elite',
         'logo': 'https://ui-avatars.com/api/?name=Foot+Logic&background=84cc16&color=fff&size=128',
+        'cover_photo': 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1600',
         'city': 'Paris',
         'founded_year': 1985,
         'colors': {'primary': '#84cc16', 'secondary': '#facc15'},
@@ -35,6 +36,7 @@ def seed_all():
     club2 = {
         'name': 'Logic Rangers',
         'logo': 'https://ui-avatars.com/api/?name=Logic+Rangers&background=facc15&color=000&size=128',
+        'cover_photo': 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=1600',
         'city': 'Lyon',
         'founded_year': 1992,
         'colors': {'primary': '#facc15', 'secondary': '#4d7c0f'},
@@ -109,87 +111,86 @@ def seed_all():
     # Link coach to team
     mongo.db.teams.update_one({'_id': team1_id}, {'$set': {'coach_ids': [user_ids[4]]}})
 
-    # ... lines 87-261 remain mostly same, adjusting user index if needed ...
-    # (Checking user_ids[2] in line 106, it was player1, now user_ids[5] is player1)
+    # 18 players per team: 2 GK, 6 DEF, 6 MID, 4 ATT — each with a photo and French name
+    # First player is linked to the existing player1@fcelite.fr user (for login testing).
+    # 18 players per team: ordered to match 4-3-3 starter slots [GK, LB, CB1, CB2, RB, CM1, CM2, CM3, LW, ST, RW]
+    # followed by 7 substitutes (GK cover, defenders, midfielders, striker).
     player_data = [
-        {'name': 'Lucas Martin', 'jersey': 1, 'pos': 'GK', 'goals': 0, 'assists': 0, 'matches': 18, 'status': 'active'},
-        {'name': 'Thomas Bernard', 'jersey': 2, 'pos': 'DEF', 'goals': 1, 'assists': 3, 'matches': 20, 'status': 'active'},
-        {'name': 'Antoine Roux', 'jersey': 3, 'pos': 'DEF', 'goals': 0, 'assists': 2, 'matches': 19, 'status': 'active'},
-        {'name': 'Nicolas Petit', 'jersey': 4, 'pos': 'DEF', 'goals': 2, 'assists': 1, 'matches': 17, 'status': 'injured'},
-        {'name': 'Hugo Moreau', 'jersey': 5, 'pos': 'DEF', 'goals': 1, 'assists': 4, 'matches': 21, 'status': 'active'},
-        {'name': 'Julien Garnier', 'jersey': 6, 'pos': 'MID', 'goals': 3, 'assists': 8, 'matches': 22, 'status': 'active'},
-        {'name': 'Maxime Leroy', 'jersey': 7, 'pos': 'MID', 'goals': 5, 'assists': 6, 'matches': 20, 'status': 'active'},
-        {'name': 'Alexandre Simon', 'jersey': 8, 'pos': 'MID', 'goals': 4, 'assists': 7, 'matches': 21, 'status': 'active'},
-        {'name': 'Romain Lambert', 'jersey': 10, 'pos': 'MID', 'goals': 8, 'assists': 12, 'matches': 22, 'status': 'active'},
-        {'name': 'Pierre Dubois', 'jersey': 9, 'pos': 'ATT', 'goals': 15, 'assists': 5, 'matches': 22, 'status': 'active'},
-        {'name': 'Olivier Laurent', 'jersey': 11, 'pos': 'ATT', 'goals': 12, 'assists': 8, 'matches': 21, 'status': 'active'},
+        # Starters (11) — index 0..10 aligned with 4-3-3 slot order
+        {'first': 'Lucas',     'last': 'Martin',    'jersey': 1,  'pos': 'GK',  'goals': 0,  'assists': 0,  'matches': 18, 'status': 'active'},
+        {'first': 'Gabriel',   'last': 'Lefebvre',  'jersey': 3,  'pos': 'LB',  'goals': 1,  'assists': 3,  'matches': 19, 'status': 'active'},
+        {'first': 'Nicolas',   'last': 'Petit',     'jersey': 4,  'pos': 'CB',  'goals': 2,  'assists': 1,  'matches': 17, 'status': 'active'},
+        {'first': 'Hugo',      'last': 'Moreau',    'jersey': 5,  'pos': 'CB',  'goals': 1,  'assists': 4,  'matches': 21, 'status': 'active'},
+        {'first': 'Antoine',   'last': 'Roux',      'jersey': 2,  'pos': 'RB',  'goals': 0,  'assists': 2,  'matches': 19, 'status': 'active'},
+        {'first': 'Julien',    'last': 'Garnier',   'jersey': 6,  'pos': 'CDM', 'goals': 3,  'assists': 8,  'matches': 22, 'status': 'active'},
+        {'first': 'Maxime',    'last': 'Leroy',     'jersey': 7,  'pos': 'CM',  'goals': 5,  'assists': 6,  'matches': 20, 'status': 'active'},
+        {'first': 'Romain',    'last': 'Lambert',   'jersey': 10, 'pos': 'CAM', 'goals': 8,  'assists': 12, 'matches': 22, 'status': 'active'},
+        {'first': 'Olivier',   'last': 'Laurent',   'jersey': 11, 'pos': 'LW',  'goals': 12, 'assists': 8,  'matches': 21, 'status': 'active'},
+        {'first': 'Pierre',    'last': 'Dubois',    'jersey': 9,  'pos': 'ST',  'goals': 15, 'assists': 5,  'matches': 22, 'status': 'active'},
+        {'first': 'Raphael',   'last': 'Michel',    'jersey': 13, 'pos': 'RW',  'goals': 10, 'assists': 6,  'matches': 20, 'status': 'active'},
+        # Substitutes (7) — index 11..17
+        {'first': 'Thomas',    'last': 'Bernard',   'jersey': 16, 'pos': 'GK',  'goals': 0,  'assists': 0,  'matches': 4,  'status': 'active'},
+        {'first': 'Paul',      'last': 'Durand',    'jersey': 15, 'pos': 'CB',  'goals': 3,  'assists': 1,  'matches': 20, 'status': 'active'},
+        {'first': 'Arthur',    'last': 'Richard',   'jersey': 17, 'pos': 'CB',  'goals': 0,  'assists': 0,  'matches': 6,  'status': 'active'},
+        {'first': 'Alexandre', 'last': 'Simon',     'jersey': 8,  'pos': 'CM',  'goals': 4,  'assists': 7,  'matches': 21, 'status': 'active'},
+        {'first': 'Louis',     'last': 'Vincent',   'jersey': 14, 'pos': 'LM',  'goals': 2,  'assists': 5,  'matches': 18, 'status': 'active'},
+        {'first': 'Nathan',    'last': 'Fournier',  'jersey': 18, 'pos': 'CM',  'goals': 1,  'assists': 2,  'matches': 9,  'status': 'active'},
+        {'first': 'Theo',      'last': 'Bertrand',  'jersey': 19, 'pos': 'ST',  'goals': 6,  'assists': 3,  'matches': 14, 'status': 'injured'},
     ]
 
-
-    # Pour chaque joueur, créer un user lié avec avatar (photo)
     for i, p in enumerate(player_data):
-        photo_url = f'https://randomuser.me/api/portraits/men/{i+10}.jpg'
-        # Premier joueur = player1 existant
+        full_name = f"{p['first']} {p['last']}"
+        photo_url = f'https://randomuser.me/api/portraits/men/{(i * 5 + 11) % 99}.jpg'
+        stats = {
+            'goals': p['goals'],
+            'assists': p['assists'],
+            'matches_played': p['matches'],
+            'yellow_cards': i % 3,
+            'red_cards': 1 if i == 10 else 0,
+        }
+
         if i == 0:
-            # Mettre à jour le user player1 pour forcer l'avatar
-            mongo.db.users.update_one({'_id': user_ids[5]}, {'$set': {'profile.avatar': photo_url}})
-            player = create_player(
-                user_id=user_ids[5],
-                club_id=club1_id,
-                team_id=team1_id,
-                jersey_number=p['jersey'],
-                position=p['pos'],
-                stats={
-                    'goals': p['goals'],
-                    'assists': p['assists'],
-                    'matches_played': p['matches'],
-                    'yellow_cards': i % 3,
-                    'red_cards': 0
-                },
-                name=p['name'],
-                status=p['status'],
-                photo=photo_url,
-                height=170 + (i * 2),
-                weight=65 + (i * 2)
+            # First player is linked to the existing player1@fcelite.fr user (for login testing)
+            mongo.db.users.update_one(
+                {'_id': user_ids[5]},
+                {'$set': {
+                    'profile.avatar': photo_url,
+                    'profile.first_name': p['first'],
+                    'profile.last_name': p['last'],
+                }},
             )
-            mongo.db.players.insert_one(player)
+            linked_user_id = user_ids[5]
         else:
-            # Créer un user fantôme pour chaque joueur
             user = create_user(
-                f'player{i+1}@fcelite.fr',
+                f'player{i + 1}@fcelite.fr',
                 generate_password_hash('player123'),
                 'player',
                 club1_id,
                 {
-                    'first_name': p['name'].split()[0],
-                    'last_name': p['name'].split()[1],
+                    'first_name': p['first'],
+                    'last_name': p['last'],
                     'avatar': photo_url,
-                    'phone': f'06{i:08d}'
-                }
-            )
-            user_id = mongo.db.users.insert_one(user).inserted_id
-            player = create_player(
-                user_id=user_id,
-                club_id=club1_id,
-                team_id=team1_id,
-                jersey_number=p['jersey'],
-                position=p['pos'],
-                stats={
-                    'goals': p['goals'],
-                    'assists': p['assists'],
-                    'matches_played': p['matches'],
-                    'yellow_cards': i % 3,
-                    'red_cards': 0
+                    'phone': f'06{i:08d}',
                 },
-                name=p['name'],
-                status=p['status'],
-                photo=photo_url,
-                height=170 + (i * 2),
-                weight=65 + (i * 2)
             )
-            mongo.db.players.insert_one(player)
+            linked_user_id = mongo.db.users.insert_one(user).inserted_id
 
-    print(f"[Seed] Created {len(player_data)} players for FC Elite")
+        player = create_player(
+            user_id=linked_user_id,
+            club_id=club1_id,
+            team_id=team1_id,
+            jersey_number=p['jersey'],
+            position=p['pos'],
+            stats=stats,
+            name=full_name,
+            status=p['status'],
+            photo=photo_url,
+            height=170 + (i % 8) * 2,
+            weight=65 + (i % 7) * 2,
+        )
+        mongo.db.players.insert_one(player)
+
+    print(f"[Seed] Created {len(player_data)} players for FC Elite (with photos)")
 
     # ========================================
     # 4. CREATE EVENTS
@@ -417,16 +418,16 @@ def seed_all():
             'formation': '4-3-3',
             'tactic_id': tactic_ids[0],
             'starters': starters_433,
-            'substitutes': player_ids[11:14] if len(player_ids) > 11 else [],
+            'substitutes': player_ids[11:18] if len(player_ids) >= 18 else player_ids[11:],
             'captains': {
-                'captain': player_ids[8] if len(player_ids) > 8 else None,
-                'vice_captain': player_ids[5] if len(player_ids) > 5 else None
+                'captain': player_ids[7] if len(player_ids) > 7 else None,       # CAM (Romain Lambert)
+                'vice_captain': player_ids[9] if len(player_ids) > 9 else None,  # ST (Pierre Dubois)
             },
             'set_pieces': {
-                'corners_left': player_ids[6] if len(player_ids) > 6 else None,
-                'corners_right': player_ids[7] if len(player_ids) > 7 else None,
-                'free_kicks': player_ids[8] if len(player_ids) > 8 else None,
-                'penalties': player_ids[9] if len(player_ids) > 9 else None
+                'corners_left': player_ids[7] if len(player_ids) > 7 else None,     # CAM
+                'corners_right': player_ids[6] if len(player_ids) > 6 else None,    # CM
+                'free_kicks': player_ids[7] if len(player_ids) > 7 else None,       # CAM
+                'penalties': player_ids[9] if len(player_ids) > 9 else None,        # ST
             },
             'player_instructions': {},
             'is_template': False,
@@ -440,10 +441,10 @@ def seed_all():
             'formation': '4-4-2',
             'tactic_id': tactic_ids[1],
             'starters': starters_442,
-            'substitutes': player_ids[11:14] if len(player_ids) > 11 else [],
+            'substitutes': player_ids[11:18] if len(player_ids) >= 18 else player_ids[11:],
             'captains': {
-                'captain': player_ids[8] if len(player_ids) > 8 else None,
-                'vice_captain': player_ids[5] if len(player_ids) > 5 else None
+                'captain': player_ids[7] if len(player_ids) > 7 else None,
+                'vice_captain': player_ids[9] if len(player_ids) > 9 else None,
             },
             'set_pieces': {},
             'player_instructions': {},
@@ -548,8 +549,8 @@ def seed_all():
     print("="*50)
     print(f"  Clubs:    2")
     print(f"  Teams:    1")
-    print(f"  Users:    {len(users)}")
-    print(f"  Players:  {len(player_data)}")
+    print(f"  Users:    {len(users) + len(player_data) - 1}")
+    print(f"  Players:  {len(player_data)} (with photos)")
     print(f"  Events:   {len(events)}")
     print(f"  Matches:  {len(matches)}")
     print(f"  Posts:    {len(posts)}")
@@ -774,16 +775,16 @@ def seed_coach_data(club_id=None, team_id=None):
                         'formation': '4-3-3',
                         'tactic_id': tactic_ids[0] if tactic_ids else None,
                         'starters': starters,
-                        'substitutes': player_ids[11:14] if len(player_ids) > 11 else [],
+                        'substitutes': player_ids[11:18] if len(player_ids) >= 18 else player_ids[11:],
                         'captains': {
-                            'captain': player_ids[8] if len(player_ids) > 8 else None,
-                            'vice_captain': player_ids[5] if len(player_ids) > 5 else None
+                            'captain': player_ids[7] if len(player_ids) > 7 else None,
+                            'vice_captain': player_ids[9] if len(player_ids) > 9 else None,
                         },
                         'set_pieces': {
-                            'corners_left': player_ids[6] if len(player_ids) > 6 else None,
-                            'corners_right': player_ids[7] if len(player_ids) > 7 else None,
-                            'free_kicks': player_ids[8] if len(player_ids) > 8 else None,
-                            'penalties': player_ids[9] if len(player_ids) > 9 else None
+                            'corners_left': player_ids[7] if len(player_ids) > 7 else None,
+                            'corners_right': player_ids[6] if len(player_ids) > 6 else None,
+                            'free_kicks': player_ids[7] if len(player_ids) > 7 else None,
+                            'penalties': player_ids[9] if len(player_ids) > 9 else None,
                         },
                         'player_instructions': {},
                         'is_template': True,
