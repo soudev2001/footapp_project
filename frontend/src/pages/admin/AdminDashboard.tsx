@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { adminApi } from '../../api'
-import { Users, Shield, TrendingUp, CreditCard, DatabaseZap, Sprout, Palette, Send, Mail } from 'lucide-react'
+import { Users, Shield, TrendingUp, CreditCard, DatabaseZap, Sprout, Palette, Send, Mail, Swords } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 
@@ -31,6 +31,21 @@ export default function AdminDashboard() {
       setTimeout(() => setSeedMsg(null), 4000)
     },
   })
+
+  const seedCoachDataMutation = useMutation({
+    mutationFn: () => adminApi.seedCoachData(),
+    onSuccess: (res) => {
+      setSeedMsg(res.data?.message ?? 'Données coach injectées')
+      qc.invalidateQueries({ queryKey: ['admin-dashboard'] })
+      qc.invalidateQueries({ queryKey: ['coach-tactics'] })
+      qc.invalidateQueries({ queryKey: ['coach-lineup'] })
+      qc.invalidateQueries({ queryKey: ['coach-drills'] })
+      qc.invalidateQueries({ queryKey: ['coach-training-plans'] })
+      setTimeout(() => setSeedMsg(null), 4000)
+    },
+  })
+
+  const anyPending = seedPlayersMutation.isPending || seedAllMutation.isPending || seedCoachDataMutation.isPending
 
   const stats = [
     { label: 'Membres', value: data?.member_count ?? '—', icon: <Users size={22} />, to: '/admin/members', color: 'text-blue-400' },
@@ -102,7 +117,7 @@ export default function AdminDashboard() {
                 if (confirm('Supprimer les joueurs existants et créer 18 nouveaux joueurs ?'))
                   seedPlayersMutation.mutate()
               }}
-              disabled={seedPlayersMutation.isPending || seedAllMutation.isPending}
+              disabled={anyPending}
               className="btn-secondary text-sm justify-center text-emerald-400 border-emerald-900 hover:bg-emerald-900/20"
             >
               <Sprout size={14} />
@@ -111,10 +126,22 @@ export default function AdminDashboard() {
 
             <button
               onClick={() => {
+                if (confirm('Ajouter tactiques, compositions, exercices et plans d\u2019entraînement ? (données existantes préservées)'))
+                  seedCoachDataMutation.mutate()
+              }}
+              disabled={anyPending}
+              className="btn-secondary text-sm justify-center text-blue-400 border-blue-900 hover:bg-blue-900/20"
+            >
+              <Swords size={14} />
+              {seedCoachDataMutation.isPending ? 'Injection...' : 'Seed données coach'}
+            </button>
+
+            <button
+              onClick={() => {
                 if (confirm('⚠️ Ceci va RÉINITIALISER toutes les données. Continuer ?'))
                   seedAllMutation.mutate()
               }}
-              disabled={seedAllMutation.isPending || seedPlayersMutation.isPending}
+              disabled={anyPending}
               className="btn-secondary text-sm justify-center text-amber-400 border-amber-900 hover:bg-amber-900/20"
             >
               <DatabaseZap size={14} />
