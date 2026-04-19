@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { adminApi } from '../../api'
-import { Users, Shield, TrendingUp, CreditCard, DatabaseZap, Sprout } from 'lucide-react'
+import { Users, Shield, TrendingUp, CreditCard, DatabaseZap, Sprout, Palette, Send, Mail } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 
@@ -69,6 +69,17 @@ export default function AdminDashboard() {
                 {a.label}
               </Link>
             ))}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-gray-800">
+            <Link to="/admin/personalization" className="btn-secondary text-sm justify-center text-purple-300 border-purple-900/60 hover:bg-purple-900/20">
+              <Palette size={14} /> Personnalisation
+            </Link>
+            <Link to="/admin/notifications" className="btn-secondary text-sm justify-center text-pitch-300 border-pitch-900/60 hover:bg-pitch-900/20">
+              <Send size={14} /> Notifications
+            </Link>
+            <Link to="/admin/email" className="btn-secondary text-sm justify-center text-blue-300 border-blue-900/60 hover:bg-blue-900/20">
+              <Mail size={14} /> Emails
+            </Link>
           </div>
         </div>
 

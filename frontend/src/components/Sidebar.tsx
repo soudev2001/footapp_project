@@ -8,6 +8,7 @@ import {
   Megaphone, Globe, FolderKanban, Mail, ListOrdered,
   DollarSign, Handshake, FileText, Star, TrendingUp,
   Dumbbell, Heart, PieChart, BookOpen, X, GitCompare,
+  Palette, Send,
 } from 'lucide-react'
 import type { Role } from '../types'
 import clsx from 'clsx'
@@ -70,7 +71,10 @@ const SECTIONS: NavSection[] = [
       { to: '/admin/teams', label: 'Équipes', icon: <Clipboard size={17} />, roles: ['admin', 'superadmin'] },
       { to: '/admin/analytics', label: 'Analyse', icon: <BarChart3 size={17} />, roles: ['admin', 'superadmin'] },
       { to: '/admin/announcements', label: 'Annonces', icon: <Megaphone size={17} />, roles: ['admin', 'superadmin'] },
+      { to: '/admin/notifications', label: 'Notifications', icon: <Send size={17} />, roles: ['admin', 'superadmin'] },
+      { to: '/admin/email', label: 'Emails', icon: <Mail size={17} />, roles: ['admin', 'superadmin'] },
       { to: '/admin/events', label: 'Événements', icon: <Calendar size={17} />, roles: ['admin', 'superadmin'] },
+      { to: '/admin/personalization', label: 'Personnalisation', icon: <Palette size={17} />, roles: ['admin', 'superadmin'] },
       { to: '/admin/club-settings', label: 'Paramètres du Club', icon: <Settings size={17} />, roles: ['admin', 'superadmin'] },
       { to: '/admin/subscription', label: 'Abonnement', icon: <CreditCard size={17} />, roles: ['admin', 'superadmin'] },
     ],

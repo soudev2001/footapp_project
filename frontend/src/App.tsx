@@ -49,6 +49,9 @@ import ClubSettings from './pages/admin/ClubSettings'
 import Onboarding from './pages/admin/Onboarding'
 import Financial from './pages/admin/Financial'
 import AdminEvents from './pages/admin/Events'
+import Personalization from './pages/admin/Personalization'
+import AdminNotifications from './pages/admin/AdminNotifications'
+import AdminEmail from './pages/admin/AdminEmail'
 
 // Player
 import PlayerDashboard from './pages/player/PlayerDashboard'
@@ -238,6 +241,9 @@ export default function App() {
           <Route path="/admin/financial" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><Financial /></ProtectedRoute>} />
           <Route path="/admin/events" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminEvents /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminUsers /></ProtectedRoute>} />
+          <Route path="/admin/personalization" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><Personalization /></ProtectedRoute>} />
+          <Route path="/admin/notifications" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminNotifications /></ProtectedRoute>} />
+          <Route path="/admin/email" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminEmail /></ProtectedRoute>} />
 
           {/* Player */}
           <Route path="/player" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerDashboard /></ProtectedRoute>} />

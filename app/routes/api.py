@@ -92,6 +92,7 @@ def api_seed_all():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+
 @api_bp.route('/admin/seed-coach-data', methods=['POST'])
 @role_required('admin')
 def api_seed_coach_data():
@@ -104,29 +105,6 @@ def api_seed_coach_data():
         return jsonify({'success': True, 'message': 'Seed coach data effectué'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
-# FootLogic V2 - API Routes (Real JWT + Complete Endpoints)
-
-import jwt
-import os
-import datetime
-from flask import Blueprint, jsonify, request, current_app, render_template, url_for
-from app.models import serialize_doc, serialize_docs
-from app.services import (
-    get_player_service, get_club_service, get_event_service,
-    get_match_service, get_post_service, get_user_service,
-    get_team_service, get_notification_service, get_contract_service,
-    get_shop_service, get_project_service, get_parent_link_service,
-    get_subscription_service, get_isy_service,
-    get_analytics_service, get_member_onboarding_service, get_billing_service,
-    get_platform_management_service, get_platform_analytics_service,
-    get_parent_monitoring_service, get_fan_engagement_service, get_media_service,
-)
-from app.services.messaging_service import MessagingService
-from app.services.db import mongo
-from functools import wraps
-from bson import ObjectId
-
-api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 
 # ============================================================
