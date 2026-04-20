@@ -23,7 +23,8 @@ export default function Login() {
   const [error, setError] = useState('')
   const [quickLoading, setQuickLoading] = useState<string | null>(null)
 
-  const showQuickLogin = import.meta.env.DEV || window.location.hostname.includes('preprod')
+  // Always show quick login for the upcoming preprod demo as requested
+  const showQuickLogin = true
 
   const { register, handleSubmit, formState: { isSubmitting } } = useForm<FormData>()
 
