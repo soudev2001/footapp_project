@@ -12,6 +12,7 @@ const QUICK_LOGINS = [
   { role: 'admin', label: 'Admin', email: 'admin@footlogic.fr', password: 'admin123', icon: <ShieldCheck size={20} />, color: 'from-purple-700 to-purple-900 border-purple-600' },
   { role: 'coach', label: 'Coach', email: 'coach@fcelite.fr', password: 'coach123', icon: <Users size={20} />, color: 'from-blue-700 to-blue-900 border-blue-600' },
   { role: 'player', label: 'Joueur', email: 'player1@fcelite.fr', password: 'player123', icon: <User size={20} />, color: 'from-pitch-700 to-pitch-900 border-pitch-600' },
+  { role: 'fan', label: 'Fan', email: 'fan@fcelite.fr', password: 'fan123', icon: <Users size={20} />, color: 'from-orange-700 to-orange-900 border-orange-600' },
   { role: 'superadmin', label: 'Super Admin', email: 'superadmin1@footlogic.com', password: 'super123', icon: <Crown size={20} />, color: 'from-yellow-700 to-yellow-900 border-yellow-600' },
 ]
 
@@ -21,6 +22,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [quickLoading, setQuickLoading] = useState<string | null>(null)
+
+  const showQuickLogin = import.meta.env.DEV || window.location.hostname.includes('preprod')
 
   const { register, handleSubmit, formState: { isSubmitting } } = useForm<FormData>()
 
@@ -151,33 +154,36 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3">
-            <hr className="flex-1 border-white/10" />
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-600">Accès Rapide</span>
-            <hr className="flex-1 border-white/10" />
-          </div>
+          {/* Quick Access - Only Show in Dev or Preprod environments */}
+          {showQuickLogin && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <hr className="flex-1 border-white/10" />
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-600">Accès Rapide (Démo)</span>
+                <hr className="flex-1 border-white/10" />
+              </div>
 
-          {/* Quick Login Roles */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {QUICK_LOGINS.map(({ role, label, email, password, icon, color }) => (
-              <button
-                key={role}
-                type="button"
-                onClick={() => quickLogin(email, password, role)}
-                disabled={quickLoading !== null}
-                className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl border bg-gradient-to-br ${color} text-white hover:brightness-110 hover:scale-105 transition-all duration-200 disabled:opacity-60`}
-              >
-                {quickLoading === role && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50">
-                    <Loader2 size={14} className="animate-spin" />
-                  </div>
-                )}
-                {icon}
-                <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
-              </button>
-            ))}
-          </div>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                {QUICK_LOGINS.map(({ role, label, email, password, icon, color }) => (
+                  <button
+                    key={role}
+                    type="button"
+                    onClick={() => quickLogin(email, password, role)}
+                    disabled={quickLoading !== null}
+                    className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl border bg-gradient-to-br ${color} text-white hover:brightness-110 hover:scale-105 transition-all duration-200 disabled:opacity-60`}
+                  >
+                    {quickLoading === role && (
+                      <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50">
+                        <Loader2 size={14} className="animate-spin" />
+                      </div>
+                    )}
+                    {icon}
+                    <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Register CTA */}
           <div className="text-center pt-4 border-t border-white/5">
