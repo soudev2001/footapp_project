@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { coachApi } from '../../api'
+import { coachApi, messagesApi } from '../../api'
 import { useTeam } from '../../contexts/TeamContext'
 import { useState, useEffect, useCallback } from 'react'
 import { Mail, Users, CheckSquare, Square, Search, Star, ArrowRightLeft, Shield, Calendar, MapPin, Send, Download, Wand2, CheckCircle2, XCircle, X, Trophy, Heart, Clock, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react'
@@ -127,7 +127,7 @@ export default function Convocation() {
               receiver_id: p.user_id,
               content: `[Convocation ${selectedEventObj?.title ?? ''}] : ${message}`,
               type: 'direct'
-            }).catch(e => console.error('Failed to send msg to', pid, e))
+            }).catch((e: unknown) => console.error('Failed to send msg to', pid, e))
           }
           return Promise.resolve()
         }))
@@ -435,7 +435,7 @@ export default function Convocation() {
                                </p>
                                <p className="text-[10px] text-gray-500">{player.position ?? '—'}</p>
                             </div>
-                            {isInj && <Heart size={14} className="text-red-400 fill-red-400 ml-2" title="Blessé" />}
+                            {isInj && <Heart size={14} className="text-red-400 fill-red-400 ml-2" aria-label="Blessé" />}
                           </div>
                           <span className={clsx('text-[10px] font-bold shrink-0', ovrColor(ovr))}>{ovr}</span>
                           <div className="flex gap-0.5 shrink-0">

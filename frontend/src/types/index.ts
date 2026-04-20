@@ -57,6 +57,7 @@ export interface Player {
     weight?: number
     nationality?: string
     foot?: 'left' | 'right' | 'both'
+    country_code?: string
   }
 }
 

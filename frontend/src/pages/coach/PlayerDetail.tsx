@@ -239,7 +239,7 @@ export default function PlayerDetail() {
             </div>
           </div>
 
-          {player.evaluations?.length > 0 && (
+          {(player as any).evaluations?.length > 0 && (
             <div className="card space-y-3">
               <h2 className="font-semibold text-white">Historique évaluations</h2>
               {(player as any).evaluations.slice(-5).map((e: any, i: number) => (

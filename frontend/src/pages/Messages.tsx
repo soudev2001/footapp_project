@@ -94,7 +94,7 @@ export default function Messages() {
 
   const handleSend = () => {
     if (!text.trim()) return
-    sendMutation.mutate()
+    sendMutation.mutate(undefined)
   }
 
   return (

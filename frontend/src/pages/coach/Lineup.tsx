@@ -950,6 +950,7 @@ export default function Lineup() {
                 {subs.map((id) => {
                   const p = getPlayer(id)
                   if (!p) return null
+                  const isInj = isInjured(id)
                   return (
                     <div
                       key={id}
@@ -964,7 +965,7 @@ export default function Lineup() {
                       <GripVertical size={10} className={isInj ? "text-red-500" : "text-gray-500"} />
                       <span className={clsx('w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold', posColor(p.position))}>{p.jersey_number ?? '?'}</span>
                       <span className={isInj ? 'line-through text-red-300' : ''}>{p.profile?.last_name ?? 'Joueur'}</span>
-                      {isInj && <Heart size={10} className="text-red-400 fill-red-400" title="Blessé" />}
+                      {isInj && <Heart size={10} className="text-red-400 fill-red-400" aria-label="Blessé" />}
                       <span className="text-[10px] text-gray-500">{p.position}</span>
                       <button type="button" onClick={() => removeSub(id)} className="ml-0.5 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><UserMinus size={11} /></button>
                     </div>
@@ -1012,7 +1013,7 @@ export default function Lineup() {
                         </span>
                       )}
                       {slot.playerId && isInjured(slot.playerId) && (
-                        <Heart size={12} className="text-red-400 fill-red-400 shrink-0" title="Blessé" />
+                        <Heart size={12} className="text-red-400 fill-red-400 shrink-0" aria-label="Blessé" />
                       )}
                       <button onClick={(e) => { e.stopPropagation(); toggleCaptain(slot.playerId!) }}
                         className={clsx('p-0.5 transition-all', captains.includes(slot.playerId!) ? 'text-yellow-400 scale-110' : 'text-gray-600 hover:text-yellow-400 opacity-0 group-hover:opacity-100')}>
@@ -1095,7 +1096,7 @@ export default function Lineup() {
                       <GripVertical size={10} className={isInj ? "text-red-600 shrink-0" : "text-gray-600 shrink-0"} />
                       <span className={clsx('w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0', posColor(p.position))}>{p.jersey_number ?? '?'}</span>
                       <span className={clsx("truncate flex-1", isInj && 'line-through text-red-300')}>{p.profile?.last_name}</span>
-                      {isInj && <Heart size={12} className="text-red-400 fill-red-400 shrink-0" title="Blessé" />}
+                      {isInj && <Heart size={12} className="text-red-400 fill-red-400 shrink-0" aria-label="Blessé" />}
                       <span className={clsx('text-[9px] font-bold shrink-0', ovrColor(calcOVR(p)))}>{calcOVR(p)}</span>
                       <span className="text-[9px] text-gray-500 shrink-0">{p.position ?? '—'}</span>
                     </div>

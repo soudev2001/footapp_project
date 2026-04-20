@@ -32,6 +32,13 @@ const TYPE_DOTS: Record<string, string> = {
 
 const CAN_MANAGE_ROLES = ['coach', 'admin', 'superadmin']
 
+const EVENT_TYPES = [
+  { value: 'training', label: 'Entraînement', icon: <Dumbbell size={16} />, color: 'text-pitch-400' },
+  { value: 'match', label: 'Match', icon: <Shield size={16} />, color: 'text-red-400' },
+  { value: 'meeting', label: 'Réunion', icon: <Users size={16} />, color: 'text-blue-400' },
+  { value: 'other', label: 'Autre', icon: <Info size={16} />, color: 'text-gray-400' },
+]
+
 export default function Calendar() {
   const qc = useQueryClient()
   const { user } = useAuthStore()
