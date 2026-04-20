@@ -35,8 +35,8 @@ jobs:
       - name: Build & deploy PreProd
         run: |
           cd ~/footapp_project
-          docker compose -f docker-compose.preprod.yml down
-          docker compose -f docker-compose.preprod.yml up -d --build
+          docker compose -f docker-compose.preprod.yml --env-file .env.preprod down
+          docker compose -f docker-compose.preprod.yml --env-file .env.preprod up -d --build
 
       - name: Health check
         run: |
