@@ -34,7 +34,7 @@ export default function Attendance() {
     queryFn: () => eventsApi.upcoming().then((r) => r.data),
   })
 
-  const events = (upcomingData as any)?.events ?? []
+  const events = Array.isArray(upcomingData) ? upcomingData : (upcomingData as any)?.events ?? (upcomingData as any)?.data?.events ?? []
 
 
   const { data: players } = useQuery({

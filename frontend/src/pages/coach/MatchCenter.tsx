@@ -148,10 +148,24 @@ export default function MatchCenter() {
       </div>
 
       {/* Quick nav */}
-      <div className="flex gap-2 flex-wrap text-xs">
-        <Link to="/coach/lineup" className="btn-ghost gap-1"><ClipboardList size={12} /> Composition</Link>
-        <Link to="/coach/convocation" className="btn-ghost gap-1"><ArrowLeftRight size={12} /> Convocation</Link>
-        <Link to="/coach/injuries" className="btn-ghost gap-1"><CircleDot size={12} /> Blessures</Link>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex gap-2 flex-wrap text-xs">
+          <Link to="/coach/lineup" className="btn-ghost gap-1"><ClipboardList size={12} /> Composition</Link>
+          <Link to="/coach/convocation" className="btn-ghost gap-1"><ArrowLeftRight size={12} /> Convocation</Link>
+          <Link to="/coach/injuries" className="btn-ghost gap-1"><CircleDot size={12} /> Blessures</Link>
+        </div>
+        
+        {/* Availability Summary */}
+        <div className="flex items-center gap-4 px-4 py-2 bg-gray-900/50 rounded-2xl border border-white/5 shadow-inner">
+           <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Disponibles</span>
+           </div>
+           <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)] animate-pulse" />
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Blessés</span>
+           </div>
+        </div>
       </div>
 
       {/* Horizontal match selector */}

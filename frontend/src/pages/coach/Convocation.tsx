@@ -99,10 +99,11 @@ export default function Convocation() {
   })
 
   const sendMutation = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
+      const pids = [...Array.from(selectedPlayers), ...Array.from(substitutes)]
       const payload = {
         event_id: selectedEvent,
-        player_ids: [...Array.from(selectedPlayers), ...Array.from(substitutes)],
+        player_ids: pids,
         starters: Array.from(selectedPlayers),
         substitutes: Array.from(substitutes),
         captain_id: captainId,
@@ -113,7 +114,26 @@ export default function Convocation() {
         player_instructions: savedLineup?.player_instructions ?? {},
         match_date: selectedEventObj?.date ?? null,
       }
-      return coachApi.sendConvocation(payload)
+      
+      const res = await coachApi.sendConvocation(payload)
+      
+      // Also send in-app messages if instruction exists
+      if (message && message.trim() && pids.length > 0) {
+        // We do this in parallel to not block too much, though ideally the backend should handle this
+        Promise.all(pids.map(pid => {
+          const p = (players as Player[] | undefined)?.find(pl => pl.id === pid)
+          if (p?.user_id) {
+            return messagesApi.send({
+              receiver_id: p.user_id,
+              content: `[Convocation ${selectedEventObj?.title ?? ''}] : ${message}`,
+              type: 'direct'
+            }).catch(e => console.error('Failed to send msg to', pid, e))
+          }
+          return Promise.resolve()
+        }))
+      }
+      
+      return res
     },
     onSuccess: () => {
       setSent(true)
