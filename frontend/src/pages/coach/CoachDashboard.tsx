@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { coachApi, matchesApi } from '../../api'
 import { useTeam } from '../../contexts/TeamContext'
-import { Users, Calendar, Shield, BarChart3, ClipboardList, Target, UserCheck, Search, ChevronRight, Swords, Dumbbell, BookOpen, Heart, PieChart, GitCompare, Mail, ListOrdered, AlertTriangle } from 'lucide-react'
+import { Users, Calendar, Shield, BarChart3, ClipboardList, Target, UserCheck, Search, ChevronRight, Swords, Dumbbell, BookOpen, Heart, PieChart, GitCompare, Mail, ListOrdered, AlertTriangle, Eye } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
@@ -17,7 +17,7 @@ const QUICK_LINKS = [
   { to: '/coach/training-plans', label: 'Entraînement', icon: <Dumbbell size={16} />, color: 'text-lime-400', desc: 'Plans & séances' },
   { to: '/coach/drills', label: 'Exercices', icon: <BookOpen size={16} />, color: 'text-emerald-400', desc: 'Bibliothèque' },
   { to: '/coach/injuries', label: 'Blessures', icon: <Heart size={16} />, color: 'text-pink-400', desc: 'Suivi médical' },
-  { to: '/coach/scouting', label: 'Recrutement', icon: <Search size={16} />, color: 'text-cyan-400', desc: 'Rapports scouting' },
+  { to: '/coach/scouting', label: 'Recrutement', icon: <Eye size={16} />, color: 'text-cyan-400', desc: 'Rapports scouting' },
   { to: '/coach/analytics', label: 'Analyse', icon: <PieChart size={16} />, color: 'text-indigo-400', desc: 'Stats joueurs' },
   { to: '/coach/player-comparison', label: 'Comparer', icon: <GitCompare size={16} />, color: 'text-fuchsia-400', desc: 'Comparer joueurs' },
 ]

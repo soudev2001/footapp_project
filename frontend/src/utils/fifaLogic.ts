@@ -42,15 +42,37 @@ export function fitBg(fit: number): string {
   return 'bg-red-500'
 }
 
+// ─── Player Attributes (FIFA Pillars) ─────────────────────────────
+export interface PlayerAttributes {
+  vit: number
+  tir: number
+  pas: number
+  dri: number
+  def: number
+  phy: number
+}
+
+export function getAttributes(player: Player & Record<string, any>): PlayerAttributes {
+  return {
+    vit: player.speed ?? player.sprint_speed ?? player.physical ?? 70,
+    tir: player.shooting ?? player.technical ?? 65,
+    pas: player.passing ?? player.technical ?? 68,
+    dri: player.dribbling ?? player.technical ?? 67,
+    def: player.defending ?? player.defensive ?? 60,
+    phy: player.physical_score ?? player.physical ?? 72,
+  }
+}
+
 // ─── Player OVR calculation ───────────────────────────────────────
-export function calcOVR(player: Player): number {
+export function calcOVR(player: Player & Record<string, any>): number {
+  const attrs = getAttributes(player)
+  const attrAvg = (attrs.vit + attrs.tir + attrs.pas + attrs.dri + attrs.def + attrs.phy) / 6
+  
   const s = player.stats ?? {}
-  const base = 55
-  const goals = (s.goals ?? 0) * 2.5
-  const assists = (s.assists ?? 0) * 2
-  const matches = (s.matches_played ?? 0) * 0.3
-  const discipline = -((s.yellow_cards ?? 0) * 0.5 + (s.red_cards ?? 0) * 2)
-  return Math.min(99, Math.max(40, Math.round(base + goals + assists + matches + discipline)))
+  const formBonus = (s.goals ?? 0) * 0.5 + (s.assists ?? 0) * 0.3
+  const matchesBonus = Math.min(5, (s.matches_played ?? 0) * 0.1)
+  
+  return Math.min(99, Math.max(40, Math.round(attrAvg + formBonus + matchesBonus)))
 }
 
 // ─── Team Overall Rating ──────────────────────────────────────────
@@ -286,6 +308,62 @@ export function autoFillPlayers(
   return newSlots
 }
 
+// ─── Formation Chemistry Links ────────────────────────────────────
+export function getFormationLinks(formation: string): [number, number][] {
+  // Define standard links for common formations (hardcoded for now)
+  // These are indexes in the FORMATION_POSITIONS array
+  const links433: [number, number][] = [
+    [0, 2], [0, 3], // GK to CBs
+    [4, 2], [2, 3], [3, 1], // LB-CB-CB-RB
+    [4, 7], [3, 6], [2, 5], [1, 5], // Def to Mid
+    [7, 6], [6, 5], // Mid chain
+    [7, 10], [6, 9], [5, 8], // Mid to Att
+    [10, 9], [9, 8], // Att chain
+  ]
+  
+  if (formation === '4-3-3') return links433
+  
+  // Generic links for others (naive distance based or just first 11)
+  return links433 // Fallback to 4-3-3 links for now as a base pattern
+}
+
+// ─── Traits & Styles ──────────────────────────────────────────────
+export function getTraits(attrs: PlayerAttributes): { name: string; icon: string }[] {
+  const traits: { name: string; icon: string }[] = []
+  if (attrs.vit > 85) traits.push({ name: 'Speedster', icon: '⚡' })
+  if (attrs.tir > 85) traits.push({ name: 'Clinical Finisher', icon: '🎯' })
+  if (attrs.pas > 85) traits.push({ name: 'Playmaker', icon: '🪄' })
+  if (attrs.dri > 85) traits.push({ name: 'Dribbler', icon: '🌪️' })
+  if (attrs.def > 85) traits.push({ name: 'Wall', icon: '🛡️' })
+  if (attrs.phy > 85) traits.push({ name: 'Engine', icon: '🫀' })
+  
+  if (attrs.tir > 80 && attrs.pas > 80) traits.push({ name: 'Technical', icon: '🧠' })
+  return traits
+}
+
+export function getStyle(attrs: PlayerAttributes, pos: string): string {
+  if (pos === 'GK') return 'Shot Stopper'
+  if (['CB', 'LB', 'RB'].includes(pos)) {
+    if (attrs.pas > 75) return 'Ball Playing Defender'
+    return 'No-Nonsense Defender'
+  }
+  if (['CDM', 'CM'].includes(pos)) {
+    if (attrs.phy > 80) return 'Box-to-Box'
+    if (attrs.pas > 80) return 'Deep Lying Playmaker'
+    return 'Workhorse'
+  }
+  if (['CAM', 'LW', 'RW'].includes(pos)) {
+    if (attrs.dri > 80) return 'Winger'
+    return 'Creative Force'
+  }
+  if (pos === 'ST') {
+    if (attrs.phy > 80) return 'Target Man'
+    if (attrs.vit > 80) return 'Poacher'
+    return 'Advanced Forward'
+  }
+  return 'All-Rounder'
+}
+
 // ─── Position color classes ───────────────────────────────────────
 export const POS_COLORS: Record<string, string> = {
   GK: 'bg-amber-800/60 text-amber-300',
@@ -316,4 +394,12 @@ export function ovrBg(ovr: number): string {
   if (ovr >= 65) return 'bg-yellow-900/60 text-yellow-300'
   if (ovr >= 50) return 'bg-orange-900/60 text-orange-300'
   return 'bg-red-900/60 text-red-300'
+}
+
+export function ratingColor(val: number): string {
+  if (val >= 80) return 'text-green-400'
+  if (val >= 70) return 'text-emerald-400'
+  if (val >= 60) return 'text-yellow-400'
+  if (val >= 50) return 'text-orange-400'
+  return 'text-red-400'
 }

@@ -1,10 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { coachApi, teamsApi } from '../../api'
-import { useTeam } from '../../contexts/TeamContext'
-import { Users, Search, Plus, X, Save, PieChart, GitCompare, CheckCircle, Trash2, Pencil } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
+import { coachApi } from '../../api'
+import { useTeam } from '../../contexts/TeamContext'
+import { 
+  Users, Plus, Search, PieChart, GitCompare, 
+  X, CheckCircle, Save, Pencil, Trash2 
+} from 'lucide-react'
 import type { Player } from '../../types'
+import FifaCard from '../../components/FifaCard'
+import { calcOVR, ovrColor, ovrBg } from '../../utils/fifaLogic'
 import clsx from 'clsx'
 
 // Map actual position codes to group
@@ -257,91 +262,37 @@ export default function Roster() {
             <span className={clsx('badge text-xs', GROUP_BADGE[group])}>{grouped[group].length}</span>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {(grouped[group] as Player[]).map((player: Player) => {
-              const firstName = player.profile?.first_name ?? ''
-              const lastName = player.profile?.last_name ?? ''
-              const fullName = `${firstName} ${lastName}`.trim() || 'Joueur'
-              const avatarUrl = getAvatarUrl(player)
-
-              return (
-                <div key={player.id} className="card group relative overflow-hidden hover:border-pitch-700 transition-all duration-300">
-                  {/* Jersey ribbon */}
-                  <div className="absolute top-0 right-8 z-10 bg-pitch-600 text-white text-sm font-bold w-8 h-12 flex items-end justify-center pb-1 rounded-b-xl group-hover:h-14 transition-all duration-300">
-                    {player.jersey_number ?? '--'}
-                  </div>
-
-                  {/* Player info */}
-                  <div className="flex items-center gap-4 mb-4 pr-10">
-                    <div className="relative flex-shrink-0">
-                      <img
-                        src={avatarUrl}
-                        alt={fullName}
-                        className="w-16 h-16 rounded-2xl object-cover group-hover:scale-105 group-hover:rotate-1 transition-all duration-300"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement
-                          target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=10b981&color=fff&size=128`
-                        }}
-                      />
-                      <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-gray-900 bg-pitch-500" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-bold text-white uppercase truncate group-hover:text-pitch-400 transition-colors">
-                        {fullName}
-                      </p>
-                      <span className={clsx('badge text-xs mt-1', GROUP_BADGE[getPositionGroup(player.position)] ?? 'bg-gray-800 text-gray-300')}>
-                        {player.position}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Stats grid */}
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="bg-gray-800/60 rounded-xl p-2 text-center">
-                      <p className="text-base font-bold text-white">{player.stats?.goals ?? 0}</p>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-wide">Buts</p>
-                    </div>
-                    <div className="bg-gray-800/60 rounded-xl p-2 text-center">
-                      <p className="text-base font-bold text-white">{player.stats?.assists ?? 0}</p>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-wide">Passes</p>
-                    </div>
-                    <div className="bg-pitch-900/40 rounded-xl p-2 text-center">
-                      <p className="text-base font-bold text-pitch-300">{player.stats?.matches_played ?? 0}</p>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-wide">Matchs</p>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2">
-                    <Link
-                      to={`/coach/roster/${player.id}`}
-                      className="flex-1 text-center py-2 rounded-xl bg-pitch-600/20 hover:bg-pitch-600/40 text-pitch-300 text-xs font-bold uppercase tracking-wide transition-colors"
-                    >
-                      Analyser
-                    </Link>
-                    <Link
-                      to={`/coach/roster/${player.id}`}
-                      className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
-                      title="Modifier"
-                    >
-                      <Pencil size={13} />
-                    </Link>
-                    <button
-                      onClick={() => {
-                        if (confirm(`Supprimer ${fullName} ?`)) deleteMutation.mutate(player.id)
-                      }}
-                      className="w-9 h-9 flex items-center justify-center rounded-xl bg-red-900/20 hover:bg-red-900/40 text-red-500 transition-colors"
-                      title="Supprimer"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-
-                  {/* Background glow */}
-                  <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-pitch-500/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+          <div className="flex flex-wrap gap-6 justify-center sm:justify-start">
+            {(grouped[group] as Player[]).map((player: Player) => (
+              <div key={player.id} className="relative group">
+                <Link to={`/coach/roster/${player.id}`}>
+                  <FifaCard player={player} />
+                </Link>
+                
+                {/* Overlay actions on hover */}
+                <div className="absolute top-4 right-4 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                  <Link
+                    to={`/coach/roster/${player.id}`}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-900/80 backdrop-blur border border-white/10 text-white hover:bg-pitch-600 transition-colors shadow-xl"
+                    title="Modifier"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Pencil size={12} />
+                  </Link>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      if (confirm(`Supprimer ${player.profile?.last_name} ?`)) deleteMutation.mutate(player.id)
+                    }}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-900/80 backdrop-blur border border-white/10 text-red-400 hover:bg-red-600 hover:text-white transition-colors shadow-xl"
+                    title="Supprimer"
+                  >
+                    <Trash2 size={12} />
+                  </button>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
         </div>
       ))}

@@ -81,6 +81,15 @@ export default function Convocation() {
     queryFn: () => coachApi.tactics(teamParams).then((r) => r.data),
   })
 
+  const { data: injuriesStats } = useQuery({
+    queryKey: ['coach-injuries-stats', activeTeamId],
+    queryFn: () => coachApi.injuryStats(teamParams).then((r) => r.data).catch(() => ({})),
+  })
+
+  const activeInjuries = (injuriesStats as any)?.active_injuries ?? []
+  const isInjured = (id: string) => activeInjuries.some((inj: any) => inj.player_id === id)
+
+
   const tactics = Array.isArray(tacticsData) ? tacticsData : []
   const [selectedTacticId, setSelectedTacticId] = useState<string>('')
 
@@ -381,27 +390,32 @@ export default function Convocation() {
                       const isSub = substitutes.has(player.id)
                       const isCaptain = captainId === player.id
                       const ovr = calcOVR(player)
+                      const isInj = isInjured(player.id)
                       return (
                         <div key={player.id} className={clsx(
                           'flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all border',
+                          isInj ? 'opacity-50 bg-red-900/10 border-red-900/30' :
                           isStarter
                             ? 'bg-pitch-900/30 border-pitch-700/40 hover:bg-pitch-900/50'
                             : isSub
                             ? 'bg-yellow-900/20 border-yellow-800/30 hover:bg-yellow-900/30'
                             : 'border-transparent hover:bg-gray-800/60'
                         )}>
-                          <button onClick={() => toggle(player.id)} className="shrink-0">
+                          <button onClick={() => { if(!isInj) toggle(player.id) }} className={clsx("shrink-0", isInj && "cursor-not-allowed")}>
                             {isStarter ? <CheckSquare size={16} className="text-pitch-500" /> : <Square size={16} className="text-gray-600" />}
                           </button>
                           <span className={clsx('w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0', posColor(player.position))}>
                             {player.jersey_number ?? '?'}
                           </span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-white font-medium truncate">
-                              {player.profile?.last_name}
-                              {isCaptain && <Star size={10} className="inline ml-1 text-yellow-400 fill-yellow-400" />}
-                            </p>
-                            <p className="text-[10px] text-gray-500">{player.position ?? '—'}</p>
+                          <div className="flex-1 min-w-0 flex items-center justify-between">
+                            <div>
+                               <p className={clsx("text-sm font-medium truncate", isInj ? "line-through text-red-300" : "text-white")}>
+                                 {player.profile?.last_name}
+                                 {isCaptain && <Star size={10} className="inline ml-1 text-yellow-400 fill-yellow-400" />}
+                               </p>
+                               <p className="text-[10px] text-gray-500">{player.position ?? '—'}</p>
+                            </div>
+                            {isInj && <Heart size={14} className="text-red-400 fill-red-400 ml-2" title="Blessé" />}
                           </div>
                           <span className={clsx('text-[10px] font-bold shrink-0', ovrColor(ovr))}>{ovr}</span>
                           <div className="flex gap-0.5 shrink-0">
@@ -411,13 +425,14 @@ export default function Convocation() {
                                 <Star size={12} className={isCaptain ? 'fill-yellow-400' : ''} />
                               </button>
                             )}
-                            <button onClick={() => toggleSub(player.id)}
-                              className={clsx('p-1 rounded transition-colors', isSub ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-400')} title="Remplaçant">
+                            <button onClick={() => { if(!isInj) toggleSub(player.id) }}
+                              className={clsx('p-1 rounded transition-colors', isSub ? 'text-yellow-400' : 'text-gray-600', isInj ? 'cursor-not-allowed opacity-50' : 'hover:text-yellow-400')} title="Remplaçant">
                               <ArrowRightLeft size={12} />
                             </button>
                           </div>
                         </div>
                       )
+
                     })}
                   </div>
                 </div>

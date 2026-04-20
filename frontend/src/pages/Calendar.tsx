@@ -42,17 +42,14 @@ export default function Calendar() {
   const [editor, setEditor] = useState<{ open: boolean; event?: Event }>({ open: false })
   const [toast, setToast] = useState('')
 
-  const { data: events, isLoading: loadingEvents } = useQuery({
+  const { data: upcomingData, isLoading } = useQuery({
     queryKey: ['events-upcoming'],
     queryFn: () => eventsApi.upcoming().then((r) => r.data),
   })
 
-  const { data: matches, isLoading: loadingMatches } = useQuery({
-    queryKey: ['matches-upcoming'],
-    queryFn: () => matchesApi.upcoming().then((r) => r.data),
-  })
-
-  const isLoading = loadingEvents || loadingMatches
+  // /api/calendar/upcoming returns { events: [], matches: [] }
+  const events = (upcomingData as any)?.events ?? []
+  const matches = (upcomingData as any)?.matches ?? []
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ['events-upcoming'] })

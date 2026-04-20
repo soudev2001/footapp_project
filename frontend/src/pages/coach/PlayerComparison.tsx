@@ -2,8 +2,12 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { coachApi } from '../../api'
 import { useTeam } from '../../contexts/TeamContext'
-import { GitCompare, Plus, X, User, Target } from 'lucide-react'
-import type { PlayerRanking } from '../../types'
+import { GitCompare, Plus, X, User, Target, Trophy, TrendingUp } from 'lucide-react'
+import type { PlayerRanking, Player } from '../../types'
+import FifaCard from '../../components/FifaCard'
+import RadarChart, { type RadarDataset } from '../../components/RadarChart'
+import { getAttributes, calcOVR, ovrColor, ratingColor } from '../../utils/fifaLogic'
+import clsx from 'clsx'
 
 const RATING_KEYS = ['VIT', 'TIR', 'PAS', 'DRI', 'DEF', 'PHY'] as const
 const RATING_LABELS: Record<string, string> = {
@@ -70,79 +74,104 @@ export default function PlayerComparison() {
         </div>
       )}
 
-      {/* Comparison table */}
+      {/* Comparison results */}
       {comparedPlayers.length >= 2 && (
-        <div className="space-y-4">
-          {/* Stats comparison */}
-          <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-700">
-                  <th className="text-left text-gray-400 font-medium p-4">Statistique</th>
-                  {comparedPlayers.map(p => (
-                    <th key={p.player_id} className="text-center text-white font-medium p-4">
-                      <div className="flex flex-col items-center gap-1">
-                        <span className="text-xs bg-purple-600/20 text-purple-400 px-2 py-0.5 rounded-full">{p.jersey_number || '?'}</span>
-                        <span className="truncate max-w-[100px]">{p.name}</span>
-                        <span className="text-xs text-gray-500">{p.position}</span>
-                      </div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {['goals', 'assists', 'matches_played', 'yellow_cards', 'red_cards'].map(stat => {
-                  const vals = comparedPlayers.map(p => p.stats?.[stat] || 0)
-                  const max = Math.max(...vals)
+        <div className="space-y-6">
+          {/* Top row: Cards & Radar */}
+          <div className="grid lg:grid-cols-3 gap-6 items-start">
+            {/* Visual Comparison: Multi-player Radar Chart */}
+            <div className="lg:col-span-1 card bg-gray-900/40 backdrop-blur-xl border-white/5 flex flex-col items-center justify-center min-h-[400px]">
+              <h2 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-8">Analyse Superposée</h2>
+              <div className="relative">
+                <RadarChart 
+                  size={300}
+                  datasets={comparedPlayers.map((p, i) => {
+                    const colors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899']
+                    const attrs = {
+                      vit: p.technical_ratings?.VIT ?? 50,
+                      tir: p.technical_ratings?.TIR ?? 50,
+                      pas: p.technical_ratings?.PAS ?? 50,
+                      dri: p.technical_ratings?.DRI ?? 50,
+                      def: p.technical_ratings?.DEF ?? 50,
+                      phy: p.technical_ratings?.PHY ?? 50,
+                    }
+                    return { data: attrs, color: colors[i % colors.length], label: p.name }
+                  })}
+                />
+              </div>
+              {/* Legend */}
+              <div className="mt-8 flex flex-wrap gap-3 justify-center">
+                {comparedPlayers.map((p, i) => {
+                  const colors = ['bg-purple-500', 'bg-blue-500', 'bg-green-500', 'bg-orange-500', 'bg-pink-500']
                   return (
-                    <tr key={stat} className="border-b border-gray-700/50">
-                      <td className="p-4 text-gray-400 capitalize">{stat === 'goals' ? 'Buts' : stat === 'assists' ? 'Passes D.' : stat === 'matches_played' ? 'Matchs' : stat === 'yellow_cards' ? 'C. Jaunes' : 'C. Rouges'}</td>
-                      {comparedPlayers.map((p, i) => (
-                        <td key={p.player_id} className={`p-4 text-center font-bold ${vals[i] === max && max > 0 ? 'text-green-400' : 'text-white'}`}>
-                          {vals[i]}
-                        </td>
-                      ))}
-                    </tr>
+                     <div key={p.player_id} className="flex items-center gap-1.5 px-2 py-1 bg-white/5 rounded-lg border border-white/5">
+                        <div className={clsx('w-2 h-2 rounded-full', colors[i % colors.length])} />
+                        <span className="text-[10px] font-bold text-gray-300 uppercase tracking-tighter">{p.name}</span>
+                     </div>
                   )
                 })}
-              </tbody>
-            </table>
+              </div>
+            </div>
+
+            {/* Player Cards */}
+            <div className="lg:col-span-2 flex flex-wrap gap-4 justify-center sm:justify-start">
+              {comparedPlayers.map((p) => (
+                <FifaCard 
+                  key={p.player_id} 
+                  player={{ ...p, id: p.player_id, profile: { last_name: p.name.split(' ').pop(), first_name: p.name.split(' ')[0] } } as any}
+                  className="hover:z-10"
+                />
+              ))}
+            </div>
           </div>
 
-          {/* Ratings comparison */}
-          <div className="bg-gray-800 rounded-xl border border-gray-700 p-5">
-            <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-              <Target className="w-5 h-5 text-blue-400" /> Attributs techniques
-            </h3>
-            <div className="space-y-3">
-              {RATING_KEYS.map(key => {
-                const vals = comparedPlayers.map(p => p.technical_ratings?.[key] || 50)
-                const max = Math.max(...vals)
-                return (
-                  <div key={key}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-gray-400 w-16">{RATING_LABELS[key]}</span>
-                      <div className="flex gap-4">
+          {/* Detailed table and attributes remain below for data depth */}
+          <div className="bg-gray-900/60 backdrop-blur-xl rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
+            <div className="p-4 border-b border-white/5 flex items-center justify-between">
+              <h3 className="text-white font-bold text-sm uppercase tracking-widest flex items-center gap-2">
+                <Target className="w-4 h-4 text-pitch-400" /> Matrice d'Attributs
+              </h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead>
+                  <tr className="bg-white/[0.02] text-gray-500 font-bold uppercase tracking-tighter">
+                    <th className="p-4 border-r border-white/5">Attribut</th>
+                    {comparedPlayers.map((p, i) => {
+                       const colors = ['text-purple-400', 'text-blue-400', 'text-green-400', 'text-orange-400', 'text-pink-400']
+                       return (
+                         <th key={p.player_id} className={clsx('p-4 text-center', colors[i % colors.length])}>
+                           {p.name.split(' ').pop()}
+                         </th>
+                       )
+                    })}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.03]">
+                  {RATING_KEYS.map(key => {
+                    const vals = comparedPlayers.map(p => p.technical_ratings?.[key] || 50)
+                    const max = Math.max(...vals)
+                    return (
+                      <tr key={key} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="p-4 font-bold text-gray-300 border-r border-white/5 flex items-center justify-between">
+                          <span>{RATING_LABELS[key]}</span>
+                          <span className="text-[10px] text-gray-600 ml-2">{key}</span>
+                        </td>
                         {comparedPlayers.map((p, i) => (
-                          <span key={p.player_id} className={`text-xs font-bold w-8 text-center ${vals[i] === max ? 'text-green-400' : 'text-gray-400'}`}>
-                            {vals[i]}
-                          </span>
+                          <td key={p.player_id} className="p-4 text-center">
+                            <span className={clsx(
+                              'inline-block px-2 py-1 rounded-lg font-black text-sm transition-transform hover:scale-110 cursor-default shadow-lg',
+                              vals[i] === max ? 'bg-pitch-600 text-white animate-pulse' : 'bg-gray-800 text-gray-400'
+                            )}>
+                              {vals[i]}
+                            </span>
+                          </td>
                         ))}
-                      </div>
-                    </div>
-                    <div className="flex gap-1">
-                      {comparedPlayers.map((p, i) => {
-                        const colors = ['bg-purple-500', 'bg-blue-500', 'bg-green-500', 'bg-orange-500', 'bg-pink-500']
-                        return (
-                          <div key={p.player_id} className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
-                            <div className={`h-full rounded-full ${colors[i % colors.length]}`} style={{ width: `${vals[i]}%` }} />
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )
-              })}
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

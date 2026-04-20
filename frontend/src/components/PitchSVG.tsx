@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import clsx from 'clsx'
 import { X } from 'lucide-react'
-import { positionFit, fitColor, calcOVR, ovrColor } from '../utils/fifaLogic'
+import { positionFit, fitColor, calcOVR, ovrColor, getFormationLinks } from '../utils/fifaLogic'
 import type { Player } from '../types'
 
 export const FORMATIONS = ['4-4-2', '4-3-3', '3-5-2', '4-2-3-1', '5-3-2', '3-4-3', '4-1-4-1', '4-5-1', '4-1-2-1-2', '5-4-1', '4-3-2-1'] as const
@@ -120,6 +120,7 @@ interface PitchSVGProps {
   editMode?: boolean
   customPositions?: Record<string, { x: number; y: number }>
   onPositionChange?: (slotKey: string, x: number, y: number) => void
+  showChemistry?: boolean
 }
 
 export default function PitchSVG({
@@ -139,6 +140,7 @@ export default function PitchSVG({
   editMode = false,
   customPositions,
   onPositionChange,
+  showChemistry = true,
 }: PitchSVGProps) {
   const positions = FORMATION_POSITIONS[formation] ?? FORMATION_POSITIONS['4-3-3']
   const h = size === 'sm' ? 180 : size === 'md' ? 320 : 440
@@ -275,6 +277,33 @@ export default function PitchSVG({
         <path d="M638,30 A12,12 0 0,1 650,42" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
         <path d="M30,1008 A12,12 0 0,0 42,1020" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
         <path d="M638,1020 A12,12 0 0,0 650,1008" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
+
+        {/* Chemistry / Cohesion Lines */}
+        {showChemistry && !editMode && getFormationLinks(formation).map(([idxA, idxB], i) => {
+          const posA = positions[idxA]
+          const posB = positions[idxB]
+          if (!posA || !posB) return null
+
+          const slotA = slots[`${posA.name}-${idxA}`]
+          const slotB = slots[`${posB.name}-${idxB}`]
+          const bothFilled = slotA?.playerId && slotB?.playerId
+
+          // Mock chemistry color based on filled status
+          const color = bothFilled ? 'rgba(34, 197, 94, 0.4)' : 'rgba(255, 255, 255, 0.08)'
+          const strokeWidth = bothFilled ? 3 : 1.5
+
+          return (
+            <line
+              key={`link-${i}`}
+              x1={posA.x * 6.8} y1={posA.y * 10.5}
+              x2={posB.x * 6.8} y2={posB.y * 10.5}
+              stroke={color}
+              strokeWidth={strokeWidth}
+              strokeDasharray={bothFilled ? "none" : "5,5"}
+              className="transition-all duration-500"
+            />
+          )
+        })}
       </svg>
 
       {/* Edit mode badge */}

@@ -129,6 +129,15 @@ export default function Lineup() {
     queryFn: () => coachApi.tactics(teamParams).then((r) => r.data).catch(() => []),
   })
 
+  const { data: injuriesStats } = useQuery({
+    queryKey: ['coach-injuries-stats', activeTeamId],
+    queryFn: () => coachApi.injuryStats(teamParams).then((r) => r.data).catch(() => ({})),
+  })
+
+  // Injury helper
+  const activeInjuries = (injuriesStats as any)?.active_injuries ?? []
+  const isInjured = (id: string) => activeInjuries.some((inj: any) => inj.player_id === id)
+
   // Load saved lineup (API data, used as fallback if no local draft)
   useEffect(() => {
     if (!savedLineup || !players) return
@@ -944,14 +953,18 @@ export default function Lineup() {
                   return (
                     <div
                       key={id}
-                      draggable
-                      onDragStart={(e) => { e.dataTransfer.setData('playerId', id); e.dataTransfer.effectAllowed = 'move'; setDragPlayer({ id, name: p.profile?.last_name ?? '', jerseyNumber: p.jersey_number, position: p.position }) }}
+                      draggable={!isInj}
+                      onDragStart={(e) => { if (isInj) { e.preventDefault(); return; } e.dataTransfer.setData('playerId', id); e.dataTransfer.effectAllowed = 'move'; setDragPlayer({ id, name: p.profile?.last_name ?? '', jerseyNumber: p.jersey_number, position: p.position }) }}
                       onDragEnd={handleDragEnd}
-                      className="inline-flex items-center gap-1.5 bg-gray-700/60 border border-gray-600 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 cursor-grab active:cursor-grabbing hover:border-yellow-600/50 transition-colors group"
+                      className={clsx(
+                        'inline-flex items-center gap-1.5 bg-gray-700/60 border rounded-lg px-2.5 py-1.5 text-xs text-gray-200 transition-colors group',
+                        isInj ? 'border-red-900/50 opacity-60 cursor-not-allowed' : 'border-gray-600 cursor-grab active:cursor-grabbing hover:border-yellow-600/50'
+                      )}
                     >
-                      <GripVertical size={10} className="text-gray-500" />
+                      <GripVertical size={10} className={isInj ? "text-red-500" : "text-gray-500"} />
                       <span className={clsx('w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold', posColor(p.position))}>{p.jersey_number ?? '?'}</span>
-                      {p.profile?.last_name ?? 'Joueur'}
+                      <span className={isInj ? 'line-through text-red-300' : ''}>{p.profile?.last_name ?? 'Joueur'}</span>
+                      {isInj && <Heart size={10} className="text-red-400 fill-red-400" title="Blessé" />}
                       <span className="text-[10px] text-gray-500">{p.position}</span>
                       <button type="button" onClick={() => removeSub(id)} className="ml-0.5 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><UserMinus size={11} /></button>
                     </div>
@@ -997,6 +1010,9 @@ export default function Lineup() {
                         <span className="text-[8px] px-1 py-0.5 rounded bg-purple-900/40 text-purple-300 font-medium" title={ROLE_LABELS[playerInstructions[key].role] ?? playerInstructions[key].role}>
                           {ROLE_LABELS[playerInstructions[key].role]?.slice(0, 8) ?? '⚙'}
                         </span>
+                      )}
+                      {slot.playerId && isInjured(slot.playerId) && (
+                        <Heart size={12} className="text-red-400 fill-red-400 shrink-0" title="Blessé" />
                       )}
                       <button onClick={(e) => { e.stopPropagation(); toggleCaptain(slot.playerId!) }}
                         className={clsx('p-0.5 transition-all', captains.includes(slot.playerId!) ? 'text-yellow-400 scale-110' : 'text-gray-600 hover:text-yellow-400 opacity-0 group-hover:opacity-100')}>
@@ -1044,13 +1060,16 @@ export default function Lineup() {
                 </div>
 
                 <div className="space-y-1 max-h-[280px] overflow-y-auto pr-1 scrollbar-thin">
-                  {filteredAvailable.length > 0 ? filteredAvailable.map((p) => (
+                  {filteredAvailable.length > 0 ? filteredAvailable.map((p) => {
+                    const isInj = isInjured(p.id);
+                    return (
                     <div
                       key={p.id}
-                      draggable
-                      onDragStart={(e) => handlePlayerDragStart(e, p)}
+                      draggable={!isInj}
+                      onDragStart={(e) => { if (isInj) { e.preventDefault(); return; } handlePlayerDragStart(e, p) }}
                       onDragEnd={handleDragEnd}
                       onClick={() => {
+                        if (isInj) return;
                         // FIFA: if in swap mode, drop selected slot player and place this one
                         if (selectedSlot) {
                           const prev = slots[selectedSlot]
@@ -1069,17 +1088,18 @@ export default function Lineup() {
                         }
                       }}
                       className={clsx(
-                        'flex items-center gap-2 bg-gray-800/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 cursor-grab active:cursor-grabbing hover:bg-gray-700 hover:text-white transition-all border hover:shadow-md hover:shadow-pitch-900/20',
-                        selectedSlot ? 'border-yellow-700/30 hover:border-yellow-500/50 cursor-pointer' : 'border-transparent hover:border-pitch-700/30'
+                        'flex items-center gap-2 bg-gray-800/80 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 transition-all border hover:shadow-md hover:shadow-pitch-900/20',
+                        isInj ? 'border-red-900/50 opacity-50 cursor-not-allowed' : (selectedSlot ? 'border-yellow-700/30 hover:border-yellow-500/50 cursor-pointer' : 'border-transparent hover:border-pitch-700/30 cursor-grab active:cursor-grabbing hover:bg-gray-700 hover:text-white')
                       )}
                     >
-                      <GripVertical size={10} className="text-gray-600 shrink-0" />
+                      <GripVertical size={10} className={isInj ? "text-red-600 shrink-0" : "text-gray-600 shrink-0"} />
                       <span className={clsx('w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0', posColor(p.position))}>{p.jersey_number ?? '?'}</span>
-                      <span className="truncate flex-1">{p.profile?.last_name}</span>
+                      <span className={clsx("truncate flex-1", isInj && 'line-through text-red-300')}>{p.profile?.last_name}</span>
+                      {isInj && <Heart size={12} className="text-red-400 fill-red-400 shrink-0" title="Blessé" />}
                       <span className={clsx('text-[9px] font-bold shrink-0', ovrColor(calcOVR(p)))}>{calcOVR(p)}</span>
                       <span className="text-[9px] text-gray-500 shrink-0">{p.position ?? '—'}</span>
                     </div>
-                  )) : (
+                  )}) : (
                     <div className="text-center py-4">
                       <p className="text-xs text-gray-600">
                         {availablePlayers.length === 0 ? '✓ Tous les joueurs sont assignés' : 'Aucun joueur pour ce filtre'}

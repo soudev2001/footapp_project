@@ -4,10 +4,12 @@ import { Link } from 'react-router-dom'
 import { coachApi } from '../../api'
 import { useTeam } from '../../contexts/TeamContext'
 import {
-  BarChart3, TrendingUp, Target, User, Activity,
-  ChevronRight, Award, Heart
+  ChevronRight, Award, Heart, Sparkles, Zap, ShieldCheck, Brain, BarChart3, Activity, TrendingUp, Target, User
 } from 'lucide-react'
 import type { PlayerRanking, PlayerDashboard } from '../../types'
+import RadarChart from '../../components/RadarChart'
+import { getAttributes, getTraits, getStyle, calcOVR, ovrColor, ratingColor } from '../../utils/fifaLogic'
+import clsx from 'clsx'
 
 const RATING_KEYS = ['VIT', 'TIR', 'PAS', 'DRI', 'DEF', 'PHY'] as const
 const RATING_LABELS: Record<string, string> = {
@@ -94,14 +96,25 @@ export default function PlayerAnalytics() {
                     {dashboard.jersey_number || '?'}
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">{dashboard.name}</h2>
-                    <p className="text-gray-400">{dashboard.position}</p>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-xl font-bold text-white">{dashboard.name}</h2>
+                      <span className={clsx('text-xs font-black px-1.5 py-0.5 rounded bg-black/40', ovrColor(calcOVR(dashboard as any)))}>
+                        OVR {calcOVR(dashboard as any)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                       <p className="text-gray-400 text-sm">{dashboard.position}</p>
+                       <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">• {getStyle(getAttributes(dashboard as any), dashboard.position ?? '')}</span>
+                    </div>
                   </div>
-                  {dashboard.injury_summary?.active && (
-                    <span className="ml-auto flex items-center gap-1 text-xs bg-red-500/20 text-red-400 px-3 py-1.5 rounded-full">
-                      <Heart className="w-3 h-3" /> Blessé — {dashboard.injury_summary.active.body_part}
-                    </span>
-                  )}
+                  <div className="ml-auto flex flex-wrap gap-2 justify-end max-w-[300px]">
+                     {getTraits(getAttributes(dashboard as any)).map(trait => (
+                       <div key={trait.name} className="flex items-center gap-1 px-2 py-1 bg-pitch-900/40 border border-pitch-700/40 rounded-lg shadow-lg group cursor-help transition-all hover:scale-105" title={trait.name}>
+                          <span className="text-xs">{trait.icon}</span>
+                          <span className="text-[10px] font-bold text-pitch-300 uppercase tracking-tighter hidden sm:inline">{trait.name}</span>
+                       </div>
+                     ))}
+                  </div>
                 </div>
               </div>
 
@@ -125,35 +138,47 @@ export default function PlayerAnalytics() {
                 </div>
               </div>
 
-              {/* Radar - Technical ratings */}
-              <div className="bg-gray-800 rounded-xl border border-gray-700 p-5">
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                  <Target className="w-5 h-5 text-blue-400" /> Attributs techniques
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {RATING_KEYS.map(key => {
-                    const val = dashboard.technical_ratings?.[key] || 50
-                    const trend = (trends as Record<string, any>)?.rating_trend as Record<string, number> | undefined
-                    const diff = trend?.[key] || 0
-                    return (
-                      <div key={key} className="bg-gray-700/30 rounded-lg p-3">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-400">{RATING_LABELS[key]}</span>
-                          <div className="flex items-center gap-1">
-                            <span className="text-sm font-bold text-white">{val}</span>
-                            {diff !== 0 && (
-                              <span className={`text-xs ${diff > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                {diff > 0 ? '+' : ''}{diff}
-                              </span>
-                            )}
+              {/* Performance Radar & Attributes */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-gray-900/40 backdrop-blur-xl rounded-2xl border border-white/5 p-6 flex flex-col items-center justify-center min-h-[350px]">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-6 flex items-center gap-2">
+                    <Sparkles size={12} className="text-pitch-400" /> Profil d'Attributs
+                  </h3>
+                  <RadarChart 
+                    size={220}
+                    data={getAttributes(dashboard as any)}
+                  />
+                </div>
+                
+                <div className="bg-gray-800 rounded-xl border border-gray-700 p-5">
+                  <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                    <Target className="w-5 h-5 text-blue-400" /> Détails techniques
+                  </h3>
+                  <div className="space-y-3">
+                    {RATING_KEYS.map(key => {
+                      const val = dashboard.technical_ratings?.[key] || 50
+                      const trend = (trends as Record<string, any>)?.rating_trend as Record<string, number> | undefined
+                      const diff = trend?.[key] || 0
+                      return (
+                        <div key={key} className="bg-gray-700/30 rounded-lg p-3">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs text-gray-400">{RATING_LABELS[key]}</span>
+                            <div className="flex items-center gap-1">
+                              <span className={clsx('text-sm font-bold', ratingColor(val))}>{val}</span>
+                              {diff !== 0 && (
+                                <span className={`text-[10px] font-bold ${diff > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                  {diff > 0 ? '↑' : '↓'}{Math.abs(diff)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="h-1.5 bg-gray-900 rounded-full overflow-hidden">
+                            <div className={clsx('h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]', ratingColor(val).replace('text-', 'bg-'))} style={{ width: `${val}%` }} />
                           </div>
                         </div>
-                        <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-                          <div className="h-full bg-blue-500 rounded-full transition-all" style={{ width: `${val}%` }} />
-                        </div>
-                      </div>
-                    )
-                  })}
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
 

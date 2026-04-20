@@ -29,10 +29,13 @@ export default function Attendance() {
   const [saved, setSaved] = useState(false)
   const [search, setSearch] = useState('')
 
-  const { data: events } = useQuery({
+  const { data: upcomingData } = useQuery({
     queryKey: ['events-upcoming'],
     queryFn: () => eventsApi.upcoming().then((r) => r.data),
   })
+
+  const events = (upcomingData as any)?.events ?? []
+
 
   const { data: players } = useQuery({
     queryKey: ['coach-roster', activeTeamId],
@@ -146,7 +149,7 @@ export default function Attendance() {
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Sélectionner un événement</h2>
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {(events as Event[] | undefined)?.map((event) => (
+          {events.map((event: Event) => (
             <button
               key={event.id}
               type="button"
@@ -168,7 +171,7 @@ export default function Attendance() {
               </div>
             </button>
           ))}
-          {!events?.length && (
+          {!events.length && (
             <div className="col-span-3 card text-gray-400 text-sm text-center py-8">Aucun événement à venir.</div>
           )}
         </div>

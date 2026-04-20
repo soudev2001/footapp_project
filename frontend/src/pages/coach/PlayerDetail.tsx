@@ -1,11 +1,14 @@
 import React from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { playersApi, coachApi } from '../../api'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Star, TrendingUp, BarChart3, Key, Trash2, PieChart, Edit, Save, X } from 'lucide-react'
+import { playersApi, coachApi } from '../../api'
+import { ArrowLeft, Star, TrendingUp, BarChart3, Key, Trash2, PieChart, Edit, Save, X, Activity } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 import type { Player } from '../../types'
+import FifaCard from '../../components/FifaCard'
+import RadarChart from '../../components/RadarChart'
+import { getAttributes, calcOVR, ratingColor } from '../../utils/fifaLogic'
 import clsx from 'clsx'
 
 interface RatingForm {
@@ -32,12 +35,6 @@ const ATTR_LABELS: Record<string, string> = {
   PHY: 'Physique',
 }
 
-function ratingColor(val: number) {
-  if (val >= 80) return 'bg-pitch-600'
-  if (val >= 60) return 'bg-yellow-600'
-  if (val >= 40) return 'bg-orange-600'
-  return 'bg-red-600'
-}
 
 export default function PlayerDetail() {
   const { id } = useParams<{ id: string }>()
@@ -101,16 +98,8 @@ export default function PlayerDetail() {
   if (isLoading) return <p className="text-gray-400">Chargement…</p>
   if (!player) return <p className="text-gray-400">Joueur introuvable.</p>
 
-  const p = player as Player & Record<string, any>
-
-  const fifaAttrs = [
-    { key: 'VIT', value: p.speed ?? p.sprint_speed ?? 70 },
-    { key: 'TIR', value: p.shooting ?? p.technical ?? 68 },
-    { key: 'PAS', value: p.passing ?? 72 },
-    { key: 'DRI', value: p.dribbling ?? 65 },
-    { key: 'DEF', value: p.defending ?? p.defensive ?? 60 },
-    { key: 'PHY', value: p.physical_score ?? p.physical ?? 74 },
-  ]
+  const attrs = getAttributes(player)
+  const ovr = calcOVR(player)
 
   return (
     <div className="space-y-6">
@@ -135,50 +124,58 @@ export default function PlayerDetail() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Player Card */}
+        {/* Left Column: Player Card & Quick Actions */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="card text-center space-y-3">
-            <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-3xl font-bold text-white mx-auto">
-              {player.jersey_number ?? '?'}
-            </div>
-            <div>
-              <p className="text-xl font-bold text-white">
-                {player.profile?.first_name} {player.profile?.last_name}
-              </p>
-              <p className="text-gray-400">{player.position}</p>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs text-gray-400 text-left pt-2 border-t border-gray-800">
-              {player.profile?.age && <span>Âge : <span className="text-white">{player.profile.age}</span></span>}
-              {player.profile?.nationality && <span>🌍 {player.profile.nationality}</span>}
-              {player.profile?.height && <span>Taille : <span className="text-white">{player.profile.height}cm</span></span>}
-              {player.profile?.weight && <span>Poids : <span className="text-white">{player.profile.weight}kg</span></span>}
-              {player.profile?.foot && <span>Pied : <span className="text-white capitalize">{player.profile.foot === 'right' ? 'Droit' : player.profile.foot === 'left' ? 'Gauche' : 'Les deux'}</span></span>}
-            </div>
+          <div className="flex flex-col items-center">
+            <FifaCard player={player} size="lg" className="mb-4" />
+            
+            <div className="card w-full space-y-4 border-gray-800 bg-gray-900/60 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+               {/* Background pattern */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-pitch-500/5 rounded-full blur-3xl -mr-16 -mt-16" />
 
-            {/* FIFA-style attribute hexagon as simple bars */}
-            <div className="pt-3 border-t border-gray-800 space-y-2">
-              {fifaAttrs.map((a) => (
-                <div key={a.key} className="flex items-center gap-2">
-                  <span className="w-8 text-xs font-bold text-gray-400">{a.key}</span>
-                  <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden">
-                    <div className={clsx('h-full rounded-full', ratingColor(a.value))} style={{ width: `${a.value}%` } as React.CSSProperties} />
+              <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
+                {player.profile?.age && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-gray-500 uppercase font-bold tracking-tighter">Âge</span>
+                    <span className="text-white font-black">{player.profile.age} ans</span>
                   </div>
-                  <span className="w-7 text-right text-xs font-bold text-white">{a.value}</span>
-                </div>
-              ))}
-            </div>
+                )}
+                {player.profile?.nationality && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-gray-500 uppercase font-bold tracking-tighter">Nation</span>
+                    <div className="flex items-center gap-1.5 font-black text-white">
+                      <span>🌍</span> {player.profile.nationality}
+                    </div>
+                  </div>
+                )}
+                {player.profile?.height && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-gray-500 uppercase font-bold tracking-tighter">Taille</span>
+                    <span className="text-white font-black">{player.profile.height} cm</span>
+                  </div>
+                )}
+                {player.profile?.weight && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-gray-500 uppercase font-bold tracking-tighter">Poids</span>
+                    <span className="text-white font-black">{player.profile.weight} kg</span>
+                  </div>
+                )}
+              </div>
 
-            <div className="flex gap-2">
-              <button type="button" onClick={() => setRating(true)} className="btn-primary flex-1 justify-center text-sm">
-                <Star size={14} /> Évaluer
-              </button>
-              <button type="button" onClick={() => setPhysicalForm(true)} className="btn-secondary flex-1 justify-center text-sm">
-                <TrendingUp size={14} /> Physique
-              </button>
+              <div className="space-y-2 pt-4 border-t border-white/5">
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setRating(true)} className="btn-primary flex-1 justify-center text-sm shadow-pitch-600/20">
+                    <Star size={14} /> Évaluer
+                  </button>
+                  <button type="button" onClick={() => setPhysicalForm(true)} className="btn-secondary flex-1 justify-center text-sm">
+                    <Activity size={14} /> Physique
+                  </button>
+                </div>
+                <button type="button" onClick={() => { setParentCodeModal(true); codeMutation.mutate() }} className="btn-ghost w-full justify-center text-xs gap-1 opacity-60 hover:opacity-100 transition-opacity">
+                  <Key size={13} /> Code Parent
+                </button>
+              </div>
             </div>
-            <button type="button" onClick={() => { setParentCodeModal(true); codeMutation.mutate() }} className="btn-secondary w-full justify-center text-xs gap-1">
-              <Key size={13} /> Générer code parent
-            </button>
           </div>
         </div>
 
@@ -204,31 +201,48 @@ export default function PlayerDetail() {
             </div>
           </div>
 
-          {/* Detailed stats */}
-          <div className="card space-y-3">
+          <div className="card space-y-4 overflow-hidden relative">
             <h2 className="font-semibold text-white flex items-center gap-2">
-              <TrendingUp size={16} className="text-yellow-400" /> Attributs
+              <TrendingUp size={16} className="text-yellow-400" /> Analyse Tactique
             </h2>
-            <div className="grid grid-cols-2 gap-3">
-              {fifaAttrs.map((a) => (
-                <div key={a.key} className="bg-gray-800 rounded-lg p-3 flex items-center gap-3">
-                  <div className={clsx('w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold text-white', ratingColor(a.value))}>
-                    {a.value}
+            
+            <div className="flex flex-col md:flex-row items-center gap-8 py-2">
+              <div className="relative group">
+                <div className="absolute inset-0 bg-pitch-500/10 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
+                <RadarChart 
+                  data={attrs} 
+                  size={240} 
+                  color={ovr >= 80 ? '#fbbf24' : '#10b981'} 
+                />
+              </div>
+
+              <div className="flex-1 w-full grid grid-cols-2 gap-3">
+                {[
+                  { key: 'VIT', label: 'Vitesse', val: attrs.vit },
+                  { key: 'TIR', label: 'Frappe', val: attrs.tir },
+                  { key: 'PAS', label: 'Passe', val: attrs.pas },
+                  { key: 'DRI', label: 'Dribble', val: attrs.dri },
+                  { key: 'DEF', label: 'Défense', val: attrs.def },
+                  { key: 'PHY', label: 'Physique', val: attrs.phy },
+                ].map((a) => (
+                  <div key={a.key} className="bg-gray-800/40 border border-white/[0.03] rounded-xl p-3 flex items-center gap-3 group hover:bg-gray-800/60 transition-colors">
+                    <div className={clsx('w-10 h-10 rounded-lg flex flex-col items-center justify-center text-xs font-black shadow-lg', ratingColor(a.val))}>
+                      {a.val}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-white font-bold text-xs truncate uppercase tracking-tight">{a.label}</p>
+                      <p className="text-[10px] text-gray-500 font-bold">{a.key}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-white font-semibold text-sm">{ATTR_LABELS[a.key]}</p>
-                    <p className="text-xs text-gray-500">{a.key}</p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Evaluations history */}
-          {p.evaluations?.length > 0 && (
+          {player.evaluations?.length > 0 && (
             <div className="card space-y-3">
               <h2 className="font-semibold text-white">Historique évaluations</h2>
-              {p.evaluations.slice(-5).map((e: any, i: number) => (
+              {(player as any).evaluations.slice(-5).map((e: any, i: number) => (
                 <div key={i} className="bg-gray-800 rounded-lg p-3 text-sm">
                   <div className="flex gap-4 text-gray-300">
                     <span>Global: <strong className="text-white">{e.overall}/10</strong></span>

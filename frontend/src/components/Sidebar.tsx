@@ -97,7 +97,7 @@ const SECTIONS: NavSection[] = [
   {
     title: 'ISY',
     items: [
-      { to: '/isy', label: 'ISY Hub', icon: <Star size={17} />, roles: ['admin', 'superadmin', 'coach'] },
+      { to: '/isy', label: 'ISY Hub', icon: <Star size={17} />, roles: ['admin', 'superadmin'] },
       { to: '/isy/payments', label: 'Paiements', icon: <DollarSign size={17} />, roles: ['admin', 'superadmin', 'coach'] },
       { to: '/isy/sponsors', label: 'Sponsors', icon: <Handshake size={17} />, roles: ['admin', 'superadmin', 'coach'] },
     ],
@@ -147,22 +147,25 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
           </button>
         </div>
 
-      {/* User pill */}
-      {user && (
-        <div className="px-4 py-3 border-b border-gray-800 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs font-medium uppercase shrink-0">
-              {user.profile.first_name?.[0]}{user.profile.last_name?.[0]}
-            </div>
-            <div className="overflow-hidden">
-              <p className="text-sm font-medium text-white truncate">
-                {user.profile.first_name} {user.profile.last_name}
-              </p>
-              <p className="text-xs text-gray-400">{ROLE_LABELS[role ?? ''] ?? role}</p>
+        {/* User profile */}
+        {user && (
+          <div className="px-4 py-5 border-b border-gray-800 shrink-0">
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pitch-600 to-pitch-800 flex items-center justify-center text-lg font-bold text-white shadow-lg shadow-pitch-900/50">
+                {user.profile.first_name?.[0]}{user.profile.last_name?.[0]}
+              </div>
+              <div className="space-y-1">
+                <p className="font-bold text-white tracking-tight leading-tight">
+                  {user.profile.first_name} {user.profile.last_name}
+                </p>
+                <div className="flex flex-col items-center">
+                  <span className="text-xs font-semibold text-pitch-400 capitalize">{ROLE_LABELS[role ?? ''] ?? role}</span>
+                  <span className="text-[10px] text-gray-500 font-medium mt-0.5">Principal</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Nav sections */}
       <nav className="flex-1 px-3 py-3 space-y-4 overflow-y-auto">
