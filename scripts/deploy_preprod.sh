@@ -30,8 +30,8 @@ ssh root@82.112.255.193 << 'EOF'
   cd ..
 
   echo "=== Rebuilding & starting PreProd containers ==="
-  docker compose -f docker-compose.preprod.yml down
-  docker compose -f docker-compose.preprod.yml up -d --build
+  docker compose -f docker-compose.preprod.yml --env-file .env.preprod down
+  docker compose -f docker-compose.preprod.yml --env-file .env.preprod up -d --build
 
   echo "=== Waiting for health checks ==="
   sleep 10
