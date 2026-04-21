@@ -8,12 +8,22 @@ import type { User as UserType } from '../../types'
 
 interface FormData { email: string; password: string }
 
-const QUICK_LOGINS = [
+type Environment = 'dev' | 'preprod'
+
+const QUICK_LOGINS_DEV = [
   { role: 'admin', label: 'Admin', email: 'admin@footlogic.fr', password: 'admin123', icon: <ShieldCheck size={20} />, color: 'from-purple-700 to-purple-900 border-purple-600' },
   { role: 'coach', label: 'Coach', email: 'coach@fcelite.fr', password: 'coach123', icon: <Users size={20} />, color: 'from-blue-700 to-blue-900 border-blue-600' },
   { role: 'player', label: 'Joueur', email: 'player1@fcelite.fr', password: 'player123', icon: <User size={20} />, color: 'from-pitch-700 to-pitch-900 border-pitch-600' },
   { role: 'fan', label: 'Fan', email: 'fan@fcelite.fr', password: 'fan123', icon: <Users size={20} />, color: 'from-orange-700 to-orange-900 border-orange-600' },
   { role: 'superadmin', label: 'Super Admin', email: 'superadmin1@footlogic.com', password: 'super123', icon: <Crown size={20} />, color: 'from-yellow-700 to-yellow-900 border-yellow-600' },
+]
+
+const QUICK_LOGINS_PREPROD = [
+  { role: 'admin', label: 'Admin PP', email: 'admin@takurte.fr', password: 'admin123', icon: <ShieldCheck size={20} />, color: 'from-indigo-700 to-indigo-900 border-indigo-600' },
+  { role: 'coach', label: 'Coach PP', email: 'coach@takurte.fr', password: 'coach123', icon: <Users size={20} />, color: 'from-cyan-700 to-cyan-900 border-cyan-600' },
+  { role: 'player', label: 'Joueur PP', email: 'player1@takurte.fr', password: 'player123', icon: <User size={20} />, color: 'from-emerald-700 to-emerald-900 border-emerald-600' },
+  { role: 'fan', label: 'Fan PP', email: 'fan@takurte.fr', password: 'fan123', icon: <Users size={20} />, color: 'from-teal-700 to-teal-900 border-teal-600' },
+  { role: 'superadmin', label: 'SA Preprod', email: 'superadmin@takurte.fr', password: 'super123', icon: <Crown size={20} />, color: 'from-slate-700 to-slate-900 border-slate-600' },
 ]
 
 export default function Login() {
@@ -22,6 +32,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [quickLoading, setQuickLoading] = useState<string | null>(null)
+  const [env, setEnv] = useState<Environment>('dev')
 
   // Always show quick login for the upcoming preprod demo as requested
   const showQuickLogin = true
@@ -158,14 +169,34 @@ export default function Login() {
           {/* Quick Access - Only Show in Dev or Preprod environments */}
           {showQuickLogin && (
             <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <hr className="flex-1 border-white/10" />
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-600">Accès Rapide (Démo)</span>
-                <hr className="flex-1 border-white/10" />
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <hr className="flex-1 border-white/10" />
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-600">Configuration</span>
+                  <hr className="flex-1 border-white/10" />
+                </div>
+                
+                {/* Environment Pickers */}
+                <div className="flex bg-gray-900/50 p-1 rounded-xl border border-white/5 self-center">
+                  {(['dev', 'preprod'] as Environment[]).map((e) => (
+                    <button
+                      key={e}
+                      type="button"
+                      onClick={() => setEnv(e)}
+                      className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                        env === e 
+                          ? 'bg-pitch-600 text-white shadow-lg' 
+                          : 'text-gray-500 hover:text-gray-300'
+                      }`}
+                    >
+                      {e === 'dev' ? 'Développement' : 'Pré-production'}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                {QUICK_LOGINS.map(({ role, label, email, password, icon, color }) => (
+                {(env === 'dev' ? QUICK_LOGINS_DEV : QUICK_LOGINS_PREPROD).map(({ role, label, email, password, icon, color }) => (
                   <button
                     key={role}
                     type="button"
