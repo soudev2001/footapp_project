@@ -1,43 +1,46 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+import { Eye, EyeOff, Loader2, ShieldCheck, Users, User, Crown, Trophy, ArrowRight, Zap } from 'lucide-react'
 import { authApi } from '../../api'
 import { useAuthStore } from '../../store/auth'
-import { Eye, EyeOff, Loader2, ShieldCheck, Users, User, Crown, Trophy } from 'lucide-react'
 import type { User as UserType } from '../../types'
 
 interface FormData { email: string; password: string }
-
 type Environment = 'dev' | 'preprod'
 
 const QUICK_LOGINS_DEV = [
-  { role: 'admin', label: 'Admin', email: 'admin@footlogic.fr', password: 'admin123', icon: <ShieldCheck size={20} />, color: 'from-purple-700 to-purple-900 border-purple-600' },
-  { role: 'coach', label: 'Coach', email: 'coach@fcelite.fr', password: 'coach123', icon: <Users size={20} />, color: 'from-blue-700 to-blue-900 border-blue-600' },
-  { role: 'player', label: 'Joueur', email: 'player1@fcelite.fr', password: 'player123', icon: <User size={20} />, color: 'from-pitch-700 to-pitch-900 border-pitch-600' },
-  { role: 'fan', label: 'Fan', email: 'fan@fcelite.fr', password: 'fan123', icon: <Users size={20} />, color: 'from-orange-700 to-orange-900 border-orange-600' },
-  { role: 'superadmin', label: 'Super Admin', email: 'superadmin1@footlogic.com', password: 'super123', icon: <Crown size={20} />, color: 'from-yellow-700 to-yellow-900 border-yellow-600' },
+  { role: 'admin', label: 'Admin', email: 'admin@footlogic.fr', password: 'admin123', icon: <ShieldCheck size={18} />, color: 'from-purple-500/20 to-purple-900/40 border-purple-500/30' },
+  { role: 'coach', label: 'Coach', email: 'coach@fcelite.fr', password: 'coach123', icon: <Users size={18} />, color: 'from-blue-500/20 to-blue-900/40 border-blue-500/30' },
+  { role: 'player', label: 'Joueur', email: 'player1@fcelite.fr', password: 'player123', icon: <User size={18} />, color: 'from-emerald-500/20 to-emerald-900/40 border-emerald-500/30' },
+  { role: 'fan', label: 'Fan', email: 'fan@fcelite.fr', password: 'fan123', icon: <Users size={18} />, color: 'from-orange-500/20 to-orange-900/40 border-orange-500/30' },
+  { role: 'superadmin', label: 'Super Admin', email: 'superadmin1@footlogic.com', password: 'super123', icon: <Crown size={18} />, color: 'from-yellow-500/20 to-yellow-900/40 border-yellow-500/30' },
 ]
 
 const QUICK_LOGINS_PREPROD = [
-  { role: 'admin', label: 'Admin PP', email: 'admin@takurte.fr', password: 'admin123', icon: <ShieldCheck size={20} />, color: 'from-indigo-700 to-indigo-900 border-indigo-600' },
-  { role: 'coach', label: 'Coach PP', email: 'coach@takurte.fr', password: 'coach123', icon: <Users size={20} />, color: 'from-cyan-700 to-cyan-900 border-cyan-600' },
-  { role: 'player', label: 'Joueur PP', email: 'player1@takurte.fr', password: 'player123', icon: <User size={20} />, color: 'from-emerald-700 to-emerald-900 border-emerald-600' },
-  { role: 'fan', label: 'Fan PP', email: 'fan@takurte.fr', password: 'fan123', icon: <Users size={20} />, color: 'from-teal-700 to-teal-900 border-teal-600' },
-  { role: 'superadmin', label: 'SA Preprod', email: 'superadmin@takurte.fr', password: 'super123', icon: <Crown size={20} />, color: 'from-slate-700 to-slate-900 border-slate-600' },
+  { role: 'admin', label: 'Admin PP', email: 'admin@footlogic.fr', password: 'admin123', icon: <ShieldCheck size={18} />, color: 'from-indigo-500/20 to-indigo-900/40 border-indigo-500/30' },
+  { role: 'coach', label: 'Coach PP', email: 'coach@fcelite.fr', password: 'coach123', icon: <Users size={18} />, color: 'from-cyan-500/20 to-cyan-900/40 border-cyan-500/30' },
+  { role: 'player', label: 'Joueur PP', email: 'player1@fcelite.fr', password: 'player123', icon: <User size={18} />, color: 'from-emerald-500/20 to-emerald-900/40 border-emerald-500/30' },
+  { role: 'fan', label: 'Fan PP', email: 'fan@fcelite.fr', password: 'fan123', icon: <Users size={18} />, color: 'from-teal-500/20 to-teal-900/40 border-teal-500/30' },
+  { role: 'superadmin', label: 'SA Preprod', email: 'superadmin1@footlogic.com', password: 'super123', icon: <Crown size={18} />, color: 'from-slate-500/20 to-slate-900/40 border-slate-500/30' },
 ]
 
 export default function Login() {
   const navigate = useNavigate()
-  const { setTokens, setUser } = useAuthStore()
+  const { setTokens, setUser, isAuthenticated } = useAuthStore()
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [quickLoading, setQuickLoading] = useState<string | null>(null)
   const [env, setEnv] = useState<Environment>('dev')
 
-  // Always show quick login for the upcoming preprod demo as requested
-  const showQuickLogin = true
-
   const { register, handleSubmit, formState: { isSubmitting } } = useForm<FormData>()
+
+  // Redirect if already authenticated (backup for router)
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true })
+    }
+  }, [isAuthenticated, navigate])
 
   const quickLogin = async (email: string, password: string, role: string) => {
     setError('')
@@ -47,8 +50,8 @@ export default function Login() {
       setTokens(res.data.access_token, res.data.refresh_token)
       setUser(res.data.user as UserType)
       navigate('/', { replace: true })
-    } catch (err: unknown) {
-      const errData = (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data
+    } catch (err: any) {
+      const errData = err.response?.data
       setError(errData?.error ?? errData?.message ?? 'Erreur de connexion')
     } finally {
       setQuickLoading(null)
@@ -62,170 +65,180 @@ export default function Login() {
       setTokens(res.data.access_token, res.data.refresh_token)
       setUser(res.data.user as UserType)
       navigate('/', { replace: true })
-    } catch (err: unknown) {
-      const errData = (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data
-      setError(errData?.error ?? errData?.message ?? 'Identifiants invalides. Vérifiez votre email et mot de passe.')
+    } catch (err: any) {
+      const errData = err.response?.data
+      setError(errData?.error ?? errData?.message ?? 'Identifiants invalides.')
     }
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Public Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-gray-800/60 bg-gray-950/80 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="p-1.5 bg-pitch-600 rounded-lg">
-              <Trophy size={16} className="text-white" />
-            </div>
-            <span className="text-lg font-bold text-white">FootApp</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link to="/" className="text-sm text-gray-400 hover:text-white transition-colors">Accueil</Link>
-            <Link to="/register" className="btn-primary text-sm">S'inscrire</Link>
-          </div>
-        </div>
-      </nav>
-
-      <div className="flex-1 flex">
-      {/* Left Panel — Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-950 via-pitch-950 to-gray-950 relative items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.15\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }} />
-        <div className="relative z-10 text-center px-12 max-w-lg">
-          <div className="w-24 h-24 bg-pitch-500/20 backdrop-blur-xl rounded-3xl flex items-center justify-center mx-auto mb-8 border border-pitch-500/30 shadow-2xl shadow-pitch-500/20">
-            <span className="text-white font-bold text-4xl">FA</span>
-          </div>
-          <h1 className="text-5xl font-black text-white mb-4 tracking-tight leading-tight">
-            Foot<span className="text-pitch-400">App</span>
-          </h1>
-          <p className="text-lg text-gray-400 mb-10 leading-relaxed">
-            La plateforme tout-en-un pour la gestion professionnelle de votre club de football
-          </p>
-          <div className="grid grid-cols-3 gap-6 mb-10">
-            <div className="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
-              <p className="text-2xl font-black text-pitch-400">150+</p>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mt-1">Clubs actifs</p>
-            </div>
-            <div className="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
-              <p className="text-2xl font-black text-blue-400">25k</p>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mt-1">Licenciés</p>
-            </div>
-            <div className="text-center p-4 rounded-2xl bg-white/5 border border-white/10">
-              <p className="text-2xl font-black text-purple-400">99.9%</p>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mt-1">Uptime</p>
-            </div>
-          </div>
-          <div className="flex items-center justify-center gap-3 text-gray-500 text-xs">
-            <ShieldCheck size={14} />
-            <span>Données sécurisées · RGPD · Hébergement FR</span>
-          </div>
-        </div>
+    <div className="min-h-screen flex bg-[#05070a] selection:bg-green-500/30 overflow-hidden font-sans text-gray-100">
+      {/* Mesh Gradient Background Elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-green-600/10 blur-[120px] animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/5 blur-[120px] animate-pulse" style={{ animationDelay: '-5s' }} />
       </div>
 
-      {/* Right Panel — Login */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-gray-950">
-        <div className="w-full max-w-md space-y-8">
-          {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-4">
-            <div className="w-16 h-16 bg-pitch-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-pitch-500/30">
-              <span className="text-white font-bold text-2xl">FA</span>
-            </div>
-            <h1 className="text-2xl font-black text-white">Foot<span className="text-pitch-400">App</span></h1>
-          </div>
+      <div className="flex-1 flex flex-col lg:flex-row relative z-10">
 
-          {/* Welcome */}
-          <div>
-            <h2 className="text-2xl font-bold text-white">Bon retour 👋</h2>
-            <p className="text-gray-400 text-sm mt-1">Connectez-vous pour gérer votre club</p>
-            <p className="text-pitch-400 text-xs font-semibold mt-2">🚀 v2.0 — CI/CD Active</p>
-          </div>
-
-          {/* Login Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {error && <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">{error}</div>}
-            <div>
-              <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Email</label>
-              <input {...register('email', { required: true })} type="email" placeholder="vous@club.fr"
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-pitch-500/50 focus:bg-white/[0.07] transition-all text-sm" />
+        {/* Left: Content Branding */}
+        <div className="hidden lg:flex w-1/2 flex-col justify-between p-16">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-green-600/20">
+              <Trophy size={20} className="text-white" />
             </div>
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Mot de passe</label>
-                <Link to="/forgot-password" className="text-[10px] font-semibold uppercase tracking-wider text-pitch-400 hover:text-pitch-300 transition">Oublié ?</Link>
+            <span className="text-2xl font-bold tracking-tight text-white">FootApp</span>
+          </Link>
+
+          <div className="max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-green-400 text-xs font-bold uppercase tracking-widest mb-6">
+              <Zap size={14} />
+              <span>Nouveauté : Analytics v2.0</span>
+            </div>
+            <h1 className="text-6xl font-black text-white leading-[1.1] tracking-tight mb-6">
+              L'excellence au service de <span className="text-green-500">votre club.</span>
+            </h1>
+            <p className="text-xl text-gray-400 font-medium leading-relaxed mb-10">
+              Gérez vos effectifs, vos entraînements et vos performances sur une interface conçue par des pros du ballon rond.
+            </p>
+
+            <div className="grid grid-cols-2 gap-8 pt-8 border-t border-white/10">
+              <div>
+                <p className="text-3xl font-bold text-white">100k+</p>
+                <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider mt-1">Matchs analysés</p>
               </div>
-              <div className="relative">
-                <input {...register('password', { required: true })} type={showPassword ? 'text' : 'password'} placeholder="••••••••"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 pr-11 text-white placeholder:text-gray-600 focus:outline-none focus:border-pitch-500/50 focus:bg-white/[0.07] transition-all text-sm" />
-                <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+              <div>
+                <p className="text-3xl font-bold text-white">500+</p>
+                <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider mt-1">Clubs partenaires</p>
               </div>
             </div>
-            <button type="submit" disabled={isSubmitting}
-              className="w-full bg-pitch-600 hover:bg-pitch-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-pitch-600/20 hover:shadow-pitch-500/30 disabled:opacity-50 flex items-center justify-center gap-2">
-              {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'Se connecter'}
-            </button>
-          </form>
+          </div>
 
-          {/* Quick Access - Only Show in Dev or Preprod environments */}
-          {showQuickLogin && (
-            <div className="space-y-6">
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-3">
-                  <hr className="flex-1 border-white/10" />
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-600">Configuration</span>
-                  <hr className="flex-1 border-white/10" />
+          <div className="flex items-center gap-6 text-gray-500 text-sm">
+            <span>© 2024 FootApp Inc.</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-800" />
+            <span>Sécurisé par SSL</span>
+          </div>
+        </div>
+
+        {/* Right: Login Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
+          <div className="w-full max-w-[440px] space-y-8">
+
+            <div className="lg:hidden flex flex-col items-center text-center mb-8">
+              <div className="w-14 h-14 bg-green-600 rounded-2xl flex items-center justify-center shadow-2xl mb-4">
+                <Trophy size={28} className="text-white" />
+              </div>
+              <h2 className="text-3xl font-bold text-white">FootApp</h2>
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-4xl font-bold text-white tracking-tight">Ravi de vous revoir</h2>
+              <p className="text-gray-400">Entrez vos identifiants pour accéder à la console.</p>
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl px-4 py-3 text-sm flex items-center gap-2">
+                  {error}
                 </div>
-                
-                {/* Environment Pickers */}
-                <div className="flex bg-gray-900/50 p-1 rounded-xl border border-white/5 self-center">
+              )}
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-widest text-gray-500 ml-1">Email professionnel</label>
+                <input
+                  {...register('email', { required: true })}
+                  type="email"
+                  placeholder="admin@votreclub.fr"
+                  className="w-full bg-white/[0.03] border border-white/10 text-white placeholder-gray-600 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/50 focus:bg-white/[0.06] transition-all duration-300"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between items-center ml-1">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Mot de passe</label>
+                  <Link to="/forgot-password" size={14} className="text-xs font-bold text-green-500 hover:text-green-400 transition-colors">Oublié ?</Link>
+                </div>
+                <div className="relative group">
+                  <input
+                    {...register('password', { required: true })}
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    className="w-full bg-white/[0.03] border border-white/10 text-white placeholder-gray-600 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500/50 focus:bg-white/[0.06] transition-all duration-300 pr-12"
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-green-600 hover:bg-green-500 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-green-600/20 hover:shadow-green-600/40 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 group"
+              >
+                {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : (
+                  <>
+                    <span>Se connecter</span>
+                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Quick Access Toolbar */}
+            <div className="pt-8 space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1 bg-white/10" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600">Accès Rapide Demo</span>
+                <div className="h-px flex-1 bg-white/10" />
+              </div>
+
+              <div className="flex flex-col gap-5 bg-white/[0.02] border border-white/[0.05] p-5 rounded-2xl shadow-inner">
+                <div className="flex justify-center bg-black/40 p-1 rounded-xl self-center border border-white/5">
                   {(['dev', 'preprod'] as Environment[]).map((e) => (
                     <button
                       key={e}
                       type="button"
                       onClick={() => setEnv(e)}
-                      className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
-                        env === e 
-                          ? 'bg-pitch-600 text-white shadow-lg' 
-                          : 'text-gray-500 hover:text-gray-300'
+                      className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${
+                        env === e ? 'bg-green-600 text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'
                       }`}
                     >
                       {e === 'dev' ? 'Développement' : 'Pré-production'}
                     </button>
                   ))}
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                {(env === 'dev' ? QUICK_LOGINS_DEV : QUICK_LOGINS_PREPROD).map(({ role, label, email, password, icon, color }) => (
-                  <button
-                    key={role}
-                    type="button"
-                    onClick={() => quickLogin(email, password, role)}
-                    disabled={quickLoading !== null}
-                    className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl border bg-gradient-to-br ${color} text-white hover:brightness-110 hover:scale-105 transition-all duration-200 disabled:opacity-60`}
-                  >
-                    {quickLoading === role && (
-                      <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50">
-                        <Loader2 size={14} className="animate-spin" />
-                      </div>
-                    )}
-                    {icon}
-                    <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
-                  </button>
-                ))}
+                <div className="grid grid-cols-5 gap-2">
+                  {(env === 'dev' ? QUICK_LOGINS_DEV : QUICK_LOGINS_PREPROD).map((login) => (
+                    <button
+                      key={login.role}
+                      type="button"
+                      onClick={() => quickLogin(login.email, login.password, login.role)}
+                      disabled={!!quickLoading}
+                      className={`group relative flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-300 bg-gradient-to-br ${login.color} hover:scale-105 active:scale-95 disabled:opacity-40`}
+                      title={login.label}
+                    >
+                      {quickLoading === login.role ? (
+                        <Loader2 size={18} className="animate-spin" />
+                      ) : (
+                        <div className="text-white/80 group-hover:text-white transition-colors">{login.icon}</div>
+                      )}
+                      <span className="text-[8px] font-black uppercase tracking-tighter opacity-80 group-hover:opacity-100">{login.role}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          )}
 
-          {/* Register CTA */}
-          <div className="text-center pt-4 border-t border-white/5">
-            <p className="text-sm text-gray-500">
-              Pas encore de compte ?{' '}
-              <Link to="/register" className="text-pitch-400 font-bold hover:text-pitch-300 transition">Créer un club →</Link>
-            </p>
+            <div className="text-center">
+              <p className="text-sm text-gray-500 font-medium">
+                Nouveau ici ? <Link to="/register" className="text-white font-bold hover:text-green-500 transition-colors">Créer un club en 2 minutes</Link>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   )

@@ -7,7 +7,9 @@ interface AuthState {
   accessToken: string | null
   refreshToken: string | null
   isAuthenticated: boolean
+  hasHydrated: boolean
   setTokens: (access: string, refresh: string) => void
+  setHasHydrated: (val: boolean) => void
   setUser: (user: User) => void
   logout: () => void
 }
@@ -19,6 +21,9 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
+      hasHydrated: false,
+
+      setHasHydrated: (val) => set({ hasHydrated: val }),
 
       setTokens: (access, refresh) => {
         localStorage.setItem('access_token', access)
@@ -36,6 +41,9 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'footapp-auth',
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true)
+      },
       partialize: (state) => ({
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,

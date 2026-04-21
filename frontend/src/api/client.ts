@@ -70,6 +70,7 @@ client.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       const refreshToken = localStorage.getItem('refresh_token')
+      
       if (refreshToken) {
         try {
           const { data } = await axios.post('/api/auth/refresh', {}, {
@@ -78,14 +79,14 @@ client.interceptors.response.use(
           localStorage.setItem('access_token', data.access_token)
           originalRequest.headers.Authorization = `Bearer ${data.access_token}`
           return client(originalRequest)
-        } catch {
-          // Refresh failed — clear tokens and redirect
+        } catch (refreshError) {
+          // Refresh failed
         }
       }
-      // No refresh token or refresh failed — force logout
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('refresh_token')
-      window.location.href = '/login'
+      
+      // No refresh token or refresh failed — force logout via store
+      const { useAuthStore } = await import('../store/auth')
+      useAuthStore.getState().logout()
     }
 
     return Promise.reject(error)

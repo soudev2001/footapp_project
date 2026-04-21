@@ -2,188 +2,125 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── CSS Variables (referenced by tailwind.config.js) ──────────────── */
+/* ─── CSS Variables (Dynamic System) ──────────────── */
 :root {
-  --primary-rgb: 22 163 74;       /* pitch-600 green */
+  /* Default Branding (Green) */
+  --primary-rgb: 22 163 74;
   --primary-fg-rgb: 255 255 255;
-  --secondary-rgb: 99 102 241;    /* indigo */
+  --secondary-rgb: 15 23 42;
   --secondary-fg-rgb: 255 255 255;
-  --accent-rgb: 234 179 8;        /* amber */
+  --accent-rgb: 234 179 8;
   --accent-fg-rgb: 0 0 0;
+
+  /* Derived Glass Colors */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 
 @layer base {
   body {
-    @apply bg-gray-950 text-gray-100 antialiased font-sans;
+    @apply bg-[#05070a] text-gray-100 antialiased font-sans selection:bg-pitch-500/30;
   }
 
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
+
   ::-webkit-scrollbar-track {
-    @apply bg-gray-900;
+    @apply bg-transparent;
   }
+
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-600 rounded-full;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-500;
+    @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
   }
 }
 
 @layer components {
-  /* ── Buttons ────────────────────────────────────────────────────────── */
+
+  /* ── Dynamic Primary Utilities ──────────────────────────────────────── */
+  .bg-primary {
+    background-color: rgb(var(--primary-rgb));
+  }
+
+  .text-primary {
+    color: rgb(var(--primary-rgb));
+  }
+
+  .border-primary {
+    border-color: rgb(var(--primary-rgb));
+  }
+
+  /* ── Modern Buttons ────────────────────────────────────────────────── */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2
-           bg-pitch-600 hover:bg-pitch-700 active:bg-pitch-800
-           text-white font-medium rounded-lg
-           transition-all duration-200
-           shadow-sm hover:shadow-md hover:shadow-pitch-600/20
-           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-white font-semibold rounded-xl transition-all duration-300 relative overflow-hidden shadow-lg shadow-pitch-600/20 hover:shadow-pitch-600/40 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    background-color: rgb(var(--primary-rgb));
   }
-  .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2
-           bg-gray-700 hover:bg-gray-600 active:bg-gray-500
-           text-white font-medium rounded-lg
-           transition-all duration-200;
+
+  .btn-primary::after {
+    content: '';
+    @apply absolute inset-0 bg-white/0 hover:bg-white/10 transition-colors duration-300;
   }
-  .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2
-           bg-red-600 hover:bg-red-700 active:bg-red-800
-           text-white font-medium rounded-lg
-           transition-all duration-200
-           shadow-sm hover:shadow-md hover:shadow-red-600/20;
-  }
-  .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2
-           bg-transparent hover:bg-gray-800 active:bg-gray-700
-           text-gray-300 hover:text-white font-medium rounded-lg
-           transition-all duration-200;
-  }
+
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2
-           bg-transparent border border-gray-700 hover:border-pitch-600 hover:bg-pitch-600/10
-           text-gray-300 hover:text-pitch-400 font-medium rounded-lg
-           transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/5 border border-white/10 hover:border-pitch-500/50 text-gray-300 hover:text-white font-semibold rounded-xl transition-all duration-300 backdrop-blur-sm;
   }
 
-  /* ── Card ───────────────────────────────────────────────────────────── */
-  .card {
-    @apply bg-gray-900 border border-gray-800 rounded-xl p-5
-           shadow-sm;
-  }
-  .card-hover {
-    @apply card hover:border-gray-700 hover:shadow-md
-           transition-all duration-200;
-  }
-
-  /* ── Inputs ─────────────────────────────────────────────────────────── */
+  /* ── Modern Inputs ─────────────────────────────────────────────────── */
   .input {
-    @apply w-full bg-gray-800 border border-gray-700 text-gray-100
-           placeholder-gray-500 rounded-lg px-4 py-2.5
-           focus:outline-none focus:ring-2 focus:ring-pitch-600 focus:border-transparent
-           transition-all duration-200;
-  }
-  .input-sm {
-    @apply input px-3 py-1.5 text-sm;
+    @apply w-full bg-white/[0.03] border border-white/10 text-white placeholder-gray-600 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-pitch-500/30 focus:border-pitch-500/50 focus:bg-white/[0.06] transition-all duration-300;
   }
 
-  /* ── Badge ──────────────────────────────────────────────────────────── */
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-  .badge-green {
-    @apply badge bg-pitch-600/20 text-pitch-400;
-  }
-  .badge-red {
-    @apply badge bg-red-600/20 text-red-400;
-  }
-  .badge-yellow {
-    @apply badge bg-yellow-600/20 text-yellow-400;
-  }
-  .badge-blue {
-    @apply badge bg-blue-600/20 text-blue-400;
+  /* ── Modern Card (Glass) ───────────────────────────────────────────── */
+  .card-glass {
+    @apply bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl rounded-3xl p-8 shadow-[0_8px_32px_0_rgba(0, 0, 0, 0.36)];
   }
 
-  /* ── Stat card ──────────────────────────────────────────────────────── */
-  .stat-card {
-    @apply card flex items-center gap-4;
-  }
-
-  /* ── Auth page shared template ─────────────────────────────────────── */
+  /* ── Auth Template Refinement ──────────────────────────────────────── */
   .auth-page {
-    @apply min-h-screen bg-gray-950 flex items-center justify-center p-4 relative overflow-hidden;
+    @apply min-h-screen bg-[#05070a] flex items-center justify-center p-4 relative overflow-hidden;
   }
+
   .auth-page::before {
     content: '';
-    @apply absolute inset-0 pointer-events-none;
-    background:
-      radial-gradient(ellipse 60% 50% at 50% -10%, rgba(22, 163, 74, 0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 40% at 80% 100%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
-  }
-  .auth-card {
-    @apply relative w-full space-y-6 z-10;
-  }
-  .auth-logo {
-    @apply text-center;
-  }
-  .auth-logo-icon {
-    @apply inline-flex items-center justify-center w-16 h-16 rounded-2xl
-           bg-gradient-to-br from-pitch-600 to-pitch-700
-           shadow-lg shadow-pitch-600/25 mb-4;
-  }
-  .auth-form {
-    @apply card space-y-5 backdrop-blur-sm;
-  }
-  .auth-divider {
-    @apply flex items-center gap-4;
-  }
-  .auth-divider hr {
-    @apply flex-1 border-gray-800;
-  }
-  .auth-divider span {
-    @apply text-gray-500 text-sm whitespace-nowrap;
+    @apply absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full opacity-20 blur-[120px] pointer-events-none;
+    background: rgb(var(--primary-rgb));
   }
 
-  /* ── Section header ─────────────────────────────────────────────────── */
-  .section-title {
-    @apply text-xl font-bold text-white;
-  }
-  .section-subtitle {
-    @apply text-sm text-gray-400;
+  .auth-page::after {
+    content: '';
+    @apply absolute -bottom-[10%] -right-[10%] w-[30%] h-[30%] rounded-full opacity-10 blur-[100px] pointer-events-none;
+    background: rgb(var(--secondary-rgb));
   }
 
-  /* ── Alert ──────────────────────────────────────────────────────────── */
   .alert-error {
-    @apply bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm;
+    @apply bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl px-4 py-3 text-sm flex items-center gap-2;
   }
-  .alert-success {
-    @apply bg-green-900/30 border border-green-800 text-green-300 rounded-lg px-4 py-3 text-sm;
-  }
-  .alert-info {
-    @apply bg-blue-900/30 border border-blue-800 text-blue-300 rounded-lg px-4 py-3 text-sm;
+
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-gray-400;
   }
 }
 
-/* ─── Keyframes (referenced by tailwind.config.js) ──────────────────── */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+/* ─── Animations ──────────────────── */
+@keyframes mesh {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+
+  33% {
+    transform: scale(1.1) translate(2%, 3%);
+  }
+
+  66% {
+    transform: scale(0.9) translate(-1%, 2%);
+  }
+
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
 }
-@keyframes glow {
-  from { box-shadow: 0 0 10px rgba(22, 163, 74, 0.3); }
-  to { box-shadow: 0 0 20px rgba(22, 163, 74, 0.6); }
-}
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-12px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+
+.animate-mesh {
+  animation: mesh 20s ease-in-out infinite;
 }

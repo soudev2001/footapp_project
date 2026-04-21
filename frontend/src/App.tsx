@@ -159,7 +159,20 @@ const FAN_ROLES: Role[] = ['fan']
 const ISY_ROLES: Role[] = ['admin', 'superadmin', 'coach']
 
 export default function App() {
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, hasHydrated } = useAuthStore()
+
+  if (!hasHydrated) {
+    return (
+      <div className="min-h-screen bg-[#05070a] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-green-600/30 animate-bounce">
+            <Trophy size={24} className="text-white" />
+          </div>
+          <Loader2 className="animate-spin text-green-500" size={24} />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <BrowserRouter>
