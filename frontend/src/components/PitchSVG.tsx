@@ -412,7 +412,7 @@ export default function PitchSVG({
             </div>
             {filled && size !== 'sm' && (
               <span className="bg-black/60 text-white text-[9px] px-1 rounded whitespace-nowrap max-w-16 truncate text-center">
-                {player?.profile?.last_name || slot.playerName || (player?.name?.split(' ').pop()) || '?'}
+                {player?.profile?.last_name || slot.playerName || '?'}
               </span>
             )}
             {filled && isInteractive && onSlotRemove && (

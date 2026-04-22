@@ -997,9 +997,9 @@ export default function Lineup() {
                       fitColor(fit)
                     )} onClick={() => handleSlotClick(key, i)}>
                       <span className={clsx('text-[10px] font-bold w-4', ovrColor(ovr))}>{ovr}</span>
-                      <span className="text-[10px] font-bold text-pitch-400 w-4">{player.jersey_number ?? '?'}</span>
-                      <span className="text-[11px] text-white flex-1 truncate">{player.profile?.last_name}</span>
-                      {fit < 0.9 && <span className="text-[8px] text-gray-500" title={`Position naturelle: ${player?.position}`}>{player?.position}</span>}
+                      <span className="text-[10px] font-bold text-pitch-400 w-4">{player?.jersey_number ?? '?'}</span>
+                      <span className="text-[11px] text-white flex-1 truncate">{player?.profile?.last_name ?? ''}</span>
+                      {fit < 0.9 && <span className="text-[8px] text-gray-500" title={`Position naturelle: ${player?.position ?? ''}`}>{player?.position ?? ''}</span>}
                       {playerInstructions[key] && (
                         <span className="text-[8px] px-1 py-0.5 rounded bg-purple-900/40 text-purple-300 font-medium" title={ROLE_LABELS[playerInstructions[key].role] ?? playerInstructions[key].role}>
                           {ROLE_LABELS[playerInstructions[key].role]?.slice(0, 8) ?? '⚙'}
