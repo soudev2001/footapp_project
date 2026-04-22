@@ -2,7 +2,8 @@ import React, { useState, useEffect, createContext, useContext } from 'react'
 import {
   Trophy, Users, Calendar, Star, ArrowRight, Shield, Zap, Globe,
   ShieldCheck, User, Crown, MapPin, Phone, Mail, Loader2,
-  ChevronDown, ChevronUp, ArrowLeft, Search, ShoppingBag, Mic2, Building2
+  ChevronDown, ChevronUp, ArrowLeft, Search, ShoppingBag, Mic2, Building2,
+  MessageCircle
 } from 'lucide-react'
 
 // --- MOCK ROUTER & API FOR PREVIEW ---
