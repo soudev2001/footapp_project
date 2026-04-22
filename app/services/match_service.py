@@ -61,10 +61,34 @@ class MatchService:
         return match
 
     def update(self, match_id, data):
-        """Update match data"""
+        """Update match data with type conversion"""
+        # Clean data to avoid MongoDB type issues
+        clean_data = {}
+        fields_to_skip = ['_id', 'id', 'created_at']
+        
+        for k, v in data.items():
+            if k in fields_to_skip or v is None:
+                continue
+                
+            # Convert known ID fields
+            if k in ['club_id', 'team_id', 'opponent_id'] and isinstance(v, str):
+                try:
+                    clean_data[k] = ObjectId(v)
+                except:
+                    clean_data[k] = v
+            # Convert date strings
+            elif k == 'date' and isinstance(v, str):
+                try:
+                    # Handle ISO format
+                    clean_data[k] = datetime.fromisoformat(v.replace('Z', '+00:00'))
+                except:
+                    clean_data[k] = v
+            else:
+                clean_data[k] = v
+
         return self.collection.update_one(
             {'_id': ObjectId(match_id)},
-            {'$set': data}
+            {'$set': clean_data}
         )
 
     def set_score(self, match_id, home_score, away_score, status=None):

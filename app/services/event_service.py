@@ -70,9 +70,28 @@ class EventService:
 
     def update(self, event_id, data):
         """Update event data"""
+        # Clean up data to avoid MongoDB errors and type mismatches
+        update_data = {k: v for k, v in data.items() if k not in ['id', '_id']}
+        
+        # Convert IDs to ObjectId
+        for field in ['club_id', 'team_id', 'created_by']:
+            if field in update_data and isinstance(update_data[field], str) and update_data[field]:
+                try:
+                    update_data[field] = ObjectId(update_data[field])
+                except:
+                    pass
+                    
+        # Convert date string to datetime object
+        if 'date' in update_data and isinstance(update_data['date'], str):
+            try:
+                # Handle ISO format from frontend (e.g., 2023-10-27T10:00)
+                update_data['date'] = datetime.fromisoformat(update_data['date'].replace('Z', ''))
+            except ValueError:
+                pass
+
         return self.collection.update_one(
             {'_id': ObjectId(event_id)},
-            {'$set': data}
+            {'$set': update_data}
         )
 
     def set_attendance(self, event_id, player_id, status):

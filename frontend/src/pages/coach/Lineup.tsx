@@ -157,7 +157,6 @@ export default function Lineup() {
           const pos = positions[i]
           newSlots[`${pos.name}-${i}`] = {
             playerId: p.id,
-            playerName: p.profile?.last_name ?? '',
             jerseyNumber: p.jersey_number,
             isCaptain: savedLineup.captain === p.id,
             position: p.position,
@@ -251,8 +250,6 @@ export default function Lineup() {
         const pos = positions[i]
         newSlots[`${pos.name}-${i}`] = {
           playerId: p.id,
-          playerName: p.profile?.last_name ?? '',
-          jerseyNumber: p.jersey_number,
           isCaptain: tactic.captains?.includes(p.id),
           position: p.position,
         }
@@ -358,8 +355,6 @@ export default function Lineup() {
         // Put target player in source slot
         next[fromSlot] = {
           playerId: targetSlot.playerId,
-          playerName: targetPlayer?.profile?.last_name ?? '',
-          jerseyNumber: targetPlayer?.jersey_number,
           isCaptain: captainId === targetSlot.playerId,
           position: targetPlayer?.position,
         }
@@ -373,8 +368,6 @@ export default function Lineup() {
       // Put dragged player in target slot
       next[slotKey] = {
         playerId: p.id,
-        playerName: p.profile?.last_name ?? '',
-        jerseyNumber: p.jersey_number,
         isCaptain: captainId === p.id,
         position: p.position,
       }
@@ -1004,8 +997,8 @@ export default function Lineup() {
                       fitColor(fit)
                     )} onClick={() => handleSlotClick(key, i)}>
                       <span className={clsx('text-[10px] font-bold w-4', ovrColor(ovr))}>{ovr}</span>
-                      <span className="text-[10px] font-bold text-pitch-400 w-4">{slot.jerseyNumber ?? '?'}</span>
-                      <span className="text-[11px] text-white flex-1 truncate">{slot.playerName}</span>
+                      <span className="text-[10px] font-bold text-pitch-400 w-4">{player.jersey_number ?? '?'}</span>
+                      <span className="text-[11px] text-white flex-1 truncate">{player.profile?.last_name}</span>
                       {fit < 0.9 && <span className="text-[8px] text-gray-500" title={`Position naturelle: ${player?.position}`}>{player?.position}</span>}
                       {playerInstructions[key] && (
                         <span className="text-[8px] px-1 py-0.5 rounded bg-purple-900/40 text-purple-300 font-medium" title={ROLE_LABELS[playerInstructions[key].role] ?? playerInstructions[key].role}>
@@ -1078,8 +1071,6 @@ export default function Lineup() {
                             ...s,
                             [selectedSlot]: {
                               playerId: p.id,
-                              playerName: p.profile?.last_name ?? '',
-                              jerseyNumber: p.jersey_number,
                               isCaptain: captainId === p.id,
                               position: p.position,
                             },
@@ -1114,11 +1105,13 @@ export default function Lineup() {
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Tactical Visualizer Modal */}
       <TacticalVisualizer
         open={showVisualizer}
         onClose={() => setShowVisualizer(false)}
         formation={formation}
+        slots={slots}
+        getPlayer={getPlayer}
       />
 
       {/* Set Pieces & Captains Panel */}

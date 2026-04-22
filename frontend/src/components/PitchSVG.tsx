@@ -410,9 +410,9 @@ export default function PitchSVG({
                 </span>
               )}
             </div>
-            {filled && slot.playerName && size !== 'sm' && (
+            {filled && size !== 'sm' && (
               <span className="bg-black/60 text-white text-[9px] px-1 rounded whitespace-nowrap max-w-16 truncate text-center">
-                {slot.playerName}
+                {player?.profile?.last_name || slot.playerName || (player?.name?.split(' ').pop()) || '?'}
               </span>
             )}
             {filled && isInteractive && onSlotRemove && (

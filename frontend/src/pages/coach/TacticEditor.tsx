@@ -149,8 +149,6 @@ const TacticEditor = forwardRef<TacticEditorHandle, TacticEditorProps>(function 
       const pos = positions[i]
       slots[`${pos.name}-${i}`] = {
         playerId: pid,
-        playerName: p?.profile?.last_name ?? '?',
-        jerseyNumber: p?.jersey_number,
         isCaptain: tactic.captains?.[0] === pid,
         position: p?.position,
       }
@@ -277,8 +275,6 @@ const TacticEditor = forwardRef<TacticEditorHandle, TacticEditorProps>(function 
         // Put target player in source slot
         next[fromSlot] = {
           playerId: targetSlot.playerId,
-          playerName: targetPlayer?.profile?.last_name ?? targetPlayer?.profile?.first_name ?? '?',
-          jerseyNumber: targetPlayer?.jersey_number,
           isCaptain: captains[0] === targetSlot.playerId,
           position: targetPlayer?.position,
         }
@@ -292,8 +288,6 @@ const TacticEditor = forwardRef<TacticEditorHandle, TacticEditorProps>(function 
       // Put dragged player in target slot
       next[slotKey] = {
         playerId: p.id,
-        playerName: p.profile?.last_name ?? p.profile?.first_name ?? '?',
-        jerseyNumber: p.jersey_number,
         isCaptain: captains[0] === p.id,
         position: p.position,
       }
@@ -598,7 +592,7 @@ const TacticEditor = forwardRef<TacticEditorHandle, TacticEditorProps>(function 
                   <div key={p.id} draggable onDragStart={(e) => handlePlayerDragStart(e, p)} onDragEnd={handleDragEnd}
                     onClick={() => {
                       if (selectedSlot) {
-                        setPitchSlots((s) => ({ ...s, [selectedSlot]: { playerId: p.id, playerName: p.profile?.last_name ?? '', jerseyNumber: p.jersey_number, isCaptain: captains[0] === p.id, position: p.position } }))
+                        setPitchSlots((s) => ({ ...s, [selectedSlot]: { playerId: p.id, isCaptain: captains[0] === p.id, position: p.position } }))
                         setSelectedSlot(null)
                       }
                     }}
@@ -636,14 +630,14 @@ const TacticEditor = forwardRef<TacticEditorHandle, TacticEditorProps>(function 
                     {slot?.playerId ? (
                       <div
                         draggable
-                        onDragStart={(e) => { e.dataTransfer.setData('playerId', slot.playerId!); e.dataTransfer.setData('fromSlot', key); e.dataTransfer.effectAllowed = 'move'; setDragPlayer({ id: slot.playerId!, name: slot.playerName ?? '', jerseyNumber: slot.jerseyNumber }) }}
+                        onDragStart={(e) => { e.dataTransfer.setData('playerId', slot.playerId!); e.dataTransfer.setData('fromSlot', key); e.dataTransfer.effectAllowed = 'move'; setDragPlayer({ id: slot.playerId!, name: player?.profile?.last_name ?? '', jerseyNumber: player?.jersey_number }) }}
                         onDragEnd={handleDragEnd}
                         className={clsx('flex-1 flex items-center gap-1.5 bg-gray-800/60 border rounded-lg px-2 py-1 transition-colors cursor-grab active:cursor-grabbing',
                           selectedSlot === key ? 'border-yellow-400/80 bg-yellow-900/20' : 'border-gray-700/50 hover:border-pitch-700/40'
                         )} onClick={() => handleSlotClick(key)}>
                         <span className={clsx('text-[10px] font-bold w-4', ovrColor(ovr))}>{ovr}</span>
-                        <span className="text-[10px] font-bold text-pitch-400 w-4">{slot.jerseyNumber ?? '?'}</span>
-                        <span className="text-[11px] text-white flex-1 truncate">{slot.playerName}</span>
+                        <span className="text-[10px] font-bold text-pitch-400 w-4">{player?.jersey_number ?? '?'}</span>
+                        <span className="text-[11px] text-white flex-1 truncate">{player?.profile?.last_name}</span>
                         <button type="button" onClick={(e) => { e.stopPropagation(); handleSlotRemove(key) }} className="text-red-500/70 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><X size={12} /></button>
                       </div>
                     ) : (

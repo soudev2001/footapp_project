@@ -46,6 +46,8 @@ class PlayerService:
             'jersey_number': jersey_number,
             'position': position,
             'name': name,
+            'first_name': kwargs.get('first_name', ''),
+            'last_name': kwargs.get('last_name', ''),
             'stats': kwargs.get('stats', {
                 'goals': 0,
                 'assists': 0,
@@ -84,10 +86,29 @@ class PlayerService:
         return player
 
     def update(self, player_id, data):
-        """Update player data"""
+        """Update player data with name synchronization and type cleanup"""
+        # Clean up data to avoid MongoDB errors and type mismatches
+        update_data = {k: v for k, v in data.items() if k not in ['id', '_id', 'profile']}
+        
+        # Handle first_name/last_name to update name field for compatibility
+        if 'first_name' in update_data or 'last_name' in update_data:
+            existing = self.get_by_id(player_id)
+            if existing:
+                fname = update_data.get('first_name', existing.get('first_name', ''))
+                lname = update_data.get('last_name', existing.get('last_name', ''))
+                update_data['name'] = f"{fname} {lname}".strip()
+
+        # Convert IDs to ObjectId
+        for field in ['club_id', 'team_id', 'user_id']:
+            if field in update_data and isinstance(update_data[field], str) and update_data[field]:
+                try:
+                    update_data[field] = ObjectId(update_data[field])
+                except:
+                    pass
+        
         return self.collection.update_one(
             {'_id': ObjectId(player_id)},
-            {'$set': data}
+            {'$set': update_data}
         )
 
     def update_stats(self, player_id, stats):

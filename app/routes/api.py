@@ -114,11 +114,21 @@ def api_seed_coach_data():
 def transform_player_for_frontend(player):
     """Transform player document to include profile structure expected by frontend."""
     doc = serialize_doc(player)
-    name_parts = (player.get('name') or '').split(' ', 1)
+    
+    # Prioritize individual name fields if they exist
+    first_name = player.get('first_name')
+    last_name = player.get('last_name')
+    
+    # Fallback to splitting 'name' field if components are missing
+    if not first_name and not last_name:
+        name_parts = (player.get('name') or '').split(' ', 1)
+        first_name = name_parts[0] if name_parts else ''
+        last_name = name_parts[1] if len(name_parts) > 1 else ''
+        
     doc['profile'] = {
-        'first_name': name_parts[0] if name_parts else '',
-        'last_name': name_parts[1] if len(name_parts) > 1 else '',
-        'avatar': player.get('photo', '')
+        'first_name': first_name or '',
+        'last_name': last_name or '',
+        'avatar': player.get('photo', player.get('avatar', ''))
     }
     return doc
 
@@ -1725,9 +1735,16 @@ def coach_add_player():
     user_id = user_service.create(email or f"player_{datetime.datetime.utcnow().timestamp()}@footapp.local",
                                    password, role='player', club_id=club_id, profile=profile)
 
+    first_name = data.get('first_name', '')
+    last_name = data.get('last_name', '')
+    name = f"{first_name} {last_name}".strip()
+
     player_id = player_service.create(
         user_id=str(user_id),
         club_id=club_id,
+        name=name,
+        first_name=first_name,
+        last_name=last_name,
         team_id=data.get('team_id'),
         jersey_number=data.get('jersey_number'),
         position=data.get('position', 'MID'),

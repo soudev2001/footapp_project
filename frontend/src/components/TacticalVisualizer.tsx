@@ -8,6 +8,8 @@ interface Props {
   onClose: () => void
   formation: string
   starters?: string[]
+  slots?: Record<string, any>
+  getPlayer?: (id: string) => any
 }
 
 type Tab = 'pitch' | 'coverage' | 'passing' | 'phases' | 'distances'
@@ -161,7 +163,7 @@ function computeDistances(positions: PitchPosition[]) {
   return { defAvgDist: avgDist(def), midAvgDist: avgDist(mid), atkAvgDist: avgDist(atk), defMidGap, midAtkGap, defCount: def.length, midCount: mid.length, atkCount: atk.length }
 }
 
-export default function TacticalVisualizer({ open, onClose, formation, starters }: Props) {
+export default function TacticalVisualizer({ open, onClose, formation, starters, slots, getPlayer }: Props) {
   const [tab, setTab] = useState<Tab>('pitch')
   const [phase, setPhase] = useState<'defense' | 'transition' | 'attack'>('transition')
   const positions = FORMATION_POSITIONS[formation] ?? FORMATION_POSITIONS['4-3-3']
@@ -204,7 +206,13 @@ export default function TacticalVisualizer({ open, onClose, formation, starters 
                 <PitchBase>
                   {/* Team shape outline */}
                   {teamShape && <polygon points={teamShape} fill="rgba(34,197,94,0.06)" stroke="rgba(34,197,94,0.25)" strokeWidth="2" strokeDasharray="8,4" />}
-                  {positions.map((p, i) => <PlayerDot key={i} p={p} color={playerColor(p)} />)}
+                  {positions.map((p, i) => {
+                    const key = `${p.name}-${i}`
+                    const slot = slots?.[key]
+                    const player = slot?.playerId ? getPlayer?.(slot.playerId) : undefined
+                    const label = player?.profile?.last_name ? `#${player.jersey_number ?? '?'} ${player.profile.last_name}` : p.name
+                    return <PlayerDot key={i} p={p} color={playerColor(p)} label={label} />
+                  })}
                 </PitchBase>
               </div>
               <div className="flex items-center justify-center gap-3 text-xs text-gray-500">
@@ -253,7 +261,13 @@ export default function TacticalVisualizer({ open, onClose, formation, starters 
                       <line key={i} x1={toSvgX(a.x)} y1={toSvgY(a.y)} x2={toSvgX(b.x)} y2={toSvgY(b.y)} stroke={`rgba(250,204,21,${strength})`} strokeWidth={dist < 15 ? 3 : 2} strokeDasharray={dist < 15 ? 'none' : '8,4'} />
                     )
                   })}
-                  {positions.map((p, i) => <PlayerDot key={i} p={p} color={playerColor(p)} />)}
+                   {positions.map((p, i) => {
+                    const key = `${p.name}-${i}`
+                    const slot = slots?.[key]
+                    const player = slot?.playerId ? getPlayer?.(slot.playerId) : undefined
+                    const label = player?.profile?.last_name ? `#${player.jersey_number ?? '?'} ${player.profile.last_name}` : p.name
+                    return <PlayerDot key={i} p={p} color={playerColor(p)} label={label} />
+                  })}
                 </PitchBase>
               </div>
               <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
@@ -291,7 +305,13 @@ export default function TacticalVisualizer({ open, onClose, formation, starters 
                     return <line key={`arr-${i}`} x1={toSvgX(p.x)} y1={toSvgY(p.y)} x2={toSvgX(np.x)} y2={toSvgY(np.y)} stroke={phase === 'defense' ? 'rgba(59,130,246,0.4)' : 'rgba(239,68,68,0.4)'} strokeWidth="1.5" markerEnd="url(#arrowhead)" />
                   })}
                   <defs><marker id="arrowhead" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><polygon points="0 0, 6 2, 0 4" fill="rgba(255,255,255,0.5)" /></marker></defs>
-                  {phasePositions.map((p, i) => <PlayerDot key={i} p={p} color={playerColor(positions[i])} />)}
+                  {phasePositions.map((p, i) => {
+                    const key = `${positions[i].name}-${i}`
+                    const slot = slots?.[key]
+                    const player = slot?.playerId ? getPlayer?.(slot.playerId) : undefined
+                    const label = player?.profile?.last_name ? `#${player.jersey_number ?? '?'} ${player.profile.last_name}` : positions[i].name
+                    return <PlayerDot key={i} p={p} color={playerColor(positions[i])} label={label} />
+                  })}
                 </PitchBase>
               </div>
               <div className={clsx('text-center text-xs p-2 rounded-lg', phase === 'defense' ? 'bg-blue-900/20 text-blue-300' : phase === 'transition' ? 'bg-amber-900/20 text-amber-300' : 'bg-red-900/20 text-red-300')}>

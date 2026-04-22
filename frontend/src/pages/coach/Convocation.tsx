@@ -242,8 +242,6 @@ export default function Convocation() {
       if (p) {
         slots[`${pos.name}-${i}`] = {
           playerId: p.id,
-          playerName: p.profile?.last_name ?? '',
-          jerseyNumber: p.jersey_number,
           isCaptain: captainId === p.id,
           position: p.position,
         }
