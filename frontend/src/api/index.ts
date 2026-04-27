@@ -324,6 +324,15 @@ export const superadminApi = {
   billing: () => client.get('/superadmin/billing'),
   billingSubscriptions: () => client.get('/superadmin/billing/subscriptions'),
   billingRevenue: () => client.get('/superadmin/billing/revenue'),
+  billingExportCsv: () => client.get('/superadmin/billing/export/csv', { responseType: 'blob' }),
+  updateClubPlan: (clubId: string, plan: string) => client.put(`/superadmin/clubs/${clubId}/plan`, { plan }),
+  analyticsExportPdf: () => client.get('/superadmin/analytics/export/pdf', { responseType: 'blob' }),
+  analyticsExportExcel: () => client.get('/superadmin/analytics/export/excel', { responseType: 'blob' }),
+  supportTickets: (params?: { status?: string; priority?: string; club_id?: string }) =>
+    client.get('/superadmin/support/tickets', { params }),
+  createTicket: (data: object) => client.post('/superadmin/support/tickets', data),
+  updateTicket: (id: string, data: object) => client.put(`/superadmin/support/tickets/${id}`, data),
+  monitoring: () => client.get('/superadmin/support/monitoring'),
 }
 
 // ─── Player ──────────────────────────────────────────────────────────────────

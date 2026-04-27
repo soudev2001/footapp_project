@@ -1,8 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { superadminApi } from '../../api'
-import { CreditCard, TrendingUp, DollarSign, Users } from 'lucide-react'
+import { CreditCard, TrendingUp, DollarSign, Users, Download } from 'lucide-react'
+
+const PLANS = ['free', 'starter', 'pro', 'enterprise']
 
 export default function PlatformBilling() {
+  const qc = useQueryClient()
+  const [changingPlan, setChangingPlan] = useState<{ clubId: string; current: string } | null>(null)
+
   const { data: billing, isLoading } = useQuery({
     queryKey: ['sa-billing'],
     queryFn: () => superadminApi.billing().then((r) => r.data),
@@ -18,11 +24,36 @@ export default function PlatformBilling() {
     queryFn: () => superadminApi.billingRevenue().then((r) => r.data),
   })
 
+  const updatePlanMutation = useMutation({
+    mutationFn: ({ clubId, plan }: { clubId: string; plan: string }) =>
+      superadminApi.updateClubPlan(clubId, plan),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['sa-subscriptions'] })
+      qc.invalidateQueries({ queryKey: ['sa-billing'] })
+      setChangingPlan(null)
+    },
+  })
+
+  const exportCsv = async () => {
+    const res = await superadminApi.billingExportCsv()
+    const url = URL.createObjectURL(new Blob([res.data as BlobPart]))
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'platform-billing.xlsx'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-        <CreditCard size={22} className="text-pitch-500" /> Platform Billing
-      </h1>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+          <CreditCard size={22} className="text-pitch-500" /> Platform Billing
+        </h1>
+        <button onClick={exportCsv} className="btn-secondary text-sm">
+          <Download size={14} /> Exporter Excel
+        </button>
+      </div>
 
       {isLoading && <p className="text-gray-400">Chargement...</p>}
 
@@ -81,6 +112,7 @@ export default function PlatformBilling() {
                   <th className="px-3 py-2 text-left">Plan</th>
                   <th className="px-3 py-2 text-center">Statut</th>
                   <th className="px-3 py-2 text-right">Montant</th>
+                  <th className="px-3 py-2 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -98,6 +130,31 @@ export default function PlatformBilling() {
                       </span>
                     </td>
                     <td className="px-3 py-2 text-right text-gray-300">€{sub.amount}/mois</td>
+                    <td className="px-3 py-2 text-right">
+                      {changingPlan?.clubId === sub.club_id ? (
+                        <div className="flex items-center gap-1 justify-end">
+                          <select
+                            defaultValue={sub.plan}
+                            className="input text-xs py-1 px-2 w-28"
+                            onChange={(e) =>
+                              updatePlanMutation.mutate({ clubId: sub.club_id, plan: e.target.value })
+                            }
+                          >
+                            {PLANS.map((p) => (
+                              <option key={p} value={p}>{p}</option>
+                            ))}
+                          </select>
+                          <button className="text-xs text-gray-400 hover:text-white px-1" onClick={() => setChangingPlan(null)}>✕</button>
+                        </div>
+                      ) : (
+                        <button
+                          className="text-xs text-pitch-400 hover:underline"
+                          onClick={() => setChangingPlan({ clubId: sub.club_id, current: sub.plan })}
+                        >
+                          Changer plan
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -107,6 +164,11 @@ export default function PlatformBilling() {
           <p className="text-sm text-gray-500">Aucun abonnement.</p>
         )}
       </div>
+
+      {/* Change plan modal pending indicator */}
+      {updatePlanMutation.isPending && (
+        <p className="text-xs text-gray-400">Mise à jour du plan en cours...</p>
+      )}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { superadminApi } from '../../api'
-import { BarChart3, TrendingUp, Users, Globe, Activity } from 'lucide-react'
+import { BarChart3, TrendingUp, Users, Globe, Activity, Download } from 'lucide-react'
 import { useState } from 'react'
 
 export default function PlatformAnalytics() {
@@ -28,9 +28,35 @@ export default function PlatformAnalytics() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-        <BarChart3 size={22} className="text-pitch-500" /> Platform Analytics
-      </h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+          <BarChart3 size={22} className="text-pitch-500" /> Platform Analytics
+        </h1>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              const res = await superadminApi.analyticsExportPdf()
+              const url = URL.createObjectURL(new Blob([res.data as BlobPart], { type: 'application/pdf' }))
+              const a = document.createElement('a'); a.href = url; a.download = 'platform-analytics.pdf'; a.click()
+              URL.revokeObjectURL(url)
+            }}
+            className="btn-secondary text-sm"
+          >
+            <Download size={14} /> PDF
+          </button>
+          <button
+            onClick={async () => {
+              const res = await superadminApi.analyticsExportExcel()
+              const url = URL.createObjectURL(new Blob([res.data as BlobPart]))
+              const a = document.createElement('a'); a.href = url; a.download = 'platform-analytics.xlsx'; a.click()
+              URL.revokeObjectURL(url)
+            }}
+            className="btn-secondary text-sm"
+          >
+            <Download size={14} /> Excel
+          </button>
+        </div>
+      </div>
 
       {isLoading && <p className="text-gray-400">Chargement...</p>}
 

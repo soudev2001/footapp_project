@@ -84,6 +84,7 @@ import Clubs from './pages/superadmin/Clubs'
 import Projects from './pages/superadmin/Projects'
 import PlatformAnalytics from './pages/superadmin/PlatformAnalytics'
 import PlatformBilling from './pages/superadmin/PlatformBilling'
+import Support from './pages/superadmin/Support'
 
 // Fan
 import FanMatchCenter from './pages/fan/MatchCenter'
@@ -295,6 +296,7 @@ export default function App() {
           <Route path="/superadmin/analytics" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><PlatformAnalytics /></ProtectedRoute>} />
           <Route path="/superadmin/billing" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><PlatformBilling /></ProtectedRoute>} />
           <Route path="/superadmin/projects/:id" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><ProjectDetail /></ProtectedRoute>} />
+          <Route path="/superadmin/support" element={<ProtectedRoute allowedRoles={SUPER_ROLES}><Support /></ProtectedRoute>} />
 
           {/* Fan */}
           <Route path="/fan/matches" element={<ProtectedRoute allowedRoles={FAN_ROLES}><FanMatchCenter /></ProtectedRoute>} />

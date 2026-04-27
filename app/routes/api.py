@@ -4224,6 +4224,279 @@ def superadmin_billing_revenue():
     return jsonify({'success': True, 'data': svc.get_revenue_chart()})
 
 
+@api_bp.route('/superadmin/billing/export/csv', methods=['GET'])
+@role_required('superadmin')
+def superadmin_billing_export_csv():
+    """Export all subscriptions as Excel."""
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill
+    import io
+
+    svc = get_billing_service()
+    subscriptions = svc.get_all_subscriptions()
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = 'Abonnements'
+
+    header_font = Font(bold=True, color='FFFFFF')
+    header_fill = PatternFill(fill_type='solid', fgColor='22C55E')
+
+    headers = ['Club', 'Plan', 'Statut', 'Montant (€/mois)', 'Membres', 'Équipes']
+    for col, h in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=h)
+        cell.font = header_font
+        cell.fill = header_fill
+
+    for r, sub in enumerate(subscriptions, 2):
+        ws.cell(row=r, column=1, value=sub.get('club_name', ''))
+        ws.cell(row=r, column=2, value=sub.get('plan', ''))
+        ws.cell(row=r, column=3, value=sub.get('status', ''))
+        ws.cell(row=r, column=4, value=sub.get('amount', 0))
+        ws.cell(row=r, column=5, value=sub.get('member_count', 0))
+        ws.cell(row=r, column=6, value=sub.get('team_count', 0))
+
+    for col in ['A', 'B', 'C', 'D', 'E', 'F']:
+        ws.column_dimensions[col].width = 20
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    response = make_response(buf.read())
+    response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    response.headers['Content-Disposition'] = 'attachment; filename=platform-billing.xlsx'
+    return response
+
+
+@api_bp.route('/superadmin/clubs/<club_id>/plan', methods=['PUT'])
+@role_required('superadmin')
+def superadmin_update_club_plan(club_id):
+    """Update a club's subscription plan."""
+    data = request.get_json()
+    plan = data.get('plan') if data else None
+    if not plan:
+        return jsonify({'success': False, 'error': 'plan required'}), 400
+    if ObjectId.is_valid(str(club_id)):
+        mongo.db.clubs.update_one(
+            {'_id': ObjectId(club_id)},
+            {'$set': {'subscription.plan': plan, 'subscription.updated_at': datetime.datetime.utcnow().isoformat()}}
+        )
+    return jsonify({'success': True, 'message': 'Plan updated'})
+
+
+@api_bp.route('/superadmin/analytics/export/pdf', methods=['GET'])
+@role_required('superadmin')
+def superadmin_analytics_export_pdf():
+    """Export platform analytics as PDF."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet
+    import io
+
+    svc = get_analytics_service()
+    metrics = svc.get_platform_metrics() if hasattr(svc, 'get_platform_metrics') else {}
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4)
+    styles = getSampleStyleSheet()
+    story = []
+
+    story.append(Paragraph('FootApp — Rapport Analytics Plateforme', styles['Title']))
+    story.append(Spacer(1, 12))
+
+    kpi_data = [['Indicateur', 'Valeur']]
+    kpi_data.append(['Total clubs', str(metrics.get('total_clubs', 0))])
+    kpi_data.append(['Total utilisateurs', str(metrics.get('total_users', 0))])
+    kpi_data.append(['MAU', str(metrics.get('mau', 0))])
+    kpi_data.append(['DAU', str(metrics.get('dau', 0))])
+    kpi_data.append(['MRR (€)', str(metrics.get('mrr', 0))])
+    kpi_data.append(['ARR (€)', str(metrics.get('arr', 0))])
+
+    t = Table(kpi_data, colWidths=[250, 200])
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#22c55e')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#f9fafb'), colors.white]),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.lightgrey),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    story.append(t)
+    doc.build(story)
+    buf.seek(0)
+
+    response = make_response(buf.read())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=platform-analytics.pdf'
+    return response
+
+
+@api_bp.route('/superadmin/analytics/export/excel', methods=['GET'])
+@role_required('superadmin')
+def superadmin_analytics_export_excel():
+    """Export platform analytics as Excel."""
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill
+    import io
+
+    svc = get_analytics_service()
+    metrics = svc.get_platform_metrics() if hasattr(svc, 'get_platform_metrics') else {}
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = 'KPIs Plateforme'
+
+    header_font = Font(bold=True, color='FFFFFF')
+    header_fill = PatternFill(fill_type='solid', fgColor='22C55E')
+
+    ws.cell(row=1, column=1, value='Indicateur').font = header_font
+    ws.cell(row=1, column=1).fill = header_fill
+    ws.cell(row=1, column=2, value='Valeur').font = header_font
+    ws.cell(row=1, column=2).fill = header_fill
+
+    rows = [
+        ('Total clubs', metrics.get('total_clubs', 0)),
+        ('Total utilisateurs', metrics.get('total_users', 0)),
+        ('MAU', metrics.get('mau', 0)),
+        ('DAU', metrics.get('dau', 0)),
+        ('MRR (€)', metrics.get('mrr', 0)),
+        ('ARR (€)', metrics.get('arr', 0)),
+    ]
+    for r, (label, value) in enumerate(rows, 2):
+        ws.cell(row=r, column=1, value=label)
+        ws.cell(row=r, column=2, value=value)
+
+    ws.column_dimensions['A'].width = 30
+    ws.column_dimensions['B'].width = 20
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+
+    response = make_response(buf.read())
+    response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    response.headers['Content-Disposition'] = 'attachment; filename=platform-analytics.xlsx'
+    return response
+
+
+# ============================================================
+# SUPERADMIN: SUPPORT & MONITORING
+# ============================================================
+
+@api_bp.route('/superadmin/support/tickets', methods=['GET'])
+@role_required('superadmin')
+def superadmin_support_tickets():
+    """List support tickets with optional filters."""
+    status = request.args.get('status')
+    priority = request.args.get('priority')
+    club_id = request.args.get('club_id')
+
+    query = {}
+    if status:
+        query['status'] = status
+    if priority:
+        query['priority'] = priority
+    if club_id:
+        query['club_id'] = club_id
+
+    tickets = list(mongo.db.support_tickets.find(query).sort('created_at', -1).limit(200))
+    return jsonify({'success': True, 'data': serialize_docs(tickets)})
+
+
+@api_bp.route('/superadmin/support/tickets', methods=['POST'])
+@role_required('superadmin')
+def superadmin_create_support_ticket():
+    """Create a new support ticket."""
+    data = request.get_json()
+    if not data or not data.get('title'):
+        return jsonify({'success': False, 'error': 'title required'}), 400
+
+    ticket = {
+        'title': data.get('title', ''),
+        'description': data.get('description', ''),
+        'category': data.get('category', 'other'),
+        'priority': data.get('priority', 'medium'),
+        'status': 'open',
+        'club_id': data.get('club_id', ''),
+        'club_name': data.get('club_name', ''),
+        'notes': [],
+        'created_at': datetime.datetime.utcnow().isoformat(),
+        'updated_at': datetime.datetime.utcnow().isoformat(),
+    }
+    result = mongo.db.support_tickets.insert_one(ticket)
+    ticket['_id'] = result.inserted_id
+    return jsonify({'success': True, 'data': serialize_doc(ticket)}), 201
+
+
+@api_bp.route('/superadmin/support/tickets/<ticket_id>', methods=['PUT'])
+@role_required('superadmin')
+def superadmin_update_support_ticket(ticket_id):
+    """Update a support ticket (status, priority, note)."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'Data required'}), 400
+
+    update = {'updated_at': datetime.datetime.utcnow().isoformat()}
+    for field in ('status', 'priority', 'category', 'title', 'description'):
+        if field in data:
+            update[field] = data[field]
+
+    ops = {'$set': update}
+    if data.get('note'):
+        ops['$push'] = {
+            'notes': {
+                'text': data['note'],
+                'created_at': datetime.datetime.utcnow().isoformat(),
+            }
+        }
+
+    if ObjectId.is_valid(str(ticket_id)):
+        mongo.db.support_tickets.update_one({'_id': ObjectId(ticket_id)}, ops)
+    return jsonify({'success': True, 'message': 'Ticket updated'})
+
+
+@api_bp.route('/superadmin/support/monitoring', methods=['GET'])
+@role_required('superadmin')
+def superadmin_monitoring():
+    """Get platform monitoring data: inactive clubs, low engagement clubs."""
+    from datetime import datetime, timedelta
+
+    cutoff_inactive = (datetime.utcnow() - timedelta(days=30)).isoformat()
+    cutoff_veryinactive = (datetime.utcnow() - timedelta(days=60)).isoformat()
+
+    clubs = list(mongo.db.clubs.find({}))
+    inactive = []
+    very_inactive = []
+
+    for club in clubs:
+        last_login = club.get('last_activity') or club.get('created_at', '')
+        if last_login < cutoff_veryinactive:
+            very_inactive.append({
+                'id': str(club['_id']),
+                'name': club.get('name', ''),
+                'last_activity': last_login,
+                'status': 'very_inactive',
+            })
+        elif last_login < cutoff_inactive:
+            inactive.append({
+                'id': str(club['_id']),
+                'name': club.get('name', ''),
+                'last_activity': last_login,
+                'status': 'inactive',
+            })
+
+    return jsonify({
+        'success': True,
+        'data': {
+            'inactive_clubs': inactive,
+            'very_inactive_clubs': very_inactive,
+            'total_monitored': len(clubs),
+        }
+    })
+
+
 # ============================================================
 # FAN ENDPOINTS
 # ============================================================

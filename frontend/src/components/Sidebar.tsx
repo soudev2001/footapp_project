@@ -8,7 +8,7 @@ import {
   Megaphone, Globe, FolderKanban, Mail, ListOrdered,
   DollarSign, Handshake, FileText, Star, TrendingUp,
   Dumbbell, Heart, PieChart, BookOpen, X, GitCompare,
-  Palette, Send,
+  Palette, Send, HeadphonesIcon,
 } from 'lucide-react'
 import type { Role } from '../types'
 import clsx from 'clsx'
@@ -106,7 +106,10 @@ const SECTIONS: NavSection[] = [
     title: 'Superadmin',
     items: [
       { to: '/superadmin/clubs', label: 'Tous les Clubs', icon: <Globe size={17} />, roles: ['superadmin'] },
+      { to: '/superadmin/analytics', label: 'Analytics Plateforme', icon: <BarChart3 size={17} />, roles: ['superadmin'] },
+      { to: '/superadmin/billing', label: 'Billing', icon: <CreditCard size={17} />, roles: ['superadmin'] },
       { to: '/superadmin/projects', label: 'Projets', icon: <FolderKanban size={17} />, roles: ['superadmin'] },
+      { to: '/superadmin/support', label: 'Support', icon: <HeadphonesIcon size={17} />, roles: ['superadmin'] },
     ],
   },
   {
