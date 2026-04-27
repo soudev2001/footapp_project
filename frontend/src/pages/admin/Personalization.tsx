@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { adminApi } from '../../api'
 import {
   Palette, Upload, Image as ImageIcon, Check, Save, RefreshCcw,
   Eye, Globe, Bell as BellIcon, Monitor, Moon, Sun, Sparkles,
@@ -38,6 +40,20 @@ const TIMEZONES = [
 ]
 
 export default function Personalization() {
+  const qc = useQueryClient()
+  const { data: savedData } = useQuery({
+    queryKey: ['admin-personalization'],
+    queryFn: () => adminApi.personalization().then((r) => r.data),
+  })
+  const saveMutation = useMutation({
+    mutationFn: (payload: object) => adminApi.updatePersonalization(payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-personalization'] })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2500)
+    },
+  })
+
   const [branding, setBranding] = useState<Branding>({
     clubName: 'FootApp FC',
     tagline: 'Le club de demain, aujourd\u2019hui.',
@@ -56,6 +72,27 @@ export default function Personalization() {
   const [toastSound, setToastSound] = useState(false)
   const [saved, setSaved] = useState(false)
 
+  // Hydrate from server data when loaded
+  useEffect(() => {
+    if (!savedData) return
+    setBranding({
+      clubName: savedData.clubName ?? 'FootApp FC',
+      tagline: savedData.tagline ?? 'Le club de demain, aujourd\u2019hui.',
+      primaryColor: savedData.primaryColor ?? '#22c55e',
+      accentColor: savedData.accentColor ?? '#16a34a',
+      logoUrl: savedData.logoUrl ?? null,
+      coverUrl: savedData.coverUrl ?? null,
+    })
+    if (savedData.theme) setTheme(savedData.theme)
+    if (savedData.density) setDensity(savedData.density)
+    if (savedData.language) setLanguage(savedData.language)
+    if (savedData.timezone) setTimezone(savedData.timezone)
+    if (savedData.dateFormat) setDateFormat(savedData.dateFormat)
+    if (savedData.showSidebarLabels !== undefined) setShowSidebarLabels(savedData.showSidebarLabels)
+    if (savedData.animations !== undefined) setAnimations(savedData.animations)
+    if (savedData.toastSound !== undefined) setToastSound(savedData.toastSound)
+  }, [savedData])
+
   const applyPreset = (p: typeof COLOR_PRESETS[number]) => {
     setBranding((b) => ({ ...b, primaryColor: p.primary, accentColor: p.accent }))
   }
@@ -68,8 +105,17 @@ export default function Personalization() {
   }
 
   const handleSave = () => {
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2500)
+    saveMutation.mutate({
+      ...branding,
+      theme,
+      density,
+      language,
+      timezone,
+      dateFormat,
+      showSidebarLabels,
+      animations,
+      toastSound,
+    })
   }
 
   const handleReset = () => {
@@ -107,8 +153,8 @@ export default function Personalization() {
           <button onClick={handleReset} className="btn-secondary text-sm">
             <RefreshCcw size={14} /> R\u00e9initialiser
           </button>
-          <button onClick={handleSave} className="btn-primary text-sm">
-            <Save size={14} /> Enregistrer
+          <button onClick={handleSave} disabled={saveMutation.isPending} className="btn-primary text-sm">
+            <Save size={14} /> {saveMutation.isPending ? 'Enregistrement…' : 'Enregistrer'}
           </button>
         </div>
       </div>

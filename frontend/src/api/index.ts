@@ -243,6 +243,8 @@ export const adminApi = {
   analyticsFinancial: () => client.get('/admin/analytics/financial'),
   analyticsExportPdf: () => client.get('/admin/analytics/export/pdf', { responseType: 'blob' }),
   analyticsExportExcel: () => client.get('/admin/analytics/export/excel', { responseType: 'blob' }),
+  personalization: () => client.get('/admin/personalization'),
+  updatePersonalization: (data: object) => client.put('/admin/personalization', data),
   // Billing
   billingDashboard: () => client.get('/admin/billing/dashboard'),
   billingInvoices: () => client.get('/admin/billing/invoices'),

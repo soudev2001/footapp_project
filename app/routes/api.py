@@ -3128,9 +3128,148 @@ def admin_analytics_financial():
     return jsonify({'success': True, 'data': svc.get_financial_metrics(club_id)})
 
 
-# ============================================================
-# ADMIN: BILLING
-# ============================================================
+@api_bp.route('/admin/analytics/export/pdf', methods=['GET'])
+@role_required('admin')
+def admin_analytics_export_pdf():
+    """Export analytics summary as PDF."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet
+    import io
+
+    club_id = request.current_user.get('club_id')
+    svc = get_analytics_service()
+    summary = svc.get_dashboard_summary(club_id)
+    financial = svc.get_financial_metrics(club_id)
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4)
+    styles = getSampleStyleSheet()
+    story = []
+
+    story.append(Paragraph('Analytics — Rapport du club', styles['Title']))
+    story.append(Spacer(1, 12))
+
+    # KPI table
+    kpi_data = [['Indicateur', 'Valeur']]
+    kpi_data.append(['Total membres', str(summary.get('total_members', 0))])
+    kpi_data.append(['Membres actifs', str(summary.get('active_members', 0))])
+    kpi_data.append(['Équipes', str(summary.get('total_teams', 0))])
+    kpi_data.append(['Revenus (€)', str(financial.get('total_revenue', 0))])
+    kpi_data.append(['Dépenses (€)', str(financial.get('total_expenses', 0))])
+    kpi_data.append(['Bénéfice net (€)', str(financial.get('net_profit', 0))])
+
+    t = Table(kpi_data, colWidths=[250, 200])
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#22c55e')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#f9fafb'), colors.white]),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.lightgrey),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    story.append(t)
+    doc.build(story)
+
+    buf.seek(0)
+    response = make_response(buf.read())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=analytics.pdf'
+    return response
+
+
+@api_bp.route('/admin/analytics/export/excel', methods=['GET'])
+@role_required('admin')
+def admin_analytics_export_excel():
+    """Export analytics summary as Excel."""
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment
+    import io
+
+    club_id = request.current_user.get('club_id')
+    svc = get_analytics_service()
+    summary = svc.get_dashboard_summary(club_id)
+    financial = svc.get_financial_metrics(club_id)
+    growth = svc.get_member_growth(club_id, days=90)
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = 'Analytics'
+
+    header_font = Font(bold=True, color='FFFFFF')
+    header_fill = PatternFill(fill_type='solid', fgColor='22C55E')
+
+    headers = ['Indicateur', 'Valeur']
+    for col, h in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=h)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal='center')
+
+    rows = [
+        ('Total membres', summary.get('total_members', 0)),
+        ('Membres actifs', summary.get('active_members', 0)),
+        ('Équipes', summary.get('total_teams', 0)),
+        ('Revenus (€)', financial.get('total_revenue', 0)),
+        ('Dépenses (€)', financial.get('total_expenses', 0)),
+        ('Bénéfice net (€)', financial.get('net_profit', 0)),
+    ]
+    for r, (label, value) in enumerate(rows, 2):
+        ws.cell(row=r, column=1, value=label)
+        ws.cell(row=r, column=2, value=value)
+
+    ws.column_dimensions['A'].width = 30
+    ws.column_dimensions['B'].width = 20
+
+    # Growth sheet
+    if growth:
+        ws2 = wb.create_sheet('Croissance')
+        ws2.append(['Période', 'Nouveaux membres'])
+        for g in growth:
+            ws2.append([g.get('period', ''), g.get('new_members', 0)])
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+
+    response = make_response(buf.read())
+    response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    response.headers['Content-Disposition'] = 'attachment; filename=analytics.xlsx'
+    return response
+
+
+@api_bp.route('/admin/personalization', methods=['GET'])
+@role_required('admin')
+def admin_get_personalization():
+    """Get club personalization settings."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': {}})
+    club = mongo.db.clubs.find_one({'_id': ObjectId(club_id)}) if ObjectId.is_valid(str(club_id)) else None
+    if not club:
+        return jsonify({'success': True, 'data': {}})
+    data = club.get('personalization', {})
+    # Merge top-level club fields as defaults
+    data.setdefault('clubName', club.get('name', ''))
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/admin/personalization', methods=['PUT'])
+@role_required('admin')
+def admin_update_personalization():
+    """Save club personalization settings."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'Data required'}), 400
+    club_id = request.current_user.get('club_id')
+    update = {'personalization': data}
+    # Sync top-level name field if provided
+    if 'clubName' in data:
+        update['name'] = data['clubName']
+    mongo.db.clubs.update_one({'_id': ObjectId(club_id)}, {'$set': update})
+    return jsonify({'success': True, 'message': 'Personalization saved'})
 
 @api_bp.route('/admin/billing/dashboard', methods=['GET'])
 @role_required('admin')
