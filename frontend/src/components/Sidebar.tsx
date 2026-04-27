@@ -105,11 +105,12 @@ const SECTIONS: NavSection[] = [
   {
     title: 'Superadmin',
     items: [
-      { to: '/superadmin/clubs', label: 'Tous les Clubs', icon: <Globe size={17} />, roles: ['superadmin'] },
-      { to: '/superadmin/analytics', label: 'Analytics Plateforme', icon: <BarChart3 size={17} />, roles: ['superadmin'] },
-      { to: '/superadmin/billing', label: 'Billing', icon: <CreditCard size={17} />, roles: ['superadmin'] },
+      { to: '/superadmin', label: 'Dashboard SA', icon: <LayoutDashboard size={17} />, roles: ['superadmin'] },
+      { to: '/superadmin/clubs', label: 'Clubs', icon: <Globe size={17} />, roles: ['superadmin'] },
+      { to: '/superadmin/analytics', label: 'Analytics', icon: <BarChart3 size={17} />, roles: ['superadmin'] },
+      { to: '/superadmin/billing', label: 'Billing & Plans', icon: <CreditCard size={17} />, roles: ['superadmin'] },
+      { to: '/superadmin/support', label: 'Support / Monitoring', icon: <HeadphonesIcon size={17} />, roles: ['superadmin'] },
       { to: '/superadmin/projects', label: 'Projets', icon: <FolderKanban size={17} />, roles: ['superadmin'] },
-      { to: '/superadmin/support', label: 'Support', icon: <HeadphonesIcon size={17} />, roles: ['superadmin'] },
     ],
   },
   {
