@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { playerApi } from '../../api'
 import { useState } from 'react'
-import { Target, Plus, Trash2, CheckCircle, Clock } from 'lucide-react'
+import { Target, Plus, Trash2, CheckCircle, Clock, TrendingUp, Minus } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 
 interface Goal {
@@ -11,7 +11,7 @@ interface Goal {
   target_value: number
   current_value: number
   deadline?: string
-  status: 'in_progress' | 'completed' | 'failed'
+  status: 'in_progress' | 'completed' | 'failed' | 'active'
 }
 
 export default function Goals() {
@@ -27,6 +27,11 @@ export default function Goals() {
   const createMutation = useMutation({
     mutationFn: (data: object) => playerApi.createGoal(data),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['player-goals'] }); setShowForm(false); reset() },
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: object }) => playerApi.updateGoal(id, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['player-goals'] }),
   })
 
   const deleteMutation = useMutation({
@@ -82,21 +87,22 @@ export default function Goals() {
       <div className="grid gap-4 md:grid-cols-2">
         {(goals ?? []).map((goal: Goal) => {
           const pct = goal.target_value > 0 ? Math.min((goal.current_value / goal.target_value) * 100, 100) : 0
+          const isCompleted = goal.status === 'completed' || pct >= 100
           return (
-            <div key={goal.id} className="card space-y-3">
+            <div key={goal.id} className={`card space-y-3 ${isCompleted ? 'border-green-900/50' : ''}`}>
               <div className="flex items-start justify-between">
-                <div>
+                <div className="flex-1 min-w-0 pr-2">
                   <p className="font-semibold text-white">{goal.title}</p>
                   <p className="text-xs text-gray-400">{goal.category}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                    goal.status === 'completed' ? 'bg-green-900/40 text-green-400' :
+                    isCompleted ? 'bg-green-900/40 text-green-400' :
                     goal.status === 'failed' ? 'bg-red-900/40 text-red-400' :
                     'bg-blue-900/40 text-blue-400'
                   }`}>
-                    {goal.status === 'completed' ? <CheckCircle size={10} /> : <Clock size={10} />}
-                    {goal.status === 'completed' ? 'Terminé' : goal.status === 'failed' ? 'Échoué' : 'En cours'}
+                    {isCompleted ? <CheckCircle size={10} /> : <Clock size={10} />}
+                    {isCompleted ? 'Terminé 🎉' : goal.status === 'failed' ? 'Échoué' : 'En cours'}
                   </span>
                   <button
                     onClick={() => deleteMutation.mutate(goal.id)}
@@ -107,6 +113,7 @@ export default function Goals() {
                 </div>
               </div>
 
+              {/* Progress bar */}
               <div className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">{goal.current_value} / {goal.target_value}</span>
@@ -121,6 +128,30 @@ export default function Goals() {
                   />
                 </div>
               </div>
+
+              {/* Progress controls */}
+              {!isCompleted && goal.target_value > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500 flex items-center gap-1">
+                    <TrendingUp size={12} /> Mettre à jour :
+                  </span>
+                  <button
+                    onClick={() => updateMutation.mutate({ id: goal.id, data: { current_value: Math.max(0, goal.current_value - 1) } })}
+                    className="w-7 h-7 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white flex items-center justify-center transition-colors"
+                    disabled={updateMutation.isPending || goal.current_value <= 0}
+                  >
+                    <Minus size={12} />
+                  </button>
+                  <span className="text-sm font-bold text-white min-w-[24px] text-center">{goal.current_value}</span>
+                  <button
+                    onClick={() => updateMutation.mutate({ id: goal.id, data: { current_value: goal.current_value + 1, status: goal.current_value + 1 >= goal.target_value ? 'completed' : 'active' } })}
+                    className="w-7 h-7 rounded-lg bg-pitch-700 hover:bg-pitch-600 text-white flex items-center justify-center transition-colors"
+                    disabled={updateMutation.isPending}
+                  >
+                    <Plus size={12} />
+                  </button>
+                </div>
+              )}
 
               {goal.deadline && (
                 <p className="text-xs text-gray-500">Échéance : {goal.deadline}</p>

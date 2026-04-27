@@ -245,6 +245,8 @@ export const adminApi = {
   analyticsExportExcel: () => client.get('/admin/analytics/export/excel', { responseType: 'blob' }),
   personalization: () => client.get('/admin/personalization'),
   updatePersonalization: (data: object) => client.put('/admin/personalization', data),
+  uploadClubLogo: (formData: FormData) => client.post('/admin/club/logo', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  uploadClubCover: (formData: FormData) => client.post('/admin/club/cover', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
   // Billing
   billingDashboard: () => client.get('/admin/billing/dashboard'),
   billingInvoices: () => client.get('/admin/billing/invoices'),
@@ -286,6 +288,9 @@ export const parentApi = {
   absenceReport: (data: object) => client.post('/parent/absence-report', data),
   payments: () => client.get('/parent/payments'),
   paymentCategories: () => client.get('/parent/payments/categories'),
+  sendCoachMessage: (coachId: string, data: object) => client.post(`/parent/messages/coach/${coachId}`, data),
+  coaches: () => client.get('/parent/coaches'),
+  exportPaymentsCsv: () => client.get('/parent/payments/export/csv', { responseType: 'blob' }),
 }
 
 // ─── Shop ────────────────────────────────────────────────────────────────────
@@ -352,6 +357,9 @@ export const playerApi = {
   trainingSchedule: () => client.get('/player/training/schedule'),
   trainingDrills: () => client.get('/player/training/drills'),
   matchPrep: (id: string) => client.get(`/player/match-prep/${id}`),
+  completeDrill: (drillId: string) => client.post(`/player/training/drills/${drillId}/complete`),
+  trainingNotes: () => client.get('/player/training/notes'),
+  createTrainingNote: (data: object) => client.post('/player/training/notes', data),
 }
 
 // ─── ISY ─────────────────────────────────────────────────────────────────────

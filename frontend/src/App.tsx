@@ -130,6 +130,7 @@ import Terms from './pages/public/Terms'
 import Help from './pages/public/Help'
 
 import type { Role } from './types'
+import { useClubTheme } from './hooks/useClubTheme'
 
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: Role[] }) {
   const { isAuthenticated, user } = useAuthStore()
@@ -162,6 +163,8 @@ const ISY_ROLES: Role[] = ['admin', 'superadmin', 'coach']
 
 export default function App() {
   const { isAuthenticated, hasHydrated } = useAuthStore()
+
+  useClubTheme()
 
   if (!hasHydrated) {
     return (

@@ -1,5 +1,22 @@
 export type Role = 'superadmin' | 'admin' | 'coach' | 'player' | 'parent' | 'fan'
 
+export interface ClubPersonalization {
+  clubName?: string
+  tagline?: string
+  primaryColor?: string
+  accentColor?: string
+  logoUrl?: string | null
+  coverUrl?: string | null
+  theme?: 'dark' | 'light' | 'auto'
+  density?: 'comfortable' | 'compact'
+  language?: string
+  timezone?: string
+  dateFormat?: string
+  showSidebarLabels?: boolean
+  animations?: boolean
+  toastSound?: boolean
+}
+
 export interface User {
   id: string
   email: string
@@ -13,6 +30,7 @@ export interface User {
     position?: string
   }
   account_status: 'active' | 'pending' | 'suspended'
+  club_personalization?: ClubPersonalization
 }
 
 export interface Club {

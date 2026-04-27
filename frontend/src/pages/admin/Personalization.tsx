@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { adminApi } from '../../api'
+import { useAuthStore } from '../../store/auth'
 import {
   Palette, Upload, Image as ImageIcon, Check, Save, RefreshCcw,
   Eye, Globe, Bell as BellIcon, Monitor, Moon, Sun, Sparkles,
 } from 'lucide-react'
 import clsx from 'clsx'
+import type { ClubPersonalization } from '../../types'
 
 type Theme = 'dark' | 'light' | 'auto'
 type Density = 'comfortable' | 'compact'
@@ -41,6 +43,7 @@ const TIMEZONES = [
 
 export default function Personalization() {
   const qc = useQueryClient()
+  const { user, setUser } = useAuthStore()
   const { data: savedData } = useQuery({
     queryKey: ['admin-personalization'],
     queryFn: () => adminApi.personalization().then((r) => r.data),
@@ -49,8 +52,61 @@ export default function Personalization() {
     mutationFn: (payload: object) => adminApi.updatePersonalization(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-personalization'] })
+      if (user) {
+        setUser({
+          ...user,
+          club_personalization: {
+            ...(user.club_personalization ?? {}),
+            ...buildPersonalizationPayload({
+              branding,
+              theme,
+              density,
+              language,
+              timezone,
+              dateFormat,
+              showSidebarLabels,
+              animations,
+              toastSound,
+            }),
+          },
+        })
+      }
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
+    },
+  })
+  const logoUploadMutation = useMutation({
+    mutationFn: (formData: FormData) => adminApi.uploadClubLogo(formData),
+    onSuccess: (response) => {
+      const logoUrl = response.data.url as string
+      setBranding((current) => ({ ...current, logoUrl }))
+      qc.invalidateQueries({ queryKey: ['admin-personalization'] })
+      if (user) {
+        setUser({
+          ...user,
+          club_personalization: {
+            ...(user.club_personalization ?? {}),
+            logoUrl,
+          },
+        })
+      }
+    },
+  })
+  const coverUploadMutation = useMutation({
+    mutationFn: (formData: FormData) => adminApi.uploadClubCover(formData),
+    onSuccess: (response) => {
+      const coverUrl = response.data.url as string
+      setBranding((current) => ({ ...current, coverUrl }))
+      qc.invalidateQueries({ queryKey: ['admin-personalization'] })
+      if (user) {
+        setUser({
+          ...user,
+          club_personalization: {
+            ...(user.club_personalization ?? {}),
+            coverUrl,
+          },
+        })
+      }
     },
   })
 
@@ -100,13 +156,18 @@ export default function Personalization() {
   const handleFile = (key: 'logoUrl' | 'coverUrl') => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const url = URL.createObjectURL(file)
-    setBranding((b) => ({ ...b, [key]: url }))
+    const formData = new FormData()
+    formData.append('file', file)
+    if (key === 'logoUrl') {
+      logoUploadMutation.mutate(formData)
+      return
+    }
+    coverUploadMutation.mutate(formData)
   }
 
   const handleSave = () => {
-    saveMutation.mutate({
-      ...branding,
+    saveMutation.mutate(buildPersonalizationPayload({
+      branding,
       theme,
       density,
       language,
@@ -115,7 +176,7 @@ export default function Personalization() {
       showSidebarLabels,
       animations,
       toastSound,
-    })
+    }))
   }
 
   const handleReset = () => {
@@ -204,7 +265,7 @@ export default function Personalization() {
                   )}
                 </div>
                 <label className="btn-secondary text-sm cursor-pointer">
-                  <Upload size={14} /> Importer
+                  <Upload size={14} /> {logoUploadMutation.isPending ? 'Import…' : 'Importer'}
                   <input type="file" accept="image/*" className="hidden" onChange={handleFile('logoUrl')} />
                 </label>
               </div>
@@ -222,7 +283,7 @@ export default function Personalization() {
                   )}
                 </div>
                 <label className="btn-secondary text-sm cursor-pointer">
-                  <Upload size={14} /> Importer
+                  <Upload size={14} /> {coverUploadMutation.isPending ? 'Import…' : 'Importer'}
                   <input type="file" accept="image/*" className="hidden" onChange={handleFile('coverUrl')} />
                 </label>
               </div>
@@ -434,6 +495,40 @@ export default function Personalization() {
       </div>
     </div>
   )
+}
+
+function buildPersonalizationPayload({
+  branding,
+  theme,
+  density,
+  language,
+  timezone,
+  dateFormat,
+  showSidebarLabels,
+  animations,
+  toastSound,
+}: {
+  branding: Branding
+  theme: Theme
+  density: Density
+  language: string
+  timezone: string
+  dateFormat: string
+  showSidebarLabels: boolean
+  animations: boolean
+  toastSound: boolean
+}): ClubPersonalization {
+  return {
+    ...branding,
+    theme,
+    density,
+    language,
+    timezone,
+    dateFormat,
+    showSidebarLabels,
+    animations,
+    toastSound,
+  }
 }
 
 function Toggle({

@@ -28,6 +28,8 @@ from email.mime.text import MIMEText
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
+ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'svg', 'webp'}
+
 
 # ============================================================
 # JWT HELPERS
@@ -70,6 +72,61 @@ def role_required(*roles):
             return jsonify({'success': False, 'message': 'Insufficient permissions'}), 403
         return decorated
     return decorator
+
+
+def _get_club_doc(club_id):
+    if not club_id or not ObjectId.is_valid(str(club_id)):
+        return None
+    return mongo.db.clubs.find_one({'_id': ObjectId(club_id)})
+
+
+def _get_club_personalization(club):
+    if not club:
+        return {}
+
+    personalization = dict(club.get('personalization', {}))
+    colors = club.get('colors', {})
+
+    personalization.setdefault('clubName', club.get('name', ''))
+    personalization.setdefault('logoUrl', club.get('logo', '') or None)
+    personalization.setdefault('coverUrl', club.get('cover_url', '') or None)
+    personalization.setdefault('primaryColor', colors.get('primary', '#22c55e'))
+    personalization.setdefault('accentColor', colors.get('secondary', '#16a34a'))
+
+    return personalization
+
+
+def _build_auth_user(user):
+    profile = user.get('profile', {})
+    club = _get_club_doc(user.get('club_id')) if user.get('club_id') else None
+
+    return {
+        'id': str(user['_id']),
+        'email': user['email'],
+        'role': user.get('role', 'fan'),
+        'club_id': str(user.get('club_id', '')) if user.get('club_id') else None,
+        'profile': {
+            'first_name': profile.get('first_name', ''),
+            'last_name': profile.get('last_name', ''),
+            'avatar': profile.get('avatar', ''),
+            'phone': profile.get('phone', ''),
+        },
+        'account_status': user.get('account_status', 'active'),
+        'club_personalization': _get_club_personalization(club),
+    }
+
+
+def _save_club_asset(club_id, file_storage, asset_name):
+    ext = file_storage.filename.rsplit('.', 1)[-1].lower() if '.' in file_storage.filename else ''
+    if ext not in ALLOWED_IMAGE_EXTENSIONS:
+        return None, 'Type de fichier invalide'
+
+    upload_dir = os.path.join(current_app.static_folder, 'uploads', 'clubs', str(club_id))
+    os.makedirs(upload_dir, exist_ok=True)
+
+    filename = f'{asset_name}.{ext}'
+    file_storage.save(os.path.join(upload_dir, filename))
+    return f'/static/uploads/clubs/{club_id}/{filename}', None
 
 @api_bp.route('/admin/seed-players', methods=['POST'])
 @role_required('admin')
@@ -244,23 +301,11 @@ def api_login():
     access_token = generate_token(user)
     refresh_token = generate_refresh_token(user)
 
-    profile = user.get('profile', {})
     return jsonify({
         'success': True,
         'access_token': access_token,
         'refresh_token': refresh_token,
-        'user': {
-            'id': str(user['_id']),
-            'email': user['email'],
-            'role': user.get('role', 'fan'),
-            'club_id': str(user.get('club_id', '')) if user.get('club_id') else None,
-            'profile': {
-                'first_name': profile.get('first_name', ''),
-                'last_name': profile.get('last_name', ''),
-                'avatar': profile.get('avatar', ''),
-                'phone': profile.get('phone', ''),
-            }
-        }
+        'user': _build_auth_user(user)
     })
 
 
@@ -350,22 +395,10 @@ def api_me():
     if not user:
         return jsonify({'success': False, 'error': 'User not found'}), 404
 
-    profile = user.get('profile', {})
     player_service = get_player_service()
     player = player_service.get_by_user(str(user['_id']))
 
-    result = {
-        'id': str(user['_id']),
-        'email': user['email'],
-        'role': user.get('role', 'fan'),
-        'club_id': str(user.get('club_id', '')) if user.get('club_id') else None,
-        'profile': {
-            'first_name': profile.get('first_name', ''),
-            'last_name': profile.get('last_name', ''),
-            'avatar': profile.get('avatar', ''),
-            'phone': profile.get('phone', ''),
-        }
-    }
+    result = _build_auth_user(user)
 
     if player:
         result['player'] = serialize_doc(player)
@@ -1593,6 +1626,64 @@ def player_training_drills():
     return jsonify({'success': True, 'data': drills})
 
 
+@api_bp.route('/player/training/drills/<drill_id>/complete', methods=['POST'])
+@token_required
+def player_complete_drill(drill_id):
+    """Mark a drill as completed by the player."""
+    player_service = get_player_service()
+    player = player_service.get_by_user(request.current_user['user_id'])
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    data = request.get_json() or {}
+    doc = {
+        'player_id': player['_id'],
+        'drill_id': drill_id,
+        'completed_at': datetime.datetime.utcnow(),
+        'note': data.get('note', ''),
+    }
+    mongo.db.drill_completions.update_one(
+        {'player_id': player['_id'], 'drill_id': drill_id},
+        {'$set': doc},
+        upsert=True,
+    )
+    return jsonify({'success': True, 'message': 'Exercice marqué complété'})
+
+
+@api_bp.route('/player/training/notes', methods=['GET'])
+@token_required
+def player_training_notes_get():
+    """Get personal training notes."""
+    player_service = get_player_service()
+    player = player_service.get_by_user(request.current_user['user_id'])
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    notes = list(mongo.db.player_training_notes.find(
+        {'player_id': player['_id']}
+    ).sort('created_at', -1).limit(50))
+    return jsonify({'success': True, 'data': serialize_docs(notes)})
+
+
+@api_bp.route('/player/training/notes', methods=['POST'])
+@token_required
+def player_training_notes_post():
+    """Create a personal training note."""
+    data = request.get_json()
+    if not data or not data.get('content'):
+        return jsonify({'success': False, 'error': 'content requis'}), 400
+    player_service = get_player_service()
+    player = player_service.get_by_user(request.current_user['user_id'])
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    doc = {
+        'player_id': player['_id'],
+        'content': data['content'],
+        'exercise_name': data.get('exercise_name', ''),
+        'created_at': datetime.datetime.utcnow(),
+    }
+    result = mongo.db.player_training_notes.insert_one(doc)
+    return jsonify({'success': True, 'note_id': str(result.inserted_id)}), 201
+
+
 @api_bp.route('/player/match-prep/<convocation_id>', methods=['GET'])
 @token_required
 def player_match_prep(convocation_id):
@@ -2399,6 +2490,62 @@ def admin_update_club():
     club_service = get_club_service()
     club_service.update(club_id, data)
     return jsonify({'success': True, 'message': 'Club updated'})
+
+
+@api_bp.route('/admin/club/logo', methods=['POST'])
+@role_required('admin')
+def admin_upload_club_logo():
+    """Upload the club logo and persist its URL."""
+    file = request.files.get('file')
+    if not file or not file.filename:
+        return jsonify({'success': False, 'error': 'Aucun fichier fourni'}), 400
+
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'Club introuvable'}), 400
+
+    logo_url, error = _save_club_asset(club_id, file, 'logo')
+    if error:
+        return jsonify({'success': False, 'error': error}), 400
+
+    club = _get_club_doc(club_id)
+    personalization = _get_club_personalization(club)
+    personalization['logoUrl'] = logo_url
+
+    mongo.db.clubs.update_one(
+        {'_id': ObjectId(club_id)},
+        {'$set': {'logo': logo_url, 'personalization': personalization}}
+    )
+
+    return jsonify({'success': True, 'data': {'url': logo_url}})
+
+
+@api_bp.route('/admin/club/cover', methods=['POST'])
+@role_required('admin')
+def admin_upload_club_cover():
+    """Upload the club banner and persist its URL."""
+    file = request.files.get('file')
+    if not file or not file.filename:
+        return jsonify({'success': False, 'error': 'Aucun fichier fourni'}), 400
+
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'Club introuvable'}), 400
+
+    cover_url, error = _save_club_asset(club_id, file, 'cover')
+    if error:
+        return jsonify({'success': False, 'error': error}), 400
+
+    club = _get_club_doc(club_id)
+    personalization = _get_club_personalization(club)
+    personalization['coverUrl'] = cover_url
+
+    mongo.db.clubs.update_one(
+        {'_id': ObjectId(club_id)},
+        {'$set': {'cover_url': cover_url, 'personalization': personalization}}
+    )
+
+    return jsonify({'success': True, 'data': {'url': cover_url}})
 
 
 @api_bp.route('/admin/onboarding', methods=['GET'])
@@ -3247,12 +3394,10 @@ def admin_get_personalization():
     club_id = request.current_user.get('club_id')
     if not club_id:
         return jsonify({'success': True, 'data': {}})
-    club = mongo.db.clubs.find_one({'_id': ObjectId(club_id)}) if ObjectId.is_valid(str(club_id)) else None
+    club = _get_club_doc(club_id)
     if not club:
         return jsonify({'success': True, 'data': {}})
-    data = club.get('personalization', {})
-    # Merge top-level club fields as defaults
-    data.setdefault('clubName', club.get('name', ''))
+    data = _get_club_personalization(club)
     return jsonify({'success': True, 'data': data})
 
 
@@ -3264,10 +3409,23 @@ def admin_update_personalization():
     if not data:
         return jsonify({'success': False, 'error': 'Data required'}), 400
     club_id = request.current_user.get('club_id')
-    update = {'personalization': data}
+    club = _get_club_doc(club_id)
+    personalization = _get_club_personalization(club)
+    personalization.update(data)
+
+    update = {'personalization': personalization}
     # Sync top-level name field if provided
-    if 'clubName' in data:
-        update['name'] = data['clubName']
+    if 'clubName' in personalization:
+        update['name'] = personalization['clubName']
+    if 'logoUrl' in personalization:
+        update['logo'] = personalization['logoUrl']
+    if 'coverUrl' in personalization:
+        update['cover_url'] = personalization['coverUrl']
+    if 'primaryColor' in personalization or 'accentColor' in personalization:
+        update['colors'] = {
+            'primary': personalization.get('primaryColor', '#22c55e'),
+            'secondary': personalization.get('accentColor', '#16a34a'),
+        }
     mongo.db.clubs.update_one({'_id': ObjectId(club_id)}, {'$set': update})
     return jsonify({'success': True, 'message': 'Personalization saved'})
 
@@ -3477,6 +3635,94 @@ def parent_payment_categories():
     """Get payment categories."""
     svc = get_billing_service()
     return jsonify({'success': True, 'data': svc.get_payment_categories()})
+
+
+# ============================================================
+# ISY ENDPOINTS
+@api_bp.route('/parent/coaches', methods=['GET'])
+@role_required('parent')
+def parent_coaches():
+    """Get coaches accessible via linked children."""
+    user_id = request.current_user['user_id']
+    from bson import ObjectId as ObjId
+    # Find linked players
+    links = list(mongo.db.parent_links.find({'parent_user_id': user_id}))
+    player_ids = [l.get('player_id') for l in links if l.get('player_id')]
+    coaches = []
+    seen = set()
+    for pid in player_ids:
+        player = mongo.db.players.find_one({'_id': ObjId(str(pid)) if isinstance(pid, str) else pid})
+        if not player:
+            continue
+        team_id = player.get('team_id')
+        if not team_id:
+            continue
+        team = mongo.db.teams.find_one({'_id': team_id})
+        if not team:
+            continue
+        coach_user_id = team.get('coach_user_id') or team.get('coach_id')
+        if not coach_user_id or str(coach_user_id) in seen:
+            continue
+        seen.add(str(coach_user_id))
+        cu = mongo.db.users.find_one({'_id': ObjId(str(coach_user_id)) if isinstance(coach_user_id, str) else coach_user_id})
+        if cu:
+            coaches.append({
+                'id': str(cu['_id']),
+                'name': cu.get('full_name') or (cu.get('first_name', '') + ' ' + cu.get('last_name', '')).strip(),
+                'player_name': player.get('name', ''),
+                'team_name': team.get('name', ''),
+            })
+    return jsonify({'success': True, 'data': coaches})
+
+
+@api_bp.route('/parent/messages/coach/<coach_id>', methods=['POST'])
+@role_required('parent')
+def parent_send_coach_message(coach_id):
+    """Send a message from parent to coach."""
+    data = request.get_json()
+    if not data or not data.get('content'):
+        return jsonify({'success': False, 'error': 'content requis'}), 400
+    user_id = request.current_user['user_id']
+    svc = MessagingService(mongo.db)
+    svc.send_direct_message(user_id, coach_id, data['content'])
+    return jsonify({'success': True, 'message': 'Message envoyé'})
+
+
+@api_bp.route('/parent/payments/export/csv', methods=['GET'])
+@role_required('parent')
+def parent_payments_export_csv():
+    """Export parent payments to Excel."""
+    import io
+    try:
+        import openpyxl
+    except ImportError:
+        return jsonify({'success': False, 'error': 'openpyxl not installed'}), 500
+    user_id = request.current_user['user_id']
+    svc = get_billing_service()
+    payments = svc.get_parent_payments(user_id)
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = 'Paiements'
+    ws.append(['Description', 'Catégorie', 'Montant (€)', 'Statut', 'Échéance', 'Payé le'])
+    for p in (payments or []):
+        ws.append([
+            p.get('description', ''),
+            p.get('category', ''),
+            p.get('amount', 0),
+            p.get('status', ''),
+            str(p.get('due_date', '')),
+            str(p.get('paid_date', '') or ''),
+        ])
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    from flask import send_file
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='paiements.xlsx',
+    )
 
 
 # ============================================================
