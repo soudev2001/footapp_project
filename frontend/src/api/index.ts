@@ -360,6 +360,10 @@ export const playerApi = {
   completeDrill: (drillId: string) => client.post(`/player/training/drills/${drillId}/complete`),
   trainingNotes: () => client.get('/player/training/notes'),
   createTrainingNote: (data: object) => client.post('/player/training/notes', data),
+  convocations: () => client.get('/player/convocations'),
+  matches: () => client.get('/player/matches'),
+  currentTactic: () => client.get('/player/tactics/current'),
+  uploadDocument: (docType: string, formData: FormData) => client.post(`/player/documents/${docType}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
 }
 
 // ─── ISY ─────────────────────────────────────────────────────────────────────

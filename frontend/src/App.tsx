@@ -64,6 +64,9 @@ import EventDetail from './pages/player/EventDetail'
 import PlayerGoals from './pages/player/Goals'
 import PlayerTraining from './pages/player/Training'
 import MatchPrep from './pages/player/MatchPrep'
+import PlayerConvocations from './pages/player/Convocations'
+import PlayerMatchCenter from './pages/player/PlayerMatchCenter'
+import PlayerTactics from './pages/player/PlayerTactics'
 
 // Parent
 import ParentDashboard from './pages/parent/ParentDashboard'
@@ -270,6 +273,9 @@ export default function App() {
           <Route path="/player/documents" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><Documents /></ProtectedRoute>} />
           <Route path="/player/team" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerTeam /></ProtectedRoute>} />
           <Route path="/player/event/:id" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><EventDetail /></ProtectedRoute>} />
+          <Route path="/player/convocations" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerConvocations /></ProtectedRoute>} />
+          <Route path="/player/match-center" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerMatchCenter /></ProtectedRoute>} />
+          <Route path="/player/tactics" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerTactics /></ProtectedRoute>} />
           <Route path="/player/goals" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerGoals /></ProtectedRoute>} />
           <Route path="/player/training" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><PlayerTraining /></ProtectedRoute>} />
           <Route path="/player/match-prep/:id" element={<ProtectedRoute allowedRoles={PLAYER_ROLES}><MatchPrep /></ProtectedRoute>} />

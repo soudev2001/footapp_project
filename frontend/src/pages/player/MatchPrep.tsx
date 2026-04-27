@@ -77,7 +77,7 @@ export default function MatchPrep() {
   if (error || !data) return (
     <div className="text-center py-12">
       <p className="text-gray-500">Convocation introuvable</p>
-      <Link to="/notifications" className="text-pitch-400 text-sm hover:underline mt-2 inline-block">Retour</Link>
+      <Link to="/player/convocations" className="text-pitch-400 text-sm hover:underline mt-2 inline-block">Retour</Link>
     </div>
   )
 
@@ -86,6 +86,7 @@ export default function MatchPrep() {
   const myInstructions = data.my_instructions
   const mySetPieces = data.my_set_pieces ?? []
   const lineupVisible = data.lineup_visible
+  const collectiveInstructions = data.collective_instructions ?? {}
 
   // Build pitch slots if lineup is visible
   const pitchSlots: Record<string, SlotData> = {}
@@ -107,7 +108,7 @@ export default function MatchPrep() {
   return (
     <div className="space-y-4 max-w-3xl mx-auto">
       {/* Back */}
-      <Link to="/notifications" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 transition-colors">
+      <Link to="/player/convocations" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 transition-colors">
         <ArrowLeft size={14} /> Retour
       </Link>
 
@@ -208,6 +209,23 @@ export default function MatchPrep() {
                 <span className="text-sm">{sp.key === 'penalties' ? '⚽' : sp.key.includes('corner') ? '↙️' : '🎯'}</span>
                 <span className="text-xs text-white font-medium flex-1">{sp.label}</span>
                 <span className="text-[10px] text-amber-400 font-bold">Priorité {sp.priority}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Collective instructions */}
+      {Object.keys(collectiveInstructions).length > 0 && (
+        <div className="card border-purple-800/40 space-y-3">
+          <h2 className="font-semibold text-white text-sm flex items-center gap-2">
+            <Target size={14} className="text-purple-300" /> Instructions collectives
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {Object.entries(collectiveInstructions).map(([k, v]) => (
+              <div key={k} className="bg-gray-800/60 rounded-lg px-3 py-2">
+                <p className="text-[9px] text-gray-500 uppercase">{k.replace(/_/g, ' ')}</p>
+                <p className="font-semibold text-white text-sm">{String(v)}</p>
               </div>
             ))}
           </div>

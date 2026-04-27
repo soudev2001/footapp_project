@@ -1814,6 +1814,137 @@ def player_match_prep(convocation_id):
     return jsonify({'success': True, 'data': response})
 
 
+@api_bp.route('/player/convocations', methods=['GET'])
+@token_required
+def player_convocations():
+    """List all convocations received by the current player."""
+    player_service = get_player_service()
+    player = player_service.get_by_user(request.current_user['user_id'])
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    player_id = str(player['_id'])
+
+    convocations_raw = list(mongo.db.convocations.find({
+        '$or': [
+            {'starters': {'$in': [player_id, ObjectId(player_id) if len(player_id) == 24 else player_id]}},
+            {'substitutes': {'$in': [player_id, ObjectId(player_id) if len(player_id) == 24 else player_id]}},
+        ]
+    }).sort('match_date', -1).limit(30))
+
+    result = []
+    event_service = get_event_service()
+    for conv in convocations_raw:
+        conv_id = str(conv['_id'])
+        event_info = {}
+        if conv.get('event_id'):
+            try:
+                ev = event_service.get_by_id(str(conv['event_id']))
+                if ev:
+                    event_info = {
+                        'title': ev.get('title', ''),
+                        'date': str(ev.get('date', '')),
+                        'location': ev.get('location', ''),
+                        'type': ev.get('type', ev.get('event_type', '')),
+                    }
+            except Exception:
+                pass
+        starters = [str(s) for s in conv.get('starters', [])]
+        substitutes = [str(s) for s in conv.get('substitutes', [])]
+        slot_type = 'starter' if player_id in starters else ('substitute' if player_id in substitutes else 'unknown')
+        result.append({
+            'id': conv_id,
+            'match_date': str(conv.get('match_date', '')),
+            'opponent': conv.get('opponent', ''),
+            'location': conv.get('location', conv.get('venue', '')),
+            'slot_type': slot_type,
+            'formation': conv.get('formation', ''),
+            'event': event_info,
+            'created_at': str(conv.get('created_at', '')),
+        })
+    return jsonify({'success': True, 'data': result})
+
+
+@api_bp.route('/player/matches', methods=['GET'])
+@token_required
+def player_matches():
+    """List matches for the player's team with personal stats per match."""
+    player_service = get_player_service()
+    player = player_service.get_by_user(request.current_user['user_id'])
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    player_id = str(player['_id'])
+    team_id = player.get('team_id')
+
+    query = {'team_id': team_id} if team_id else {}
+    matches_raw = list(mongo.db.matches.find(query).sort('date', -1).limit(30))
+
+    result = []
+    for m in matches_raw:
+        match_id = str(m['_id'])
+        # Find personal stats for this player in this match
+        personal = {}
+        player_stats = m.get('player_stats', [])
+        if isinstance(player_stats, list):
+            for ps in player_stats:
+                if str(ps.get('player_id', '')) == player_id:
+                    personal = ps
+                    break
+        elif isinstance(player_stats, dict):
+            personal = player_stats.get(player_id, {})
+
+        result.append({
+            'id': match_id,
+            'date': str(m.get('date', '')),
+            'opponent': m.get('opponent', m.get('away_team', '')),
+            'home_score': m.get('home_score', m.get('score_home')),
+            'away_score': m.get('away_score', m.get('score_away')),
+            'result': m.get('result', ''),
+            'status': m.get('status', 'scheduled'),
+            'location': m.get('location', m.get('venue', '')),
+            'competition': m.get('competition', ''),
+            'personal_stats': {
+                'goals': personal.get('goals', 0),
+                'assists': personal.get('assists', 0),
+                'rating': personal.get('rating'),
+                'minutes_played': personal.get('minutes_played', personal.get('minutes', 0)),
+                'yellow_cards': personal.get('yellow_cards', 0),
+                'red_cards': personal.get('red_cards', 0),
+            },
+        })
+    return jsonify({'success': True, 'data': result})
+
+
+@api_bp.route('/player/tactics/current', methods=['GET'])
+@token_required
+def player_current_tactic():
+    """Return the active/latest tactic for the player's team (read-only)."""
+    player_service = get_player_service()
+    player = player_service.get_by_user(request.current_user['user_id'])
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+    team_id = player.get('team_id')
+    club_id = player.get('club_id')
+
+    query = {}
+    if team_id:
+        query['team_id'] = team_id
+    elif club_id:
+        query['club_id'] = club_id
+
+    tactic = None
+    if query:
+        tactic = mongo.db.tactics.find_one(query, sort=[('updated_at', -1)])
+    if not tactic:
+        return jsonify({'success': True, 'data': None})
+
+    t = dict(tactic)
+    t['id'] = str(t.pop('_id'))
+    for k in ('team_id', 'club_id', 'created_by'):
+        if k in t:
+            t[k] = str(t[k])
+    return jsonify({'success': True, 'data': t})
+
+
 # ============================================================
 # COACH EXTENDED ENDPOINTS
 # ============================================================

@@ -8,7 +8,7 @@ import {
   Megaphone, Globe, FolderKanban, Mail, ListOrdered,
   DollarSign, Handshake, FileText, Star, TrendingUp,
   Dumbbell, Heart, PieChart, BookOpen, X, GitCompare,
-  Palette, Send, HeadphonesIcon,
+  Palette, Send, HeadphonesIcon, Ticket, Trophy, Layout,
 } from 'lucide-react'
 import type { Role } from '../types'
 import clsx from 'clsx'
@@ -84,6 +84,9 @@ const SECTIONS: NavSection[] = [
     items: [
       { to: '/player/team', label: 'Mon Équipe', icon: <Shield size={17} />, roles: ['player'] },
       { to: '/player/evo-hub', label: 'Evo Hub', icon: <TrendingUp size={17} />, roles: ['player'] },
+      { to: '/player/convocations', label: 'Convocations', icon: <Ticket size={17} />, roles: ['player'] },
+      { to: '/player/match-center', label: 'Match Center', icon: <Trophy size={17} />, roles: ['player'] },
+      { to: '/player/tactics', label: 'Tactiques', icon: <Layout size={17} />, roles: ['player'] },
       { to: '/player/contracts', label: 'Contrats', icon: <FileText size={17} />, roles: ['player'] },
       { to: '/player/documents', label: 'Documents', icon: <FolderKanban size={17} />, roles: ['player'] },
     ],
