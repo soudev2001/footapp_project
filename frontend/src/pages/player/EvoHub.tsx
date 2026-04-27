@@ -59,8 +59,8 @@ export default function EvoHub() {
   const physicalHistory: Array<Record<string, unknown>> = dash?.physical_history ?? []
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+    <div className="space-y-6 moe-page moe-stagger">
+      <h1 className="moe-title text-xl sm:text-2xl text-white flex items-center gap-2">
         <BarChart3 size={22} className="text-pitch-500" /> Hub d'Évolution
       </h1>
 
@@ -68,7 +68,7 @@ export default function EvoHub() {
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Radar attributs */}
-        <div className="card space-y-4">
+        <div className="card card-hover space-y-4">
           <h2 className="font-semibold text-white flex items-center gap-2">
             <Star size={16} className="text-yellow-400" /> Attributs techniques
           </h2>
@@ -84,7 +84,7 @@ export default function EvoHub() {
         </div>
 
         {/* Stats de saison */}
-        <div className="card space-y-4">
+        <div className="card card-hover space-y-4">
           <h2 className="font-semibold text-white flex items-center gap-2">
             <TrendingUp size={16} className="text-pitch-400" /> Stats de saison
           </h2>
@@ -111,7 +111,7 @@ export default function EvoHub() {
 
       {/* Historique physique */}
       {physicalHistory.length > 0 && (
-        <div className="card space-y-4">
+        <div className="card card-hover space-y-4">
           <h2 className="font-semibold text-white flex items-center gap-2">
             <TrendingUp size={16} className="text-blue-400" /> Évolution physique
           </h2>
@@ -146,7 +146,7 @@ export default function EvoHub() {
 
       {/* Évaluations coach */}
       {data?.evaluations?.length > 0 && (
-        <div className="card space-y-3">
+        <div className="card card-hover space-y-3">
           <h2 className="font-semibold text-white">Évaluations du coach</h2>
           <div className="space-y-3">
             {data.evaluations.map((ev: { date: string; coach_name?: string; strengths?: string; weaknesses?: string; rating?: number }, i: number) => (

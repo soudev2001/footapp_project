@@ -36,9 +36,9 @@ export default function PlayerDashboard() {
   const attendanceColor = attendanceRate >= 80 ? 'bg-green-500' : attendanceRate >= 60 ? 'bg-yellow-500' : 'bg-red-500'
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 moe-page moe-stagger">
       {/* Header card */}
-      <div className="card flex items-center gap-5">
+      <div className="card card-hover flex items-center gap-5">
         <div className="w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center text-2xl font-bold text-white uppercase shrink-0">
           {profile?.profile?.first_name?.[0]}{profile?.profile?.last_name?.[0] ?? '?'}
         </div>
@@ -74,7 +74,7 @@ export default function PlayerDashboard() {
       {/* Présence + Physique */}
       <div className="grid gap-4 md:grid-cols-2">
         {/* Présence entraînements */}
-        <div className="card space-y-3">
+        <div className="card card-hover space-y-3">
           <h2 className="font-semibold text-white flex items-center gap-2">
             <Activity size={16} className="text-pitch-400" /> Présence aux entraînements
           </h2>
@@ -89,7 +89,7 @@ export default function PlayerDashboard() {
 
         {/* Données physiques */}
         {lastPhysical && (
-          <div className="card space-y-3">
+          <div className="card card-hover space-y-3">
             <h2 className="font-semibold text-white flex items-center gap-2">
               <TrendingUp size={16} className="text-blue-400" /> Dernières données physiques
             </h2>
@@ -107,7 +107,7 @@ export default function PlayerDashboard() {
 
       {/* Classement d'équipe */}
       {(rankings ?? []).length > 0 && (
-        <div className="card space-y-3">
+        <div className="card card-hover space-y-3">
           <h2 className="font-semibold text-white flex items-center gap-2">
             <Trophy size={16} className="text-yellow-400" /> Classement dans l'équipe
           </h2>
@@ -133,7 +133,7 @@ export default function PlayerDashboard() {
           { to: '/player/contracts', label: 'Contrats', desc: 'Consultez vos contrats', icon: <FileText size={24} className="text-blue-400" /> },
           { to: '/player/documents', label: 'Documents', desc: 'Gérez vos documents', icon: <FileText size={24} className="text-yellow-400" /> },
         ].map((item) => (
-          <Link key={item.to} to={item.to} className="card hover:border-gray-700 transition-colors flex items-start gap-4">
+          <Link key={item.to} to={item.to} className="card card-hover transition-colors flex items-start gap-4">
             {item.icon}
             <div>
               <p className="font-semibold text-white">{item.label}</p>

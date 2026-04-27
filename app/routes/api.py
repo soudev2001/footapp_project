@@ -87,9 +87,26 @@ def _get_club_personalization(club):
     personalization = dict(club.get('personalization', {}))
     colors = club.get('colors', {})
 
-    personalization.setdefault('clubName', club.get('name', ''))
-    personalization.setdefault('logoUrl', club.get('logo', '') or None)
-    personalization.setdefault('coverUrl', club.get('cover_url', '') or None)
+    personalization['clubName'] = club.get('name', '')
+    
+    # Only include logoUrl if it's a valid URL (starts with / or http)
+    logo = club.get('logo')
+    if logo and isinstance(logo, str):
+        logo = logo.strip()
+    if logo and (logo.startswith('/') or logo.startswith('http')):
+        personalization['logoUrl'] = logo
+    else:
+        personalization.pop('logoUrl', None)
+    
+    # Only include coverUrl if it's a valid URL
+    cover = club.get('cover_url')
+    if cover and isinstance(cover, str):
+        cover = cover.strip()
+    if cover and (cover.startswith('/') or cover.startswith('http')):
+        personalization['coverUrl'] = cover
+    else:
+        personalization.pop('coverUrl', None)
+    
     personalization.setdefault('primaryColor', colors.get('primary', '#22c55e'))
     personalization.setdefault('accentColor', colors.get('secondary', '#16a34a'))
 

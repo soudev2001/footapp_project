@@ -69,9 +69,9 @@ export default function ParentPayments() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 moe-page moe-stagger">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+        <h1 className="moe-title text-xl sm:text-2xl text-white flex items-center gap-2">
           <CreditCard size={22} className="text-pitch-500" /> Paiements
         </h1>
         <button onClick={exportCsv} disabled={exporting} className="btn-secondary text-sm flex items-center gap-2">
@@ -105,8 +105,8 @@ export default function ParentPayments() {
           { key: 'categories' as Tab, label: 'Par catégorie', icon: <Tag size={16} /> },
         ]).map((t) => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
-              tab === t.key ? 'bg-pitch-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+            className={`moe-tab ${
+              tab === t.key ? 'moe-tab-active' : 'hover:bg-white/10'
             }`}>
             {t.icon} {t.label}
           </button>
@@ -119,8 +119,8 @@ export default function ParentPayments() {
           <div className="flex gap-2 flex-wrap">
             {['', 'paid', 'pending', 'overdue'].map((s) => (
               <button key={s} onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                  statusFilter === s ? 'bg-pitch-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                className={`moe-pill transition-colors ${
+                  statusFilter === s ? 'ring-2 ring-pink-300/45' : 'opacity-80 hover:opacity-100'
                 }`}>
                 {s === '' ? 'Tous' : statusConfig[s]?.label ?? s}
               </button>
@@ -130,7 +130,7 @@ export default function ParentPayments() {
           {filtered.map((payment: Payment) => {
             const cfg = statusConfig[payment.status] ?? statusConfig.pending
             return (
-              <div key={payment.id} className="card flex items-center justify-between">
+              <div key={payment.id} className="card card-hover flex items-center justify-between">
                 <div className="space-y-1">
                   <p className="font-medium text-white">{payment.description}</p>
                   <div className="flex items-center gap-3 text-xs text-gray-400">

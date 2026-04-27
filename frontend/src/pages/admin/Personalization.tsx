@@ -44,6 +44,7 @@ const TIMEZONES = [
 export default function Personalization() {
   const qc = useQueryClient()
   const { user, setUser } = useAuthStore()
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set())
   const { data: savedData } = useQuery({
     queryKey: ['admin-personalization'],
     queryFn: () => adminApi.personalization().then((r) => r.data),
@@ -127,6 +128,7 @@ export default function Personalization() {
   const [animations, setAnimations] = useState(true)
   const [toastSound, setToastSound] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set())
 
   // Hydrate from server data when loaded
   useEffect(() => {
@@ -153,9 +155,18 @@ export default function Personalization() {
     setBranding((b) => ({ ...b, primaryColor: p.primary, accentColor: p.accent }))
   }
 
+  const handleImageError = (key: 'logoUrl' | 'coverUrl') => () => {
+    setFailedImages((prev) => new Set([...prev, key]))
+  }
+
   const handleFile = (key: 'logoUrl' | 'coverUrl') => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    setFailedImages((prev) => {
+      const next = new Set(prev)
+      next.delete(key)
+      return next
+    })
     const formData = new FormData()
     formData.append('file', file)
     if (key === 'logoUrl') {
@@ -258,8 +269,8 @@ export default function Personalization() {
               <label className="block text-xs text-gray-400 mb-2">Logo</label>
               <div className="flex items-center gap-3">
                 <div className="w-16 h-16 rounded-xl bg-gray-800 border border-gray-700 overflow-hidden flex items-center justify-center shrink-0">
-                  {branding.logoUrl ? (
-                    <img src={branding.logoUrl} alt="logo" className="w-full h-full object-cover" />
+                  {branding.logoUrl && !failedImages.has('logo') ? (
+                    <img src={branding.logoUrl} alt="logo" className="w-full h-full object-cover" onError={() => setFailedImages(f => new Set([...f, 'logo']))} />
                   ) : (
                     <ImageIcon size={22} className="text-gray-600" />
                   )}
@@ -276,8 +287,8 @@ export default function Personalization() {
               <label className="block text-xs text-gray-400 mb-2">Banni\u00e8re</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-16 rounded-xl bg-gray-800 border border-gray-700 overflow-hidden flex items-center justify-center">
-                  {branding.coverUrl ? (
-                    <img src={branding.coverUrl} alt="banner" className="w-full h-full object-cover" />
+                  {branding.coverUrl && !failedImages.has('cover') ? (
+                    <img src={branding.coverUrl} alt="banner" className="w-full h-full object-cover" onError={() => setFailedImages(f => new Set([...f, 'cover']))} />
                   ) : (
                     <ImageIcon size={22} className="text-gray-600" />
                   )}
@@ -350,14 +361,17 @@ export default function Personalization() {
             <div
               className="h-20 relative"
               style={{
-                background: branding.coverUrl
+                background: branding.coverUrl && !failedImages.has('cover-preview')
                   ? `url(${branding.coverUrl}) center/cover`
                   : `linear-gradient(135deg, ${branding.primaryColor}, ${branding.accentColor})`,
               }}
             >
+              {branding.coverUrl && !failedImages.has('cover-preview') && (
+                <img src={branding.coverUrl} alt="" className="hidden" onError={() => setFailedImages(f => new Set([...f, 'cover-preview']))} />
+              )}
               <div className="absolute -bottom-6 left-4 w-12 h-12 rounded-xl border-2 border-gray-900 bg-gray-800 overflow-hidden flex items-center justify-center">
-                {branding.logoUrl ? (
-                  <img src={branding.logoUrl} alt="" className="w-full h-full object-cover" />
+                {branding.logoUrl && !failedImages.has('logo-preview') ? (
+                  <img src={branding.logoUrl} alt="" className="w-full h-full object-cover" onError={() => setFailedImages(f => new Set([...f, 'logo-preview']))} />
                 ) : (
                   <span className="text-white font-bold text-sm">
                     {branding.clubName.split(' ').map((w) => w[0]).join('').slice(0, 2)}

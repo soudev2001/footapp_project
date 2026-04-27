@@ -1,23 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ─── CSS Variables (Dynamic System) ──────────────── */
 :root {
-  /* Default Branding (Green) */
-  --primary-rgb: 22 163 74;
+  /* Moe Branding (Pastel Sakura + Aqua) */
+  --primary-rgb: 244 114 182;
   --primary-fg-rgb: 255 255 255;
-  --secondary-rgb: 15 23 42;
+  --secondary-rgb: 125 211 252;
   --secondary-fg-rgb: 255 255 255;
-  --accent-rgb: 234 179 8;
+  --accent-rgb: 34 211 238;
   --accent-fg-rgb: 0 0 0;
-  --pitch-50-rgb: 240 253 244;
-  --pitch-100-rgb: 220 252 231;
-  --pitch-500-rgb: 34 197 94;
-  --pitch-600-rgb: 22 163 74;
-  --pitch-700-rgb: 21 128 61;
-  --pitch-800-rgb: 22 101 52;
-  --pitch-900-rgb: 20 83 45;
+  --pitch-50-rgb: 254 242 248;
+  --pitch-100-rgb: 252 231 243;
+  --pitch-500-rgb: 236 72 153;
+  --pitch-600-rgb: 219 39 119;
+  --pitch-700-rgb: 190 24 93;
+  --pitch-800-rgb: 157 23 77;
+  --pitch-900-rgb: 131 24 67;
 
   /* Derived Glass Colors */
   --glass-bg: rgba(255, 255, 255, 0.03);
@@ -26,7 +28,13 @@
 
 @layer base {
   body {
-    @apply bg-[#05070a] text-gray-100 antialiased font-sans selection:bg-pitch-500/30;
+    @apply bg-[#100d18] text-gray-100 antialiased selection:bg-pink-400/40;
+    font-family: 'Nunito', 'Quicksand', sans-serif;
+    background-image:
+      radial-gradient(circle at 10% 15%, rgba(244, 114, 182, 0.14) 0, transparent 28%),
+      radial-gradient(circle at 90% 20%, rgba(34, 211, 238, 0.12) 0, transparent 24%),
+      radial-gradient(circle at 50% 95%, rgba(250, 204, 21, 0.08) 0, transparent 26%),
+      linear-gradient(180deg, #120f1f 0%, #0f1220 100%);
   }
 
   ::-webkit-scrollbar {
@@ -60,8 +68,9 @@
 
   /* ── Modern Buttons ────────────────────────────────────────────────── */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-white font-semibold rounded-xl transition-all duration-300 relative overflow-hidden shadow-lg shadow-pitch-600/20 hover:shadow-pitch-600/40 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
-    background-color: rgb(var(--primary-rgb));
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-white font-semibold rounded-2xl transition-all duration-300 relative overflow-hidden shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    background: linear-gradient(135deg, rgb(var(--primary-rgb)) 0%, rgb(var(--accent-rgb)) 100%);
+    box-shadow: 0 8px 24px rgba(236, 72, 153, 0.35);
   }
 
   .btn-primary::after {
@@ -70,12 +79,12 @@
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/5 border border-white/10 hover:border-pitch-500/50 text-gray-300 hover:text-white font-semibold rounded-xl transition-all duration-300 backdrop-blur-sm;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 border border-pink-200/20 hover:border-pink-300/50 text-gray-200 hover:text-white font-semibold rounded-2xl transition-all duration-300 backdrop-blur-sm;
   }
 
   /* ── Modern Inputs ─────────────────────────────────────────────────── */
   .input {
-    @apply w-full bg-white/[0.03] border border-white/10 text-white placeholder-gray-600 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-pitch-500/30 focus:border-pitch-500/50 focus:bg-white/[0.06] transition-all duration-300;
+    @apply w-full bg-white/[0.08] border border-pink-100/20 text-white placeholder-gray-400 rounded-2xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-pink-400/40 focus:border-pink-300/60 focus:bg-white/[0.12] transition-all duration-300;
   }
 
   /* ── Modern Card (Glass) ───────────────────────────────────────────── */
@@ -110,20 +119,32 @@
 
   /* ── Surfaces (unified glass) ──────────────────────────────────────── */
   .card {
-    @apply bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl rounded-2xl p-6 transition-colors;
+    @apply backdrop-blur-xl rounded-3xl p-6 transition-all duration-300 border;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+    border-color: rgba(251, 207, 232, 0.22);
+    box-shadow: 0 10px 30px rgba(16, 13, 24, 0.45);
   }
 
   .card-hover {
-    @apply hover:border-white/[0.15] hover:bg-white/[0.04];
+    @apply hover:-translate-y-0.5;
+    border-color: rgba(253, 164, 175, 0.38);
+    box-shadow: 0 12px 34px rgba(236, 72, 153, 0.22);
   }
 
   .stat-card {
-    @apply bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl rounded-2xl p-5 flex items-center gap-4 transition-colors hover:border-white/[0.15] hover:bg-white/[0.04];
+    @apply rounded-3xl p-5 flex items-center gap-4 border backdrop-blur-xl transition-all duration-300;
+    background: linear-gradient(150deg, rgba(244, 114, 182, 0.16), rgba(125, 211, 252, 0.08));
+    border-color: rgba(251, 207, 232, 0.3);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(34, 211, 238, 0.2);
   }
 
   /* ── Extra buttons ─────────────────────────────────────────────────── */
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-semibold rounded-xl transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white/15 border border-pink-100/20 hover:bg-pink-300/20 text-white font-semibold rounded-2xl transition-all duration-200;
   }
 
   .btn-ghost {
@@ -137,6 +158,45 @@
   /* ── Page shell + ambient mesh ─────────────────────────────────────── */
   .page-shell {
     @apply min-h-full text-gray-100 relative;
+  }
+
+  .moe-page {
+    @apply relative;
+  }
+
+  .moe-page::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none -z-10;
+    background-image:
+      radial-gradient(circle at 20px 20px, rgba(255, 255, 255, 0.08) 1.2px, transparent 0);
+    background-size: 30px 30px;
+    opacity: 0.35;
+  }
+
+  .moe-title {
+    font-family: 'Quicksand', 'Nunito', sans-serif;
+    @apply tracking-[0.01em] font-bold;
+  }
+
+  .moe-pill {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold;
+    background: rgba(244, 114, 182, 0.2);
+    border: 1px solid rgba(253, 164, 175, 0.35);
+    color: #fce7f3;
+  }
+
+  .moe-tab {
+    @apply px-4 py-2 rounded-2xl text-sm font-semibold flex items-center gap-2 transition-all;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(251, 207, 232, 0.2);
+    color: #d1d5db;
+  }
+
+  .moe-tab-active {
+    @apply text-white;
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.9), rgba(34, 211, 238, 0.85));
+    border-color: rgba(251, 207, 232, 0.45);
+    box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
   }
 
   .page-mesh-bg {
@@ -182,3 +242,24 @@
 .animate-mesh {
   animation: mesh 20s ease-in-out infinite;
 }
+
+@keyframes moeRise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.moe-stagger > * {
+  animation: moeRise 520ms ease both;
+}
+
+.moe-stagger > *:nth-child(2) { animation-delay: 80ms; }
+.moe-stagger > *:nth-child(3) { animation-delay: 140ms; }
+.moe-stagger > *:nth-child(4) { animation-delay: 200ms; }
+.moe-stagger > *:nth-child(5) { animation-delay: 260ms; }
