@@ -128,7 +128,6 @@ export default function Personalization() {
   const [animations, setAnimations] = useState(true)
   const [toastSound, setToastSound] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [failedImages, setFailedImages] = useState<Set<string>>(new Set())
 
   // Hydrate from server data when loaded
   useEffect(() => {
