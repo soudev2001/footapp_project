@@ -57,6 +57,19 @@ class SubscriptionService:
             }
         )
 
+    def cancel_subscription(self, club_id):
+        """Cancel a club's subscription (set to cancelled status)."""
+        return self.db.clubs.update_one(
+            {'_id': ObjectId(club_id)},
+            {
+                '$set': {
+                    'subscription.status': 'cancelled',
+                    'subscription.cancelled_at': datetime.utcnow(),
+                    'subscription.updated_at': datetime.utcnow(),
+                }
+            }
+        )
+
     def calculate_monthly_bill(self, club_id):
         """Calculate the monthly bill based on current user counts"""
         club = self.db.clubs.find_one({'_id': ObjectId(club_id)})

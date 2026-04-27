@@ -48,6 +48,7 @@ class AnnouncementService:
 
         success_count = 0
         failed_emails = []
+        recipient_emails = []
 
         mail = current_app.extensions.get('mail')
 
@@ -58,6 +59,7 @@ class AnnouncementService:
             email = user.get('email')
             if not email:
                 continue
+            recipient_emails.append(email)
             first_name = user.get('profile', {}).get('first_name', '')
             personalized_body = body.replace('{name}', first_name) if first_name else body
 
@@ -87,6 +89,8 @@ class AnnouncementService:
         result = self.collection.insert_one(doc)
         doc['_id'] = result.inserted_id
         doc['recipient_count'] = success_count
+        doc['failed_emails'] = failed_emails
+        doc['recipient_emails'] = recipient_emails
         return doc
 
     def get_announcements(self, club_id, limit=50):

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { adminApi } from '../../api'
 import {
@@ -130,14 +130,6 @@ const CAMPAIGNS: Campaign[] = [
     recipients: 0,
     status: 'draft',
   },
-]
-
-const LOGS: LogEntry[] = [
-  { id: 'l1', to: 'marie.dupont@mail.com', subject: 'Newsletter Avril 2026',  status: 'opened',    sentAt: '2026-04-18T14:22:00Z', campaign: 'Newsletter Avril 2026' },
-  { id: 'l2', to: 'jean.martin@mail.com',  subject: 'Convocation - U17 vs ASM', status: 'delivered', sentAt: '2026-04-18T09:10:00Z' },
-  { id: 'l3', to: 'old.account@mail.com',  subject: 'Newsletter Avril 2026',  status: 'bounced',   sentAt: '2026-04-18T10:00:00Z', campaign: 'Newsletter Avril 2026' },
-  { id: 'l4', to: 'sara.benali@mail.com',  subject: 'Bienvenue au club',      status: 'opened',    sentAt: '2026-04-17T11:45:00Z' },
-  { id: 'l5', to: 'unknown@fail.xyz',      subject: 'Facture - Mars 2026',    status: 'failed',    sentAt: '2026-04-15T08:00:00Z' },
 ]
 
 export default function AdminEmail() {
@@ -326,10 +318,42 @@ function MiniStat({ label, value, sub }: { label: string; value: string; sub?: s
 
 // ─── Templates ───────────────────────────────────────────────────────────────
 function TemplatesTab({ onNotify }: { onNotify: (m: string) => void }) {
-  const [templates, setTemplates] = useState(TEMPLATES)
+  const qc = useQueryClient()
+  const { data } = useQuery({
+    queryKey: ['admin-email-templates'],
+    queryFn: () => adminApi.emailTemplates().then((r) => r.data),
+  })
+  const hasPersistedTemplates = Array.isArray(data) && data.length > 0
+  const templates = (hasPersistedTemplates ? data : TEMPLATES) as Template[]
   const [editing, setEditing] = useState<Template | null>(null)
   const [query, setQuery] = useState('')
   const [cat, setCat] = useState<string>('')
+
+  const createMutation = useMutation({
+    mutationFn: (payload: Omit<Template, 'id'>) => adminApi.createEmailTemplate(payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-email-templates'] })
+      setEditing(null)
+      onNotify('Template enregistré.')
+    },
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Omit<Template, 'id'> }) => adminApi.updateEmailTemplate(id, payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-email-templates'] })
+      setEditing(null)
+      onNotify('Template mis à jour.')
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => adminApi.deleteEmailTemplate(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-email-templates'] })
+      onNotify('Template supprimé.')
+    },
+  })
 
   const filtered = templates.filter((t) => {
     const matchQ = !query || t.name.toLowerCase().includes(query.toLowerCase()) || t.subject.toLowerCase().includes(query.toLowerCase())
@@ -338,18 +362,28 @@ function TemplatesTab({ onNotify }: { onNotify: (m: string) => void }) {
   })
 
   const save = (t: Template) => {
-    setTemplates((prev) => {
-      const exists = prev.some((p) => p.id === t.id)
-      return exists ? prev.map((p) => (p.id === t.id ? t : p)) : [t, ...prev]
-    })
-    setEditing(null)
-    onNotify('Template enregistr\u00e9.')
+    const payload = {
+      name: t.name,
+      subject: t.subject,
+      body: t.body,
+      category: t.category,
+      updatedAt: t.updatedAt,
+    }
+    const existingPersisted = hasPersistedTemplates && templates.some((p) => p.id === t.id)
+    if (existingPersisted) {
+      updateMutation.mutate({ id: t.id, payload })
+      return
+    }
+    createMutation.mutate(payload)
   }
 
   const remove = (id: string) => {
     if (!confirm('Supprimer ce template ?')) return
-    setTemplates((p) => p.filter((x) => x.id !== id))
-    onNotify('Template supprim\u00e9.')
+    if (!hasPersistedTemplates) {
+      onNotify('Aucun template persistant à supprimer pour le moment.')
+      return
+    }
+    deleteMutation.mutate(id)
   }
 
   return (
@@ -429,11 +463,11 @@ function TemplatesTab({ onNotify }: { onNotify: (m: string) => void }) {
 function LogsTab() {
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('')
-  const filtered = LOGS.filter((l) => {
-    const mq = !q || l.to.toLowerCase().includes(q.toLowerCase()) || l.subject.toLowerCase().includes(q.toLowerCase())
-    const ms = !status || l.status === status
-    return mq && ms
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-email-logs', q, status],
+    queryFn: () => adminApi.emailLogs({ q, status }).then((r) => r.data),
   })
+  const logs = (data ?? []) as LogEntry[]
 
   return (
     <div className="space-y-4">
@@ -457,6 +491,7 @@ function LogsTab() {
       </div>
 
       <div className="card p-0 overflow-hidden">
+        {isLoading && <p className="px-4 py-3 text-sm text-gray-400">Chargement...</p>}
         <table className="w-full text-sm">
           <thead className="bg-gray-800/50 text-gray-400 text-xs">
             <tr>
@@ -467,7 +502,7 @@ function LogsTab() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
-            {filtered.map((l) => (
+            {logs.map((l) => (
               <tr key={l.id} className="hover:bg-gray-800/30">
                 <td className="px-4 py-2.5 text-gray-300">{l.to}</td>
                 <td className="px-4 py-2.5 text-gray-300">
@@ -484,7 +519,7 @@ function LogsTab() {
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && (
+            {logs.length === 0 && (
               <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-500">Aucun résultat.</td></tr>
             )}
           </tbody>
@@ -496,6 +531,12 @@ function LogsTab() {
 
 // ─── SMTP ────────────────────────────────────────────────────────────────────
 function SmtpTab({ onNotify }: { onNotify: (m: string) => void }) {
+  const qc = useQueryClient()
+  const { data: smtpData } = useQuery({
+    queryKey: ['admin-email-smtp'],
+    queryFn: () => adminApi.smtpConfig().then((r) => r.data),
+  })
+
   const [cfg, setCfg] = useState({
     host: 'smtp.sendgrid.net',
     port: '587',
@@ -508,15 +549,116 @@ function SmtpTab({ onNotify }: { onNotify: (m: string) => void }) {
   })
   const [testEmail, setTestEmail] = useState('')
   const [testing, setTesting] = useState(false)
+  const [errors, setErrors] = useState<{ port?: string; fromEmail?: string; testEmail?: string }>({})
+
+  const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+
+  const validateConfig = () => {
+    const next: { port?: string; fromEmail?: string } = {}
+    const portNum = Number(cfg.port)
+    if (!Number.isInteger(portNum) || portNum <= 0 || portNum > 65535) {
+      next.port = 'Le port doit être un entier entre 1 et 65535.'
+    }
+    if (!isValidEmail(cfg.fromEmail)) {
+      next.fromEmail = 'Email expéditeur invalide.'
+    }
+    setErrors((prev) => ({ ...prev, ...next }))
+    return Object.keys(next).length === 0
+  }
+
+  const validateTestEmail = () => {
+    if (!isValidEmail(testEmail)) {
+      setErrors((prev) => ({ ...prev, testEmail: 'Adresse email de test invalide.' }))
+      return false
+    }
+    setErrors((prev) => ({ ...prev, testEmail: undefined }))
+    return true
+  }
+
+  useEffect(() => {
+    if (!smtpData) return
+    setCfg((prev) => ({
+      ...prev,
+      host: smtpData.host ?? prev.host,
+      port: smtpData.port ?? prev.port,
+      user: smtpData.user ?? prev.user,
+      password: smtpData.password ?? prev.password,
+      fromName: smtpData.fromName ?? prev.fromName,
+      fromEmail: smtpData.fromEmail ?? prev.fromEmail,
+      replyTo: smtpData.replyTo ?? prev.replyTo,
+      useTLS: typeof smtpData.useTLS === 'boolean' ? smtpData.useTLS : prev.useTLS,
+    }))
+  }, [smtpData])
+
+  const saveMutation = useMutation({
+    mutationFn: () => adminApi.updateSmtpConfig(cfg),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-email-smtp'] })
+      onNotify('Configuration SMTP enregistrée.')
+    },
+  })
+
+  const testMutation = useMutation({
+    mutationFn: () => adminApi.smtpTest({ to: testEmail, config: cfg }),
+    onSuccess: () => {
+      onNotify(`Email de test envoyé à ${testEmail}.`)
+    },
+    onError: () => {
+      onNotify('Échec de l’envoi de l’email de test.')
+    },
+  })
 
   const testConnection = () => {
-    if (!testEmail) return
+    if (!validateTestEmail() || !validateConfig()) return
     setTesting(true)
-    setTimeout(() => {
-      setTesting(false)
-      onNotify(`Email de test envoyé à ${testEmail}.`)
-    }, 1200)
+    testMutation.mutate(undefined, {
+      onSettled: () => {
+        setTesting(false)
+      },
+    })
   }
+
+  const saveConfig = () => {
+    if (!validateConfig()) return
+    saveMutation.mutate()
+  }
+
+  useEffect(() => {
+    if (!cfg.port) {
+      setErrors((prev) => ({ ...prev, port: undefined }))
+      return
+    }
+    const portNum = Number(cfg.port)
+    if (!Number.isInteger(portNum) || portNum <= 0 || portNum > 65535) {
+      setErrors((prev) => ({ ...prev, port: 'Le port doit être un entier entre 1 et 65535.' }))
+    } else {
+      setErrors((prev) => ({ ...prev, port: undefined }))
+    }
+  }, [cfg.port])
+
+  useEffect(() => {
+    if (!cfg.fromEmail) {
+      setErrors((prev) => ({ ...prev, fromEmail: undefined }))
+      return
+    }
+    if (!isValidEmail(cfg.fromEmail)) {
+      setErrors((prev) => ({ ...prev, fromEmail: 'Email expéditeur invalide.' }))
+    } else {
+      setErrors((prev) => ({ ...prev, fromEmail: undefined }))
+    }
+  }, [cfg.fromEmail])
+
+  useEffect(() => {
+    if (!testEmail) {
+      setErrors((prev) => ({ ...prev, testEmail: undefined }))
+      return
+    }
+    if (!isValidEmail(testEmail)) {
+      setErrors((prev) => ({ ...prev, testEmail: 'Adresse email de test invalide.' }))
+    } else {
+      setErrors((prev) => ({ ...prev, testEmail: undefined }))
+    }
+  }, [testEmail])
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -530,6 +672,7 @@ function SmtpTab({ onNotify }: { onNotify: (m: string) => void }) {
           <Field label="Utilisateur" value={cfg.user} onChange={(v) => setCfg({ ...cfg, user: v })} />
           <Field label="Mot de passe" type="password" value={cfg.password} onChange={(v) => setCfg({ ...cfg, password: v })} />
         </div>
+        {errors.port && <p className="text-xs text-red-400 -mt-2">{errors.port}</p>}
         <div className="flex items-center justify-between pt-2 border-t border-gray-800">
           <div>
             <p className="text-sm font-medium text-white">Utiliser TLS/SSL</p>
@@ -548,7 +691,11 @@ function SmtpTab({ onNotify }: { onNotify: (m: string) => void }) {
             )} />
           </button>
         </div>
-        <button onClick={() => onNotify('Configuration SMTP enregistrée.')} className="btn-primary text-sm w-full">
+        <button
+          onClick={saveConfig}
+          className="btn-primary text-sm w-full disabled:opacity-50"
+          disabled={saveMutation.isPending}
+        >
           <CheckCircle2 size={14} /> Enregistrer
         </button>
       </div>
@@ -561,6 +708,7 @@ function SmtpTab({ onNotify }: { onNotify: (m: string) => void }) {
           <Field label="Nom de l\u2019expéditeur" value={cfg.fromName} onChange={(v) => setCfg({ ...cfg, fromName: v })} />
           <Field label="Email de l\u2019expéditeur" value={cfg.fromEmail} onChange={(v) => setCfg({ ...cfg, fromEmail: v })} />
           <Field label="Reply-To" value={cfg.replyTo} onChange={(v) => setCfg({ ...cfg, replyTo: v })} />
+          {errors.fromEmail && <p className="text-xs text-red-400">{errors.fromEmail}</p>}
         </div>
 
         <div className="card space-y-3">
@@ -577,12 +725,13 @@ function SmtpTab({ onNotify }: { onNotify: (m: string) => void }) {
             />
             <button
               onClick={testConnection}
-              disabled={!testEmail || testing}
+              disabled={!testEmail || testing || testMutation.isPending || !!errors.testEmail}
               className="btn-secondary text-sm disabled:opacity-50"
             >
               {testing ? 'Envoi...' : 'Envoyer'}
             </button>
           </div>
+          {errors.testEmail && <p className="text-xs text-red-400">{errors.testEmail}</p>}
           <p className="text-xs text-gray-500">Un email de test sera envoyé pour valider la configuration.</p>
         </div>
       </div>

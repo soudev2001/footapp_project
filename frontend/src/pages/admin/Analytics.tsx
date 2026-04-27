@@ -1,12 +1,39 @@
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { adminApi } from '../../api'
-import { BarChart3, TrendingUp, Users, Shield, Euro } from 'lucide-react'
+import { BarChart3, TrendingUp, Users, Shield, Euro, Download, FileSpreadsheet } from 'lucide-react'
 
 type Period = 30 | 90 | 365
 
+type TeamPerformanceRow = {
+  team_name: string
+  wins: number
+  draws: number
+  losses: number
+  attendance_rate: number
+}
+
 export default function Analytics() {
   const [period, setPeriod] = useState<Period>(90)
+
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const exportPdf = async () => {
+    const res = await adminApi.analyticsExportPdf()
+    downloadBlob(res.data as Blob, 'analytics.pdf')
+  }
+
+  const exportExcel = async () => {
+    const res = await adminApi.analyticsExportExcel()
+    downloadBlob(res.data as Blob, 'analytics.xlsx')
+  }
 
   const { data: summary, isLoading } = useQuery({
     queryKey: ['admin-analytics', period],
@@ -19,7 +46,7 @@ export default function Analytics() {
   })
 
   const { data: retention } = useQuery({
-    queryKey: ['admin-analytics-retention'],
+    queryKey: ['admin-analytics-retention', period],
     queryFn: () => adminApi.analyticsRetention(period).then((r) => r.data),
   })
 
@@ -52,7 +79,8 @@ export default function Analytics() {
         <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
           <BarChart3 size={22} className="text-pitch-500" /> Analyse
         </h1>
-        <div className="flex gap-2">
+
+        <div className="flex gap-2 flex-wrap">
           {[30, 90, 365].map((d) => (
             <button
               key={d}
@@ -62,6 +90,12 @@ export default function Analytics() {
               {d}j
             </button>
           ))}
+          <button onClick={exportPdf} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 text-gray-300 text-sm hover:bg-gray-700">
+            <Download size={15} /> PDF
+          </button>
+          <button onClick={exportExcel} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 text-gray-300 text-sm hover:bg-gray-700">
+            <FileSpreadsheet size={15} /> Excel
+          </button>
         </div>
       </div>
 
@@ -152,7 +186,7 @@ export default function Analytics() {
               </tr>
             </thead>
             <tbody>
-              {(teamPerformance ?? []).map((row: { team_name: string; wins: number; draws: number; losses: number; attendance_rate: number }) => (
+              {(teamPerformance ?? []).map((row: TeamPerformanceRow) => (
                 <tr key={row.team_name} className="border-t border-gray-800">
                   <td className="px-3 py-2 text-white">{row.team_name}</td>
                   <td className="px-3 py-2 text-center text-green-400">{row.wins}</td>

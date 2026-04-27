@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { adminApi } from '../../api'
-import { CreditCard, CheckCircle } from 'lucide-react'
+import { CreditCard, CheckCircle, AlertTriangle } from 'lucide-react'
 
 const PLANS = [
   { id: 'club_standard', name: 'Club Standard', price: '29€/mois', players: 30, teams: 2, features: ['Analyse basique', 'Gestion des membres', 'Calendrier'] },
@@ -23,6 +24,17 @@ export default function Subscription() {
     },
   })
 
+  const [confirmCancel, setConfirmCancel] = useState(false)
+
+  const cancelMutation = useMutation({
+    mutationFn: () => adminApi.cancelSubscription(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-subscription'] })
+      qc.invalidateQueries({ queryKey: ['admin-billing-dashboard'] })
+      setConfirmCancel(false)
+    },
+  })
+
   const currentPlan = data?.plan_id ?? data?.plan ?? ''
 
   return (
@@ -42,6 +54,33 @@ export default function Subscription() {
           </div>
           {data.renewal_date && (
             <p className="text-sm text-gray-400">Renouvellement le {data.renewal_date}</p>
+          )}
+          {data.status !== 'cancelled' && (
+            <div className="pt-2">
+              {!confirmCancel ? (
+                <button
+                  className="text-sm text-red-400 hover:text-red-300 underline"
+                  onClick={() => setConfirmCancel(true)}
+                >
+                  Annuler l'abonnement
+                </button>
+              ) : (
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-red-900/30 border border-red-800">
+                  <AlertTriangle size={16} className="text-red-400 shrink-0" />
+                  <p className="text-sm text-red-300">Confirmer l'annulation ?</p>
+                  <button
+                    className="ml-auto px-3 py-1 rounded bg-red-700 text-white text-sm hover:bg-red-600 disabled:opacity-50"
+                    onClick={() => cancelMutation.mutate()}
+                    disabled={cancelMutation.isPending}
+                  >
+                    {cancelMutation.isPending ? '...' : 'Confirmer'}
+                  </button>
+                  <button className="text-sm text-gray-400 hover:text-gray-200" onClick={() => setConfirmCancel(false)}>
+                    Annuler
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}

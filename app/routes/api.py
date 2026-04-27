@@ -6,6 +6,7 @@
 import jwt
 import os
 import datetime
+import smtplib
 from flask import Blueprint, jsonify, request, current_app, render_template, url_for, make_response
 from app.models import serialize_doc, serialize_docs
 from app.services import (
@@ -23,6 +24,7 @@ from app.services.messaging_service import MessagingService
 from app.services.db import mongo
 from functools import wraps
 from bson import ObjectId
+from email.mime.text import MIMEText
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -2466,6 +2468,19 @@ def admin_update_subscription():
 
 
 @api_bp.route('/admin/announcements', methods=['GET'])
+@api_bp.route('/admin/subscription', methods=['DELETE'])
+@role_required('admin')
+def admin_cancel_subscription():
+    """Cancel the club subscription."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'Club non trouvé'}), 400
+    sub_service = get_subscription_service()
+    sub_service.cancel_subscription(club_id)
+    return jsonify({'success': True, 'message': 'Abonnement annulé'})
+
+
+@api_bp.route('/admin/announcements', methods=['GET'])
 @role_required('admin')
 def admin_announcements():
     """Get announcement history for the admin's club."""
@@ -2587,8 +2602,10 @@ def admin_create_email_campaign():
         target_type, target_id = 'role', 'admin'
 
     recipients = 0
+    email_logs = []
     if status == 'sent':
         announcement_service = get_announcement_service()
+        recipients_rows = announcement_service.get_announcement_recipients(club_id, target_type, target_id)
         result = announcement_service.send_announcement(
             club_id,
             subject,
@@ -2598,6 +2615,22 @@ def admin_create_email_campaign():
             request.current_user.get('user_id')
         )
         recipients = result.get('recipient_count', 0)
+        failed_set = set(result.get('failed_emails', []))
+
+        now = datetime.datetime.utcnow()
+        for row in recipients_rows:
+            email = row.get('email')
+            if not email:
+                continue
+            email_logs.append({
+                'club_id': ObjectId(club_id),
+                'to': email,
+                'subject': subject,
+                'campaign': name,
+                'status': 'failed' if email in failed_set else 'delivered',
+                'sentAt': now,
+                'created_at': now,
+            })
 
     doc = {
         'club_id': ObjectId(club_id),
@@ -2615,7 +2648,302 @@ def admin_create_email_campaign():
     }
     inserted = mongo.db.email_campaigns.insert_one(doc)
     doc['_id'] = inserted.inserted_id
+
+    if email_logs:
+        mongo.db.email_logs.insert_many(email_logs)
+
     return jsonify({'success': True, 'data': serialize_doc(doc)}), 201
+
+
+@api_bp.route('/admin/email/logs', methods=['GET'])
+@role_required('admin')
+def admin_email_logs():
+    """List email delivery logs for the admin club."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': []})
+
+    query = {'club_id': ObjectId(club_id)}
+    status = (request.args.get('status') or '').strip()
+    q = (request.args.get('q') or '').strip()
+
+    if status in ('delivered', 'opened', 'bounced', 'failed'):
+        query['status'] = status
+    if q:
+        query['$or'] = [
+            {'to': {'$regex': q, '$options': 'i'}},
+            {'subject': {'$regex': q, '$options': 'i'}},
+            {'campaign': {'$regex': q, '$options': 'i'}},
+        ]
+
+    raw = list(
+        mongo.db.email_logs.find(query)
+        .sort('sentAt', -1)
+        .limit(300)
+    )
+    return jsonify({'success': True, 'data': serialize_docs(raw)})
+
+
+@api_bp.route('/admin/email/templates', methods=['GET'])
+@role_required('admin')
+def admin_email_templates():
+    """List email templates for the admin club."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': []})
+
+    raw = list(
+        mongo.db.email_templates.find({'club_id': ObjectId(club_id)})
+        .sort('updated_at', -1)
+        .limit(200)
+    )
+    return jsonify({'success': True, 'data': serialize_docs(raw)})
+
+
+@api_bp.route('/admin/email/templates', methods=['POST'])
+@role_required('admin')
+def admin_create_email_template():
+    """Create an email template."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'No club'}), 400
+
+    data = request.get_json() or {}
+    name = (data.get('name') or '').strip()
+    subject = (data.get('subject') or '').strip()
+    body = (data.get('body') or '').strip()
+    category = (data.get('category') or 'announcement').strip()
+
+    allowed_categories = {'onboarding', 'event', 'match', 'announcement', 'billing'}
+    if not name or not subject or not body:
+        return jsonify({'success': False, 'error': 'name, subject and body required'}), 400
+    if category not in allowed_categories:
+        return jsonify({'success': False, 'error': 'invalid category'}), 400
+
+    now = datetime.datetime.utcnow()
+    doc = {
+        'club_id': ObjectId(club_id),
+        'name': name,
+        'subject': subject,
+        'body': body,
+        'category': category,
+        'created_at': now,
+        'updated_at': now,
+    }
+    inserted = mongo.db.email_templates.insert_one(doc)
+    doc['_id'] = inserted.inserted_id
+    return jsonify({'success': True, 'data': serialize_doc(doc)}), 201
+
+
+@api_bp.route('/admin/email/templates/<template_id>', methods=['PUT'])
+@role_required('admin')
+def admin_update_email_template(template_id):
+    """Update an email template."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'No club'}), 400
+
+    try:
+        tpl_oid = ObjectId(template_id)
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid template id'}), 400
+
+    data = request.get_json() or {}
+    name = (data.get('name') or '').strip()
+    subject = (data.get('subject') or '').strip()
+    body = (data.get('body') or '').strip()
+    category = (data.get('category') or 'announcement').strip()
+
+    allowed_categories = {'onboarding', 'event', 'match', 'announcement', 'billing'}
+    if not name or not subject or not body:
+        return jsonify({'success': False, 'error': 'name, subject and body required'}), 400
+    if category not in allowed_categories:
+        return jsonify({'success': False, 'error': 'invalid category'}), 400
+
+    result = mongo.db.email_templates.update_one(
+        {'_id': tpl_oid, 'club_id': ObjectId(club_id)},
+        {
+            '$set': {
+                'name': name,
+                'subject': subject,
+                'body': body,
+                'category': category,
+                'updated_at': datetime.datetime.utcnow(),
+            }
+        }
+    )
+    if result.matched_count == 0:
+        return jsonify({'success': False, 'error': 'Template not found'}), 404
+
+    updated = mongo.db.email_templates.find_one({'_id': tpl_oid})
+    return jsonify({'success': True, 'data': serialize_doc(updated)})
+
+
+@api_bp.route('/admin/email/templates/<template_id>', methods=['DELETE'])
+@role_required('admin')
+def admin_delete_email_template(template_id):
+    """Delete an email template."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'No club'}), 400
+
+    try:
+        tpl_oid = ObjectId(template_id)
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid template id'}), 400
+
+    result = mongo.db.email_templates.delete_one({'_id': tpl_oid, 'club_id': ObjectId(club_id)})
+    if result.deleted_count == 0:
+        return jsonify({'success': False, 'error': 'Template not found'}), 404
+
+    return jsonify({'success': True, 'data': {'deleted': True}})
+
+
+@api_bp.route('/admin/email/smtp', methods=['GET'])
+@role_required('admin')
+def admin_get_smtp_config():
+    """Get SMTP configuration for the admin club."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'No club'}), 400
+
+    club = mongo.db.clubs.find_one({'_id': ObjectId(club_id)}, {'smtp_config': 1}) or {}
+    smtp = club.get('smtp_config') or {}
+    data = {
+        'host': smtp.get('host', ''),
+        'port': str(smtp.get('port', '587')),
+        'user': smtp.get('user', ''),
+        'password': smtp.get('password', ''),
+        'fromName': smtp.get('fromName', ''),
+        'fromEmail': smtp.get('fromEmail', ''),
+        'replyTo': smtp.get('replyTo', ''),
+        'useTLS': bool(smtp.get('useTLS', True)),
+    }
+    return jsonify({'success': True, 'data': data})
+
+
+@api_bp.route('/admin/email/smtp', methods=['PUT'])
+@role_required('admin')
+def admin_update_smtp_config():
+    """Update SMTP configuration for the admin club."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'No club'}), 400
+
+    data = request.get_json() or {}
+    host = (data.get('host') or '').strip()
+    port_raw = data.get('port', '587')
+    user = (data.get('user') or '').strip()
+    password = data.get('password') or ''
+    from_name = (data.get('fromName') or '').strip()
+    from_email = (data.get('fromEmail') or '').strip()
+    reply_to = (data.get('replyTo') or '').strip()
+    use_tls = bool(data.get('useTLS', True))
+
+    try:
+        port = int(port_raw)
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'error': 'invalid port'}), 400
+
+    if not host or not from_email:
+        return jsonify({'success': False, 'error': 'host and fromEmail are required'}), 400
+
+    smtp_config = {
+        'host': host,
+        'port': port,
+        'user': user,
+        'password': password,
+        'fromName': from_name,
+        'fromEmail': from_email,
+        'replyTo': reply_to,
+        'useTLS': use_tls,
+        'updated_at': datetime.datetime.utcnow(),
+    }
+
+    mongo.db.clubs.update_one(
+        {'_id': ObjectId(club_id)},
+        {'$set': {'smtp_config': smtp_config, 'updated_at': datetime.datetime.utcnow()}},
+    )
+
+    smtp_config['port'] = str(smtp_config['port'])
+    return jsonify({'success': True, 'data': serialize_doc(smtp_config)})
+
+
+@api_bp.route('/admin/email/smtp/test', methods=['POST'])
+@role_required('admin')
+def admin_test_smtp_config():
+    """Send a real SMTP test email using saved club SMTP settings."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'No club'}), 400
+
+    payload = request.get_json() or {}
+    to_email = (payload.get('to') or '').strip()
+    if not to_email or '@' not in to_email:
+        return jsonify({'success': False, 'error': 'invalid recipient email'}), 400
+
+    club = mongo.db.clubs.find_one({'_id': ObjectId(club_id)}, {'smtp_config': 1}) or {}
+    smtp_saved = club.get('smtp_config') or {}
+    smtp_payload = payload.get('config') if isinstance(payload.get('config'), dict) else {}
+    smtp = {**smtp_saved, **smtp_payload}
+
+    host = (smtp.get('host') or '').strip()
+    user = (smtp.get('user') or '').strip()
+    password = smtp.get('password') or ''
+    from_name = (smtp.get('fromName') or '').strip()
+    from_email = (smtp.get('fromEmail') or '').strip()
+    use_tls = bool(smtp.get('useTLS', True))
+
+    try:
+        port = int(smtp.get('port', 587))
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'error': 'invalid configured SMTP port'}), 400
+
+    if not host or not from_email:
+        return jsonify({'success': False, 'error': 'SMTP config incomplete: host/fromEmail required'}), 400
+
+    subject = "FootApp - Test SMTP"
+    body = "Ceci est un email de test SMTP envoyé depuis FootApp."
+    msg = MIMEText(body, 'plain', 'utf-8')
+    msg['Subject'] = subject
+    msg['From'] = f"{from_name} <{from_email}>" if from_name else from_email
+    msg['To'] = to_email
+
+    try:
+        with smtplib.SMTP(host, port, timeout=15) as server:
+            server.ehlo()
+            if use_tls:
+                server.starttls()
+                server.ehlo()
+            if user:
+                server.login(user, password)
+            server.sendmail(from_email, [to_email], msg.as_string())
+    except Exception as exc:
+        current_app.logger.warning("SMTP test failed for club %s: %s", club_id, exc)
+
+        mongo.db.email_logs.insert_one({
+            'club_id': ObjectId(club_id),
+            'to': to_email,
+            'subject': subject,
+            'campaign': 'SMTP Test',
+            'status': 'failed',
+            'sentAt': datetime.datetime.utcnow(),
+            'created_at': datetime.datetime.utcnow(),
+            'error': str(exc),
+        })
+        return jsonify({'success': False, 'error': 'SMTP test failed'}), 500
+
+    mongo.db.email_logs.insert_one({
+        'club_id': ObjectId(club_id),
+        'to': to_email,
+        'subject': subject,
+        'campaign': 'SMTP Test',
+        'status': 'delivered',
+        'sentAt': datetime.datetime.utcnow(),
+        'created_at': datetime.datetime.utcnow(),
+    })
+
+    return jsonify({'success': True, 'data': {'sent': True}})
 
 
 @api_bp.route('/admin/notifications', methods=['GET'])
@@ -3875,6 +4203,29 @@ def match_timeline(match_id):
     events = match.get('events', [])
     return jsonify({'success': True, 'data': events})
 
+
+@api_bp.route('/matches/<match_id>/stats', methods=['GET'])
+def match_stats(match_id):
+    """Get match statistics (public)."""
+    match = mongo.db.matches.find_one({'_id': ObjectId(match_id)})
+    if not match:
+        return jsonify({'success': False, 'error': 'Match not found'}), 404
+    stats = match.get('stats', {
+        'possession_home': 50, 'possession_away': 50,
+        'shots_home': 0, 'shots_away': 0,
+        'corners_home': 0, 'corners_away': 0,
+    })
+    return jsonify({'success': True, 'data': stats})
+
+
+@api_bp.route('/matches/fixtures/<club_id>', methods=['GET'])
+def match_fixtures(club_id):
+    """Get upcoming fixtures (public)."""
+    matches = list(mongo.db.matches.find({
+        'club_id': ObjectId(club_id),
+        'status': {'$ne': 'completed'}
+    }).sort('date', 1).limit(10))
+    return jsonify({'success': True, 'data': serialize_docs(matches)})
 
 @api_bp.route('/matches/<match_id>/stats', methods=['GET'])
 def match_stats(match_id):
