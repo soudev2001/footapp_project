@@ -64,6 +64,10 @@ export default function PlayerTactics() {
         <Layout size={22} className="text-pitch-500" /> Tactiques
       </h1>
 
+      <div className="card border-gray-800/40 text-xs text-gray-400">
+        Ici vous trouvez les consignes collectives de l'équipe. Les consignes individuelles par match sont dans Convocations puis Match Prep.
+      </div>
+
       {/* Header card */}
       <div className="card space-y-3">
         <div className="flex items-start justify-between gap-3">

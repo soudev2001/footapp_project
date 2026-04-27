@@ -162,6 +162,10 @@ export default function MatchPrep() {
         </div>
       )}
 
+      <div className="card border-gray-800/40 text-xs text-gray-400">
+        Cette page affiche vos consignes personnelles pour cette convocation. Les consignes d'équipe restent accessibles dans l'onglet Tactiques.
+      </div>
+
       {/* My Tactical Instructions */}
       {myInstructions && (
         <div className="card border-green-800/40 space-y-3">

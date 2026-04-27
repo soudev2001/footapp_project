@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { playerApi } from '../../api'
+import { playerApi, matchesApi } from '../../api'
 import { useState, useEffect, useRef } from 'react'
-import { Trophy, Calendar, MapPin, Target, Star, Loader2, Swords, Clock, TrendingUp } from 'lucide-react'
+import { Trophy, Calendar, MapPin, Loader2, Swords, Clock, TrendingUp } from 'lucide-react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { Link } from 'react-router-dom'
@@ -94,14 +94,11 @@ export default function PlayerMatchCenter() {
     setLiveMatchId(id)
     const fetchTimeline = async () => {
       try {
-        const res = await fetch(`/api/matches/${id}/timeline`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token') ?? ''}` },
-        })
-        if (res.ok) {
-          const json = await res.json()
-          setTimeline(json.data ?? json.timeline ?? [])
-        }
-      } catch { /* silent */ }
+        const res = await matchesApi.timeline(id)
+        setTimeline(res.data ?? [])
+      } catch {
+        setTimeline([])
+      }
     }
     fetchTimeline()
     intervalRef.current = setInterval(fetchTimeline, 30000)

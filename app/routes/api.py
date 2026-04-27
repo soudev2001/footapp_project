@@ -1711,8 +1711,11 @@ def player_match_prep(convocation_id):
     if not convocation:
         return jsonify({'success': False, 'error': 'Convocation not found'}), 404
 
-    user_id = request.current_user.get('user_id') or str(request.current_user.get('_id', ''))
-    player_id = request.current_user.get('player_id') or user_id
+    player = player_service.get_by_user(request.current_user['user_id'])
+    if not player:
+        return jsonify({'success': False, 'error': 'Player not found'}), 404
+
+    player_id = str(player.get('_id'))
 
     # Check if lineup should be visible (24h before match_date)
     lineup_visible = False
@@ -1734,9 +1737,25 @@ def player_match_prep(convocation_id):
     my_slot = None
     my_instructions = None
     my_set_pieces = []
+    collective_instructions = convocation.get('collective_instructions') or convocation.get('instructions') or {}
     starters = convocation.get('starters', [])
     player_instructions = convocation.get('player_instructions', {})
     set_pieces = convocation.get('set_pieces', {})
+
+    # Fallback: if convocation does not snapshot collective instructions,
+    # expose current team/club tactic instructions so players always see team guidance.
+    if not collective_instructions:
+        team_id = player.get('team_id')
+        club_id = player.get('club_id')
+        tactic_query = {}
+        if team_id:
+            tactic_query['team_id'] = team_id
+        elif club_id:
+            tactic_query['club_id'] = club_id
+        if tactic_query:
+            tactic = mongo.db.tactics.find_one(tactic_query, sort=[('updated_at', -1)])
+            if tactic:
+                collective_instructions = tactic.get('instructions', {}) or {}
 
     # Check if player is in starters
     if isinstance(starters, list):
@@ -1788,6 +1807,7 @@ def player_match_prep(convocation_id):
         'my_slot': my_slot,
         'my_instructions': my_instructions,
         'my_set_pieces': my_set_pieces,
+        'collective_instructions': collective_instructions,
         'lineup_visible': lineup_visible,
     }
 

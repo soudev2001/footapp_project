@@ -28,6 +28,7 @@ export const matchesApi = {
     client.get<Match[]>('/matches/results', { params }),
 
   getById: (id: string) => client.get<Match>(`/matches/${id}`),
+  timeline: (id: string) => client.get(`/matches/${id}/timeline`),
 
   seasonStats: () => client.get('/matches/season-stats'),
 }
