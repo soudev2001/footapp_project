@@ -6,7 +6,10 @@ import { Upload, Send, UserPlus, CheckCircle, AlertCircle, RefreshCw } from 'luc
 export default function Onboarding() {
   const qc = useQueryClient()
   const fileRef = useRef<HTMLInputElement>(null)
-  const [csvData, setCsvData] = useState<{ preview: unknown[]; total: number } | null>(null)
+  const [csvData, setCsvData] = useState<{
+    valid: Array<{ email: string; first_name: string; last_name: string; role: string; team_id?: string | null }>
+    errors: Array<{ row: number; data?: Record<string, string>; errors?: string[]; error?: string }>
+  } | null>(null)
   const [tab, setTab] = useState<'import' | 'invitations'>('import')
 
   const { data: invitations, isLoading: invLoading } = useQuery({
@@ -20,11 +23,16 @@ export default function Onboarding() {
       fd.append('file', file)
       return adminApi.importCSV(fd)
     },
-    onSuccess: (res) => setCsvData(res.data),
+    onSuccess: (res) => {
+      setCsvData({
+        valid: res.data?.valid ?? [],
+        errors: res.data?.errors ?? [],
+      })
+    },
   })
 
   const confirmMutation = useMutation({
-    mutationFn: () => adminApi.confirmImport({}),
+    mutationFn: () => adminApi.confirmImport({ members: csvData?.valid ?? [] }),
     onSuccess: () => {
       setCsvData(null)
       qc.invalidateQueries({ queryKey: ['admin-invitations'] })
@@ -89,7 +97,10 @@ export default function Onboarding() {
           {csvData && (
             <div className="space-y-3 border-t border-gray-800 pt-4">
               <p className="text-sm text-gray-300">
-                <strong>{csvData.total}</strong> membres détectés
+                <strong>{csvData.valid.length}</strong> membres valides détectés
+                {csvData.errors.length > 0 && (
+                  <span className="text-yellow-400"> · {csvData.errors.length} ligne(s) en erreur</span>
+                )}
               </p>
               <div className="max-h-60 overflow-auto rounded-lg border border-gray-800">
                 <table className="w-full text-sm">
@@ -101,7 +112,7 @@ export default function Onboarding() {
                     </tr>
                   </thead>
                   <tbody>
-                    {(csvData.preview as { email: string; first_name: string; last_name: string; role: string }[]).map((row, i) => (
+                    {csvData.valid.map((row, i) => (
                       <tr key={i} className="border-t border-gray-800">
                         <td className="px-3 py-2 text-gray-300">{row.email}</td>
                         <td className="px-3 py-2 text-white">{row.first_name} {row.last_name}</td>
@@ -114,10 +125,21 @@ export default function Onboarding() {
               <button
                 onClick={() => confirmMutation.mutate()}
                 className="btn-primary"
-                disabled={confirmMutation.isPending}
+                disabled={confirmMutation.isPending || csvData.valid.length === 0}
               >
                 <CheckCircle size={16} /> Confirmer l'import
               </button>
+
+              {csvData.errors.length > 0 && (
+                <div className="rounded-lg border border-yellow-900/40 bg-yellow-900/10 p-3 text-xs text-yellow-300 space-y-1">
+                  {csvData.errors.slice(0, 8).map((err, idx) => (
+                    <p key={idx}>Ligne {err.row}: {err.error ?? err.errors?.join(' · ')}</p>
+                  ))}
+                  {csvData.errors.length > 8 && (
+                    <p>...et {csvData.errors.length - 8} erreur(s) supplémentaire(s).</p>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -130,20 +152,29 @@ export default function Onboarding() {
 
           {invitations && (
             <div className="space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                {[
-                  { label: 'Envoyées', value: invitations.sent ?? 0, color: 'text-blue-400' },
-                  { label: 'Acceptées', value: invitations.accepted ?? 0, color: 'text-green-400' },
-                  { label: 'En attente', value: invitations.pending ?? 0, color: 'text-yellow-400' },
-                ].map((s) => (
-                  <div key={s.label} className="text-center p-3 bg-gray-800 rounded-lg">
-                    <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
-                    <p className="text-xs text-gray-400 mt-1">{s.label}</p>
+              {(() => {
+                const total = invitations.length
+                const sent = invitations.filter((i: { account_status?: string; display_status?: string }) => i.account_status === 'pending' || i.display_status === 'Pending').length
+                const accepted = invitations.filter((i: { account_status?: string }) => i.account_status === 'active').length
+                const pending = invitations.filter((i: { display_status?: string }) => i.display_status === 'Pending').length
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                    {[
+                      { label: 'Total', value: total, color: 'text-blue-400' },
+                      { label: 'Envoyées', value: sent, color: 'text-indigo-400' },
+                      { label: 'Acceptées', value: accepted, color: 'text-green-400' },
+                      { label: 'En attente', value: pending, color: 'text-yellow-400' },
+                    ].map((s) => (
+                      <div key={s.label} className="text-center p-3 bg-gray-800 rounded-lg">
+                        <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
+                        <p className="text-xs text-gray-400 mt-1">{s.label}</p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                )
+              })()}
 
-              {invitations.items?.length > 0 && (
+              {invitations.length > 0 && (
                 <div className="max-h-72 overflow-auto rounded-lg border border-gray-800">
                   <table className="w-full text-sm">
                     <thead className="bg-gray-800 text-gray-400 sticky top-0">
@@ -154,20 +185,20 @@ export default function Onboarding() {
                       </tr>
                     </thead>
                     <tbody>
-                      {invitations.items.map((inv: { id: string; email: string; status: string }) => (
+                      {invitations.map((inv: { id: string; email: string; display_status?: string; account_status?: string }) => (
                         <tr key={inv.id} className="border-t border-gray-800">
                           <td className="px-3 py-2 text-gray-300">{inv.email}</td>
                           <td className="px-3 py-2">
                             <span className={`inline-flex items-center gap-1 text-xs font-medium ${
-                              inv.status === 'accepted' ? 'text-green-400' :
-                              inv.status === 'pending' ? 'text-yellow-400' : 'text-red-400'
+                              inv.display_status === 'Active' || inv.account_status === 'active' ? 'text-green-400' :
+                              inv.display_status === 'Pending' ? 'text-yellow-400' : 'text-red-400'
                             }`}>
-                              {inv.status === 'accepted' ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
-                              {inv.status === 'accepted' ? 'Accepté' : inv.status === 'pending' ? 'En attente' : 'Expiré'}
+                              {(inv.display_status === 'Active' || inv.account_status === 'active') ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                              {(inv.display_status === 'Active' || inv.account_status === 'active') ? 'Accepté' : inv.display_status === 'Pending' ? 'En attente' : 'Expiré'}
                             </span>
                           </td>
                           <td className="px-3 py-2 text-right">
-                            {inv.status === 'pending' && (
+                            {inv.display_status === 'Pending' && (
                               <button
                                 onClick={() => resendMutation.mutate([inv.id])}
                                 className="text-pitch-400 hover:text-pitch-300 text-xs flex items-center gap-1 ml-auto"

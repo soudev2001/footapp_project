@@ -13,6 +13,22 @@ export default function Financial() {
     queryFn: () => adminApi.billingInvoices().then((r) => r.data),
   })
 
+  const downloadInvoice = async (invoiceId: string) => {
+    const res = await adminApi.billingInvoicePdf(invoiceId)
+    const blob = new Blob([res.data], { type: 'application/pdf' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `invoice-${invoiceId}.pdf`
+    a.click()
+    window.URL.revokeObjectURL(url)
+  }
+
+  const subscription = dashboard?.subscription ?? {}
+  const billing = subscription?.billing ?? {}
+  const monthlyTotal = typeof billing.total_monthly === 'number' ? billing.total_monthly : null
+  const totalPaid = typeof dashboard?.total_paid_eur === 'number' ? dashboard.total_paid_eur : null
+
   return (
     <div className="space-y-6">
       <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
@@ -25,10 +41,10 @@ export default function Financial() {
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: 'Plan actuel', value: dashboard.plan ?? 'Free', icon: <CreditCard size={20} />, color: 'text-purple-400' },
-              { label: 'Statut', value: dashboard.status ?? '—', icon: <TrendingUp size={20} />, color: 'text-green-400' },
-              { label: 'Prochaine facture', value: dashboard.next_invoice ? `€${dashboard.next_invoice}` : '—', icon: <DollarSign size={20} />, color: 'text-yellow-400' },
-              { label: 'Total facturé', value: dashboard.total_billed ? `€${dashboard.total_billed}` : '—', icon: <FileText size={20} />, color: 'text-blue-400' },
+              { label: 'Plan actuel', value: subscription.plan_id ?? 'free', icon: <CreditCard size={20} />, color: 'text-purple-400' },
+              { label: 'Statut', value: subscription.status ?? '—', icon: <TrendingUp size={20} />, color: 'text-green-400' },
+              { label: 'Mensuel estimé', value: monthlyTotal !== null ? `€${monthlyTotal.toFixed(2)}` : '—', icon: <DollarSign size={20} />, color: 'text-yellow-400' },
+              { label: 'Total payé', value: totalPaid !== null ? `€${totalPaid.toFixed(2)}` : '—', icon: <FileText size={20} />, color: 'text-blue-400' },
             ].map((s) => (
               <div key={s.label} className="stat-card">
                 <div className={s.color}>{s.icon}</div>
@@ -76,23 +92,32 @@ export default function Financial() {
               <thead className="bg-gray-800 text-gray-400">
                 <tr>
                   <th className="px-3 py-2 text-left">Date</th>
-                  <th className="px-3 py-2 text-left">Description</th>
+                  <th className="px-3 py-2 text-left">Plan</th>
                   <th className="px-3 py-2 text-right">Montant</th>
                   <th className="px-3 py-2 text-center">Statut</th>
+                  <th className="px-3 py-2 text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {invoices.map((inv: { id: string; date: string; description: string; amount: number; status: string }) => (
+                {invoices.map((inv: { id: string; created_at?: string; plan_name?: string; amount_cents?: number; currency?: string; status: string }) => (
                   <tr key={inv.id} className="border-t border-gray-800">
-                    <td className="px-3 py-2 text-gray-300">{inv.date}</td>
-                    <td className="px-3 py-2 text-white">{inv.description}</td>
-                    <td className="px-3 py-2 text-right text-gray-300">€{inv.amount}</td>
+                    <td className="px-3 py-2 text-gray-300">{inv.created_at ? new Date(inv.created_at).toLocaleDateString('fr-FR') : '—'}</td>
+                    <td className="px-3 py-2 text-white">{inv.plan_name ?? 'Abonnement'}</td>
+                    <td className="px-3 py-2 text-right text-gray-300">{((inv.amount_cents ?? 0) / 100).toFixed(2)} {(inv.currency ?? 'EUR').toUpperCase()}</td>
                     <td className="px-3 py-2 text-center">
                       <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                         inv.status === 'paid' ? 'bg-green-900/40 text-green-400' : 'bg-yellow-900/40 text-yellow-400'
                       }`}>
                         {inv.status}
                       </span>
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <button
+                        className="btn-secondary"
+                        onClick={() => downloadInvoice(inv.id)}
+                      >
+                        PDF
+                      </button>
                     </td>
                   </tr>
                 ))}

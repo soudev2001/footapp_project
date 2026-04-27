@@ -210,12 +210,17 @@ export const adminApi = {
   addCoachToTeam: (teamId: string, coachId: string) => client.post(`/admin/teams/${teamId}/add-coach`, { coach_id: coachId }),
   removeCoachFromTeam: (teamId: string, coachId: string) => client.post(`/admin/teams/${teamId}/remove-coach`, { coach_id: coachId }),
   updateClub: (data: object) => client.put('/admin/club', data),
-  analytics: () => client.get('/admin/analytics'),
+  analytics: (days?: number) => client.get('/admin/analytics', { params: { days } }),
   subscription: () => client.get('/admin/subscription'),
+  updateSubscription: (plan: string) => client.put('/admin/subscription', { plan }),
   invite: (data: object) => client.post('/admin/invite', data),
   resetPassword: (id: string) => client.post(`/admin/members/${id}/reset-password`),
   announcements: () => client.get('/admin/announcements'),
   createAnnouncement: (data: object) => client.post('/admin/announcement', data),
+  emailCampaigns: () => client.get('/admin/email/campaigns'),
+  createEmailCampaign: (data: object) => client.post('/admin/email/campaigns', data),
+  notifications: () => client.get('/admin/notifications'),
+  createNotification: (data: object) => client.post('/admin/notifications', data),
   onboarding: () => client.get('/admin/onboarding'),
   // Enhanced Onboarding
   importCSV: (formData: FormData) => client.post('/admin/onboarding/import', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
@@ -224,12 +229,14 @@ export const adminApi = {
   resendInvitations: (data: { member_ids: string[] }) => client.post('/admin/onboarding/resend', data),
   // Enhanced Analytics
   analyticsTeams: () => client.get('/admin/analytics/teams'),
-  analyticsRetention: () => client.get('/admin/analytics/retention'),
+  analyticsRetention: (days?: number) => client.get('/admin/analytics/retention', { params: { days } }),
   analyticsEngagement: () => client.get('/admin/analytics/engagement'),
   analyticsFinancial: () => client.get('/admin/analytics/financial'),
   // Billing
   billingDashboard: () => client.get('/admin/billing/dashboard'),
   billingInvoices: () => client.get('/admin/billing/invoices'),
+  billingInvoicePdf: (invoiceId: string) =>
+    client.get(`/admin/billing/invoices/${invoiceId}/pdf`, { responseType: 'blob' }),
   // Jersey validation
   checkJersey: (data: { team_id: string; jersey_number: number; exclude_player_id?: string }) =>
     client.post('/admin/check-jersey', data),

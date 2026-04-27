@@ -1,39 +1,78 @@
+import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { adminApi } from '../../api'
-import { BarChart3, TrendingUp, Users, Shield } from 'lucide-react'
+import { BarChart3, TrendingUp, Users, Shield, Euro } from 'lucide-react'
+
+type Period = 30 | 90 | 365
 
 export default function Analytics() {
-  const { data, isLoading } = useQuery({
-    queryKey: ['admin-analytics'],
-    queryFn: () => adminApi.analytics().then((r) => r.data),
+  const [period, setPeriod] = useState<Period>(90)
+
+  const { data: summary, isLoading } = useQuery({
+    queryKey: ['admin-analytics', period],
+    queryFn: () => adminApi.analytics(period).then((r) => r.data),
   })
 
-  const sections = [
-    {
-      label: 'Membres par rôle',
-      icon: <Users size={18} className="text-blue-400" />,
-      items: data?.members_by_role,
-    },
-    {
-      label: 'Performance des équipes',
-      icon: <Shield size={18} className="text-pitch-400" />,
-      items: data?.team_stats,
-    },
-  ]
+  const { data: teamPerformance } = useQuery({
+    queryKey: ['admin-analytics-teams'],
+    queryFn: () => adminApi.analyticsTeams().then((r) => r.data),
+  })
+
+  const { data: retention } = useQuery({
+    queryKey: ['admin-analytics-retention'],
+    queryFn: () => adminApi.analyticsRetention(period).then((r) => r.data),
+  })
+
+  const { data: engagement } = useQuery({
+    queryKey: ['admin-analytics-engagement'],
+    queryFn: () => adminApi.analyticsEngagement().then((r) => r.data),
+  })
+
+  const { data: financial } = useQuery({
+    queryKey: ['admin-analytics-financial'],
+    queryFn: () => adminApi.analyticsFinancial().then((r) => r.data),
+  })
+
+  const roleItems = useMemo(() => {
+    const labels = summary?.members_by_role?.labels ?? []
+    const data = summary?.members_by_role?.data ?? []
+    return labels.map((label: string, idx: number) => ({
+      label,
+      value: Number(data[idx] ?? 0),
+    }))
+  }, [summary])
+
+  const growthPoints = summary?.member_growth?.data ?? []
+  const growthLabels = summary?.member_growth?.labels ?? []
+  const maxGrowth = Math.max(1, ...growthPoints)
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-        <BarChart3 size={22} className="text-pitch-500" /> Analyse
-      </h1>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+          <BarChart3 size={22} className="text-pitch-500" /> Analyse
+        </h1>
+        <div className="flex gap-2">
+          {[30, 90, 365].map((d) => (
+            <button
+              key={d}
+              className={`px-3 py-1.5 rounded-lg text-sm ${period === d ? 'bg-pitch-600 text-white' : 'bg-gray-800 text-gray-300'}`}
+              onClick={() => setPeriod(d as Period)}
+            >
+              {d}j
+            </button>
+          ))}
+        </div>
+      </div>
 
       {isLoading && <p className="text-gray-400">Chargement de l'analyse...</p>}
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         {[
-          { label: 'Membres', value: data?.total_members ?? '—', icon: <Users size={22} className="text-blue-400" /> },
-          { label: 'Joueurs actifs', value: data?.active_players ?? '—', icon: <TrendingUp size={22} className="text-pitch-400" /> },
-          { label: 'Matchs joués', value: data?.matches_played ?? '—', icon: <Shield size={22} className="text-purple-400" /> },
+          { label: 'Membres totaux', value: summary?.engagement?.total ?? 0, icon: <Users size={20} className="text-blue-400" /> },
+          { label: 'Actifs (30j)', value: `${summary?.engagement?.active_pct ?? 0}%`, icon: <TrendingUp size={20} className="text-pitch-400" /> },
+          { label: 'Rétention (3 mois)', value: `${retention?.retention_rate_3m ?? 0}%`, icon: <Shield size={20} className="text-yellow-400" /> },
+          { label: 'MRR', value: `€${financial?.mrr ?? 0}`, icon: <Euro size={20} className="text-green-400" /> },
         ].map((s) => (
           <div key={s.label} className="stat-card">
             {s.icon}
@@ -45,51 +84,92 @@ export default function Analytics() {
         ))}
       </div>
 
-      {sections.map((section) => (
-        section.items && (
-          <div key={section.label} className="card space-y-4">
-            <h2 className="font-semibold text-white flex items-center gap-2">
-              {section.icon} {section.label}
-            </h2>
-            <div className="space-y-2">
-              {Object.entries(section.items as Record<string, number>).map(([key, val]) => {
-                const max = Math.max(...Object.values(section.items as Record<string, number>))
-                const pct = max > 0 ? (val / max) * 100 : 0
-                return (
-                  <div key={key} className="space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-300 capitalize">{key.replace(/_/g, ' ')}</span>
-                      <span className="text-gray-400 font-medium">{val}</span>
-                    </div>
-                    <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-pitch-600 rounded-full transition-all duration-500"
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  </div>
-                )
-              })}
+      <div className="card space-y-4">
+        <h2 className="font-semibold text-white">Croissance des membres ({period} jours)</h2>
+        <div className="space-y-2 max-h-72 overflow-auto pr-1">
+          {growthPoints.map((val: number, idx: number) => (
+            <div key={`${growthLabels[idx]}-${idx}`} className="space-y-1">
+              <div className="flex justify-between text-xs">
+                <span className="text-gray-400">{growthLabels[idx]}</span>
+                <span className="text-gray-300">{val}</span>
+              </div>
+              <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(val / maxGrowth) * 100}%` }} />
+              </div>
             </div>
-          </div>
-        )
-      ))}
+          ))}
+          {growthPoints.length === 0 && <p className="text-sm text-gray-500">Pas de données sur la période.</p>}
+        </div>
+      </div>
 
-      {data?.engagement && (
+      <div className="grid gap-4 lg:grid-cols-2">
         <div className="card space-y-4">
-          <h2 className="font-semibold text-white flex items-center gap-2">
-            <TrendingUp size={18} className="text-yellow-400" /> Engagement
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {Object.entries(data.engagement as Record<string, number>).map(([key, val]) => (
-              <div key={key} className="text-center">
-                <p className="text-xl sm:text-2xl font-bold text-white">{val}</p>
-                <p className="text-xs text-gray-400 capitalize mt-1">{key.replace(/_/g, ' ')}</p>
+          <h2 className="font-semibold text-white">Membres par rôle</h2>
+          <div className="space-y-2">
+            {roleItems.map((item: { label: string; value: number }) => {
+              const max = Math.max(1, ...roleItems.map((r: { label: string; value: number }) => r.value))
+              const pct = (item.value / max) * 100
+              return (
+                <div key={item.label} className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-300 capitalize">{item.label}</span>
+                    <span className="text-gray-400">{item.value}</span>
+                  </div>
+                  <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-pitch-600 rounded-full" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              )
+            })}
+            {roleItems.length === 0 && <p className="text-sm text-gray-500">Aucune donnée.</p>}
+          </div>
+        </div>
+
+        <div className="card space-y-4">
+          <h2 className="font-semibold text-white">Usage des fonctionnalités</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {Object.entries((engagement ?? {}) as Record<string, number>).map(([key, value]) => (
+              <div key={key} className="bg-gray-800 rounded-lg p-3">
+                <p className="text-lg font-bold text-white">{value}</p>
+                <p className="text-xs text-gray-400 capitalize">{key.replace(/_/g, ' ')}</p>
               </div>
             ))}
           </div>
         </div>
-      )}
+      </div>
+
+      <div className="card space-y-4">
+        <h2 className="font-semibold text-white">Performance des équipes</h2>
+        <div className="overflow-auto rounded-lg border border-gray-800">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-800 text-gray-400">
+              <tr>
+                <th className="px-3 py-2 text-left">Équipe</th>
+                <th className="px-3 py-2 text-center">V</th>
+                <th className="px-3 py-2 text-center">N</th>
+                <th className="px-3 py-2 text-center">D</th>
+                <th className="px-3 py-2 text-right">Assiduité</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(teamPerformance ?? []).map((row: { team_name: string; wins: number; draws: number; losses: number; attendance_rate: number }) => (
+                <tr key={row.team_name} className="border-t border-gray-800">
+                  <td className="px-3 py-2 text-white">{row.team_name}</td>
+                  <td className="px-3 py-2 text-center text-green-400">{row.wins}</td>
+                  <td className="px-3 py-2 text-center text-yellow-400">{row.draws}</td>
+                  <td className="px-3 py-2 text-center text-red-400">{row.losses}</td>
+                  <td className="px-3 py-2 text-right text-gray-300">{row.attendance_rate}%</td>
+                </tr>
+              ))}
+              {(teamPerformance ?? []).length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-3 py-6 text-center text-gray-500">Aucune donnée équipe.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   )
 }

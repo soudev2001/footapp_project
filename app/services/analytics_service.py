@@ -157,18 +157,18 @@ class AnalyticsService:
             })
         return result
 
-    def get_member_retention(self, club_id):
+    def get_member_retention(self, club_id, days=90):
         """Return retention and churn metrics."""
         now = datetime.utcnow()
         total = self.users.count_documents({'club_id': ObjectId(club_id)})
-        three_months_ago = now - timedelta(days=90)
+        period_start = now - timedelta(days=days)
         new_3m = self.users.count_documents({
             'club_id': ObjectId(club_id),
-            'created_at': {'$gte': three_months_ago}
+            'created_at': {'$gte': period_start}
         })
         still_active_3m = self.users.count_documents({
             'club_id': ObjectId(club_id),
-            'created_at': {'$gte': three_months_ago},
+            'created_at': {'$gte': period_start},
             'last_login': {'$gte': now - timedelta(days=30)}
         })
         retention_3m = round((still_active_3m / new_3m * 100) if new_3m else 0, 1)

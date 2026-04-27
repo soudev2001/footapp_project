@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { adminApi } from '../../api'
 import {
   Mail, Send, Plus, FileText, Inbox, Settings as SettingsIcon,
   CheckCircle2, AlertCircle, Copy, Edit2, Trash2, Eye, Server,
@@ -226,13 +228,27 @@ function Kpi({
 
 // ─── Campaigns ───────────────────────────────────────────────────────────────
 function CampaignsTab({ onNotify }: { onNotify: (m: string) => void }) {
-  const [campaigns, setCampaigns] = useState(CAMPAIGNS)
+  const qc = useQueryClient()
+  const { data } = useQuery({
+    queryKey: ['admin-email-campaigns'],
+    queryFn: () => adminApi.emailCampaigns().then((r) => r.data),
+  })
+  const campaigns = (data?.length ? data : CAMPAIGNS) as Campaign[]
+
+  const createMutation = useMutation({
+    mutationFn: (payload: Campaign) => adminApi.createEmailCampaign(payload),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ['admin-email-campaigns'] })
+      setComposerOpen(false)
+      const saved = res.data
+      onNotify(saved?.status === 'scheduled' ? 'Campagne planifiée.' : 'Campagne envoyée.')
+    },
+  })
+
   const [composerOpen, setComposerOpen] = useState(false)
 
   const handleCreate = (c: Campaign) => {
-    setCampaigns((prev) => [c, ...prev])
-    setComposerOpen(false)
-    onNotify(c.status === 'scheduled' ? 'Campagne planifi\u00e9e.' : 'Campagne envoy\u00e9e.')
+    createMutation.mutate(c)
   }
 
   return (

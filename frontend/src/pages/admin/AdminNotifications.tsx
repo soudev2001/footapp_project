@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { adminApi } from '../../api'
 import {
   Bell, Send, Plus, CheckCircle, Clock, AlertTriangle, Info,
   Smartphone, Mail, MessageSquare, Users, History, X, Calendar as CalIcon,
@@ -83,10 +85,27 @@ const MOCK: NotificationItem[] = [
 ]
 
 export default function AdminNotifications() {
-  const [items, setItems] = useState<NotificationItem[]>(MOCK)
+  const qc = useQueryClient()
+  const { data: itemsData } = useQuery({
+    queryKey: ['admin-notifications'],
+    queryFn: () => adminApi.notifications().then((r) => r.data),
+  })
   const [tab, setTab] = useState<'all' | Status>('all')
   const [composerOpen, setComposerOpen] = useState(false)
   const [toast, setToast] = useState('')
+
+  const createMutation = useMutation({
+    mutationFn: (data: NotificationItem) => adminApi.createNotification(data),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ['admin-notifications'] })
+      const saved = res.data
+      setComposerOpen(false)
+      setToast(saved?.status === 'scheduled' ? 'Notification planifiée.' : 'Notification envoyée.')
+      setTimeout(() => setToast(''), 2500)
+    },
+  })
+
+  const items: NotificationItem[] = (itemsData?.length ? itemsData : MOCK) as NotificationItem[]
 
   const filtered = tab === 'all' ? items : items.filter((i) => i.status === tab)
 
@@ -97,12 +116,7 @@ export default function AdminNotifications() {
     reach: items.reduce((sum, i) => sum + (i.reach ?? 0), 0),
   }
 
-  const handleCreate = (data: NotificationItem) => {
-    setItems((prev) => [data, ...prev])
-    setComposerOpen(false)
-    setToast(data.status === 'scheduled' ? 'Notification planifi\u00e9e.' : 'Notification envoy\u00e9e.')
-    setTimeout(() => setToast(''), 2500)
-  }
+  const handleCreate = (data: NotificationItem) => createMutation.mutate(data)
 
   return (
     <div className="space-y-6">

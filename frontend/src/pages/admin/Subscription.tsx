@@ -1,18 +1,29 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { adminApi } from '../../api'
 import { CreditCard, CheckCircle } from 'lucide-react'
 
 const PLANS = [
-  { name: 'Starter', price: '29€/mois', players: 30, teams: 2, features: ['Analyse basique', 'Gestion des membres', 'Calendrier'] },
-  { name: 'Pro', price: '79€/mois', players: 100, teams: 10, features: ['Analyse avancée', 'Recrutement', 'Centre de match', 'Boutique'] },
-  { name: 'Club', price: '199€/mois', players: 'Illimité', teams: 'Illimité', features: ['Toutes les fonctionnalités Pro', 'Accès API', 'Support prioritaire', 'Marque personnalisée'] },
+  { id: 'club_standard', name: 'Club Standard', price: '29€/mois', players: 30, teams: 2, features: ['Analyse basique', 'Gestion des membres', 'Calendrier'] },
+  { id: 'pack_pro', name: 'Pack Pro', price: '49€/mois', players: 100, teams: 10, features: ['Analyse avancée', 'Recrutement', 'Centre de match', 'Boutique'] },
+  { id: 'pass_elite', name: 'Pass Elite', price: '99€/mois', players: 'Illimité', teams: 'Illimité', features: ['Toutes les fonctionnalités Pro', 'Accès API', 'Support prioritaire', 'Marque personnalisée'] },
 ]
 
 export default function Subscription() {
+  const qc = useQueryClient()
   const { data, isLoading } = useQuery({
     queryKey: ['admin-subscription'],
     queryFn: () => adminApi.subscription().then((r) => r.data),
   })
+
+  const updateMutation = useMutation({
+    mutationFn: (planId: string) => adminApi.updateSubscription(planId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-subscription'] })
+      qc.invalidateQueries({ queryKey: ['admin-billing-dashboard'] })
+    },
+  })
+
+  const currentPlan = data?.plan_id ?? data?.plan ?? ''
 
   return (
     <div className="space-y-6">
@@ -26,7 +37,7 @@ export default function Subscription() {
         <div className="card border-pitch-800 space-y-2">
           <p className="text-sm text-gray-400">Plan actuel</p>
           <div className="flex items-center gap-3">
-            <p className="text-xl sm:text-2xl font-bold text-white capitalize">{data.plan ?? 'Gratuit'}</p>
+            <p className="text-xl sm:text-2xl font-bold text-white capitalize">{currentPlan || 'Gratuit'}</p>
             <span className="badge bg-pitch-900 text-pitch-300">Actif</span>
           </div>
           {data.renewal_date && (
@@ -37,10 +48,10 @@ export default function Subscription() {
 
       <div className="grid gap-4 md:grid-cols-3">
         {PLANS.map((plan) => {
-          const isCurrent = data?.plan?.toLowerCase() === plan.name.toLowerCase()
+          const isCurrent = currentPlan === plan.id
           return (
             <div
-              key={plan.name}
+              key={plan.id}
               className={`card space-y-4 ${isCurrent ? 'border-pitch-600 ring-1 ring-pitch-600' : ''}`}
             >
               {isCurrent && (
@@ -63,8 +74,12 @@ export default function Subscription() {
                 ))}
               </ul>
               {!isCurrent && (
-                <button className="btn-primary w-full justify-center">
-                  Passer à {plan.name}
+                <button
+                  className="btn-primary w-full justify-center"
+                  onClick={() => updateMutation.mutate(plan.id)}
+                  disabled={updateMutation.isPending}
+                >
+                  {updateMutation.isPending ? 'Mise à jour...' : `Passer à ${plan.name}`}
                 </button>
               )}
             </div>

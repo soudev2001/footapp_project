@@ -6,7 +6,7 @@
 import jwt
 import os
 import datetime
-from flask import Blueprint, jsonify, request, current_app, render_template, url_for
+from flask import Blueprint, jsonify, request, current_app, render_template, url_for, make_response
 from app.models import serialize_doc, serialize_docs
 from app.services import (
     get_player_service, get_club_service, get_event_service,
@@ -15,6 +15,7 @@ from app.services import (
     get_shop_service, get_project_service, get_parent_link_service,
     get_subscription_service, get_isy_service,
     get_analytics_service, get_member_onboarding_service, get_billing_service,
+    get_announcement_service,
     get_platform_management_service, get_platform_analytics_service,
     get_parent_monitoring_service, get_fan_engagement_service, get_media_service,
 )
@@ -2423,14 +2424,20 @@ def admin_onboarding():
 @api_bp.route('/admin/analytics', methods=['GET'])
 @role_required('admin')
 def admin_analytics():
-    """Get club analytics."""
+    """Get analytics dashboard summary."""
     club_id = request.current_user.get('club_id')
     if not club_id:
         return jsonify({'success': True, 'data': {}})
-    from app.services import get_club_service
-    club_service = get_club_service()
-    stats = club_service.get_stats(club_id)
-    return jsonify({'success': True, 'data': stats})
+
+    days = request.args.get('days', default=90, type=int)
+    if days not in (30, 90, 365):
+        days = 90
+
+    svc = get_analytics_service()
+    summary = svc.get_dashboard_summary(club_id)
+    # Override growth window according to UI filter.
+    summary['member_growth'] = svc.get_member_growth(club_id, days=days)
+    return jsonify({'success': True, 'data': summary})
 
 
 @api_bp.route('/admin/subscription', methods=['GET'])
@@ -2456,6 +2463,241 @@ def admin_update_subscription():
     sub_service = get_subscription_service()
     sub_service.update_subscription(club_id, data['plan'])
     return jsonify({'success': True, 'message': 'Subscription updated'})
+
+
+@api_bp.route('/admin/announcements', methods=['GET'])
+@role_required('admin')
+def admin_announcements():
+    """Get announcement history for the admin's club."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': []})
+
+    svc = get_announcement_service()
+    rows = svc.get_announcements(club_id)
+
+    # Keep API payload aligned with frontend keys.
+    payload = []
+    for row in rows:
+        target_roles = [row.get('target_id')] if row.get('target_type') == 'role' and row.get('target_id') else []
+        payload.append({
+            '_id': row.get('_id'),
+            'title': row.get('subject', ''),
+            'content': row.get('body', ''),
+            'created_at': row.get('sent_at'),
+            'target_roles': target_roles,
+            'target_type': row.get('target_type', 'all'),
+            'target_label': row.get('target_label', ''),
+            'recipient_count': row.get('recipient_count', 0),
+            'failed_count': row.get('failed_count', 0),
+        })
+
+    return jsonify({'success': True, 'data': serialize_docs(payload)})
+
+
+@api_bp.route('/admin/announcement', methods=['POST'])
+@role_required('admin')
+def admin_create_announcement():
+    """Create and send an announcement from frontend admin page."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'No club'}), 400
+
+    data = request.get_json() or {}
+    title = (data.get('title') or '').strip()
+    content = (data.get('content') or '').strip()
+    roles = data.get('target_roles') or []
+
+    if not title or not content:
+        return jsonify({'success': False, 'error': 'title and content required'}), 400
+
+    svc = get_announcement_service()
+    sender_id = request.current_user.get('user_id')
+
+    results = []
+    if roles:
+        for role in roles:
+            results.append(
+                svc.send_announcement(club_id, title, content, 'role', role, sender_id)
+            )
+    else:
+        results.append(
+            svc.send_announcement(club_id, title, content, 'all', '', sender_id)
+        )
+
+    total_sent = sum(r.get('recipient_count', 0) for r in results)
+    total_failed = sum(r.get('failed_count', 0) for r in results)
+
+    return jsonify({
+        'success': True,
+        'data': {
+            'sent_count': total_sent,
+            'failed_count': total_failed,
+            'batches': len(results),
+        }
+    }), 201
+
+
+@api_bp.route('/admin/email/campaigns', methods=['GET'])
+@role_required('admin')
+def admin_email_campaigns():
+    """List email campaigns for the admin club."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': []})
+
+    raw = list(
+        mongo.db.email_campaigns.find({'club_id': ObjectId(club_id)})
+        .sort('created_at', -1)
+        .limit(100)
+    )
+    return jsonify({'success': True, 'data': serialize_docs(raw)})
+
+
+@api_bp.route('/admin/email/campaigns', methods=['POST'])
+@role_required('admin')
+def admin_create_email_campaign():
+    """Create and optionally send an email campaign."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'No club'}), 400
+
+    data = request.get_json() or {}
+    name = (data.get('name') or '').strip()
+    subject = (data.get('subject') or '').strip()
+    audience = (data.get('audience') or 'Tous les membres').strip()
+    status = data.get('status') or 'sent'
+    scheduled_for = data.get('scheduledFor')
+
+    if not name or not subject:
+        return jsonify({'success': False, 'error': 'name and subject required'}), 400
+
+    target_type = 'all'
+    target_id = ''
+    audience_lower = audience.lower()
+    if 'joueur' in audience_lower:
+        target_type, target_id = 'role', 'player'
+    elif 'parent' in audience_lower:
+        target_type, target_id = 'role', 'parent'
+    elif 'coach' in audience_lower:
+        target_type, target_id = 'role', 'coach'
+    elif 'supporter' in audience_lower or 'fan' in audience_lower:
+        target_type, target_id = 'role', 'fan'
+    elif 'admin' in audience_lower:
+        target_type, target_id = 'role', 'admin'
+
+    recipients = 0
+    if status == 'sent':
+        announcement_service = get_announcement_service()
+        result = announcement_service.send_announcement(
+            club_id,
+            subject,
+            data.get('body', '') or subject,
+            target_type,
+            target_id,
+            request.current_user.get('user_id')
+        )
+        recipients = result.get('recipient_count', 0)
+
+    doc = {
+        'club_id': ObjectId(club_id),
+        'name': name,
+        'subject': subject,
+        'audience': audience,
+        'recipients': recipients,
+        'status': status,
+        'opens': 0,
+        'clicks': 0,
+        'bounces': 0,
+        'scheduledFor': scheduled_for,
+        'sentAt': datetime.datetime.utcnow() if status == 'sent' else None,
+        'created_at': datetime.datetime.utcnow(),
+    }
+    inserted = mongo.db.email_campaigns.insert_one(doc)
+    doc['_id'] = inserted.inserted_id
+    return jsonify({'success': True, 'data': serialize_doc(doc)}), 201
+
+
+@api_bp.route('/admin/notifications', methods=['GET'])
+@role_required('admin')
+def admin_notifications():
+    """List admin broadcast notifications for the club."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': True, 'data': []})
+
+    raw = list(
+        mongo.db.admin_notifications.find({'club_id': ObjectId(club_id)})
+        .sort('created_at', -1)
+        .limit(100)
+    )
+    return jsonify({'success': True, 'data': serialize_docs(raw)})
+
+
+@api_bp.route('/admin/notifications', methods=['POST'])
+@role_required('admin')
+def admin_create_notification():
+    """Create a broadcast notification and fan out in-app messages."""
+    club_id = request.current_user.get('club_id')
+    if not club_id:
+        return jsonify({'success': False, 'error': 'No club'}), 400
+
+    data = request.get_json() or {}
+    title = (data.get('title') or '').strip()
+    message = (data.get('message') or '').strip()
+    audience = data.get('audience') or []
+    channels = data.get('channels') or ['inapp']
+    priority = data.get('priority') or 'normal'
+    status = data.get('status') or 'sent'
+    scheduled_for = data.get('scheduledFor')
+
+    if not title or not message:
+        return jsonify({'success': False, 'error': 'title and message required'}), 400
+
+    if not isinstance(audience, list):
+        return jsonify({'success': False, 'error': 'audience must be an array'}), 400
+    if not isinstance(channels, list):
+        return jsonify({'success': False, 'error': 'channels must be an array'}), 400
+
+    reach = 0
+    if status == 'sent':
+        user_service = get_user_service()
+        notification_service = get_notification_service()
+        members = user_service.get_members_by_club(club_id)
+        recipients = [
+            m for m in members
+            if m.get('account_status') == 'active' and (not audience or m.get('role') in audience)
+        ]
+        for recipient in recipients:
+            try:
+                notification_service.create_notification(
+                    str(recipient.get('_id')),
+                    title,
+                    message,
+                    type=priority,
+                )
+                reach += 1
+            except Exception as exc:
+                current_app.logger.warning("admin notification fanout failed: %s", exc)
+
+    doc = {
+        'club_id': ObjectId(club_id),
+        'title': title,
+        'message': message,
+        'audience': audience,
+        'channels': channels,
+        'priority': priority,
+        'status': status,
+        'scheduledFor': scheduled_for,
+        'sentAt': datetime.datetime.utcnow() if status == 'sent' else None,
+        'reach': reach,
+        'opens': 0,
+        'created_at': datetime.datetime.utcnow(),
+    }
+    inserted = mongo.db.admin_notifications.insert_one(doc)
+    doc['_id'] = inserted.inserted_id
+
+    return jsonify({'success': True, 'data': serialize_doc(doc)}), 201
 
 
 # ============================================================
@@ -2533,8 +2775,11 @@ def admin_analytics_teams():
 def admin_analytics_retention():
     """Get member retention metrics."""
     club_id = request.current_user.get('club_id')
+    days = request.args.get('days', default=90, type=int)
+    if days not in (30, 90, 365):
+        days = 90
     svc = get_analytics_service()
-    return jsonify({'success': True, 'data': svc.get_member_retention(club_id)})
+    return jsonify({'success': True, 'data': svc.get_member_retention(club_id, days=days)})
 
 
 @api_bp.route('/admin/analytics/engagement', methods=['GET'])
@@ -2575,6 +2820,21 @@ def admin_billing_invoices():
     club_id = request.current_user.get('club_id')
     svc = get_billing_service()
     return jsonify({'success': True, 'data': svc.get_invoices(club_id)})
+
+
+@api_bp.route('/admin/billing/invoices/<invoice_id>/pdf', methods=['GET'])
+@role_required('admin')
+def admin_billing_invoice_pdf(invoice_id):
+    """Download a PDF version of an invoice."""
+    svc = get_billing_service()
+    pdf_bytes = svc.generate_invoice_pdf(invoice_id)
+    if not pdf_bytes:
+        return jsonify({'success': False, 'error': 'Invoice not found or PDF unavailable'}), 404
+
+    response = make_response(pdf_bytes)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename=invoice-{invoice_id}.pdf'
+    return response
 
 
 # ============================================================
