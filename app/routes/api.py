@@ -4638,26 +4638,3 @@ def match_fixtures(club_id):
         'status': {'$ne': 'completed'}
     }).sort('date', 1).limit(10))
     return jsonify({'success': True, 'data': serialize_docs(matches)})
-
-@api_bp.route('/matches/<match_id>/stats', methods=['GET'])
-def match_stats(match_id):
-    """Get match statistics (public)."""
-    match = mongo.db.matches.find_one({'_id': ObjectId(match_id)})
-    if not match:
-        return jsonify({'success': False, 'error': 'Match not found'}), 404
-    stats = match.get('stats', {
-        'possession_home': 50, 'possession_away': 50,
-        'shots_home': 0, 'shots_away': 0,
-        'corners_home': 0, 'corners_away': 0,
-    })
-    return jsonify({'success': True, 'data': stats})
-
-
-@api_bp.route('/matches/fixtures/<club_id>', methods=['GET'])
-def match_fixtures(club_id):
-    """Get upcoming fixtures (public)."""
-    matches = list(mongo.db.matches.find({
-        'club_id': ObjectId(club_id),
-        'status': {'$ne': 'completed'}
-    }).sort('date', 1).limit(10))
-    return jsonify({'success': True, 'data': serialize_docs(matches)})
