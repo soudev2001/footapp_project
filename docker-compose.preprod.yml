@@ -29,6 +29,8 @@ services:
       - FLASK_ENV=development
       - MAIL_USERNAME=${MAIL_USERNAME:-}
       - MAIL_PASSWORD=${MAIL_PASSWORD:-}
+    volumes:
+      - uploads_preprod:/app/static/uploads
     networks:
       - default
       - root_default
@@ -40,7 +42,7 @@ services:
       start_period: 60s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.footapp-preprod.rule=Host(`preprod.takurte.fr`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.footapp-preprod.rule=Host(`preprod.takurte.fr`) && (PathPrefix(`/api`) || PathPrefix(`/auth`) || PathPrefix(`/static`))"
       - "traefik.http.routers.footapp-preprod.entrypoints=websecure"
       - "traefik.http.routers.footapp-preprod.tls=true"
       - "traefik.http.routers.footapp-preprod.tls.certresolver=mytlschallenge"
@@ -68,6 +70,7 @@ services:
 
 volumes:
   mongodb_data_preprod:
+  uploads_preprod:
 
 networks:
   root_default:
